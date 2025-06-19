@@ -215,9 +215,9 @@ static long long evalOffset(psi_timezone ptz, time_t time, bool valid) {
       offset = strtol(offstr, &err, 0);
       if (err != 0 && *err != '\0') {
         offset = 0;
-      } else {
-        flg = true;
       }
+    } else {
+      flg = true;
     }
   }
 
@@ -227,6 +227,7 @@ static long long evalOffset(psi_timezone ptz, time_t time, bool valid) {
   if (flg) {
     struct tm *tm = localtime(&time);
     offset -= tm->tm_gmtoff; // Subtract out local timezone
+    offset += 3600 * tm->tm_isdst * 2;
     offset *= 1000000;       // Turn it into microseconds
   }
 
