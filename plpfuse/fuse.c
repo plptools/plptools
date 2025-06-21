@@ -20,9 +20,10 @@
 #include <syslog.h>
 #ifdef HAVE_ATTR_XATTR_H
 #include <attr/xattr.h>
-#else
+#elif defined(HAVE_SYS_XATTR_H)
 #include <sys/xattr.h>
 #endif
+
 #ifndef ENOATTR
 #define ENOATTR ENODATA
 #endif
@@ -453,8 +454,10 @@ static int plp_setxattr(const char *path, const char *name, const char *value, s
     long psisattr, psidattr;
     char oxattr[XATTR_MAXLEN + 1], nxattr[XATTR_MAXLEN + 1];
 
+    #ifdef XATTR_CREATE
     if (flags & XATTR_CREATE)
       return -EEXIST;
+    #endif
 
     strncpy(nxattr, value, size < XATTR_MAXLEN ? size : XATTR_MAXLEN);
     nxattr[XATTR_MAXLEN] = '\0';
@@ -473,9 +476,11 @@ static int plp_setxattr(const char *path, const char *name, const char *value, s
     debuglog("setxattr succeeded");
     return 0;
   } else {
+    #ifdef XATTR_REPLACE
     if (flags & XATTR_REPLACE)
       return -ENOATTR;
     else
+    #endif
       return -ENOTSUP;
   }
 }
