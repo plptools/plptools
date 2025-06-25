@@ -269,7 +269,7 @@ ps_bitmap(FILE *f, unsigned long llx, unsigned long lly, unsigned long urx,
     bufferStore out;
     int width, height;
     if (decodeBitmap((const unsigned char *)buf, width, height, out)) {
-        fprintf(f, "%ld %ld %ld %ld %d %d I\n", llx, lly, urx, ury, width, height);
+        fprintf(f, "%lu %lu %lu %lu %d %d I\n", llx, lly, urx, ury, width, height);
         const unsigned char *p = (const unsigned char *)out.getString(0);
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++)
@@ -532,9 +532,9 @@ convertPage(FILE *f, int page, bool last, bufferStore buf)
                 break;
             case 0x0f: {
                 // Pen thickness x, y
-                fprintf(f, "%% @%d: Pen thickness %d %d\n", i, buf.getDWord(i+1),
+                fprintf(f, "%% @%d: Pen thickness %u %u\n", i, buf.getDWord(i+1),
                          buf.getDWord(i+5));
-                fprintf(f, "%d %d TH\n", buf.getDWord(i+1), buf.getDWord(i+5));
+                fprintf(f, "%u %u TH\n", buf.getDWord(i+1), buf.getDWord(i+5));
                 i += 9;
             }
                 break;
@@ -586,17 +586,17 @@ convertPage(FILE *f, int page, bool last, bufferStore buf)
                 break;
             case 0x17: {
                 // ???
-                fprintf(f, "%% @%d: U17 %d %d\n", i, buf.getDWord(i+1),
+                fprintf(f, "%% @%d: U17 %u %u\n", i, buf.getDWord(i+1),
                          buf.getDWord(i+5));
                 i += 9;
             }
                 break;
             case 0x19: {
                 // Draw line
-                fprintf(f, "%% @%d: Line %d %d %d %d\n", i,
+                fprintf(f, "%% @%d: Line %u %u %u %u\n", i,
                         buf.getDWord(i+1), buf.getDWord(i+5),
                         buf.getDWord(i+9), buf.getDWord(i+13));
-                fprintf(f, "%d %d %d %d L\n",
+                fprintf(f, "%u %u %u %u L\n",
                         buf.getDWord(i+1), buf.getDWord(i+5),
                         buf.getDWord(i+9), buf.getDWord(i+13));
                 i += 17;
@@ -604,17 +604,17 @@ convertPage(FILE *f, int page, bool last, bufferStore buf)
                 break;
             case 0x1b: {
                 // ???
-                fprintf(f, "%% @%d: U1b %d %d\n", i, buf.getDWord(i+1),
+                fprintf(f, "%% @%d: U1b %u %u\n", i, buf.getDWord(i+1),
                          buf.getDWord(i+5));
                 i += 9;
             }
                 break;
             case 0x1f: {
                 // Draw ellipse
-                fprintf(f, "%% @%d: Ellipse %d %d %d %d\n", i,
+                fprintf(f, "%% @%d: Ellipse %u %u %u %u\n", i,
                         buf.getDWord(i+1), buf.getDWord(i+5),
                         buf.getDWord(i+9), buf.getDWord(i+13));
-                fprintf(f, "%d %d %d %d E\n",
+                fprintf(f, "%u %u %u %u E\n",
                         buf.getDWord(i+1), buf.getDWord(i+5),
                         buf.getDWord(i+9), buf.getDWord(i+13));
                 i += 17;
@@ -622,10 +622,10 @@ convertPage(FILE *f, int page, bool last, bufferStore buf)
                 break;
             case 0x20: {
                 // Draw rectangle
-                fprintf(f, "%% @%d: Rectangle %d %d %d %d\n", i,
+                fprintf(f, "%% @%d: Rectangle %u %u %u %u\n", i,
                         buf.getDWord(i+1), buf.getDWord(i+5),
                         buf.getDWord(i+9), buf.getDWord(i+13));
-                fprintf(f, "%d %d %d %d R\n",
+                fprintf(f, "%u %u %u %u R\n",
                         buf.getDWord(i+1), buf.getDWord(i+5),
                         buf.getDWord(i+9), buf.getDWord(i+13));
                 i += 17;
