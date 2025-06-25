@@ -314,7 +314,7 @@ convertPage(FILE *f, int page, bool last, bufferStore buf)
             "%%EndComments\n"
             "%%BeginProlog\n", f);
         char pbuf[1024];
-        FILE *pf = fopen(PKGDATADIR "/prolog.ps", "r");
+        FILE *pf = fopen(PKGDATADIR PSDICT, "r");
         while (fgets(pbuf, sizeof(pbuf), pf))
             fputs(pbuf, f);
         fclose(pf);
