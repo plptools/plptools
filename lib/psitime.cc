@@ -137,11 +137,11 @@ psi_timeval &PsiTime::getPsiTimeval(void) {
     return ptv;
 }
 
-const uint32_t PsiTime::getPsiTimeLo(void) {
+uint32_t PsiTime::getPsiTimeLo(void) {
     return ptv.tv_low;
 }
 
-const uint32_t PsiTime::getPsiTimeHi(void) {
+uint32_t PsiTime::getPsiTimeHi(void) {
     return ptv.tv_high;
 }
 

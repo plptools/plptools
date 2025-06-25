@@ -130,7 +130,7 @@ public:
     * @param _utv A Unix time value for initialization.
     * @param _utz A Unix timezone for initialization.
     */
-    PsiTime(struct timeval *_utv, struct timezone *_utz = 0L);
+    PsiTime(struct timeval *_utv, struct timezone *_utz = nullptr);
 
     /**
     * Contructs a new instance.
@@ -145,7 +145,7 @@ public:
     * @param _ptv A Psion time value for initialization.
     * @param _ptz A Psion timezone for initialization.
     */
-    PsiTime(psi_timeval *_ptv, psi_timezone *_ptz = 0L);
+    PsiTime(psi_timeval *_ptv, psi_timezone *_ptz = nullptr);
 
     /**
     * Contructs a new instance.
@@ -258,7 +258,7 @@ public:
     * @returns The instance's current time as lower 32 bits of
     * a Psion struct psi_timeval_t.
     */
-    const uint32_t getPsiTimeLo(void);
+    uint32_t getPsiTimeLo(void);
 
     /**
     * Retrieves the instance's current value
@@ -267,7 +267,7 @@ public:
     * @returns The instance's current time as upper 32 bits of
     * a Psion struct psi_timeval_t.
     */
-    const uint32_t getPsiTimeHi(void);
+    uint32_t getPsiTimeHi(void);
 
     /**
     * Prints the instance's value in human readable format.
