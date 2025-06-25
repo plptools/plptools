@@ -164,7 +164,6 @@ protected:
     * to E_PSI_FILE_DISC.
     *
     * @param cc The command to execute on the remote side.
-    * @param data Additional data for this command.
     *
     * @returns true on success, false on failure.
     */

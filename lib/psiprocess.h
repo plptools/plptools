@@ -44,7 +44,7 @@ public:
     * A copy constructor.
     * Mainly used by STL container classes.
     *
-    * @param d The object to be used as initializer.
+    * @param p The object to be used as initializer.
     */
     PsiProcess(const PsiProcess &p);
 
@@ -91,7 +91,7 @@ public:
     * Assignment operator
     * Mainly used by STL container classes.
     *
-    * @param e The new value to assign.
+    * @param p The new value to assign.
     *
     * @returns The modified object.
     */
