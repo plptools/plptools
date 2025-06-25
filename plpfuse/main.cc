@@ -349,11 +349,11 @@ help()
 }
 
 static struct option opts[] = {
-    {"help",       no_argument,       0, 'h'},
-    {"debug",      no_argument,       0, 'd'},
-    {"version",    no_argument,       0, 'V'},
-    {"port",       required_argument, 0, 'p'},
-    {NULL,       0,                 0,  0 }
+    {"help",       no_argument,       nullptr, 'h'},
+    {"debug",      no_argument,       nullptr, 'd'},
+    {"version",    no_argument,       nullptr, 'V'},
+    {"port",       required_argument, nullptr, 'p'},
+    {nullptr,      0,                 nullptr,  0 }
 };
 
 static void
@@ -377,7 +377,7 @@ parse_destination(const char *arg, const char **host, int *port)
 	// 10.0.0.1
 	if (strchr(argcpy, '.') || !isdigit(argcpy[0])) {
 	    *host = argcpy;
-	    pp = 0L;
+	    pp = nullptr;
 	} else
 	    pp = argcpy;
     }
@@ -413,7 +413,7 @@ int main(int argc, char**argv) {
 
     struct servent *se = getservbyname("psion", "tcp");
     endservent();
-    if (se != 0L)
+    if (se != nullptr)
 	sockNum = ntohs(se->s_port);
 
     /* N.B. Option handling is kludged. Most of the options are shared

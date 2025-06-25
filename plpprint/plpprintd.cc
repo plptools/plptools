@@ -907,14 +907,14 @@ usage() {
 }
 
 static struct option opts[] = {
-    {"debug",    no_argument,       0, 'd'},
-    {"help",     no_argument,       0, 'h'},
-    {"version",  no_argument,       0, 'V'},
-    {"verbose",  no_argument,       0, 'v'},
-    {"port",     required_argument, 0, 'p'},
-    {"spooldir", required_argument, 0, 's'},
-    {"printcmd", required_argument, 0, 'c'},
-    {NULL,       0,                 0,  0 }
+    {"debug",    no_argument,       nullptr, 'd'},
+    {"help",     no_argument,       nullptr, 'h'},
+    {"version",  no_argument,       nullptr, 'V'},
+    {"verbose",  no_argument,       nullptr, 'v'},
+    {"port",     required_argument, nullptr, 'p'},
+    {"spooldir", required_argument, nullptr, 's'},
+    {"printcmd", required_argument, nullptr, 'c'},
+    {nullptr,    0,                 nullptr,  0 }
 };
 
 static void
@@ -938,7 +938,7 @@ parse_destination(const char *arg, const char **host, int *port)
         // 10.0.0.1
         if (strchr(argcpy, '.') || !isdigit(argcpy[0])) {
             *host = argcpy;
-            pp = 0L;
+            pp = nullptr;
         } else
             pp = argcpy;
     }
@@ -958,7 +958,7 @@ main(int argc, char **argv)
 
     struct servent *se = getservbyname("psion", "tcp");
     endservent();
-    if (se != 0L)
+    if (se != nullptr)
         sockNum = ntohs(se->s_port);
 
     while (1) {
