@@ -55,7 +55,7 @@ checkAbortHash(void *, uint32_t)
 
 SISInstaller::SISInstaller()
 {
-        m_installed = 0;
+        m_installed = nullptr;
         m_ownInstalled = false;
 }
 
@@ -108,7 +108,7 @@ void
 SISInstaller::copyFile(SISFileRecord* fileRecord)
 {
         uint8_t* destptr = fileRecord->getDestPtr();
-        if (destptr == 0)
+        if (destptr == nullptr)
                 return;
         if (destptr[0] == '!')
                 {
@@ -130,7 +130,7 @@ SISInstaller::copyFile(SISFileRecord* fileRecord)
 
         char msgbuf[1024];
         sprintf(msgbuf,
-                        "Copying %d bytes to %s\n",
+                        "Copying %u bytes to %s\n",
                         fileRecord->m_fileLengths[m_fileNo], dest);
                         {
                         printf("%s\n", msgbuf);
@@ -190,7 +190,7 @@ SISInstaller::installFile(SISFileRecord* fileRecord)
 
                                 {
                                 printf("Info:\n%.*s\n",
-                                           fileRecord->m_fileLengths[m_fileNo],
+                                       (int) fileRecord->m_fileLengths[m_fileNo],
                                            fileRecord->getFilePtr(m_fileNo));
                                 switch (fileRecord->m_fileDetails)
                                         {
@@ -520,7 +520,7 @@ SISInstaller::run(SISFile* file, uint8_t* buf, off_t len, SISFile* parent)
         m_file->setFiles(nCopiedFiles);
         if (logLevel >= 1)
                 fprintf(stderr,
-                                "Installed %d files of %d, cutting at offset %d.\n",
+                                "Installed %d files of %d, cutting at offset %u.\n",
                                 m_file->m_header.m_installationFiles,
                                 m_file->m_header.m_nfiles,
                                 m_file->getResidualEnd());
@@ -557,8 +557,6 @@ SISInstaller::selectDrive()
         uint32_t devbits = 0;
         Enum<rfsv::errs> res;
         char drivelist[26];
-        int space[26];
-        int size[26];
         int ndrives = 0;
         if ((res = m_psion->devlist(devbits)) == rfsv::E_PSI_GEN_NONE)
                 {
@@ -572,8 +570,6 @@ SISInstaller::selectDrive()
                                 if ((mediaType == 3) || (mediaType == 5))
                                         {
                                         drivelist[ndrives] = 'A' + i;
-                                        space[ndrives] = plpdrive.getSpace();
-                                        size[ndrives] = plpdrive.getSize();
                                         printf("%c: %lud bytes free, %lud bytes total\n",
                                                'A' + i,
                                                plpdrive.getSpace(),
