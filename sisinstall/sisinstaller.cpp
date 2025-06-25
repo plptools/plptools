@@ -256,12 +256,12 @@ SISInstaller::installFile(SISFileRecord* fileRecord)
                 case 3:
                         if (logLevel >= 1)
                                 fprintf(stderr, "Run %.*s during installation/remove\n",
-                                                fileRecord->m_destLength, fileRecord->getDestPtr());
+                                        (int) fileRecord->m_destLength, fileRecord->getDestPtr());
                         break;
                 case 4:
                         if (logLevel >= 2)
                                 fprintf(stderr, "Running the app will create %.*s\n",
-                                                fileRecord->m_destLength, fileRecord->getDestPtr());
+                                        (int) fileRecord->m_destLength, fileRecord->getDestPtr());
                         break;
                 }
         return FILE_OK;

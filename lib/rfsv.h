@@ -33,7 +33,7 @@ typedef std::deque<class PlpDirent> PlpDir;
 class ppsocket;
 class PlpDrive;
 
-const int RFSV_SENDLEN = 2000;
+inline const int RFSV_SENDLEN = 2000;
 
 /**
  * Defines the callback procedure for
