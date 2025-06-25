@@ -19,8 +19,7 @@
 # along with this program; if not, see <https://www.gnu.org/licenses/>.
 
 AM_CPPFLAGS = -I$(top_srcdir)/libgnu -I$(top_builddir)/libgnu
-AM_CFLAGS = $(THREADED_CFLAGS)
-AM_CXXFLAGS = $(THREADED_CXXFLAGS)
+AM_CXXFLAGS = $(THREADED_CXXFLAGS) $(WARN_CXXFLAGS)
 LDADD = $(HOSTENT_LIB) $(LIBSOCKET)
 
 pkglib_LTLIBRARIES = libplp.la

@@ -3,7 +3,7 @@
 # This file is part of plptools.
 #
 # Copyright (C) 1999-2002 Fritz Elfert <felfert@to.com>
-# Copyright (C) 2007-2024 Reuben Thomas <rrt@sc3d.org>
+# Copyright (C) 2007-2025 Reuben Thomas <rrt@sc3d.org>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -40,14 +40,14 @@ LT_INIT
 
 dnl Extra warnings with GCC
 AC_ARG_ENABLE([gcc-warnings],
-  [AS_HELP_STRING([--enable-gcc-warnings],
-                  [turn on lots of GCC warnings (for developers)])],
+  [AS_HELP_STRING([--disable-gcc-warnings],
+                  [turn off lots of GCC warnings])],
   [case $enableval in
      yes|no) ;;
      *)      AC_MSG_ERROR([bad value $enableval for gcc-warnings option]) ;;
    esac
    gl_gcc_warnings=$enableval],
-  [gl_gcc_warnings=no]
+  [gl_gcc_warnings=yes]
 )
 if test "$gl_gcc_warnings" = yes; then
   dnl Set up the list of undesired warnings.
@@ -61,6 +61,16 @@ if test "$gl_gcc_warnings" = yes; then
   for w in $warnings; do
     gl_WARN_ADD([$w])
   done
+
+  AC_LANG_PUSH([C++])
+  gl_MANYWARN_ALL_GCC([cxx_warnings])
+
+  dnl Enable all G++ warnings not in this list.
+  gl_MANYWARN_COMPLEMENT([cxx_warnings], [$cxx_warnings], [$nw])
+  for w in $cxx_warnings; do
+    gl_WARN_ADD([$w])
+  done
+  AC_LANG_POP
 
   dnl Add an extra warning
   gl_WARN_ADD([-Wconversion])

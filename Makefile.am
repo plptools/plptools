@@ -3,7 +3,7 @@
 # This file is part of plptools.
 #
 # Copyright (C) 1999-2002 Fritz Elfert <felfert@to.com>
-# Copyright (C) 2007-2024 Reuben Thomas <rrt@sc3d.org>
+# Copyright (C) 2007-2025 Reuben Thomas <rrt@sc3d.org>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
