@@ -18,11 +18,20 @@
 #include <errno.h>
 #include <sys/time.h>
 #include <syslog.h>
-#ifdef HAVE_ATTR_XATTR_H
+#ifdef __FreeBSD__
+/*
+  The constants `XATTR_CREATE` and `XATTR_REPLACE` are both missing on FreeBSD
+  FreeBSD's replacement to `xattr`, `extattr` does not appear to have anything to replace this functionality
+  Since `xattr` is missing, it can't be imported on FreeBSD along with the missing constants.
+
+  https://github.com/plptools/plptools/pull/27
+*/
+#elif HAVE_ATTR_XATTR_H
 #include <attr/xattr.h>
 #else
 #include <sys/xattr.h>
 #endif
+
 #ifndef ENOATTR
 #define ENOATTR ENODATA
 #endif
@@ -453,8 +462,12 @@ static int plp_setxattr(const char *path, const char *name, const char *value, s
     long psisattr, psidattr;
     char oxattr[XATTR_MAXLEN + 1], nxattr[XATTR_MAXLEN + 1];
 
+    #ifdef __FreeBSD__
+    /* Since the flag constants (XATTR_CREATE, XATTR_REPLACE) do not exist on FreeBSD, this is skipped. */
+    #else
     if (flags & XATTR_CREATE)
       return -EEXIST;
+    #endif
 
     strncpy(nxattr, value, size < XATTR_MAXLEN ? size : XATTR_MAXLEN);
     nxattr[XATTR_MAXLEN] = '\0';
@@ -473,10 +486,14 @@ static int plp_setxattr(const char *path, const char *name, const char *value, s
     debuglog("setxattr succeeded");
     return 0;
   } else {
+    #ifdef __FreeBSD__
+    /* Since the flag constants (XATTR_CREATE, XATTR_REPLACE) do not exist on FreeBSD, this is skipped. */
+    #else
     if (flags & XATTR_REPLACE)
       return -ENOATTR;
     else
       return -ENOTSUP;
+    #endif
   }
 }
 
