@@ -125,8 +125,6 @@ getMachineInfo(machineInfo &mi)
     return res;
 }
 
-static unsigned long hhh;
-
 Enum<rfsv::errs> rpcs32::
 regOpenIter(uint32_t uid, char *match, uint16_t &handle)
 {

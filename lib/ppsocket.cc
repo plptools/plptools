@@ -126,7 +126,6 @@ toString()
     string ret = "";
     char nbuf[10];
     char *tmp = 0L;
-    int port;
 
     tmp = inet_ntoa(((struct sockaddr_in *) &m_HostAddr)->sin_addr);
     ret += tmp ? tmp : "none:none";
