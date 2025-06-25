@@ -772,11 +772,11 @@ service_loop()
         bool cancelled = false;
         bool jobEnd;
         unsigned long plen;
-        int pageCount;
+        int pageCount = 0;
         bufferStore buf;
         bufferStore pageBuf;
         int fd;
-        FILE *f;
+        FILE *f = nullptr;
         unsigned char b;
         char *jname =
             (char *)malloc(strlen(spooldir) +
@@ -951,7 +951,6 @@ main(int argc, char **argv)
 {
     ppsocket *skt;
     const char *host = "127.0.0.1";
-    int status = 0;
     int sockNum = DPORT;
     int ret = 0;
     int c;
