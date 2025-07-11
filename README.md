@@ -20,8 +20,9 @@ plpprintd(8), and, where installed, plpfuse(8).
 
 To build plpfuse, the following packages are required:
 
+* GNU Make
 * FUSE: https://github.com/libfuse/libfuse (MacFUSE on macOS)
-* libattr: https://savannah.nongnu.org/projects/attr (not required on macOS)
+* libattr: https://savannah.nongnu.org/projects/attr (not required on macOS or BSD)
 
 For command-line editing and history support in plpftp, Readline 4.3 or later or a compatible library is required.
 

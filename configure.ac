@@ -31,6 +31,7 @@ AC_PROG_INSTALL
 AC_PROG_CXX
 AC_PROG_CC
 gl_EARLY
+AX_CHECK_GNU_MAKE(,[AC_MSG_ERROR([GNU make is required])])
 gl_INIT
 
 dnl Basic settings
