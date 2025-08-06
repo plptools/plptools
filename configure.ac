@@ -20,7 +20,7 @@
 
 AC_PREREQ([2.71])
 
-AC_INIT([plptools],[1.0.25],[plptools-developers@lists.sourceforge.net])
+AC_INIT([plptools],[1.0.26],[plptools-developers@lists.sourceforge.net])
 AC_CANONICAL_TARGET
 AC_CONFIG_AUX_DIR([build-aux])
 AM_INIT_AUTOMAKE
