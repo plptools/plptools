@@ -80,7 +80,7 @@ public:
      * @param ncp   The calling ncp instance.
      * @_verbose    Verbosity (for debugging/troubleshooting)
      */
-    Link(const char *fname, int baud, ncp *_ncp, unsigned short _verbose = 0);
+    Link(const char *fname, int baud, ncp *ncp, unsigned short _verbose = 0);
 
     /**
      * Disconnects from device and destroys instance.
