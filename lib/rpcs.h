@@ -227,7 +227,7 @@ public:
     *
     * @returns A psion error code. 0 = Ok.
     */
-    Enum<rfsv::errs> stopProgram(const char *);
+    Enum<rfsv::errs> stopProgram(const char *program);
 
     Enum<rfsv::errs> queryProgram(const char *);
 
@@ -271,7 +271,7 @@ public:
     *
     * @returns A psion error code. 0 = Ok.
     */
-    Enum<rfsv::errs> getOwnerInfo(bufferArray &);
+    Enum<rfsv::errs> getOwnerInfo(bufferArray &owner);
 
     /**
     * Retrieves the type of machine on the remote side
@@ -351,7 +351,7 @@ public:
     *
     * @returns Psion error code. 0 = Ok.
     */
-    virtual Enum<rfsv::errs> getMachineInfo(machineInfo &) { return rfsv::E_PSI_NOT_SIBO;}
+    virtual Enum<rfsv::errs> getMachineInfo(machineInfo &machineInfo) { return rfsv::E_PSI_NOT_SIBO;}
 
     /**
      * Release an rpcs handle.
