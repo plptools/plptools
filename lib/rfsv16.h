@@ -46,6 +46,7 @@ public:
     Enum<rfsv::errs> freplacefile(const uint32_t, const char * const, uint32_t &);
     Enum<rfsv::errs> fclose(const uint32_t);
     Enum<rfsv::errs> dir(const char * const, PlpDir &);
+    Enum<rfsv::errs> pathtest(const char * const);
     Enum<rfsv::errs> fgetmtime(const char * const, PsiTime &);
     Enum<rfsv::errs> fsetmtime(const char * const, const PsiTime);
     Enum<rfsv::errs> fgetattr(const char * const, uint32_t &);

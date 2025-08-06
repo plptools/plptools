@@ -48,6 +48,7 @@ public:
     Enum<rfsv::errs> copyFromPsion(const char *from, int fd, cpCallback_t cb);
     Enum<rfsv::errs> copyToPsion(const char * const, const char * const, void *, cpCallback_t);
     Enum<rfsv::errs> copyOnPsion(const char * const, const char * const, void *, cpCallback_t);
+    Enum<rfsv::errs> pathtest(const char * const);
     Enum<rfsv::errs> mkdir(const char * const);
     Enum<rfsv::errs> rmdir(const char * const);
     Enum<rfsv::errs> remove(const char * const);
