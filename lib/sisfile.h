@@ -20,9 +20,9 @@
 #ifndef _SISFILE_H
 #define _SISFILE_H
 
-#include <sistypes.h>
-#include <sisfileheader.h>
-#include <siscomponentrecord.h>
+#include "sistypes.h"
+#include "sisfileheader.h"
+#include "siscomponentrecord.h"
 
 class SISLangRecord;
 class SISFileRecord;

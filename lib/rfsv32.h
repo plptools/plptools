@@ -22,8 +22,8 @@
 #ifndef _RFSV32_H_
 #define _RFSV32_H_
 
-#include <rfsv.h>
-#include <plpdirent.h>
+#include "rfsv.h"
+#include "plpdirent.h"
 
 class rfsvfactory;
 

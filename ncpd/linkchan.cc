@@ -24,8 +24,8 @@
 #include <string>
 #include <cstring>
 
-#include <bufferstore.h>
-#include <bufferarray.h>
+#include "bufferstore.h"
+#include "bufferarray.h"
 
 #include "linkchan.h"
 #include "ncp.h"

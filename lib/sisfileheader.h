@@ -20,7 +20,7 @@
 #ifndef _SISFILEHEADER_H
 #define _SISFILEHEADER_H
 
-#include <sistypes.h>
+#include "sistypes.h"
 
 /**
  * The first part of a SISFile.

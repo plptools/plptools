@@ -21,7 +21,7 @@
 #ifndef _RPCS16_H_
 #define _RPCS16_H_
 
-#include <rpcs.h>
+#include "rpcs.h"
 
 class ppsocket;
 class bufferStore;

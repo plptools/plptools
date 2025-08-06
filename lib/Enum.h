@@ -26,8 +26,7 @@
 #include <map>
 #include <string>
 
-#include <plpintl.h>
-#include <assert.h>
+#include "plpintl.h"
 
 /**
  * the Base for the Enum template.
@@ -131,7 +130,7 @@ protected:
  * and more readable, an ENUM_DEFINITION() macro is provided.
  *
  * FIXME: At the moment enumeration strings don't get translated by gettext
- * 
+ *
  * @see #ENUM_DEFINITION
  * @author Henner Zeller
  */
@@ -296,10 +295,10 @@ template<typename E> typename Enum<E>::sdata Enum<E>::staticData;
  *
  * @author Henner Zeller
  */
-/**								
-  * The definition of the static variable holding the static	
-  * data for this Enumeration wrapper.				
-  */								
+/**
+  * The definition of the static variable holding the static
+  * data for this Enumeration wrapper.
+  */
 #define ENUM_DEFINITION_BEGIN(EnumName, initWith)			\
 /**								\
   * actual definition of the constructor for the static data.	\

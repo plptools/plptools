@@ -20,8 +20,8 @@
 #ifndef _WPRT_H_
 #define _WPRT_H_
 
-#include <rfsv.h>
-#include <Enum.h>
+#include "rfsv.h"
+#include "Enum.h"
 
 class ppsocket;
 class bufferStore;
