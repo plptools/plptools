@@ -692,6 +692,16 @@ copyOnPsion(const char *from, const char *to, void *ptr, cpCallback_t cb)
 }
 
 Enum<rfsv::errs> rfsv16::
+pathtest(const char * const path)
+{
+    string realName = convertSlash(path);
+    bufferStore a;
+    a.addStringT(realName.c_str());
+    sendCommand(SIBO_PATHTEST, a);
+    return getResponse(a);
+}
+
+Enum<rfsv::errs> rfsv16::
 fsetsize(uint32_t handle, uint32_t size)
 {
     bufferStore a;

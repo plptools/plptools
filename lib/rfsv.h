@@ -324,6 +324,27 @@ public:
     virtual Enum<errs> fgetattr(const char * const name, uint32_t &attr) = 0;
 
     /**
+     * Checks to see if the directory component of a path or file name exists
+     * and is valid. Returns `E_PSI_GEN_NONE` if is valid.
+     *
+     * Only paths up to the last trailing backslash are tested; trailing
+     * filenames are ignored. For example,
+     *
+     * - "C:\\" tests the validity of "C:\\"
+     * - "C:\\System" tests the validity of "C:\\"
+     * - "C:\\System\\" tests the validity of "C:\\System\\"
+     * - "D:\\Documents\\hello.txt" tests the validity of "D:\\Documents\\"
+     *
+     * This can be safely used to test for the existence of directories and
+     * drives on EPOC16 and EPOC32; check for `E_PSI_FILE_NXIST`,
+     * `E_PSI_FILE_DIR`, `E_PSI_FILE_DEVICE`, and `E_PSI_FILE_NOTREADY` to
+     * determine non-existence.
+     *
+     * @returns A Psion error code (One of enum @ref #errs ).
+     */
+    virtual Enum<errs> pathtest(const char * const name) = 0;
+
+    /**
     * Retrieves attributes, size and modification time of a file on the Psion.
     *
     * @param name The name of the file.
