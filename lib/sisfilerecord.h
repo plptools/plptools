@@ -20,7 +20,7 @@
 #ifndef _SISFILERECORD_H
 #define _SISFILERECORD_H
 
-#include <sistypes.h>
+#include "sistypes.h"
 
 class SISFile;
 

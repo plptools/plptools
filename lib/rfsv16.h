@@ -21,7 +21,7 @@
 #ifndef _RFSV16_H_
 #define _RFSV16_H_
 
-#include <rfsv.h>
+#include "rfsv.h"
 
 class rfsvfactory;
 

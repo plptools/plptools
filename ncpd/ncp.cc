@@ -25,10 +25,10 @@
 
 #include <time.h>
 
-#include <bufferstore.h>
-#include <bufferarray.h>
-#include <rfsv.h>
+#include "bufferstore.h"
+#include "bufferarray.h"
 
+#include "rfsv.h"
 #include "ncp.h"
 #include "linkchan.h"
 #include "link.h"
@@ -132,11 +132,11 @@ receive(bufferStore s) {
 	} else {
 	    int allData = s.getByte(1);
 	    s.discardFirstBytes(2);
-            
+
             if (protocolVersion == PV_SERIES_3) {
                 channel = lastSentChannel;
             }
-                
+
 	    if (!isValidChannel(channel)) {
 		lerr << "ncp: Got message for unknown channel\n";
 	    } else {

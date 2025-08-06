@@ -20,7 +20,7 @@
 #ifndef _SISLANGRECORD_H
 #define _SISLANGRECORD_H
 
-#include <sistypes.h>
+#include "sistypes.h"
 
 /**
  * A simple language record, only containing the epoc specific 16 bit

@@ -20,8 +20,8 @@
 #ifndef _RCLIP_H_
 #define _RCLIP_H_
 
-#include <rfsv.h>
-#include <Enum.h>
+#include "rfsv.h"
+#include "Enum.h"
 
 class ppsocket;
 class bufferStore;

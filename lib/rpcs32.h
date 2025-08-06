@@ -21,7 +21,7 @@
 #ifndef _RPCS32_H_
 #define _RPCS32_H_
 
-#include <rpcs.h>
+#include "rpcs.h"
 
 class ppsocket;
 class rpcsfactory;

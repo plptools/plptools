@@ -22,7 +22,7 @@
 #define _linkchan_h_
 
 #include "channel.h"
-#include <bufferarray.h>
+#include "bufferarray.h"
 
 #define LINKCHAN_DEBUG_LOG  1
 #define LINKCHAN_DEBUG_DUMP 2

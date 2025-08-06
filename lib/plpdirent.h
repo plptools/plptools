@@ -24,8 +24,8 @@
 #include <string>
 #include <cstring>
 
-#include <psitime.h>
-#include <rfsv.h>
+#include "psitime.h"
+#include "rfsv.h"
 
 /**
  * A class, representing the UIDs of a file on the Psion.

@@ -21,7 +21,7 @@
 #ifndef _PSIBITMAP_H_
 #define _PSIBITMAP_H_
 
-#include <bufferstore.h>
+#include "bufferstore.h"
 
 /**
  * This function is used by encodeBitmap for retrieving image data.

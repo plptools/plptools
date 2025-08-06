@@ -24,9 +24,9 @@
 #include <deque>
 #include <string>
 
-#include <Enum.h>
-#include <plpdirent.h>
-#include <bufferstore.h>
+#include "Enum.h"
+#include "plpdirent.h"
+#include "bufferstore.h"
 
 typedef std::deque<class PlpDirent> PlpDir;
 
