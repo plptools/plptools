@@ -93,7 +93,7 @@ getMachineInfo(machineInfo &mi)
     mi.time.tv_low = a.getDWord(48);
     mi.time.tv_high = a.getDWord(52);
 
-    mi.tz.utc_offset = a.getDWord(60);
+    mi.tz.utc_offset = a.getSDWord(60);
     mi.tz.dst_zones = a.getDWord(64);
     mi.tz.home_zone = a.getDWord(68);
 
