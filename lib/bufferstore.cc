@@ -110,6 +110,13 @@ uint32_t bufferStore::getDWord(long pos) const {
 	(buff[pos+start+3] << 24);
 }
 
+int32_t bufferStore::getSDWord(long pos) const {
+    return buff[pos+start] +
+        (buff[pos+start+1] << 8) +
+        (buff[pos+start+2] << 16) +
+        (buff[pos+start+3] << 24);
+}
+
 const char * bufferStore::getString(long pos) const {
     return (const char *)buff + pos + start;
 }

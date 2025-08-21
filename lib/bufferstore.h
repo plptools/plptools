@@ -103,6 +103,15 @@ public:
     uint32_t getDWord(long pos = 0) const;
 
     /**
+     * Retrieves the signed dword at index <em>pos</em>.
+     *
+     * @param pos The index of the signed dword  to retrieve.
+     *
+     * @returns The value of the signed dword at index <em>pos</em>
+     */
+    int32_t getSDWord(long pos = 0) const;
+
+    /**
     * Retrieves the characters at index <em>pos</em>.
     *
     * @param pos The index of the characters to retrieve.
