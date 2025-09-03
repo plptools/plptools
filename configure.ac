@@ -102,6 +102,13 @@ AC_CHECK_HEADER(attr/attributes.h)
 AC_CHECK_HEADERS(attr/xattr.h)
 AM_CONDITIONAL(BUILD_PLPFUSE, test x$enable_fuse = xyes)
 
+# Fully expand sbindir so we can reference it in scripts
+AC_CONFIG_COMMANDS_PRE([
+  sbindir=$(eval echo "$sbindir")
+  sbindir=$(eval echo "$sbindir")
+  AC_SUBST([sbindir], [$sbindir])
+])
+
 dnl special options for customization
 
 AC_ARG_WITH(serial,
