@@ -1,0 +1,11 @@
+[Unit]
+Description=Daemon which handles the serial link to a Psion
+Documentation=man:ncpd(8)
+
+[Service]
+Environment=NCPD_ARGS=
+EnvironmentFile=-/etc/sysconfig/plptools
+ExecStart=@sbindir@/ncpd -d $NCPD_ARGS
+
+[Install]
+WantedBy=multi-user.target
