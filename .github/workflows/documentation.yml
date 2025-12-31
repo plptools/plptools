@@ -1,0 +1,57 @@
+name: build
+
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [ main ]
+  schedule:
+    - cron:  '0 9 * * *'
+  workflow_dispatch:
+
+jobs:
+
+  documentation-build:
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        submodules: true
+
+    - name: Build documentation
+      run: |
+        doxygen Doxyfile
+
+    - name: Build website
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        scripts/build-website.sh
+        chmod -v -R +rX "_site/"
+
+    - name: Upload artifact
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: ./html
+
+  # documentation-deploy:
+#
+  #   needs: documentation-build
+  #   if: ${{ github.ref == 'refs/heads/main' }}
+#
+  #   permissions:
+  #     pages: write
+  #     id-token: write
+#
+  #   environment:
+  #     name: github-pages
+  #     url: ${{ steps.deployment.outputs.page_url }}
+#
+  #   runs-on: ubuntu-latest
+#
+  #   steps:
+  #     - name: Deploy to GitHub Pages
+  #       id: deployment
+  #       uses: actions/deploy-pages@v4
