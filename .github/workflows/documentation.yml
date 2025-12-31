@@ -1,4 +1,4 @@
-name: build
+name: Documentation
 
 on:
   pull_request:
@@ -8,11 +8,6 @@ on:
   schedule:
     - cron:  '0 9 * * *'
   workflow_dispatch:
-
-permissions:
-  contents: read
-  pages: write
-  id-token: write
 
 concurrency:
   group: "pages"
