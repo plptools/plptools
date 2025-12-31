@@ -22,8 +22,6 @@ jobs:
 
     - name: Build documentation
       uses: mattnotmitt/doxygen-action@v1.9.5
-      with:
-        doxyfile-path: Doxygen
 
     # - name: Build website
     #   env:
