@@ -21,15 +21,16 @@ jobs:
         submodules: true
 
     - name: Build documentation
-      run: |
-        doxygen Doxyfile
+      uses: mattnotmitt/doxygen-action@v1.9.5
+      with:
+        doxyfile-path: Doxygen
 
-    - name: Build website
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        scripts/build-website.sh
-        chmod -v -R +rX "_site/"
+    # - name: Build website
+    #   env:
+    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    #   run: |
+    #     scripts/build-website.sh
+    #     chmod -v -R +rX "_site/"
 
     - name: Upload artifact
       uses: actions/upload-pages-artifact@v3
