@@ -26,7 +26,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-      with: { submodules: true }
+      with:
+        submodules: true
     - name: Install dependencies (Ubuntu)
       if: ${{ matrix.os == 'ubuntu-latest' }}
       run: sudo apt-get -y install libreadline-dev pkg-config gettext autopoint libfuse-dev libattr1-dev
@@ -54,12 +55,8 @@ jobs:
 
       - name: Checkout source
         uses: actions/checkout@v4
-
-      # TODO: It seems like the Bookworm container doesn't have the correct version of Git installed. We might consider
-      #       explicitly updating this, or we migth need to manually install it before proceeding.
-      - name: Checkout submodules
-        run: |
-          git submodule update --init --recursive
+        with:
+          submodules: true
 
       - name: Install dependencies (Ubuntu)
         if: ${{ matrix.os == 'ubuntu-latest' }}
