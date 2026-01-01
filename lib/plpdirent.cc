@@ -40,7 +40,7 @@ operator[](int idx) {
 }
 
 PlpDirent::PlpDirent()
-    : size(0), attr(0), name(""), time(0L), attrstr("") {
+    : size(0), attr(0), name(""), time(time_t(0)), attrstr("") {
 }
 
 PlpDirent::PlpDirent(const PlpDirent &e) {
