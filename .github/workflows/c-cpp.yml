@@ -18,12 +18,6 @@ jobs:
           - os: macos-latest
             shell: bash
 
-          - os: ubuntu-latest
-            env:
-              ASAN: "yes"  # TODO: What does this do?
-            shell: bash  # TODO: I think we can set this globally.
-            container: debian:bookworm
-
     runs-on: ${{ matrix.os }}
 
     defaults:
@@ -45,3 +39,20 @@ jobs:
         echo "CPPFLAGS=-I$(brew --prefix readline)/include" >> "$GITHUB_ENV"
     - name: Build
       run: ./build-aux/build.sh
+
+
+  build-debian:
+      runs-on: ubuntu-latest
+      container: debian:bookworm
+
+      steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Install dependencies (Ubuntu)
+        if: ${{ matrix.os == 'ubuntu-latest' }}
+        run: sudo apt-get -y install libreadline-dev pkg-config gettext autopoint libfuse-dev libattr1-dev
+
+      - name: Build
+        run: ./build-aux/build.sh
