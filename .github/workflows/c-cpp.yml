@@ -53,6 +53,7 @@ jobs:
           apt-get update -y
           apt-get install -y build-essential git
           apt-get install -y libreadline-dev pkg-config gettext autopoint libfuse-dev libattr1-dev
+          apt-get install -y libtool gpg pkg-config gettext autopoint libreadline-dev
 
       - name: Checkout source
         uses: actions/checkout@v4
