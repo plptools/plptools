@@ -47,8 +47,10 @@ jobs:
 
       steps:
 
-      - name: Check Git is installed
-        run: which git
+      - name: Install dependencies
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y build-essential git
 
       - name: Checkout source
         uses: actions/checkout@v4
