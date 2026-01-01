@@ -4,20 +4,32 @@ on: [ push, pull_request ]
 
 jobs:
   build:
+
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
         include:
+
           - os: ubuntu-latest
             env:
               ASAN: "yes"
             shell: bash
+
           - os: macos-latest
             shell: bash
+
+          - os: ubuntu-latest
+            env:
+              ASAN: "yes"  # TODO: What does this do?
+            shell: bash  # TODO: I think we can set this globally.
+            container: debian:bookworm
+
     runs-on: ${{ matrix.os }}
+
     defaults:
       run:
         shell: ${{ matrix.shell }} {0}
+
     steps:
     - uses: actions/checkout@v4
       with: { submodules: true }
