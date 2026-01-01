@@ -25,8 +25,14 @@ if BUILD_PLPFUSE
 SUBDIRS += plpfuse
 endif
 
+if HAVE_SYSTEMD
+dist_systemdsystemunit_DATA = etc/ncpd.service etc/plpprintd.service
+endif
+
 EXTRA_DIST = AUTHORS COPYING INSTALL NEWS README TODO HISTORY ABOUT-NLS \
 	etc/plptools.in \
+	etc/ncpd.service.in \
+	etc/plpprintd.service.in \
 	etc/ttytap.c etc/psidump etc/psidump.1 \
 	etc/udev-usbserial-plptools.rules \
 	m4/gnulib-cache.m4
