@@ -45,7 +45,7 @@
 #endif
 #include <getopt.h>
 
-#include <fuse/fuse_lowlevel.h>
+#include <fuse3/fuse_lowlevel.h>
 
 using namespace std;
 
@@ -388,18 +388,17 @@ parse_destination(const char *arg, const char **host, int *port)
 int fuse(int argc, char *argv[])
 {
     struct fuse_args args = FUSE_ARGS_INIT(argc, argv);
-    struct fuse_chan *ch;
-    char *mountpoint;
+    struct fuse_cmdline_opts opts;
+    struct fuse *fp;
     int err = -1, foreground;
 
-    if (fuse_parse_cmdline(&args, &mountpoint, NULL, &foreground) != -1 &&
-        (ch = fuse_mount(mountpoint, &args)) != NULL) {
-        if (fuse_daemonize(foreground) != -1) {
-            struct fuse *fp = fuse_new(ch, &args, &plp_oper, sizeof(plp_oper), NULL);
-            if (fp != NULL)
+    if (fuse_parse_cmdline(&args, &opts) != -1) {
+        if (fuse_daemonize(opts.foreground) != -1) {
+            fp = fuse_new(&args, &plp_oper, sizeof(plp_oper), NULL);
+            if (fp != NULL && (fuse_mount(fp, opts.mountpoint)) != 0)
                 err = fuse_loop(fp);
         }
-        fuse_unmount(mountpoint, ch);
+        fuse_unmount(fp);
     }
     fuse_opt_free_args(&args);
 
