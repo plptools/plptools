@@ -52,15 +52,12 @@ jobs:
         run: |
           apt-get update -y
           apt-get install -y build-essential git
+          apt-get install -y libreadline-dev pkg-config gettext autopoint libfuse-dev libattr1-dev
 
       - name: Checkout source
         uses: actions/checkout@v4
         with:
           submodules: true
-
-      - name: Install dependencies (Ubuntu)
-        if: ${{ matrix.os == 'ubuntu-latest' }}
-        run: sudo apt-get -y install libreadline-dev pkg-config gettext autopoint libfuse-dev libattr1-dev
 
       - name: Build
         run: ./build-aux/build.sh
