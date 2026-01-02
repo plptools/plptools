@@ -58,26 +58,3 @@ jobs:
 
     - name: Run smoke tests
       run: ./build-aux/smoke-tests.sh
-
-
-  build-debian:
-      runs-on: ubuntu-latest
-      container: debian:bookworm
-
-      steps:
-
-      - name: Install dependencies
-        run: |
-          apt-get update -y
-          apt-get install -y build-essential git libtool gpg pkg-config gettext autopoint libreadline-dev
-
-      - name: Checkout source
-        uses: actions/checkout@v4
-        with:
-          submodules: true
-
-      - name: Build
-        run: ./build-aux/build.sh
-
-      - name: Run smoke tests
-        run: ./build-aux/smoke-tests.sh
