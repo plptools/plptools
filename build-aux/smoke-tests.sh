@@ -26,21 +26,23 @@
 
 set -exuo pipefail
 
-function assert_exists {
-    { local old_opts=$-; set +x; } 2>/dev/null
-    filename=$1
-    echo -n "Checking '$1' exists... "
-    if [ -f "$filename" ]; then
-        echo "OK"
-    else
-        echo "FAILED"
-        echo "Error: '$filename' does not exist" >&2
-        exit 1
-    fi
-    set -$old_opts 2>/dev/null || true
+function fatal {
+    echo $1 >&2
+    exit 1
 }
 
-assert_exists "ncpd/ncpd"
-assert_exists "plpftp/plpftp"
-assert_exists "plpprint/plpprintd"
-assert_exists "sisinstall/sisinstall"
+# Check the binaries exist.
+[ -f "ncpd/ncpd" ] || fatal "npd missing"
+[ -f "plpftp/plpftp" ] || fatal "plpftp missing"
+# [ -f "plpfuse/plpfuse" ] || fatal "plpfuse missing"
+[ -f "plpprint/plpprintd" ] || fatal "plpprintd missing"
+[ -f "sisinstall/sisinstall" ] || fatal "sisinstall missing"
+
+# Check the versions.
+ncpd/ncpd --version
+plpftp/plpftp --version
+# TODO: plpfuse doesn't exit when printing the version #57
+#       https://github.com/plptools/plptools/issues/57
+# plpfuse/plpfuse --version
+plpprint/plpprintd --version
+sisinstall/sisinstall --version
