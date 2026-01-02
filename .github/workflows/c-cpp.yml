@@ -7,22 +7,26 @@ jobs:
 
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]
         include:
 
           - os: ubuntu-latest
             env:
               ASAN: "yes"
-            shell: bash
+            setup: |
+              sudo apt-get -y install libreadline-dev pkg-config gettext autopoint libfuse-dev libattr1-dev
 
           - os: macos-latest
-            shell: bash
+            setup: |
+              brew install coreutils readline pkg-config libtool automake gettext macfuse
+              echo "$(brew --prefix m4)/bin:/usr/local/opt/gettext/bin" >> $GITHUB_PATH
+              echo "LDFLAGS=-L$(brew --prefix readline)/lib" >> "$GITHUB_ENV"
+              echo "CPPFLAGS=-I$(brew --prefix readline)/include" >> "$GITHUB_ENV"
 
     runs-on: ${{ matrix.os }}
 
     defaults:
       run:
-        shell: ${{ matrix.shell }} {0}
+        shell: bash
 
     steps:
 
@@ -31,17 +35,8 @@ jobs:
       with:
         submodules: true
 
-    - name: Install dependencies (Ubuntu)
-      if: ${{ matrix.os == 'ubuntu-latest' }}
-      run: sudo apt-get -y install libreadline-dev pkg-config gettext autopoint libfuse-dev libattr1-dev
-
-    - name: Install dependencies (macOS)
-      if: ${{ matrix.os == 'macos-latest' }}
-      run: |
-        brew install coreutils readline pkg-config libtool automake gettext macfuse
-        echo "$(brew --prefix m4)/bin:/usr/local/opt/gettext/bin" >> $GITHUB_PATH
-        echo "LDFLAGS=-L$(brew --prefix readline)/lib" >> "$GITHUB_ENV"
-        echo "CPPFLAGS=-I$(brew --prefix readline)/include" >> "$GITHUB_ENV"
+    - name: Install dependencies and configure environment
+      run: ${{ matrix.setup }}
 
     - name: Build
       run: ./build-aux/build.sh
@@ -59,9 +54,7 @@ jobs:
       - name: Install dependencies
         run: |
           apt-get update -y
-          apt-get install -y build-essential git
-          # apt-get install -y libreadline-dev pkg-config gettext autopoint libfuse-dev libattr1-dev
-          apt-get install -y libtool gpg pkg-config gettext autopoint libreadline-dev
+          apt-get install -y build-essential git libtool gpg pkg-config gettext autopoint libreadline-dev
 
       - name: Checkout source
         uses: actions/checkout@v4
