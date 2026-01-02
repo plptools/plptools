@@ -26,10 +26,14 @@
 
 set -exuo pipefail
 
+ROOT_DIRECTORY="$( cd "$( dirname "$( dirname "${BASH_SOURCE[0]}" )" )" &> /dev/null && pwd )"
+
 function fatal {
     echo $1 >&2
     exit 1
 }
+
+cd "$ROOT_DIRECTORY"
 
 # Check the binaries exist.
 [ -f "ncpd/ncpd" ] || fatal "npd missing"
