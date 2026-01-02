@@ -38,15 +38,17 @@ cd "$ROOT_DIRECTORY"
 # Check the binaries exist.
 [ -f "ncpd/ncpd" ] || fatal "npd missing"
 [ -f "plpftp/plpftp" ] || fatal "plpftp missing"
+# TODO: Exercise and smoke test conditional plpfuse builds in CI #58
+#       https://github.com/plptools/plptools/issues/58
 # [ -f "plpfuse/plpfuse" ] || fatal "plpfuse missing"
 [ -f "plpprint/plpprintd" ] || fatal "plpprintd missing"
 [ -f "sisinstall/sisinstall" ] || fatal "sisinstall missing"
 
 # Check the versions.
-ncpd/ncpd --version
-plpftp/plpftp --version
+ncpd/ncpd --version || fatal "Failed to get ncpd version"
+plpftp/plpftp --version || fatal "Failed to get plpftp version"
 # TODO: plpfuse doesn't exit when printing the version #57
 #       https://github.com/plptools/plptools/issues/57
-# plpfuse/plpfuse --version
-plpprint/plpprintd --version
-sisinstall/sisinstall --version
+# plpfuse/plpfuse --version || fatal "Failed to get ncpd version"
+plpprint/plpprintd --version || fatal "Failed to get plpfuse version"
+sisinstall/sisinstall --version || fatal "Failed to get sisinstall version"
