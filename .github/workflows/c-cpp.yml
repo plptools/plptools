@@ -20,6 +20,13 @@ jobs:
             setup: |
               sudo apt-get -y install libreadline-dev pkg-config gettext autopoint libfuse-dev libattr1-dev
 
+          - name: debian-bookworm
+            os: ubuntu-latest
+            container: debian:bookworm
+            setup: |
+              apt-get update -y
+              apt-get install -y build-essential git libtool gpg pkg-config gettext autopoint libreadline-dev
+
           - name: macos-latest
             os: macos-latest
             setup: |
