@@ -25,12 +25,16 @@ jobs:
         shell: ${{ matrix.shell }} {0}
 
     steps:
-    - uses: actions/checkout@v4
+
+    - name: Checkout source
+      uses: actions/checkout@v4
       with:
         submodules: true
+
     - name: Install dependencies (Ubuntu)
       if: ${{ matrix.os == 'ubuntu-latest' }}
       run: sudo apt-get -y install libreadline-dev pkg-config gettext autopoint libfuse-dev libattr1-dev
+
     - name: Install dependencies (macOS)
       if: ${{ matrix.os == 'macos-latest' }}
       run: |
@@ -38,8 +42,12 @@ jobs:
         echo "$(brew --prefix m4)/bin:/usr/local/opt/gettext/bin" >> $GITHUB_PATH
         echo "LDFLAGS=-L$(brew --prefix readline)/lib" >> "$GITHUB_ENV"
         echo "CPPFLAGS=-I$(brew --prefix readline)/include" >> "$GITHUB_ENV"
+
     - name: Build
       run: ./build-aux/build.sh
+
+    - name: Run smoke tests
+      run: ./build-aux/smoke-tests.sh
 
 
   build-debian:
