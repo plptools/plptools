@@ -47,6 +47,8 @@ cd "$ROOT_DIRECTORY"
 # Check the versions.
 ncpd/ncpd --version || fatal "Failed to get ncpd version"
 plpftp/plpftp --version || fatal "Failed to get plpftp version"
-plpfuse/plpfuse --version || fatal "Failed to get plpfuse version"
+# TODO: Exercise and smoke test conditional plpfuse builds in CI #58
+#       https://github.com/plptools/plptools/issues/58
+# plpfuse/plpfuse --version || fatal "Failed to get plpfuse version"
 plpprint/plpprintd --version || fatal "Failed to get plpprintd version"
 sisinstall/sisinstall --version || fatal "Failed to get sisinstall version"
