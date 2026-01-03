@@ -1374,8 +1374,8 @@ msgstr ""
 " -n, --dry-run           Nur parsen; keine Installation.\n"
 
 #: sisinstall/sismain.cpp:103
-msgid "sisinstall version 0.1\n"
-msgstr "Installationsprogramm, Version 0.1\n"
+msgid "sisinstall Version"
+msgstr "Installationsprogramm, Version"
 
 #: sisinstall/sismain.cpp:110
 #, c-format

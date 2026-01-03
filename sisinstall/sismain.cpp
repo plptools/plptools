@@ -100,7 +100,7 @@ int main(int argc, char* argv[])
                                 dryrun = true;
                                 break;
                         case 'V':
-                                printf("%s", _("sisinstall version 0.1\n"));
+                                printf("%s %s\n", _("sisinstall Version"), VERSION);
                                 exit(0);
                         }
                 }
