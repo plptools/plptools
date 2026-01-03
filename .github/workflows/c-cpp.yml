@@ -31,6 +31,13 @@ jobs:
               apt-get update -y
               apt-get install -y build-essential git libtool gpg pkg-config gettext autopoint libreadline-dev
 
+          - name: debian-trixie
+            os: ubuntu-latest
+            container: debian:trixie
+            setup: |
+              apt-get update -y
+              apt-get install -y build-essential git libtool gpg pkg-config gettext autopoint libreadline-dev
+
           - name: macos-latest
             os: macos-latest
             setup: |
