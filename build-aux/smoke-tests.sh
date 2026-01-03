@@ -47,6 +47,6 @@ cd "$ROOT_DIRECTORY"
 # Check the versions.
 ncpd/ncpd --version || fatal "Failed to get ncpd version"
 plpftp/plpftp --version || fatal "Failed to get plpftp version"
-plpfuse/plpfuse --version || fatal "Failed to get ncpd version"
-plpprint/plpprintd --version || fatal "Failed to get plpfuse version"
+plpfuse/plpfuse --version || fatal "Failed to get plpfuse version"
+plpprint/plpprintd --version || fatal "Failed to get plpprintd version"
 sisinstall/sisinstall --version || fatal "Failed to get sisinstall version"
