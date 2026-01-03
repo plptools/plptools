@@ -47,8 +47,6 @@ cd "$ROOT_DIRECTORY"
 # Check the versions.
 ncpd/ncpd --version || fatal "Failed to get ncpd version"
 plpftp/plpftp --version || fatal "Failed to get plpftp version"
-# TODO: plpfuse doesn't exit when printing the version #57
-#       https://github.com/plptools/plptools/issues/57
-# plpfuse/plpfuse --version || fatal "Failed to get ncpd version"
+plpfuse/plpfuse --version || fatal "Failed to get ncpd version"
 plpprint/plpprintd --version || fatal "Failed to get plpfuse version"
 sisinstall/sisinstall --version || fatal "Failed to get sisinstall version"
