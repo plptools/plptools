@@ -1,35 +1,64 @@
 name: C/C++ CI
 
-on: [ push, pull_request ]
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [ main ]
+  schedule:
+    - cron:  '0 9 * * *'
+  workflow_dispatch:
+
 
 jobs:
   build:
+
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]
         include:
-          - os: ubuntu-latest
+
+          - name: ubuntu-latest
+            os: ubuntu-latest
             env:
               ASAN: "yes"
-            shell: bash
-          - os: macos-latest
-            shell: bash
+            setup: |
+              sudo apt-get -y install libreadline-dev pkg-config gettext autopoint libfuse-dev libattr1-dev
+
+          - name: debian-bookworm
+            os: ubuntu-latest
+            container: debian:bookworm
+            setup: |
+              apt-get update -y
+              apt-get install -y build-essential git libtool gpg pkg-config gettext autopoint libreadline-dev
+
+          - name: macos-latest
+            os: macos-latest
+            setup: |
+              brew install coreutils readline pkg-config libtool automake gettext macfuse
+              echo "$(brew --prefix m4)/bin:/usr/local/opt/gettext/bin" >> $GITHUB_PATH
+              echo "LDFLAGS=-L$(brew --prefix readline)/lib" >> "$GITHUB_ENV"
+              echo "CPPFLAGS=-I$(brew --prefix readline)/include" >> "$GITHUB_ENV"
+
+    name: ${{ matrix.name }}
     runs-on: ${{ matrix.os }}
+    container: ${{ matrix.container || '' }}
+
     defaults:
       run:
-        shell: ${{ matrix.shell }} {0}
+        shell: bash
+
     steps:
-    - uses: actions/checkout@v4
-      with: { submodules: true }
-    - name: Install dependencies (Ubuntu)
-      if: ${{ matrix.os == 'ubuntu-latest' }}
-      run: sudo apt-get -y install libreadline-dev pkg-config gettext autopoint libfuse-dev libattr1-dev
-    - name: Install dependencies (macOS)
-      if: ${{ matrix.os == 'macos-latest' }}
-      run: |
-        brew install coreutils readline pkg-config libtool automake gettext macfuse
-        echo "$(brew --prefix m4)/bin:/usr/local/opt/gettext/bin" >> $GITHUB_PATH
-        echo "LDFLAGS=-L$(brew --prefix readline)/lib" >> "$GITHUB_ENV"
-        echo "CPPFLAGS=-I$(brew --prefix readline)/include" >> "$GITHUB_ENV"
+
+    - name: Install dependencies and configure environment
+      run: ${{ matrix.setup }}
+
+    - name: Checkout source
+      uses: actions/checkout@v4
+      with:
+        submodules: true
+
     - name: Build
       run: ./build-aux/build.sh
+
+    - name: Run smoke tests
+      run: ./build-aux/smoke-tests.sh
