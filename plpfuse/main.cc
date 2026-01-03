@@ -425,11 +425,11 @@ int main(int argc, char**argv) {
     while ((c = getopt_long(argc, argv, "hVp:d", opts, NULL)) != -1) {
 	switch (c) {
         case 'V':
-            cerr << _("plpfuse version ") << VERSION << endl;
-            break;
+            cout << _("plpfuse version ") << VERSION << endl;
+            return 0;
         case 'h':
             help();
-            break;
+            return 0;
         case 'd':
             debug++;
             break;
