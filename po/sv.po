@@ -1374,7 +1374,7 @@ msgstr ""
 " -n, --dry-run           Läs bara igenom filen.\n"
 
 #: sisinstall/sismain.cpp:103
-msgid "sisinstall version 0.1\n"
+msgid "sisinstall Version"
 msgstr ""
 
 #: sisinstall/sismain.cpp:110
