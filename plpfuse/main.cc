@@ -426,7 +426,7 @@ int main(int argc, char**argv) {
 	switch (c) {
         case 'V':
             cerr << _("plpfuse version ") << VERSION << endl;
-            break;
+            return 0;
         case 'h':
             help();
             break;
