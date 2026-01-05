@@ -19,7 +19,7 @@
 
 sbin_PROGRAMS = plpfuse
 plpfuse_CPPFLAGS = -I$(top_srcdir)/lib -I$(top_srcdir)/libgnu -I$(top_builddir)/libgnu
-plpfuse_CFLAGS = $(FUSE_CFLAGS) $(WARN_CFLAGS)
-plpfuse_CXXFLAGS = $(FUSE_CFLAGS) $(WARN_CXXFLAGS)
-plpfuse_LDADD = $(LIB_PLP) $(INTLLIBS) $(FUSE_LIBS) $(top_builddir)/libgnu/libgnu.a
+plpfuse_CFLAGS = $(FUSE3_CFLAGS) $(WARN_CFLAGS)
+plpfuse_CXXFLAGS = $(FUSE3_CFLAGS) $(WARN_CXXFLAGS)
+plpfuse_LDADD = $(LIB_PLP) $(INTLLIBS) $(FUSE3_LIBS) $(top_builddir)/libgnu/libgnu.a
 plpfuse_SOURCES = main.cc fuse.c rfsv_api.h plpfuse.h

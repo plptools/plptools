@@ -20,7 +20,7 @@
 #ifndef _plpfuse_h_
 #define _plpfuse_h_
 
-#include <fuse.h>
+#include <fuse3/fuse.h>
 
 typedef struct p_inode {
 	int inode;
