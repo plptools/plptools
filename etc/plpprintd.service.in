@@ -1,0 +1,14 @@
+[Unit]
+Description=Daemon for printing via PC from a Psion
+Documentation=man:plpprintd(8)
+Requires=ncpd.service
+After=ncpd.service
+
+[Service]
+Type=forking
+Environment=PLPPRINTD_ARGS=
+EnvironmentFile=-/etc/sysconfig/plptools
+ExecStart=@sbindir@/plpprintd -d $PLPPRINTD_ARGS
+
+[Install]
+WantedBy=multi-user.target

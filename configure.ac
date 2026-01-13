@@ -102,6 +102,18 @@ AC_CHECK_HEADER(attr/attributes.h)
 AC_CHECK_HEADERS(attr/xattr.h)
 AM_CONDITIONAL(BUILD_PLPFUSE, test x$enable_fuse = xyes)
 
+# systemd
+PKG_CHECK_MODULES([SYSTEMD], [systemd], [], [])
+AC_SUBST([systemdsystemunitdir], [$($PKG_CONFIG --variable=systemdsystemunitdir systemd)])
+AM_CONDITIONAL([HAVE_SYSTEMD], [test "x$systemdsystemunitdir" != "x"])
+
+# Fully expand sbindir so we can reference it in scripts
+AC_CONFIG_COMMANDS_PRE([
+  sbindir=$(eval echo "$sbindir")
+  sbindir=$(eval echo "$sbindir")
+  AC_SUBST([sbindir], [$sbindir])
+])
+
 dnl special options for customization
 
 AC_ARG_WITH(serial,
@@ -203,6 +215,8 @@ AC_CONFIG_FILES(
         sisinstall/Makefile
         doc/Makefile
         etc/plptools
+        etc/ncpd.service
+        etc/plpprintd.service
         doc/ncpd.man
         doc/plpfuse.man
         doc/plpftp.man
