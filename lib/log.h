@@ -36,13 +36,13 @@
  * Here is an example showing the usage of logbuf:
  *
  * <PRE>
- *	openlog("myDaemon", LOG_CONS|LOG_PID, LOG_DAEMON);
- *	logbuf ebuf(LOG_ERR, 2);
- *	ostream lerr(&ebuf);
+ *     openlog("myDaemon", LOG_CONS|LOG_PID, LOG_DAEMON);
+ *     logbuf ebuf(LOG_ERR, 2);
+ *     ostream lerr(&ebuf);
  *
- *	... some code ...
+ *     ... some code ...
  *
- *	lerr << "Whoops, got an error" << endl;
+ *     lerr << "Whoops, got an error" << endl;
  * </PRE>
  *
  * The second optional argument of the constructor can be used

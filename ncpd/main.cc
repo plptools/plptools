@@ -94,29 +94,29 @@ checkForNewSocketConnection()
 {
     string peer;
     if (accept_iow.watch(5,0) <= 0) {
-	return;
+        return;
     }
     ppsocket *next = skt.accept(&peer, &iow);
     if (next != NULL) {
-	next->setWatch(&iow);
-	// New connect
-	if (verbose)
-	    lout << "New socket connection from " << peer << endl;
-	if ((numScp >= theNCP->maxLinks()) || (!theNCP->gotLinkChannel())) {
-	    bufferStore a;
+        next->setWatch(&iow);
+        // New connect
+        if (verbose)
+            lout << "New socket connection from " << peer << endl;
+        if ((numScp >= theNCP->maxLinks()) || (!theNCP->gotLinkChannel())) {
+            bufferStore a;
 
-	    // Give the client time to send its version request.
-	    next->dataToGet(1, 0);
-	    next->getBufferStore(a, false);
+            // Give the client time to send its version request.
+            next->dataToGet(1, 0);
+            next->getBufferStore(a, false);
 
-	    a.init();
-	    a.addStringT("No Psion Connected\n");
-	    next->sendBufferStore(a);
-	    delete next;
-	    if (verbose)
-		lout << "rejected" << endl;
-	} else
-	    scp[numScp++] = new socketChan(next, theNCP);
+            a.init();
+            a.addStringT("No Psion Connected\n");
+            next->sendBufferStore(a);
+            delete next;
+            if (verbose)
+                lout << "rejected" << endl;
+        } else
+            scp[numScp++] = new socketChan(next, theNCP);
     }
 }
 
@@ -126,15 +126,15 @@ pollSocketConnections(void *)
     while (active) {
         iow.watch(0, 10000);
         for (int i = 0; i < numScp; i++) {
-	    scp[i]->socketPoll();
-	    if (scp[i]->terminate()) {
-	        // Requested channel termination
-	        delete scp[i];
-	        numScp--;
-	        for (int j = i; j < numScp; j++)
-		    scp[j] = scp[j + 1];
-		i--;
-	    }
+            scp[i]->socketPoll();
+            if (scp[i]->terminate()) {
+                // Requested channel termination
+                delete scp[i];
+                numScp--;
+                for (int j = i; j < numScp; j++)
+                    scp[j] = scp[j + 1];
+                i--;
+            }
         }
     }
     return NULL;
@@ -144,40 +144,40 @@ static void
 help()
 {
     cout << _(
-	"Usage: ncpd [OPTIONS]...\n"
-	"\n"
-	"Supported options:\n"
-	"\n"
+        "Usage: ncpd [OPTIONS]...\n"
+        "\n"
+        "Supported options:\n"
+        "\n"
         " -d, --dontfork          Run in foreground, don't fork\n"
-	" -h, --help              Display this text.\n"
-	" -V, --version           Print version and exit.\n"
-	" -e, --autoexit          Exit after device is disconnected.\n"
-	" -v, --verbose=LOGCLASS  Enable logging of LOGCLASS events\n"
-	"                         Valid log classes are:\n"
-	"                           m   - main program\n"
-	"                           nl  - NCP protocol log\n"
-	"                           nd  - NCP protocol data dump\n"
-	"                           ll  - PLP protocol log\n"
-	"                           ld  - PLP protocol data dump\n"
-	"                           pl  - physical I/O log\n"
-	"                           ph  - physical I/O handshake\n"
-	"                           pd  - physical I/O data dump\n"
-	"                           all - All of the above\n"
-	" -s, --serial=DEV        Use serial device DEV.\n"
-	" -b, --baudrate=RATE     Set serial speed to BAUD.\n"
-	);
+        " -h, --help              Display this text.\n"
+        " -V, --version           Print version and exit.\n"
+        " -e, --autoexit          Exit after device is disconnected.\n"
+        " -v, --verbose=LOGCLASS  Enable logging of LOGCLASS events\n"
+        "                         Valid log classes are:\n"
+        "                           m   - main program\n"
+        "                           nl  - NCP protocol log\n"
+        "                           nd  - NCP protocol data dump\n"
+        "                           ll  - PLP protocol log\n"
+        "                           ld  - PLP protocol data dump\n"
+        "                           pl  - physical I/O log\n"
+        "                           ph  - physical I/O handshake\n"
+        "                           pd  - physical I/O data dump\n"
+        "                           all - All of the above\n"
+        " -s, --serial=DEV        Use serial device DEV.\n"
+        " -b, --baudrate=RATE     Set serial speed to BAUD.\n"
+        );
     cout <<
 #if DSPEED > 0
 #define SPEEDSTR(x) #x
-	_("                         Default: ") << DSPEED << ".\n";
+        _("                         Default: ") << DSPEED << ".\n";
 #else
     _("                         Default: Autocycle 115.2k, 57.6k 38.4k, 19.2k\n");
 #endif
     cout << _(
-	" -p, --port=[HOST:]PORT  Listen on host HOST, port PORT.\n"
-	"                         Default for HOST: 127.0.0.1\n"
-	"                         Default for PORT: "
-	) << DPORT << "\n\n";
+        " -p, --port=[HOST:]PORT  Listen on host HOST, port PORT.\n"
+        "                         Default for HOST: 127.0.0.1\n"
+        "                         Default for PORT: "
+        ) << DPORT << "\n\n";
 }
 
 static void
@@ -201,29 +201,29 @@ static void
 parse_destination(const char *arg, const char **host, int *port)
 {
     if (!arg)
-	return;
+        return;
     // We don't want to modify argv, therefore copy it first ...
     char *argcpy = strdup(arg);
     char *pp = strchr(argcpy, ':');
 
     if (pp) {
-	// host.domain:400
-	// 10.0.0.1:400
-	*pp ++= '\0';
-	*host = argcpy;
+        // host.domain:400
+        // 10.0.0.1:400
+        *pp ++= '\0';
+        *host = argcpy;
     } else {
-	// 400
-	// host.domain
-	// host
-	// 10.0.0.1
-	if (strchr(argcpy, '.') || !isdigit(argcpy[0])) {
-	    *host = argcpy;
-	    pp = 0L;
-	} else
-	    pp = argcpy;
+        // 400
+        // host.domain
+        // host
+        // 10.0.0.1
+        if (strchr(argcpy, '.') || !isdigit(argcpy[0])) {
+            *host = argcpy;
+            pp = 0L;
+        } else
+            pp = argcpy;
     }
     if (pp)
-	*port = atoi(pp);
+        *port = atoi(pp);
 }
 
 static void *
@@ -234,9 +234,9 @@ link_thread(void *arg)
         iow.watch(1, 0);
         if (theNCP->hasFailed()) {
             if (autoexit) {
-		active = false;
+                active = false;
                 break;
-	    }
+            }
             iow.watch(5, 0);
             if (verbose)
                 lout << "ncp: restarting\n";
@@ -263,142 +263,142 @@ main(int argc, char **argv)
     elog.setOn(false);
     endservent();
     if (se != 0L)
-	sockNum = ntohs(se->s_port);
+        sockNum = ntohs(se->s_port);
 
     while (1) {
-	int c = getopt_long(argc, argv, "hdeVb:s:p:v:", opts, NULL);
-	if (c == -1)
-	    break;
-	switch (c) {
-	    case '?':
-		usage();
-		return -1;
-	    case 'V':
-		cout << _("ncpd Version ") << VERSION << endl;
-		return 0;
-	    case 'h':
-		help();
-		return 0;
-	    case 'v':
-		if (!strcmp(optarg, "nl"))
-		    nverbose |= NCP_DEBUG_LOG;
-		if (!strcmp(optarg, "nd"))
-		    nverbose |= NCP_DEBUG_DUMP;
-		if (!strcmp(optarg, "ll"))
-		    nverbose |= LNK_DEBUG_LOG;
-		if (!strcmp(optarg, "ld"))
-		    nverbose |= LNK_DEBUG_DUMP;
-		if (!strcmp(optarg, "pl"))
-		    nverbose |= PKT_DEBUG_LOG;
-		if (!strcmp(optarg, "pd"))
-		    nverbose |= PKT_DEBUG_DUMP;
-		if (!strcmp(optarg, "ph"))
-		    nverbose |= PKT_DEBUG_HANDSHAKE;
-		if (!strcmp(optarg, "m"))
-		    verbose = true;
-		if (!strcmp(optarg, "all")) {
-		    nverbose = NCP_DEBUG_LOG | NCP_DEBUG_DUMP |
-			LNK_DEBUG_LOG | LNK_DEBUG_DUMP |
-			PKT_DEBUG_LOG | PKT_DEBUG_DUMP | PKT_DEBUG_HANDSHAKE;
-		    verbose = true;
-		}
-		break;
-	    case 'd':
-		dofork = 0;
-		break;
-	    case 'e':
-		autoexit = true;
-		break;
-	    case 'b':
-		if (!strcmp(optarg, "auto"))
-		    baudRate = -1;
-		else
-		    baudRate = atoi(optarg);
-		break;
-	    case 's':
-		serialDevice = optarg;
-		break;
-	    case 'p':
-		parse_destination(optarg, &host, &sockNum);
-		break;
-	}
+        int c = getopt_long(argc, argv, "hdeVb:s:p:v:", opts, NULL);
+        if (c == -1)
+            break;
+        switch (c) {
+            case '?':
+                usage();
+                return -1;
+            case 'V':
+                cout << _("ncpd Version ") << VERSION << endl;
+                return 0;
+            case 'h':
+                help();
+                return 0;
+            case 'v':
+                if (!strcmp(optarg, "nl"))
+                    nverbose |= NCP_DEBUG_LOG;
+                if (!strcmp(optarg, "nd"))
+                    nverbose |= NCP_DEBUG_DUMP;
+                if (!strcmp(optarg, "ll"))
+                    nverbose |= LNK_DEBUG_LOG;
+                if (!strcmp(optarg, "ld"))
+                    nverbose |= LNK_DEBUG_DUMP;
+                if (!strcmp(optarg, "pl"))
+                    nverbose |= PKT_DEBUG_LOG;
+                if (!strcmp(optarg, "pd"))
+                    nverbose |= PKT_DEBUG_DUMP;
+                if (!strcmp(optarg, "ph"))
+                    nverbose |= PKT_DEBUG_HANDSHAKE;
+                if (!strcmp(optarg, "m"))
+                    verbose = true;
+                if (!strcmp(optarg, "all")) {
+                    nverbose = NCP_DEBUG_LOG | NCP_DEBUG_DUMP |
+                        LNK_DEBUG_LOG | LNK_DEBUG_DUMP |
+                        PKT_DEBUG_LOG | PKT_DEBUG_DUMP | PKT_DEBUG_HANDSHAKE;
+                    verbose = true;
+                }
+                break;
+            case 'd':
+                dofork = 0;
+                break;
+            case 'e':
+                autoexit = true;
+                break;
+            case 'b':
+                if (!strcmp(optarg, "auto"))
+                    baudRate = -1;
+                else
+                    baudRate = atoi(optarg);
+                break;
+            case 's':
+                serialDevice = optarg;
+                break;
+            case 'p':
+                parse_destination(optarg, &host, &sockNum);
+                break;
+        }
     }
     if (optind < argc) {
-	usage();
-	return -1;
+        usage();
+        return -1;
     }
 
     if (serialDevice == NULL)
         serialDevice = DDEV;
 
     if (dofork)
-	pid = fork();
+        pid = fork();
     else
-	pid = 0;
+        pid = 0;
     switch (pid) {
-	case 0:
-	    signal(SIGTERM, term_handler);
-	    signal(SIGINT, int_handler);
-	    skt.setWatch(&accept_iow);
-	    if (!skt.listen(host, sockNum))
-		cerr << "listen on " << host << ":" << sockNum << ": "
-		     << strerror(errno) << endl;
-	    else {
-		if (dofork) {
-		    openlog("ncpd", LOG_CONS|LOG_PID, LOG_DAEMON);
-		    dlog.setOn(true);
-		    elog.setOn(true);
-		    ilog.setOn(true);
-		    linf << _("daemon started. Listening at ") << host << ":"
-			 << sockNum << _(" using device ") << serialDevice
-			 << endl;
-		    setsid();
-		    ignore_value(chdir("/"));
-		    int devnull =
-			open("/dev/null", O_RDWR, 0);
-		    if (devnull != -1) {
-			dup2(devnull, STDIN_FILENO);
-			dup2(devnull, STDOUT_FILENO);
-			dup2(devnull, STDERR_FILENO);
-			if (devnull > 2)
-			    close(devnull);
-		    }
-		}
-		memset(scp, 0, sizeof(scp));
-		theNCP = new ncp(serialDevice, baudRate, nverbose);
-		if (!theNCP) {
-		    lerr << "Could not create NCP object" << endl;
-		    exit(-1);
-		}
-		pthread_t thr_a, thr_b;
-		if (pthread_create(&thr_a, NULL, link_thread, NULL) != 0) {
-		    lerr << "Could not create Link thread" << endl;
-		    exit(-1);
-		}
-		if (pthread_create(&thr_b, NULL,
-				   pollSocketConnections, NULL) != 0) {
-		    lerr << "Could not create Socket thread" << endl;
-		    exit(-1);
-		}
-		while (active)
-		    checkForNewSocketConnection();
-		linf << _("terminating") << endl;
-		void *ret;
-		pthread_join(thr_a, &ret);
+        case 0:
+            signal(SIGTERM, term_handler);
+            signal(SIGINT, int_handler);
+            skt.setWatch(&accept_iow);
+            if (!skt.listen(host, sockNum))
+                cerr << "listen on " << host << ":" << sockNum << ": "
+                     << strerror(errno) << endl;
+            else {
+                if (dofork) {
+                    openlog("ncpd", LOG_CONS|LOG_PID, LOG_DAEMON);
+                    dlog.setOn(true);
+                    elog.setOn(true);
+                    ilog.setOn(true);
+                    linf << _("daemon started. Listening at ") << host << ":"
+                         << sockNum << _(" using device ") << serialDevice
+                         << endl;
+                    setsid();
+                    ignore_value(chdir("/"));
+                    int devnull =
+                        open("/dev/null", O_RDWR, 0);
+                    if (devnull != -1) {
+                        dup2(devnull, STDIN_FILENO);
+                        dup2(devnull, STDOUT_FILENO);
+                        dup2(devnull, STDERR_FILENO);
+                        if (devnull > 2)
+                            close(devnull);
+                    }
+                }
+                memset(scp, 0, sizeof(scp));
+                theNCP = new ncp(serialDevice, baudRate, nverbose);
+                if (!theNCP) {
+                    lerr << "Could not create NCP object" << endl;
+                    exit(-1);
+                }
+                pthread_t thr_a, thr_b;
+                if (pthread_create(&thr_a, NULL, link_thread, NULL) != 0) {
+                    lerr << "Could not create Link thread" << endl;
+                    exit(-1);
+                }
+                if (pthread_create(&thr_b, NULL,
+                                   pollSocketConnections, NULL) != 0) {
+                    lerr << "Could not create Socket thread" << endl;
+                    exit(-1);
+                }
+                while (active)
+                    checkForNewSocketConnection();
+                linf << _("terminating") << endl;
+                void *ret;
+                pthread_join(thr_a, &ret);
                 linf << _("joined Link thread") << endl;
-		pthread_join(thr_b, &ret);
+                pthread_join(thr_b, &ret);
                 linf << _("joined Socket thread") << endl;
-		delete theNCP;
+                delete theNCP;
                 linf << _("shut down NCP") << endl;
-	    }
-	    skt.closeSocket();
+            }
+            skt.closeSocket();
             linf << _("socket closed") << endl;
-	    break;
-	case -1:
-	    lerr << "fork: " << strerror(errno) << endl;
-	    break;
-	default:
-	    exit(0);
+            break;
+        case -1:
+            lerr << "fork: " << strerror(errno) << endl;
+            break;
+        default:
+            exit(0);
     }
     linf << _("normal exit") << endl;
     return 0;

@@ -23,21 +23,21 @@
 #include <fuse.h>
 
 typedef struct p_inode {
-	int inode;
-	char *name;
-	struct p_inode *nextnam, *nextnum;
+    int inode;
+    char *name;
+    struct p_inode *nextnam, *nextnum;
 } p_inode;
 
 /**
  * Description of a Psion-Device
  */
 typedef struct p_device {
-  char *name;  /* Volume-Name */
-  char letter; /* Drive-Letter */
-  long attrib; /* Device-Attribs */
-  long total;  /* Total capacity in bytes */
-  long free;   /* Free space in bytes */
-  struct p_device *next;
+    char *name;  /* Volume-Name */
+    char letter; /* Drive-Letter */
+    long attrib; /* Device-Attribs */
+    long total;  /* Total capacity in bytes */
+    long free;   /* Free space in bytes */
+    struct p_device *next;
 } device;
 
 /*
@@ -45,12 +45,12 @@ typedef struct p_device {
  */
 typedef struct p_dentry
 {
-  char *name;
-  long time;
-  long attr;
-  long size;
-  long links;
-  struct p_dentry *next;
+    char *name;
+    long time;
+    long attr;
+    long size;
+    long links;
+    struct p_dentry *next;
 } dentry;
 
 extern int debug;

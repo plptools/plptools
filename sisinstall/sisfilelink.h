@@ -26,10 +26,10 @@ class SISFile;
 class SISFileLink
 {
 public:
-	SISFileLink(SISFile* file);
+    SISFileLink(SISFile* file);
 
-	SISFileLink* m_next;
-	SISFile* m_file;
+    SISFileLink* m_next;
+    SISFile* m_file;
 };
 
 #endif

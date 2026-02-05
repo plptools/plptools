@@ -39,8 +39,8 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
-#define  INVALID_SOCKET	-1
-#define  SOCKET_ERROR	-1
+#define  INVALID_SOCKET -1
+#define  SOCKET_ERROR   -1
 
 #ifndef MSG_NOSIGNAL
 #define MSG_NOSIGNAL 0
@@ -77,19 +77,19 @@ ppsocket::ppsocket()
 ppsocket::~ppsocket()
 {
     if (m_Socket != INVALID_SOCKET) {
-	if (myWatch)
-	    myWatch->remIO(m_Socket);
-	shutdown(m_Socket, SHUT_RDWR);
-	::close(m_Socket);
+        if (myWatch)
+            myWatch->remIO(m_Socket);
+        shutdown(m_Socket, SHUT_RDWR);
+        ::close(m_Socket);
     }
 }
 
 void ppsocket::
 setWatch(IOWatch *watch) {
     if (watch) {
-	if (myWatch && (m_Socket != INVALID_SOCKET))
-	   myWatch->remIO(m_Socket);
-	myWatch = watch;
+        if (myWatch && (m_Socket != INVALID_SOCKET))
+           myWatch->remIO(m_Socket);
+        myWatch = watch;
     }
 }
 
@@ -97,26 +97,26 @@ bool ppsocket::
 reconnect()
 {
     if (m_Socket != INVALID_SOCKET) {
-	if (myWatch)
-	    myWatch->remIO(m_Socket);
-	shutdown(m_Socket, SHUT_RDWR);
-	::close(m_Socket);
+        if (myWatch)
+            myWatch->remIO(m_Socket);
+        shutdown(m_Socket, SHUT_RDWR);
+        ::close(m_Socket);
     }
     m_Socket = INVALID_SOCKET;
     if (!createSocket())
-	return (false);
+        return (false);
     m_LastError = 0;
     m_Bound = false;
     if (::bind(m_Socket, &m_HostAddr, sizeof(m_HostAddr)) != 0) {
-	m_LastError = errno;
-	return (false);
+        m_LastError = errno;
+        return (false);
     }
     if (::connect(m_Socket, &m_PeerAddr, sizeof(m_PeerAddr)) != 0) {
-	m_LastError = errno;
-	return (false);
+        m_LastError = errno;
+        return (false);
     }
     if (myWatch)
-	myWatch->addIO(m_Socket);
+        myWatch->addIO(m_Socket);
     return (true);
 }
 
@@ -130,17 +130,17 @@ toString()
     tmp = inet_ntoa(((struct sockaddr_in *) &m_HostAddr)->sin_addr);
     ret += tmp ? tmp : "none:none";
     if (tmp) {
-	ret += ':';
-	sprintf(nbuf, "%d", ntohs(((struct sockaddr_in *) &m_HostAddr)->sin_port));
-	ret += nbuf;
+        ret += ':';
+        sprintf(nbuf, "%d", ntohs(((struct sockaddr_in *) &m_HostAddr)->sin_port));
+        ret += nbuf;
     }
     ret += " -> ";
     tmp = inet_ntoa(((struct sockaddr_in *) &m_PeerAddr)->sin_addr);
     ret += tmp ? tmp : "none:none";
     if (tmp) {
-	ret += ':';
-	sprintf(nbuf, "%d", ntohs(((struct sockaddr_in *) &m_PeerAddr)->sin_port));
-	ret += nbuf;
+        ret += ':';
+        sprintf(nbuf, "%d", ntohs(((struct sockaddr_in *) &m_PeerAddr)->sin_port));
+        ret += nbuf;
     }
     return ret;
 }
@@ -153,25 +153,25 @@ connect(const char * const Peer, int PeerPort, const char * const Host, int Host
     //****************************************************
 
     if (!bindSocket(Host, HostPort)) {
-	if (m_LastError != 0) {
-	    return (false);
-	}
+        if (m_LastError != 0) {
+            return (false);
+        }
     }
     //****************
     //* Set the peer *
     //****************
     if (!setPeer(Peer, PeerPort)) {
-	return (false);
+        return (false);
     }
     //***********
     //* Connect *
     //***********
     if (::connect(m_Socket, &m_PeerAddr, sizeof(m_PeerAddr)) != 0) {
-	m_LastError = errno;
-	return (false);
+        m_LastError = errno;
+        return (false);
     }
     if (myWatch)
-	myWatch->addIO(m_Socket);
+        myWatch->addIO(m_Socket);
     return (true);
 }
 
@@ -183,19 +183,19 @@ listen(const char * const Host, int Port)
     //****************************************************
 
     if (!bindSocket(Host, Port)) {
-	if (m_LastError != 0) {
-	    return (false);
-	}
+        if (m_LastError != 0) {
+            return (false);
+        }
     }
     //**********************
     //* Listen on the port *
     //**********************
 
     if (myWatch)
-	myWatch->addIO(m_Socket);
+        myWatch->addIO(m_Socket);
     if (::listen(m_Socket, 5) != 0) {
-	m_LastError = errno;
-	return (false);
+        m_LastError = errno;
+        return (false);
     }
     return (true);
 }
@@ -213,10 +213,10 @@ accept(string *Peer, IOWatch *iow)
     accepted = new ppsocket;
 
     if (!iow)
-	iow = myWatch;
+        iow = myWatch;
     if (!accepted) {
-	m_LastError = errno;
-	return NULL;
+        m_LastError = errno;
+        return NULL;
     }
     //***********************
     //* Accept a connection *
@@ -226,9 +226,9 @@ accept(string *Peer, IOWatch *iow)
     accepted->m_Socket = ::accept(m_Socket, &accepted->m_PeerAddr, &len);
 
     if (accepted->m_Socket == INVALID_SOCKET) {
-	m_LastError = errno;
-	delete accepted;
-	return NULL;
+        m_LastError = errno;
+        delete accepted;
+        return NULL;
     }
     //****************************************************
     //* Got a connection so fill in the other attributes *
@@ -247,13 +247,13 @@ accept(string *Peer, IOWatch *iow)
     //* If required get the name of the connected client *
     //****************************************************
     if (Peer) {
-	peer = inet_ntoa(((struct sockaddr_in *) &accepted->m_PeerAddr)->sin_addr);
-	if (peer)
-	    *Peer = peer;
+        peer = inet_ntoa(((struct sockaddr_in *) &accepted->m_PeerAddr)->sin_addr);
+        if (peer)
+            *Peer = peer;
     }
     if (accepted && iow) {
-	accepted->setWatch(iow);
-	iow->addIO(accepted->m_Socket);
+        accepted->setWatch(iow);
+        iow->addIO(accepted->m_Socket);
     }
     return accepted;
 }
@@ -282,24 +282,24 @@ getBufferStore(bufferStore & a, bool wait)
     unsigned char *buff;
     unsigned char *bp;
     if (!wait && !dataToGet(0, 0))
-	return 0;
+        return 0;
     a.init();
     if (recv(&l, sizeof(l), MSG_NOSIGNAL) != sizeof(l)) {
-	return -1;
+        return -1;
     }
     l = ntohl(l);
     if (l > 16384)
-	    return -1;
+            return -1;
     bp = buff = new unsigned char[l];
     while (l > 0) {
-	int j = recv(bp, l, MSG_NOSIGNAL);
-	if (j == SOCKET_ERROR || j == 0) {
-	    delete[]buff;
-	    return -1;
-	}
-	count += j;
-	l -= j;
-	bp += j;
+        int j = recv(bp, l, MSG_NOSIGNAL);
+        if (j == SOCKET_ERROR || j == 0) {
+            delete[]buff;
+            return -1;
+        }
+        count += j;
+        l -= j;
+        bp += j;
     };
     a.init(buff, count);
     delete[]buff;
@@ -320,15 +320,15 @@ sendBufferStore(const bufferStore & a)
     b.addBuff(a);
     l += 4;
     while (l > 0) {
-	i = send((const char *)b.getString(sent), l, MSG_NOSIGNAL);
-	if (i == SOCKET_ERROR || i == 0)
-	    return (false);
-	sent += i;
-	l -= i;
-	if (++retries > 5) {
-	    m_LastError = 0;
-	    return (false);
-	}
+        i = send((const char *)b.getString(sent), l, MSG_NOSIGNAL);
+        if (i == SOCKET_ERROR || i == 0)
+            return (false);
+        sent += i;
+        l -= i;
+        if (++retries > 5) {
+            m_LastError = 0;
+            return (false);
+        }
     }
     return true;
 }
@@ -339,7 +339,7 @@ recv(void *buf, int len, int flags)
     int i = ::recv(m_Socket, buf, len, flags);
 
     if (i < 0)
-	m_LastError = errno;
+        m_LastError = errno;
 
     return (i);
 }
@@ -350,7 +350,7 @@ send(const void * const buf, int len, int flags)
     int i = ::send(m_Socket, buf, len, flags);
 
     if (i < 0)
-	m_LastError = errno;
+        m_LastError = errno;
 
     return (i);
 }
@@ -359,11 +359,11 @@ bool ppsocket::
 closeSocket(void)
 {
     if (myWatch)
-	myWatch->remIO(m_Socket);
+        myWatch->remIO(m_Socket);
     shutdown(m_Socket, SHUT_RDWR);
     if (::close(m_Socket) != 0) {
-	m_LastError = errno;
-	return false;
+        m_LastError = errno;
+        return false;
     }
     m_Socket = INVALID_SOCKET;
     return true;
@@ -375,31 +375,31 @@ bindSocket(const char * const Host, int Port)
 
     // If we are already bound return false but with no last error
     if (m_Bound) {
-	m_LastError = 0;
-	return false;
+        m_LastError = 0;
+        return false;
     }
 
     // If the socket hasn't been created create it now
 
     if (m_Socket == INVALID_SOCKET) {
-	if (!createSocket())
-	    return false;
+        if (!createSocket())
+            return false;
     }
 
     // Set SO_REUSEADDR
     int one = 1;
     if (setsockopt(m_Socket, SOL_SOCKET, SO_REUSEADDR,
-		   (const char *)&one, sizeof(int)) < 0)
-	cerr << "Warning: Unable to set SO_REUSEADDR option\n";
+                   (const char *)&one, sizeof(int)) < 0)
+        cerr << "Warning: Unable to set SO_REUSEADDR option\n";
 
     // If a host name was supplied then use it
     if (!setHost(Host, Port))
-	return false;
+        return false;
 
     // Now bind the socket
     if (::bind(m_Socket, &m_HostAddr, sizeof(m_HostAddr)) != 0) {
-	m_LastError = errno;
-	return false;
+        m_LastError = errno;
+        return false;
     }
 
     m_Bound = true;
@@ -414,41 +414,41 @@ bindInRange(const char * const Host, int Low, int High, int Retries)
 
     // If we are already bound return false but with no last error
     if (m_Bound) {
-	m_LastError = 0;
-	return (false);
+        m_LastError = 0;
+        return (false);
     }
 
     // If the socket hasn't been created create it now
     if (m_Socket == INVALID_SOCKET) {
-	if (!createSocket())
-	    return false;
+        if (!createSocket())
+            return false;
     }
 
     // If the number of retries is greater than the range then work
     // through the range sequentially.
     if (Retries > High - Low) {
-	for (port = Low; port <= High; port++) {
-	    if (!setHost(Host, port))
-		return false;
-	    if (::bind(m_Socket, &m_HostAddr, sizeof(m_HostAddr)) == 0)
-		break;
-	}
-	if (port > High) {
-	    m_LastError = errno;
-	    return false;
-	}
+        for (port = Low; port <= High; port++) {
+            if (!setHost(Host, port))
+                return false;
+            if (::bind(m_Socket, &m_HostAddr, sizeof(m_HostAddr)) == 0)
+                break;
+        }
+        if (port > High) {
+            m_LastError = errno;
+            return false;
+        }
     } else {
-	for (i = 0; i < Retries; i++) {
-	    port = Low + (rand() % (High - Low));
-	    if (!setHost(Host, port))
-		return false;
-	    if (::bind(m_Socket, &m_HostAddr, sizeof(m_HostAddr)) == 0)
-		break;
-	}
-	if (i >= Retries) {
-	    m_LastError = errno;
-	    return false;
-	}
+        for (i = 0; i < Retries; i++) {
+            port = Low + (rand() % (High - Low));
+            if (!setHost(Host, port))
+                return false;
+            if (::bind(m_Socket, &m_HostAddr, sizeof(m_HostAddr)) == 0)
+                break;
+        }
+        if (i >= Retries) {
+            m_LastError = errno;
+            return false;
+        }
     }
     m_Bound = true;
     return true;
@@ -462,23 +462,23 @@ linger(bool LingerOn, int LingerTime)
 
     // If the socket hasn't been created create it now
     if (m_Socket == INVALID_SOCKET) {
-	if (!createSocket())
-	    return false;
+        if (!createSocket())
+            return false;
     }
 
     // Set the lingering
     if (LingerOn) {
-	l.l_onoff = 1;
-	l.l_linger = LingerTime;
+        l.l_onoff = 1;
+        l.l_linger = LingerTime;
     } else {
-	l.l_onoff = 0;
-	l.l_linger = 0;
+        l.l_onoff = 0;
+        l.l_linger = 0;
     }
     i = setsockopt(m_Socket, SOL_SOCKET, SO_LINGER, (const char *) &l, sizeof(l));
     // Check for errors
     if (i != 0) {
-	m_LastError = errno;
-	return false;
+        m_LastError = errno;
+        return false;
     }
     return true;
 }
@@ -488,13 +488,13 @@ createSocket(void)
 {
     // If the socket has already been created just return true
     if (m_Socket != INVALID_SOCKET)
-	return true;
+        return true;
 
     // Create the socket
     m_Socket = ::socket(PF_INET, SOCK_STREAM, 0);
     if (m_Socket == INVALID_SOCKET) {
-	m_LastError = errno;
-	return false;
+        m_LastError = errno;
+        return false;
     }
 
     // By default set no lingering
@@ -511,29 +511,29 @@ setPeer(const char * const Peer, int Port)
 
     // If a peer name was supplied then use it
     if (Peer) {
-	if (!isdigit(Peer[0]))
-	    // RFC1035 specifies that hostnames must not start
-	    // with a digit. So we can speed up things here.
-	    he = gethostbyname(Peer);
-	if (!he) {
-	    struct in_addr ipaddr;
+        if (!isdigit(Peer[0]))
+            // RFC1035 specifies that hostnames must not start
+            // with a digit. So we can speed up things here.
+            he = gethostbyname(Peer);
+        if (!he) {
+            struct in_addr ipaddr;
 
-	    if (!inet_aton(Peer, &ipaddr)) {
-		m_LastError = errno;
-		return false;
-	    }
-	    he = gethostbyaddr((const char *)&ipaddr.s_addr, sizeof(ipaddr.s_addr), PF_INET);
-	    if (!he) {
-		m_LastError = errno;
-		return (false);
-	    }
-	}
-	memcpy(&((struct sockaddr_in *)&m_PeerAddr)->sin_addr, he->h_addr_list[0],
-	       sizeof(((struct sockaddr_in *)&m_PeerAddr)->sin_addr));
+            if (!inet_aton(Peer, &ipaddr)) {
+                m_LastError = errno;
+                return false;
+            }
+            he = gethostbyaddr((const char *)&ipaddr.s_addr, sizeof(ipaddr.s_addr), PF_INET);
+            if (!he) {
+                m_LastError = errno;
+                return (false);
+            }
+        }
+        memcpy(&((struct sockaddr_in *)&m_PeerAddr)->sin_addr, he->h_addr_list[0],
+               sizeof(((struct sockaddr_in *)&m_PeerAddr)->sin_addr));
     }
     // If a port name was supplied use it
     if (Port > 0)
-	((struct sockaddr_in *)&m_PeerAddr)->sin_port = htons(Port);
+        ((struct sockaddr_in *)&m_PeerAddr)->sin_port = htons(Port);
     return true;
 }
 
@@ -543,15 +543,15 @@ getPeer(string *Peer, int *Port)
     char *peer;
 
     if (Peer) {
-	peer = inet_ntoa(((struct sockaddr_in *) &m_PeerAddr)->sin_addr);
-	if (!peer) {
-	    m_LastError = errno;
-	    return (false);
-	}
-	*Peer = peer;
+        peer = inet_ntoa(((struct sockaddr_in *) &m_PeerAddr)->sin_addr);
+        if (!peer) {
+            m_LastError = errno;
+            return (false);
+        }
+        *Peer = peer;
     }
     if (Port)
-	*Port = ntohs(((struct sockaddr_in *) &m_PeerAddr)->sin_port);
+        *Port = ntohs(((struct sockaddr_in *) &m_PeerAddr)->sin_port);
     return false;
 }
 
@@ -562,31 +562,31 @@ setHost(const char * const Host, int Port)
 
     // If a host name was supplied then use it
     if (Host) {
-	if (!isdigit(Host[0]))
-	    // RFC1035 specifies that hostnames must not start
-	    // with a digit. So we can speed up things here.
-	    he = gethostbyname(Host);
-	he = gethostbyname(Host);
-	if (!he) {
-	    struct in_addr ipaddr;
+        if (!isdigit(Host[0]))
+            // RFC1035 specifies that hostnames must not start
+            // with a digit. So we can speed up things here.
+            he = gethostbyname(Host);
+        he = gethostbyname(Host);
+        if (!he) {
+            struct in_addr ipaddr;
 
-	    if (!inet_aton(Host, &ipaddr)) {
-		m_LastError = errno;
-		return false;
-	    }
-	    he = gethostbyaddr((const char *)&ipaddr.s_addr, sizeof(ipaddr.s_addr), PF_INET);
-	    if (!he) {
-		m_LastError = errno;
-		return false;
-	    }
-	}
-	memcpy(&((struct sockaddr_in *)&m_HostAddr)->sin_addr, he->h_addr_list[0],
-	       sizeof(((struct sockaddr_in *)&m_HostAddr)->sin_addr));
+            if (!inet_aton(Host, &ipaddr)) {
+                m_LastError = errno;
+                return false;
+            }
+            he = gethostbyaddr((const char *)&ipaddr.s_addr, sizeof(ipaddr.s_addr), PF_INET);
+            if (!he) {
+                m_LastError = errno;
+                return false;
+            }
+        }
+        memcpy(&((struct sockaddr_in *)&m_HostAddr)->sin_addr, he->h_addr_list[0],
+               sizeof(((struct sockaddr_in *)&m_HostAddr)->sin_addr));
     }
 
     // If a port name was supplied use it
     if (Port > 0)
-	((struct sockaddr_in *)&m_HostAddr)->sin_port = htons(Port);
+        ((struct sockaddr_in *)&m_HostAddr)->sin_port = htons(Port);
     return true;
 }
 
@@ -596,14 +596,14 @@ getHost(string *Host, int *Port)
     char *host;
 
     if (Host) {
-	host = inet_ntoa(((struct sockaddr_in *)&m_HostAddr)->sin_addr);
-	if (!host) {
-	    m_LastError = errno;
-	    return false;
-	}
-	*Host = host;
+        host = inet_ntoa(((struct sockaddr_in *)&m_HostAddr)->sin_addr);
+        if (!host) {
+            m_LastError = errno;
+            return false;
+        }
+        *Host = host;
     }
     if (Port)
-	*Port = ntohs(((struct sockaddr_in *)&m_HostAddr)->sin_port);
+        *Port = ntohs(((struct sockaddr_in *)&m_HostAddr)->sin_port);
     return true;
 }

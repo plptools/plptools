@@ -46,19 +46,19 @@ extern int rfsv_dircount(const char *name, long *count);
 extern int rfsv_isalive(void);
 
 /* File attributes, C-style */
-#define	PSI_A_RDONLY		0x0001
-#define	PSI_A_HIDDEN		0x0002
-#define	PSI_A_SYSTEM		0x0004
-#define PSI_A_DIR		0x0008
-#define PSI_A_ARCHIVE		0x0010
-#define PSI_A_VOLUME		0x0020
-#define PSI_A_NORMAL		0x0040
-#define PSI_A_TEMP		0x0080
-#define PSI_A_COMPRESSED	0x0100
-#define PSI_A_READ		0x0200
-#define PSI_A_EXEC		0x0400
-#define PSI_A_STREAM		0x0800
-#define PSI_A_TEXT		0x1000
+#define PSI_A_RDONLY         0x0001
+#define PSI_A_HIDDEN         0x0002
+#define PSI_A_SYSTEM         0x0004
+#define PSI_A_DIR            0x0008
+#define PSI_A_ARCHIVE        0x0010
+#define PSI_A_VOLUME         0x0020
+#define PSI_A_NORMAL         0x0040
+#define PSI_A_TEMP           0x0080
+#define PSI_A_COMPRESSED     0x0100
+#define PSI_A_READ           0x0200
+#define PSI_A_EXEC           0x0400
+#define PSI_A_STREAM         0x0800
+#define PSI_A_TEXT           0x1000
 
 #ifdef __cplusplus
 }

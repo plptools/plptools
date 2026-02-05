@@ -47,9 +47,9 @@ getCmdLine(const char *process, string &ret)
 
     a.addStringT(process);
     if (!sendCommand(rpcs::GET_CMDLINE, a))
-	return rfsv::E_PSI_FILE_DISC;
+        return rfsv::E_PSI_FILE_DISC;
     if ((res = getResponse(a, true)) == rfsv::E_PSI_GEN_NONE)
-	ret = a.getString(0);
+        ret = a.getString(0);
     return res;
 }
 
@@ -60,11 +60,11 @@ getMachineInfo(machineInfo &mi)
     Enum<rfsv::errs> res;
 
     if (!sendCommand(rpcs::GET_MACHINE_INFO, a))
-	return rfsv::E_PSI_FILE_DISC;
+        return rfsv::E_PSI_FILE_DISC;
     if ((res = getResponse(a, true)) != rfsv::E_PSI_GEN_NONE)
-	return res;
+        return res;
     if (a.getLen() != 256)
-	return rfsv::E_PSI_GEN_FAIL;
+        return rfsv::E_PSI_GEN_FAIL;
     mi.machineType = (enum rpcs::machs)a.getDWord(0);
     strncpy(mi.machineName, a.getString(16), 16);
     mi.machineName[16] = '\0';
@@ -118,8 +118,8 @@ getMachineInfo(machineInfo &mi)
 
     mtCacheS5mx |= 8;
     if (res == rfsv::E_PSI_GEN_NONE) {
-	if (!strcmp(mi.machineName, "SERIES5mx"))
-	    mtCacheS5mx |= 2;
+        if (!strcmp(mi.machineName, "SERIES5mx"))
+            mtCacheS5mx |= 2;
     }
 
     return res;
@@ -136,11 +136,11 @@ regOpenIter(uint32_t uid, char *match, uint16_t &handle)
     a.addDWord(strlen(match));
     a.addStringT(match);
     if (!sendCommand(rpcs::REG_OPEN_ITER, a))
-	return rfsv::E_PSI_FILE_DISC;
+        return rfsv::E_PSI_FILE_DISC;
     res = getResponse(a, true);
     cout << "ro: r=" << res << " a=" << a << endl;
     if (a.getLen() == 2)
-	handle = a.getWord(0);
+        handle = a.getWord(0);
     return rfsv::E_PSI_GEN_NONE;
 }
 
@@ -153,11 +153,11 @@ regReadIter(uint16_t handle)
     cout << "Riter" << endl;
     a.addWord(handle);
     if (!sendCommand(rpcs::REG_READ_ITER, a))
-	return rfsv::E_PSI_FILE_DISC;
+        return rfsv::E_PSI_FILE_DISC;
     res = getResponse(a, true);
     cout << "ro: r=" << res << " a=" << a << endl;
     if ((a.getLen() == 3) && (a.getByte(2) == 0xff))
-	return rfsv::E_PSI_FILE_EOF;
+        return rfsv::E_PSI_FILE_EOF;
     return rfsv::E_PSI_GEN_NONE;
 }
 
@@ -198,10 +198,10 @@ configOpen(uint16_t &handle, uint32_t size)
 
     a.addDWord(size);
     if (!sendCommand(rpcs::CONFIG_OPEN, a))
-	return rfsv::E_PSI_FILE_DISC;
+        return rfsv::E_PSI_FILE_DISC;
     res = getResponse(a, true);
     if (res == rfsv::E_PSI_GEN_NONE && (a.getLen() >= 2))
-	handle = a.getWord(0);
+        handle = a.getWord(0);
     return res;
 }
 
@@ -214,19 +214,19 @@ configRead(uint32_t size, bufferStore &ret)
 
     ret.init();
     if ((res = configOpen(handle, size)) != rfsv::E_PSI_GEN_NONE)
-	return res;
+        return res;
     do {
-	a.init();
-	a.addWord(handle);
-	a.addDWord(2047);
-	if (!sendCommand(rpcs::CONFIG_READ, a))
-	    return rfsv::E_PSI_FILE_DISC;
-	if ((res = getResponse(a, true)) != rfsv::E_PSI_GEN_NONE) {
-	    closeHandle(handle);
-	    return res;
-	}
-	if (a.getLen() > 0)
-	    ret.addBuff(a);
+        a.init();
+        a.addWord(handle);
+        a.addDWord(2047);
+        if (!sendCommand(rpcs::CONFIG_READ, a))
+            return rfsv::E_PSI_FILE_DISC;
+        if ((res = getResponse(a, true)) != rfsv::E_PSI_GEN_NONE) {
+            closeHandle(handle);
+            return res;
+        }
+        if (a.getLen() > 0)
+            ret.addBuff(a);
     } while (a.getLen() > 0);
     return rfsv::E_PSI_GEN_NONE;
 }
@@ -240,19 +240,19 @@ configWrite(bufferStore data)
 
     return rfsv::E_PSI_GEN_NONE;
     if ((res = configOpen(handle, data.getLen())) != rfsv::E_PSI_GEN_NONE)
-	return res;
+        return res;
     do {
-	a.init();
-	long l = (data.getLen() > 2047) ? 2047 : data.getLen();
-	a.addWord(handle);
-	a.addBuff(data, l);
-	data.discardFirstBytes(l);
-	if (!sendCommand(rpcs::CONFIG_WRITE, a))
-	    return rfsv::E_PSI_FILE_DISC;
-	if ((res = getResponse(a, true)) != rfsv::E_PSI_GEN_NONE) {
-	    closeHandle(handle);
-	    return res;
-	}
+        a.init();
+        long l = (data.getLen() > 2047) ? 2047 : data.getLen();
+        a.addWord(handle);
+        a.addBuff(data, l);
+        data.discardFirstBytes(l);
+        if (!sendCommand(rpcs::CONFIG_WRITE, a))
+            return rfsv::E_PSI_FILE_DISC;
+        if ((res = getResponse(a, true)) != rfsv::E_PSI_GEN_NONE) {
+            closeHandle(handle);
+            return res;
+        }
     } while (data.getLen() > 0);
     return rfsv::E_PSI_GEN_NONE;
 }
@@ -264,6 +264,6 @@ closeHandle(uint16_t handle)
 
     a.addWord(handle);
     if (!sendCommand(rpcs::CLOSE_HANDLE, a))
-	return rfsv::E_PSI_FILE_DISC;
+        return rfsv::E_PSI_FILE_DISC;
     return getResponse(a, true);
 }

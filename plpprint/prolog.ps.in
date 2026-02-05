@@ -211,7 +211,7 @@ putinterval d
           0 -10 rmoveto 0.5 setlinewidth
         }ifelse
         sw 0 rlineto s
-	pen_th setlinewidth
+        pen_th setlinewidth
       grestore
     }if
     st{

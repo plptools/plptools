@@ -70,8 +70,7 @@ public:
     /**
     * Retrieves the length of a bufferStore.
     *
-    * @returns The current length of the contents
-    * 	in bytes.
+    * @returns The current length of the contents in bytes.
     */
     unsigned long getLen() const;
 
@@ -142,8 +141,7 @@ public:
     /**
     * Tests if the bufferStore is empty.
     *
-    * @returns true, if the bufferStore is empty.
-    * 	false, if it contains data.
+    * @returns true, if the bufferStore is empty; false, if it contains data.
     */
     bool empty() const;
 

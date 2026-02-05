@@ -39,7 +39,7 @@ channel::channel(ncp * _ncpController)
 channel::~channel()
 {
     if (connectName)
-	free((void *)connectName);
+        free((void *)connectName);
 }
 
 void channel::
@@ -154,8 +154,8 @@ void channel::
 setNcpConnectName(const char *name)
 {
     if (name) {
-	if (connectName)
-	    free((void *)connectName);
-	connectName = strdup(name);
+        if (connectName)
+            free((void *)connectName);
+        connectName = strdup(name);
     }
 }

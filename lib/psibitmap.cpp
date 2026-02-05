@@ -24,7 +24,7 @@
 
 void
 encodeBitmap(int width, int height, getPixelFunction_t getPixel, bool /*rle*/,
-	     bufferStore &out) {
+             bufferStore &out) {
     bufferStore ib;
 
     ib.addDWord(0x00000028);   // hdrlen
@@ -39,31 +39,31 @@ encodeBitmap(int width, int height, getPixelFunction_t getPixel, bool /*rle*/,
 
     bufferStore rawBuf;
     for (int y = 0; y < height; y++) {
-	int ov = 0;
-	int shift = 0;
-	int bc = 0;
+        int ov = 0;
+        int shift = 0;
+        int bc = 0;
 
-	for (int x = 0; x < width; x++) {
-	    int v = getPixel(x, y) / 85;
-	    ov |= (v << shift);
-	    if (shift == 6) {
-		rawBuf.addByte(ov);
-		bc++;
-		shift = 0;
-		ov = 0;
-	    } else
-		shift += 2;
-	}
-	if (shift != 0) {
-	    rawBuf.addByte(ov);
-	    shift = 0;
-	    ov = 0;
-	    bc++;
-	}
-	while (bc % 4) {
-	    rawBuf.addByte(0);
-	    bc++;
-	}
+        for (int x = 0; x < width; x++) {
+            int v = getPixel(x, y) / 85;
+            ov |= (v << shift);
+            if (shift == 6) {
+                rawBuf.addByte(ov);
+                bc++;
+                shift = 0;
+                ov = 0;
+            } else
+                shift += 2;
+        }
+        if (shift != 0) {
+            rawBuf.addByte(ov);
+            shift = 0;
+            ov = 0;
+            bc++;
+        }
+        while (bc % 4) {
+            rawBuf.addByte(0);
+            bc++;
+        }
     }
 
 #if 1
@@ -77,38 +77,38 @@ encodeBitmap(int width, int height, getPixelFunction_t getPixel, bool /*rle*/,
     bufferStore diBuf;
 
     for (int i = 1; i <= rawLen; i++) {
-	int v;
-	if (i < rawLen)
-	    v = rawBuf.getByte(i);
-	else
-	    v = lastByte + 1;
-	if (v == lastByte) {
-	    if (diBuf.getLen()) {
-		ib.addByte(0x100 - diBuf.getLen());
-		ib.addBuff(diBuf);
-		diBuf.init();
-	    }
-	    eqCount++;
-	    if (eqCount > 0x7f) {
-		ib.addByte(0x7f);
-		ib.addByte(v);
-		eqCount = 1;
-	    }
-	} else {
-	    if (eqCount > 1) {
-		ib.addByte(eqCount);
-		ib.addByte(lastByte);
-		eqCount = 1;
-	    } else {
-		diBuf.addByte(lastByte);
-		if ((diBuf.getLen() > 0x7f) || (i == rawLen)) {
-		    ib.addByte(0x100 - diBuf.getLen());
-		    ib.addBuff(diBuf);
-		    diBuf.init();
-		}
-	    }
-	}
-	lastByte = v;
+        int v;
+        if (i < rawLen)
+            v = rawBuf.getByte(i);
+        else
+            v = lastByte + 1;
+        if (v == lastByte) {
+            if (diBuf.getLen()) {
+                ib.addByte(0x100 - diBuf.getLen());
+                ib.addBuff(diBuf);
+                diBuf.init();
+            }
+            eqCount++;
+            if (eqCount > 0x7f) {
+                ib.addByte(0x7f);
+                ib.addByte(v);
+                eqCount = 1;
+            }
+        } else {
+            if (eqCount > 1) {
+                ib.addByte(eqCount);
+                ib.addByte(lastByte);
+                eqCount = 1;
+            } else {
+                diBuf.addByte(lastByte);
+                if ((diBuf.getLen() > 0x7f) || (i == rawLen)) {
+                    ib.addByte(0x100 - diBuf.getLen());
+                    ib.addBuff(diBuf);
+                    diBuf.init();
+                }
+            }
+        }
+        lastByte = v;
     }
 #endif
 
@@ -121,20 +121,20 @@ do {                                                \
     int j;                                          \
                                                     \
     if (x < bytesPerLine)                           \
-	for (j = 0; j < pixelsPerByte; j++) {       \
-	    if (j && ((oidx % xPixels) == 0))       \
-		break;                              \
-	    else                                    \
+        for (j = 0; j < pixelsPerByte; j++) {       \
+            if (j && ((oidx % xPixels) == 0))       \
+                break;                              \
+            else                                    \
               if (oidx >= picsize)                  \
-		return false;                       \
-	    else {                                  \
-		out.addByte((v & mask) * grayVal);  \
+                return false;                       \
+            else {                                  \
+                out.addByte((v & mask) * grayVal);  \
                 v >>= bitsPerPixel;                 \
-		oidx++;                             \
-	    }                                       \
-	}                                           \
+                oidx++;                             \
+            }                                       \
+        }                                           \
     if (++x >= linelen)                             \
-	x = 0;                                      \
+        x = 0;                                      \
 } while (0)
 
 bool
@@ -169,48 +169,48 @@ decodeBitmap(const unsigned char *p, int &width, int &height, bufferStore &out)
     int offset = 0;
 
     if (RLEflag) {
-	int i = 0;
-	while (offset < datlen) {
-	    unsigned char b = *(p + offset);
-	    if (b >= 0x80) {
-		offset += 0x100 - b + 1;
-		i += 0x100 - b;
-	    } else {
-		offset += 2;
-		i += b + 1;
-	    }
-	}
-	linelen = i / yPixels;
-	offset = 0;
-	while (offset < datlen) {
-	    unsigned char b = *(p + offset++);
-	    if (b >= 0x80) {
-		for (i = 0; i < 0x100 - b; i++, offset++) {
-		    if (offset >= datlen)
-			return false; // data corrupted
-		    unsigned char b2 = *(p + offset);
-		    splitByte(b2);
-		}
-	    } else {
-		if (offset >= datlen)
-		    return false;
-		else {
-		    unsigned char b2 = *(p + offset);
-		    unsigned char bs = b2;
-		    for (i = 0; i <= b; i++) {
-			splitByte(b2);
-			b2 = bs;
-		    }
-		}
-		offset++;
-	    }
-	}
+        int i = 0;
+        while (offset < datlen) {
+            unsigned char b = *(p + offset);
+            if (b >= 0x80) {
+                offset += 0x100 - b + 1;
+                i += 0x100 - b;
+            } else {
+                offset += 2;
+                i += b + 1;
+            }
+        }
+        linelen = i / yPixels;
+        offset = 0;
+        while (offset < datlen) {
+            unsigned char b = *(p + offset++);
+            if (b >= 0x80) {
+                for (i = 0; i < 0x100 - b; i++, offset++) {
+                    if (offset >= datlen)
+                        return false; // data corrupted
+                    unsigned char b2 = *(p + offset);
+                    splitByte(b2);
+                }
+            } else {
+                if (offset >= datlen)
+                    return false;
+                else {
+                    unsigned char b2 = *(p + offset);
+                    unsigned char bs = b2;
+                    for (i = 0; i <= b; i++) {
+                        splitByte(b2);
+                        b2 = bs;
+                    }
+                }
+                offset++;
+            }
+        }
     } else {
-	linelen = datlen / yPixels;
-	while (offset < datlen) {
-	    unsigned char b = *(p + offset++);
-	    splitByte(b);
-	}
+        linelen = datlen / yPixels;
+        while (offset < datlen) {
+            unsigned char b = *(p + offset++);
+            splitByte(b);
+        }
     }
     return true;
 }

@@ -51,55 +51,55 @@ protected:
     */
     class i2sMapper {
     private:
-	/**
-	* there can be one value, mapping to multiple
-	* strings. Therefore, we need a multimap.
-	*/
-	typedef std::multimap<long, const char*> i2s_map_t;
+        /**
+        * there can be one value, mapping to multiple
+        * strings. Therefore, we need a multimap.
+        */
+        typedef std::multimap<long, const char*> i2s_map_t;
 
-	/**
-	* just for the record. Mapping back a string to the
-	* Integer value in question. Since Symbols must be unique,
-	* there is only a 1:1 relation as opposed to i2s_map_t. So
-	* we can use a normal map here.
-	*
-	* Since in the usual application, mapping a string back
-	* to its value is not important performance wise (typically
-	* in a frontend), so it is implemented as exhaustive search,
-	* not as extra map. Saves some bits of memrory ..
-	*/
-	//typedef map<const char*, long> s2i_map_t;
+        /**
+        * just for the record. Mapping back a string to the
+        * Integer value in question. Since Symbols must be unique,
+        * there is only a 1:1 relation as opposed to i2s_map_t. So
+        * we can use a normal map here.
+        *
+        * Since in the usual application, mapping a string back
+        * to its value is not important performance wise (typically
+        * in a frontend), so it is implemented as exhaustive search,
+        * not as extra map. Saves some bits of memrory ..
+        */
+        //typedef map<const char*, long> s2i_map_t;
 
-	i2s_map_t stringMap;
+        i2s_map_t stringMap;
     public:
-	/**
-	* adds a new int -> string mapping
-	* Does NOT take over responsibility for the
-	* pointer (i.e. it is not freed), so it is save
-	* to add constant strings provided in the program code.
-	*/
-	void add(long, const char*);
+        /**
+        * adds a new int -> string mapping
+        * Does NOT take over responsibility for the
+        * pointer (i.e. it is not freed), so it is save
+        * to add constant strings provided in the program code.
+        */
+        void add(long, const char*);
 
-	/**
-	* returns the string representation for this integer.
-	* If there are multiple strings for this integer,
-	* return a comma delimited list.
-	*/
-	std::string lookup(long) const;
+        /**
+        * returns the string representation for this integer.
+        * If there are multiple strings for this integer,
+        * return a comma delimited list.
+        */
+        std::string lookup(long) const;
 
-	/**
-	* returns the integer associated with the
-	* given string or -1 if the value
-	* is not found (XXX: this should throw
-	* an exception).
-	*/
-	long lookup (const char *) const;
+        /**
+        * returns the integer associated with the
+        * given string or -1 if the value
+        * is not found (XXX: this should throw
+        * an exception).
+        */
+        long lookup (const char *) const;
 
-	/**
-	* returns true, if we have an representation for
-	* the given integer.
-	*/
-	bool inRange(long) const;
+        /**
+        * returns true, if we have an representation for
+        * the given integer.
+        */
+        bool inRange(long) const;
     };
 };
 
@@ -138,21 +138,21 @@ template<typename E>
 class Enum : private EnumBase {
 public:
     struct sdata {
-	/**
-	 * The constructor of the static data part.
-	 * You've to provide a constructor for each Enumeration
-	 * you want to wrap with this class. Initializes
-	 * the string Representation map, the readable name
-	 * of this Enumeration and a default value.
-	 *
-	 * The constructor is called automatically on definition,
-	 * so this makes sure, that the static part is initialized
-	 * properly before the program starts.
-	 */
-	sdata();
-	i2sMapper    stringRep;
-	std::string name;
-	E           defaultValue;
+        /**
+         * The constructor of the static data part.
+         * You've to provide a constructor for each Enumeration
+         * you want to wrap with this class. Initializes
+         * the string Representation map, the readable name
+         * of this Enumeration and a default value.
+         *
+         * The constructor is called automatically on definition,
+         * so this makes sure, that the static part is initialized
+         * properly before the program starts.
+         */
+        sdata();
+        i2sMapper    stringRep;
+        std::string name;
+        E           defaultValue;
     };
     static sdata staticData;
 
@@ -172,10 +172,10 @@ public:
     * initialize with Enumeration given.
     */
     Enum(E init) : value(init){
-	// if this hits you and you're sure, that the
-	// value is right .. is this Enum proper
-	// initialized in the Enum<E>::sdata::sdata() ?
-	assert(inRange(init));
+        // if this hits you and you're sure, that the
+        // value is right .. is this Enum proper
+        // initialized in the Enum<E>::sdata::sdata() ?
+        assert(inRange(init));
     }
 
     /**
@@ -183,7 +183,7 @@ public:
     * XXX: throw Exception if not found ?
     */
     Enum(const std::string& s) : value(getValueFor(s)) {
-	assert(inRange(value));
+        assert(inRange(value));
     }
 
     /**
@@ -192,15 +192,15 @@ public:
     * this Enumeration.
     */
     inline Enum& operator = (E setval) {
-	value = setval;
-	assert(inRange(setval));
-	return *this;
+        value = setval;
+        assert(inRange(setval));
+        return *this;
     }
 
     inline Enum& operator = (const Enum& rhs) {
         if (&rhs != this)
             value = rhs.value;
-	return *this;
+        return *this;
     }
 
     /**
@@ -233,7 +233,7 @@ public:
     * for this.
     */
     static bool inRange(long i) {
-	return (staticData.stringRep.inRange(i));
+        return (staticData.stringRep.inRange(i));
     }
 
     /**
@@ -247,7 +247,7 @@ public:
     * value of this Enumeration.
     */
     static std::string getStringFor(E e) {
-	return staticData.stringRep.lookup((long) e);
+        return staticData.stringRep.lookup((long) e);
     }
 
     /**
@@ -255,7 +255,7 @@ public:
     * XXX: throw OutOfRangeException ?
     */
     static E getValueFor(const std::string &s) {
-	return (E) staticData.stringRep.lookup(s.c_str());
+        return (E) staticData.stringRep.lookup(s.c_str());
     }
 };
 
@@ -276,16 +276,15 @@ template<typename E> typename Enum<E>::sdata Enum<E>::staticData;
  * // declaration of enumeration; somewhere
  * class rfsv {
  * [...]
- *	enum PSI_ERROR_CODES { E_PSI_GEN_NONE, E_PSI_GEN_FAIL, E_PSI_GEN_ARG };
+ *        enum PSI_ERROR_CODES { E_PSI_GEN_NONE, E_PSI_GEN_FAIL, E_PSI_GEN_ARG };
  * [...]
  * };
  *
  * // definition of the Enum<E> with the appropriate string representations
- * ENUM_DEFINITION(rfsv::PSI_ERROR_CODES,
- *		   rfsv::E_PSI_GEN_NONE) {
- *	stringRep.add(rfsv::E_PSI_GEN_NONE,	"no error");
- *	stringRep.add(rfsv::E_PSI_GEN_FAIL,	"general");
- *	stringRep.add(rfsv::E_PSI_GEN_ARG,	"bad argument");
+ * ENUM_DEFINITION(rfsv::PSI_ERROR_CODES, rfsv::E_PSI_GEN_NONE) {
+ *     stringRep.add(rfsv::E_PSI_GEN_NONE, "no error");
+ *     stringRep.add(rfsv::E_PSI_GEN_FAIL, "general");
+ *     stringRep.add(rfsv::E_PSI_GEN_ARG,  "bad argument");
  * }
  * </pre>
  *
@@ -299,12 +298,12 @@ template<typename E> typename Enum<E>::sdata Enum<E>::staticData;
   * The definition of the static variable holding the static
   * data for this Enumeration wrapper.
   */
-#define ENUM_DEFINITION_BEGIN(EnumName, initWith)			\
-/**								\
-  * actual definition of the constructor for the static data.	\
-  * This is called implicitly by the definition above.		\
-  */								\
-template <> Enum<EnumName>::sdata::sdata() :				\
+#define ENUM_DEFINITION_BEGIN(EnumName, initWith)                             \
+/**                                                                           \
+  * actual definition of the constructor for the static data.                 \
+  * This is called implicitly by the definition above.                        \
+  */                                                                          \
+template <> Enum<EnumName>::sdata::sdata() :                                  \
     name(#EnumName),defaultValue(initWith) {
 
 #define ENUM_DEFINITION_END(EnumName) \

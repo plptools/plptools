@@ -36,39 +36,39 @@ class Psion
 {
 public:
 
-	virtual ~Psion();
+    virtual ~Psion();
 
-	virtual bool connect();
+    virtual bool connect();
 
-	virtual Enum<rfsv::errs> copyFromPsion(const char * const from, int fd,
-										   cpCallback_t func);
+    virtual Enum<rfsv::errs> copyFromPsion(const char * const from, int fd,
+                                           cpCallback_t func);
 
     virtual Enum<rfsv::errs> copyToPsion(const char * const from,
-										 const char * const to,
-										 void *, cpCallback_t func);
+                                         const char * const to,
+                                         void *, cpCallback_t func);
 
-	virtual Enum<rfsv::errs> devinfo(const char drive, PlpDrive& plpDrive);
+    virtual Enum<rfsv::errs> devinfo(const char drive, PlpDrive& plpDrive);
 
-	virtual Enum<rfsv::errs> devlist(uint32_t& devbits);
+    virtual Enum<rfsv::errs> devlist(uint32_t& devbits);
 
-	virtual Enum<rfsv::errs> dir(const char* dir, PlpDir& files);
+    virtual Enum<rfsv::errs> dir(const char* dir, PlpDir& files);
 
-	virtual bool dirExists(const char* name);
+    virtual bool dirExists(const char* name);
 
-	virtual void disconnect();
+    virtual void disconnect();
 
-	virtual Enum<rfsv::errs> mkdir(const char* dir);
+    virtual Enum<rfsv::errs> mkdir(const char* dir);
 
-	virtual void remove(const char* name);
+    virtual void remove(const char* name);
 
 private:
 
-	ppsocket* m_skt;
-	ppsocket* m_skt2;
-	rfsvfactory* m_rfsvFactory;
-	rpcsfactory* m_rpcsFactory;
-	rpcs* m_rpcs;
-	rfsv* m_rfsv;
+    ppsocket* m_skt;
+    ppsocket* m_skt2;
+    rfsvfactory* m_rfsvFactory;
+    rpcsfactory* m_rpcsFactory;
+    rpcs* m_rpcs;
+    rfsv* m_rfsv;
 
 };
 

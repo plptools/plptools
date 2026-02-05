@@ -126,24 +126,24 @@ SISFileHeader::fillFrom(uint8_t* buf, int* base, off_t len)
         m_languagePtr = read32(start + 48);
         if (logLevel >= 2)
                 printf(_("Languages begin at %d\n"), m_languagePtr);
-//	if (m_languagePtr >= len)
-//		return SIS_TRUNCATED;
+//    if (m_languagePtr >= len)
+//        return SIS_TRUNCATED;
         m_filesPtr = read32(start + 52);
         if (logLevel >= 2)
                 printf(_("Files begin at %d\n"), m_filesPtr);
-//	if (m_filesPtr >= len)
-//		return SIS_TRUNCATED;
+//    if (m_filesPtr >= len)
+//        return SIS_TRUNCATED;
         m_reqPtr = read32(start + 56);
         if (logLevel >= 2)
                 printf(_("Requisites begin at %d\n"), m_reqPtr);
-//	if (m_reqPtr >= len)
-//		return SIS_TRUNCATED;
+//    if (m_reqPtr >= len)
+//        return SIS_TRUNCATED;
         m_unknown = read32(start + 60);
         m_componentPtr = read32(start + 64);
         if (logLevel >= 2)
                 printf(_("Components begin at %d\n"), m_componentPtr);
-//	if (m_componentPtr >= len)
-//		return SIS_TRUNCATED;
+//    if (m_componentPtr >= len)
+//        return SIS_TRUNCATED;
         *base += 68;
         return SIS_OK;
 }

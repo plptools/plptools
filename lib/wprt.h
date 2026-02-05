@@ -87,10 +87,10 @@ protected:
     * The possible commands.
     */
     enum commands {
-	WPRT_INIT    = 0x00,
-	WPRT_GET     = 0xf0,
-	WPRT_CANCEL  = 0xf1,
-	WPRT_STOP    = 0xff
+        WPRT_INIT    = 0x00,
+        WPRT_GET     = 0xf0,
+        WPRT_CANCEL  = 0xf1,
+        WPRT_STOP    = 0xff
     };
 
     /**

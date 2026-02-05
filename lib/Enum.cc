@@ -33,18 +33,18 @@ string EnumBase::i2sMapper::lookup (long i) const {
     i2s_map_t::const_iterator searchPtr = stringMap.find(i);
 
     if (searchPtr == stringMap.end())
-	return "[OUT-OF-RANGE]";
+        return "[OUT-OF-RANGE]";
     /*
     * now combine the probably the multiple strings belonging to this
     * integer
     */
     string result;
     for (i = stringMap.count(i); i > 0 ; --i, ++searchPtr) {
-	// this should be the case:
-	assert(searchPtr != stringMap.end());
-	if (result.length() != 0)
-	    result += string(",");
-	result += string(searchPtr->second);
+        // this should be the case:
+        assert(searchPtr != stringMap.end());
+        if (result.length() != 0)
+            result += string(",");
+        result += string(searchPtr->second);
     }
     return result;
 }
@@ -60,10 +60,10 @@ long EnumBase::i2sMapper::lookup (const char *s) const {
     */
     i2s_map_t::const_iterator run = stringMap.begin();
     while (run != stringMap.end() && strcmp(s, run->second)) {
-	++run;
+        ++run;
     }
     if (run == stringMap.end())
-	return  -1;
+        return  -1;
     return run->first;
 }
 

@@ -52,7 +52,7 @@ public:
     * Destructor
     */
     virtual ~ppsocket();
-	  
+
     /**
     * Connects to a given host.
     *
@@ -201,7 +201,7 @@ public:
     * @param watch The IOWatch to register.
     */
     void setWatch(IOWatch *watch);
-	
+
 private:
     /**
     * Creates the socket.
@@ -213,7 +213,7 @@ private:
     bool setHost(const char * const Host, int Port);
     int recv(void *buf, int len, int flags);
     int send(const void * const buf, int len, int flags);
-	
+
     struct sockaddr m_HostAddr;
     struct sockaddr m_PeerAddr;
     int m_Socket;

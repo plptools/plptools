@@ -42,13 +42,13 @@ PsiTime::PsiTime(time_t time) {
 
 PsiTime::PsiTime(psi_timeval *_ptv, psi_timezone *_ptz) {
     if (_ptv != 0L)
-	ptv = *_ptv;
+        ptv = *_ptv;
     if (_ptz != 0L) {
-	ptz = *_ptz;
-	ptzValid = true;
+        ptz = *_ptz;
+        ptzValid = true;
     } else {
-	ptzValid = false;
-	tryPsiZone();
+        ptzValid = false;
+        tryPsiZone();
     }
     /* get our own timezone */
     gettimeofday(&utv, &utz);
@@ -67,9 +67,9 @@ PsiTime::PsiTime(const uint32_t _ptvHi, const uint32_t _ptvLo) {
 
 PsiTime::PsiTime(struct timeval *_utv, struct timezone *_utz) {
     if (_utv != 0L)
-	utv = *_utv;
+        utv = *_utv;
     if (_utz != 0L)
-	utz = *_utz;
+        utz = *_utz;
     tryPsiZone();
     unix2psi();
 }
@@ -89,7 +89,7 @@ PsiTime::~PsiTime() {
 
 void PsiTime::setUnixTime(struct timeval *_utv) {
     if (_utv != 0L)
-	utv = *_utv;
+        utv = *_utv;
     unix2psi();
 }
 
@@ -107,7 +107,7 @@ void PsiTime::setUnixNow(void) {
 
 void PsiTime::setPsiTime(psi_timeval *_ptv) {
     if (_ptv != 0L)
-	ptv = *_ptv;
+        ptv = *_ptv;
     psi2unix();
 }
 
@@ -119,8 +119,8 @@ void PsiTime::setPsiTime(const uint32_t _ptvHi, const uint32_t _ptvLo) {
 
 void PsiTime::setPsiZone(psi_timezone *_ptz) {
     if (_ptz != 0L) {
-	ptz = *_ptz;
-	ptzValid = true;
+        ptz = *_ptz;
+        ptzValid = true;
     }
     psi2unix();
 }
@@ -158,23 +158,23 @@ PsiTime &PsiTime::operator=(const PsiTime &t) {
 bool PsiTime::operator==(const PsiTime &t) {
     psi2unix();
     return ((utv.tv_sec == t.utv.tv_sec) &&
-	    (utv.tv_usec == t.utv.tv_usec));
+            (utv.tv_usec == t.utv.tv_usec));
 }
 
 bool PsiTime::operator<(const PsiTime &t) {
     psi2unix();
     if (utv.tv_sec == t.utv.tv_sec)
-	return (utv.tv_usec < t.utv.tv_usec);
+        return (utv.tv_usec < t.utv.tv_usec);
     else
-	return (utv.tv_sec < t.utv.tv_sec);
+        return (utv.tv_sec < t.utv.tv_sec);
 }
 
 bool PsiTime::operator>(const PsiTime &t) {
     psi2unix();
     if (utv.tv_sec == t.utv.tv_sec)
-	return (utv.tv_usec > t.utv.tv_usec);
+        return (utv.tv_usec > t.utv.tv_usec);
     else
-	return (utv.tv_sec > t.utv.tv_sec);
+        return (utv.tv_sec > t.utv.tv_sec);
 }
 
 ostream &operator<<(ostream &s, const PsiTime &t) {
@@ -275,9 +275,9 @@ void PsiTime::unix2psi(void) {
 
 void PsiTime::tryPsiZone() {
     if (ptzValid)
-	return;
+        return;
     if (PsiZone::getInstance().getZone(ptz))
-	ptzValid = true;
+        ptzValid = true;
 }
 
 PsiZone *PsiZone::_instance = 0L;
@@ -285,7 +285,7 @@ PsiZone *PsiZone::_instance = 0L;
 PsiZone &PsiZone::
 getInstance() {
     if (_instance == 0L)
-	_instance = new PsiZone();
+        _instance = new PsiZone();
     return *_instance;
 }
 
@@ -302,6 +302,6 @@ setZone(psi_timezone &ptz) {
 bool PsiZone::
 getZone(psi_timezone &ptz) {
     if (_ptzValid)
-	ptz = _ptz;
+        ptz = _ptz;
     return _ptzValid;
 }

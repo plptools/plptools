@@ -88,7 +88,7 @@ void bufferStore::init(const unsigned char *_buff, long _len) {
 
 bufferStore::~bufferStore() {
     if (buff)
-	::free(buff);
+        ::free(buff);
 }
 
 unsigned long bufferStore::getLen() const {
@@ -105,9 +105,9 @@ uint16_t bufferStore::getWord(long pos) const {
 
 uint32_t bufferStore::getDWord(long pos) const {
     return buff[pos+start] +
-	(buff[pos+start+1] << 8) +
-	(buff[pos+start+2] << 16) +
-	(buff[pos+start+3] << 24);
+        (buff[pos+start+1] << 8) +
+        (buff[pos+start+2] << 16) +
+        (buff[pos+start+3] << 24);
 }
 
 int32_t bufferStore::getSDWord(long pos) const {
@@ -126,15 +126,15 @@ ostream &operator<<(ostream &s, const bufferStore &m) {
     ostream::fmtflags old = s.flags();
 
     for (int i = m.start; i < m.len; i++)
-	s << hex << setw(2) << setfill('0') << (int)m.buff[i] << " ";
+        s << hex << setw(2) << setfill('0') << (int)m.buff[i] << " ";
 
     // restore stream flags
     s.flags(old);
     s << "(";
 
     for (int i = m.start; i < m.len; i++) {
-	unsigned char c = m.buff[i];
-	s << (unsigned char)(isprint(c) ? c : '.');
+        unsigned char c = m.buff[i];
+        s << (unsigned char)(isprint(c) ? c : '.');
     }
 
     return s << ")";
@@ -147,12 +147,12 @@ void bufferStore::discardFirstBytes(int n) {
 
 void bufferStore::checkAllocd(long newLen) {
     if (newLen >= lenAllocd) {
-	do {
-	    lenAllocd = (lenAllocd < MIN_LEN) ? MIN_LEN : (lenAllocd * 2);
-	} while (newLen >= lenAllocd);
-	assert(lenAllocd);
-	buff = (unsigned char *)realloc(buff, lenAllocd);
-	assert(buff);
+        do {
+            lenAllocd = (lenAllocd < MIN_LEN) ? MIN_LEN : (lenAllocd * 2);
+        } while (newLen >= lenAllocd);
+        assert(lenAllocd);
+        buff = (unsigned char *)realloc(buff, lenAllocd);
+        assert(buff);
     }
 }
 
@@ -183,10 +183,10 @@ void bufferStore::addBuff(const bufferStore &s, long maxLen) {
     long l = s.getLen();
     checkAllocd(len + l);
     if ((maxLen >= 0) && (maxLen < l))
-	l = maxLen;
+        l = maxLen;
     if (l > 0) {
-	memcpy(&buff[len], s.getString(0), l);
-	len += l;
+        memcpy(&buff[len], s.getString(0), l);
+        len += l;
     }
 }
 
@@ -206,7 +206,7 @@ void bufferStore::addDWord(long a) {
 
 void bufferStore::truncate(long newLen) {
     if (newLen < len)
-	len = newLen;
+        len = newLen;
 }
 
 void bufferStore::prependByte(unsigned char cc) {

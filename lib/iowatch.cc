@@ -42,9 +42,9 @@ void IOWatch::addIO(const int fd) {
     int pos;
     for (pos = 0; pos < num && fd < io[pos]; pos++);
     if (io[pos] == fd)
-	return;
+        return;
     for (int i = num; i > pos; i--)
-	io[i] = io[i-1];
+        io[i] = io[i-1];
     io[pos] = fd;
     num++;
 }
@@ -53,25 +53,25 @@ void IOWatch::remIO(const int fd) {
     int pos;
     for (pos = 0; pos < num && fd != io[pos]; pos++);
     if (pos != num) {
-	num--;
-	for (int i = pos; i <num; i++) io[i] = io[i+1];
+        num--;
+        for (int i = pos; i <num; i++) io[i] = io[i+1];
     }
 }
 
 bool IOWatch::watch(const long secs, const long usecs) {
     if (num > 0) {
-	int maxfd = 0;
-	fd_set iop;
-	FD_ZERO(&iop);
-	for (int i = 0; i < num; i++) {
-	    FD_SET(io[i], &iop);
-	    if (io[i] > maxfd)
-		maxfd = io[i];
-	}
-	struct timeval t;
-	t.tv_usec = usecs;
-	t.tv_sec = secs;
-	return (select(maxfd+1, &iop, NULL, NULL, &t) > 0);
+        int maxfd = 0;
+        fd_set iop;
+        FD_ZERO(&iop);
+        for (int i = 0; i < num; i++) {
+            FD_SET(io[i], &iop);
+            if (io[i] > maxfd)
+                maxfd = io[i];
+        }
+        struct timeval t;
+        t.tv_usec = usecs;
+        t.tv_sec = secs;
+        return (select(maxfd+1, &iop, NULL, NULL, &t) > 0);
     }
     sleep(secs);
     usleep(usecs);

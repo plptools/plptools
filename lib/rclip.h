@@ -138,9 +138,9 @@ protected:
     * The possible commands.
     */
     enum commands {
-	RCLIP_INIT   = 0x00,
-	RCLIP_NOTIFY = 0x08,
-	RCLIP_LISTEN = 0x04
+        RCLIP_INIT   = 0x00,
+        RCLIP_NOTIFY = 0x08,
+        RCLIP_LISTEN = 0x04
     };
 
     /**

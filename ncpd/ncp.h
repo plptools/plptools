@@ -80,15 +80,15 @@ private:
 
     enum c { MAX_LEN = 200, LAST_MESS = 1, NOT_LAST_MESS = 2 };
     enum interControllerMessageType {
-	// Inter controller message types
-	NCON_MSG_DATA_XOFF=1,
-	NCON_MSG_DATA_XON=2,
-	NCON_MSG_CONNECT_TO_SERVER=3,
-	NCON_MSG_CONNECT_RESPONSE=4,
-	NCON_MSG_CHANNEL_CLOSED=5,
-	NCON_MSG_NCP_INFO=6,
-	NCON_MSG_CHANNEL_DISCONNECT=7,
-	NCON_MSG_NCP_END=8
+        // Inter controller message types
+        NCON_MSG_DATA_XOFF=1,
+        NCON_MSG_DATA_XON=2,
+        NCON_MSG_CONNECT_TO_SERVER=3,
+        NCON_MSG_CONNECT_RESPONSE=4,
+        NCON_MSG_CHANNEL_CLOSED=5,
+        NCON_MSG_NCP_INFO=6,
+        NCON_MSG_CHANNEL_DISCONNECT=7,
+        NCON_MSG_NCP_END=8
     };
     enum protocolVersionType { PV_SERIES_5 = 6, PV_SERIES_3 = 3 };
     void receive(bufferStore s);
