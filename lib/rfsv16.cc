@@ -827,9 +827,32 @@ mkdir(const char* dirName)
 Enum<rfsv::errs> rfsv16::
 rmdir(const char *dirName)
 {
-    // There doesn't seem to be an RMDIR command, but DELETE works. We
-    // should probably check to see if the file is a directory first!
-    return remove(dirName);
+    // EPOC16 doesn't provide an RMDIR command, so we fake it using DELETE (and a few little tweaks).
+
+    // Rudimentary argument checking.
+    string path(dirName);
+    if (path.empty()) {
+        return E_PSI_FILE_NAME;
+    }
+
+    // The EPOC32 implementation of RMDIR allows for deletion of paths with or without a trailing forward slash.
+    // However, EPOC16's DELETE (which we use here) doesn't like these, so we strip them to ensure parity between the
+    // two implementations.
+    if (path.back() == '\\') {
+        path.pop_back();
+    }
+
+    // Get the path's attributes and ensure it's a directory.
+    uint32_t attr;
+    Enum<rfsv::errs> res = fgetattr(path.c_str(), attr);
+    if (res != E_PSI_GEN_NONE) {
+        return res;
+    }
+    if ((attr & PSI_A_DIR) == 0) {
+        return E_PSI_FILE_DIR;
+    }
+
+    return remove(path.c_str());
 }
 
 Enum<rfsv::errs> rfsv16::
