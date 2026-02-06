@@ -43,31 +43,31 @@ typedef struct psi_timeval_t {
      * Prints a psi_timeval in human readable format.
      */
     friend std::ostream &operator<<(std::ostream &o, const psi_timeval_t &ptv) {
-	std::ostream::fmtflags old = o.flags();
-	uint64_t micro = ptv.tv_high;
-	micro = (micro << 32) | ptv.tv_low;
-	micro /= 1000000;
-	int s = micro % 60;
-	micro /= 60;
-	int m = micro % 60;
-	micro /= 60;
-	int h = micro % 24;
-	micro /= 24;
-	int d = micro % 365;
-	micro /= 365;
-	int y = micro;
-	o << std::dec;
-	if (y > 0)
-	    o << y << ((y > 1) ? _(" years ") : _(" year "));
-	if (d > 0)
-	    o << d << ((d > 1) ? _(" days ") : _(" day "));
-	if (h > 0)
-	    o << h << ((h != 1) ? _(" hours ") : _(" hour "));
-	if (m > 0)
-	    o << m << ((m != 1) ? _(" minutes ") : _(" minute "));
-	o << s << ((s != 1) ? _(" seconds") : _(" second"));
-	o.flags(old);
-	return o;
+        std::ostream::fmtflags old = o.flags();
+        uint64_t micro = ptv.tv_high;
+        micro = (micro << 32) | ptv.tv_low;
+        micro /= 1000000;
+        int s = micro % 60;
+        micro /= 60;
+        int m = micro % 60;
+        micro /= 60;
+        int h = micro % 24;
+        micro /= 24;
+        int d = micro % 365;
+        micro /= 365;
+        int y = micro;
+        o << std::dec;
+        if (y > 0)
+            o << y << ((y > 1) ? _(" years ") : _(" year "));
+        if (d > 0)
+            o << d << ((d > 1) ? _(" days ") : _(" day "));
+        if (h > 0)
+            o << h << ((h != 1) ? _(" hours ") : _(" hour "));
+        if (m > 0)
+            o << m << ((m != 1) ? _(" minutes ") : _(" minute "));
+        o << s << ((s != 1) ? _(" seconds") : _(" second"));
+        o.flags(old);
+        return o;
     }
     /**
     * The lower 32 bits
@@ -84,14 +84,14 @@ typedef struct psi_timeval_t {
  */
 typedef struct psi_timezone_t {
     friend std::ostream &operator<<(std::ostream &s, const psi_timezone_t &ptz) {
-	std::ostream::fmtflags old = s.flags();
-	int h = ptz.utc_offset / 3600;
-	int m = ptz.utc_offset % 3600;
-	s << "offs: " << std::dec << h << "h";
-	if (m != 0)
-	    s << ", " << m << "m";
-	s.flags(old);
-	return s;
+        std::ostream::fmtflags old = s.flags();
+        int h = ptz.utc_offset / 3600;
+        int m = ptz.utc_offset % 3600;
+        s << "offs: " << std::dec << h << "h";
+        if (m != 0)
+            s << ", " << m << "m";
+        s.flags(old);
+        return s;
     }
     signed long   utc_offset;
     unsigned long dst_zones;
@@ -294,11 +294,11 @@ public:
     bool operator>(const PsiTime &t);
 
     enum zone {
-	PSI_TZ_NONE = 0,
-	PSI_TZ_EUROPEAN = 1,
-	PSI_TZ_NORTHERN = 2,
-	PSI_TZ_SOUTHERN = 4,
-	PSI_TZ_HOME = 0x40000000
+        PSI_TZ_NONE = 0,
+        PSI_TZ_EUROPEAN = 1,
+        PSI_TZ_NORTHERN = 2,
+        PSI_TZ_SOUTHERN = 4,
+        PSI_TZ_HOME = 0x40000000
     };
 
 private:

@@ -34,7 +34,7 @@
 
 #include "ignore-value.h"
 
-#define	RFSV16_MAXDATALEN	852	// 640
+#define RFSV16_MAXDATALEN 852 // 640
 
 using namespace std;
 
@@ -50,18 +50,18 @@ Enum<rfsv::errs> rfsv16::
 fopen(uint32_t attr, const char *name, uint32_t &handle)
 {
     bufferStore a;
-    string realName	= convertSlash(name);
+    string realName = convertSlash(name);
 
     // Allow random access, rather than forcing the caller to ask for it
     a.addWord((P_FRANDOM | attr) & 0xFFFF);
     a.addStringT(realName.c_str());
     if (!sendCommand(SIBO_FOPEN, a))
-	return E_PSI_FILE_DISC;
+        return E_PSI_FILE_DISC;
 
     Enum<rfsv::errs> res = getResponse(a);
     if (res == 0) {
-	handle = (long)a.getWord(0);
-	return E_PSI_GEN_NONE;
+        handle = (long)a.getWord(0);
+        return E_PSI_GEN_NONE;
     }
     return res;
 }
@@ -74,13 +74,13 @@ mktemp(uint32_t &handle, string &tmpname)
     a.addWord(P_FUNIQUE);
     a.addStringT("TMP");
     if (!sendCommand(SIBO_OPENUNIQUE, a))
-	return E_PSI_FILE_DISC;
+        return E_PSI_FILE_DISC;
 
     Enum<rfsv::errs> res = getResponse(a);
     if (res == E_PSI_GEN_NONE) {
-	handle = a.getWord(0);
-	tmpname = a.getString(2);
-	return res;
+        handle = a.getWord(0);
+        tmpname = a.getString(2);
+        return res;
     }
     return res;
 }
@@ -109,7 +109,7 @@ fclose(uint32_t fileHandle)
     bufferStore a;
     a.addWord(fileHandle & 0xFFFF);
     if (!sendCommand(SIBO_FCLOSE, a))
-	return E_PSI_FILE_DISC;
+        return E_PSI_FILE_DISC;
     return getResponse(a);
 }
 
@@ -132,30 +132,30 @@ readdir(rfsvDirhandle &dH, PlpDirent &e) {
     Enum<rfsv::errs> res = E_PSI_GEN_NONE;
 
     if (dH.b.getLen() < 17) {
-	dH.b.init();
-	dH.b.addWord(dH.h & 0xFFFF);
-	if (!sendCommand(SIBO_FDIRREAD, dH.b))
-	    return E_PSI_FILE_DISC;
-	res = getResponse(dH.b);
-	if (res == E_PSI_GEN_NONE) {
-	    uint16_t bufferLen = dH.b.getWord(0);
-	    dH.b.discardFirstBytes(2);
-	    if (dH.b.getLen() != bufferLen)
-		return E_PSI_GEN_FAIL;
-	}
+        dH.b.init();
+        dH.b.addWord(dH.h & 0xFFFF);
+        if (!sendCommand(SIBO_FDIRREAD, dH.b))
+            return E_PSI_FILE_DISC;
+        res = getResponse(dH.b);
+        if (res == E_PSI_GEN_NONE) {
+            uint16_t bufferLen = dH.b.getWord(0);
+            dH.b.discardFirstBytes(2);
+            if (dH.b.getLen() != bufferLen)
+                return E_PSI_GEN_FAIL;
+        }
     }
     if ((res == E_PSI_GEN_NONE) && (dH.b.getLen() > 16)) {
-	uint16_t version = dH.b.getWord(0);
-	if (version != 2)
-	    return E_PSI_GEN_FAIL;
-	e.attr    = attr2std((uint32_t)dH.b.getWord(2));
-	e.size    = dH.b.getDWord(4);
-	e.time.setSiboTime(dH.b.getDWord(8));
-	e.name    = dH.b.getString(16);
-	//e.UID     = PlpUID(0,0,0);
-	e.attrstr = attr2String(e.attr);
+        uint16_t version = dH.b.getWord(0);
+        if (version != 2)
+            return E_PSI_GEN_FAIL;
+        e.attr    = attr2std((uint32_t)dH.b.getWord(2));
+        e.size    = dH.b.getDWord(4);
+        e.time.setSiboTime(dH.b.getDWord(8));
+        e.name    = dH.b.getString(16);
+        //e.UID     = PlpUID(0,0,0);
+        e.attrstr = attr2String(e.attr);
 
-	dH.b.discardFirstBytes(17 + e.name.length());
+        dH.b.discardFirstBytes(17 + e.name.length());
 
     }
     return res;
@@ -168,14 +168,14 @@ dir(const char *name, PlpDir &files)
     files.clear();
     Enum<rfsv::errs> res = opendir(PSI_A_HIDDEN|PSI_A_SYSTEM|PSI_A_DIR, name, h);
     while (res == E_PSI_GEN_NONE) {
-	PlpDirent e;
-	res = readdir(h, e);
-	if (res == E_PSI_GEN_NONE)
-	    files.push_back(e);
+        PlpDirent e;
+        res = readdir(h, e);
+        if (res == E_PSI_GEN_NONE)
+            files.push_back(e);
     }
     closedir(h);
     if (res == E_PSI_FILE_EOF)
-	res = E_PSI_GEN_NONE;
+        res = E_PSI_GEN_NONE;
     return res;
 }
 
@@ -189,7 +189,7 @@ opMode(uint32_t mode)
     ret |= (mode & PSI_O_CREAT) ? P_FCREATE : 0;
     ret |= (mode & PSI_O_APPEND) ? P_FAPPEND : 0;
     if ((mode & 03) == PSI_O_RDONLY)
-	ret |= (mode & PSI_O_EXCL) ? 0 : P_FSHARE;
+        ret |= (mode & PSI_O_EXCL) ? 0 : P_FSHARE;
     return ret;
 }
 
@@ -200,16 +200,16 @@ fgetmtime(const char * const name, PsiTime &mtime)
     string realName = convertSlash(name);
     a.addStringT(realName.c_str());
     if (!sendCommand(SIBO_FINFO, a))
-	return E_PSI_FILE_DISC;
+        return E_PSI_FILE_DISC;
 
     Enum<rfsv::errs> res = getResponse(a);
     if (res != E_PSI_GEN_NONE)
-	return res;
+        return res;
     else if (a.getLen() == 16) {
-	// According to Alex's docs, Psion's file times are in
-	// seconds since 13:00!!, 1.1.1970
-	mtime.setSiboTime(a.getDWord(8));
-	return res;
+        // According to Alex's docs, Psion's file times are in
+        // seconds since 13:00!!, 1.1.1970
+        mtime.setSiboTime(a.getDWord(8));
+        return res;
     }
     return E_PSI_GEN_FAIL;
 }
@@ -238,14 +238,14 @@ fgetattr(const char * const name, uint32_t &attr)
     string realName = convertSlash(name);
     a.addStringT(realName.c_str());
     if (!sendCommand(SIBO_FINFO, a))
-	return E_PSI_FILE_DISC;
+        return E_PSI_FILE_DISC;
 
     Enum<rfsv::errs> res = getResponse(a);
     if (res != E_PSI_GEN_NONE)
-	return res;
+        return res;
     else if (a.getLen() == 16) {
-	attr = attr2std((long)a.getWord(2));
-	return res;
+        attr = attr2std((long)a.getWord(2));
+        return res;
     }
     return E_PSI_GEN_FAIL;
 }
@@ -257,23 +257,23 @@ fgeteattr(const char * const name, PlpDirent &e)
     string realName = convertSlash(name);
     a.addStringT(realName.c_str());
     if (!sendCommand(SIBO_FINFO, a))
-	return E_PSI_FILE_DISC;
+        return E_PSI_FILE_DISC;
     Enum<rfsv::errs> res = getResponse(a);
     if (res != E_PSI_GEN_NONE)
-	return res;
+        return res;
     else if (a.getLen() == 16) {
-	const char *p = strrchr(realName.c_str(), '\\');
-	if (p)
-	    p++;
-	else
-	    p = realName.c_str();
-	e.name = p;
-	e.attr = attr2std((long)a.getWord(2));
-	e.size = a.getDWord(4);
-	e.time.setSiboTime(a.getDWord(8));
-	e.UID  = PlpUID(0,0,0);
-	e.attrstr = string(attr2String(e.attr));
-	return res;
+        const char *p = strrchr(realName.c_str(), '\\');
+        if (p)
+            p++;
+        else
+            p = realName.c_str();
+        e.name = p;
+        e.attr = attr2std((long)a.getWord(2));
+        e.size = a.getDWord(4);
+        e.time.setSiboTime(a.getDWord(8));
+        e.UID  = PlpUID(0,0,0);
+        e.attrstr = string(attr2String(e.attr));
+        return res;
     }
     return E_PSI_GEN_FAIL;
 }
@@ -289,7 +289,7 @@ fsetattr(const char *name, uint32_t seta, uint32_t unseta)
     a.addWord(bitmask & 0xFFFF);
     a.addStringT(name);
     if (!sendCommand(SIBO_SFSTAT, a))
-	return E_PSI_FILE_DISC;
+        return E_PSI_FILE_DISC;
     return getResponse(a);
 }
 
@@ -299,14 +299,14 @@ dircount(const char * const name, uint32_t &count)
     rfsvDirhandle h;
     Enum<rfsv::errs> res = opendir(PSI_A_HIDDEN|PSI_A_SYSTEM|PSI_A_DIR, name, h);
     while (res == E_PSI_GEN_NONE) {
-	PlpDirent e;
-	res = readdir(h, e);
-	if (res == E_PSI_GEN_NONE)
-	    count++;
+        PlpDirent e;
+        res = readdir(h, e);
+        if (res == E_PSI_GEN_NONE)
+            count++;
     }
     closedir(h);
     if (res == E_PSI_FILE_EOF)
-	res = E_PSI_GEN_NONE;
+        res = E_PSI_GEN_NONE;
     return res;
 }
 
@@ -328,10 +328,10 @@ devlist(uint32_t &devbits)
     a.addByte(0x00); // no Name 2
     a.addByte(0x00); // no Name 3
     if (!sendCommand(SIBO_PARSE, a))
-	return E_PSI_FILE_DISC;
+        return E_PSI_FILE_DISC;
     res = getResponse(a);
     if (res != E_PSI_GEN_NONE)
-	return res;
+        return res;
 
     // Find the drive to FOPEN
     char name[4] = { 'x', ':', '\\', '\0' } ;
@@ -340,34 +340,34 @@ devlist(uint32_t &devbits)
     name[0] = (char) a.getByte(5); // the M
     res = fopen(P_FDEVICE, name, fileHandle);
     if (res != E_PSI_GEN_NONE)
-	return status;
+        return status;
 
     while (1) {
-	a.init();
-	a.addWord(fileHandle & 0xFFFF);
-	if (!sendCommand(SIBO_FDEVICEREAD, a))
-	    return E_PSI_FILE_DISC;
-	res = getResponse(a);
-	if (res)
-	    break;
-	uint16_t version = a.getWord(0);
-	if ((version < 1) || (version > 2)) {
-	    cerr << "devlist: not version 1 or 2" << endl;
-	    fclose(fileHandle);
-	    return E_PSI_GEN_FAIL;
-	}
-	char drive = a.getByte(64);
-	if (drive >= 'A' && drive <= 'Z') {
-	    int shift = (drive - 'A');
-	    devbits |= (long) ( 1 << shift );
-	}
-	else {
-	    cerr << "devlist: non-alphabetic drive letter ("
-		 << drive << ")" << endl;
-	}
+        a.init();
+        a.addWord(fileHandle & 0xFFFF);
+        if (!sendCommand(SIBO_FDEVICEREAD, a))
+            return E_PSI_FILE_DISC;
+        res = getResponse(a);
+        if (res)
+            break;
+        uint16_t version = a.getWord(0);
+        if ((version < 1) || (version > 2)) {
+            cerr << "devlist: not version 1 or 2" << endl;
+            fclose(fileHandle);
+            return E_PSI_GEN_FAIL;
+        }
+        char drive = a.getByte(64);
+        if (drive >= 'A' && drive <= 'Z') {
+            int shift = (drive - 'A');
+            devbits |= (long) ( 1 << shift );
+        }
+        else {
+            cerr << "devlist: non-alphabetic drive letter ("
+                 << drive << ")" << endl;
+        }
     }
     if (res == E_PSI_FILE_EOF)
-	res = E_PSI_GEN_NONE;
+        res = E_PSI_GEN_NONE;
     fclose(fileHandle);
     return res;
 }
@@ -400,9 +400,9 @@ devinfo(const char drive, PlpDrive &dinfo)
     a.addByte(0x00); // No name 2
     a.addByte(0x00); // No name 3
     if (!sendCommand(SIBO_PARSE, a))
-	return E_PSI_FILE_DISC;
+        return E_PSI_FILE_DISC;
     if ((res = getResponse(a)) != E_PSI_GEN_NONE)
-	return res;
+        return res;
 
     a.init();
     a.addByte(toupper(drive)); // Name 1
@@ -410,9 +410,9 @@ devinfo(const char drive, PlpDrive &dinfo)
     a.addByte('\\');
     a.addByte(0x00);
     if (!sendCommand(SIBO_STATUSDEVICE, a))
-	return E_PSI_FILE_DISC;
+        return E_PSI_FILE_DISC;
     if ((res = getResponse(a)) != E_PSI_GEN_NONE)
-	return res;
+        return res;
 
     int attr = a.getWord(2);
     attr = sibo_dattr[a.getWord(2) & 0xff];
@@ -445,9 +445,9 @@ bool rfsv16::
 sendCommand(enum commands cc, bufferStore & data)
 {
     if (status == E_PSI_FILE_DISC) {
-	reconnect();
-	if (status == E_PSI_FILE_DISC)
-	    return false;
+        reconnect();
+        if (status == E_PSI_FILE_DISC)
+            return false;
     }
 
     bool result;
@@ -457,10 +457,10 @@ sendCommand(enum commands cc, bufferStore & data)
     a.addBuff(data);
     result = skt->sendBufferStore(a);
     if (!result) {
-	reconnect();
-	result = skt->sendBufferStore(a);
-	if (!result)
-	    status = E_PSI_FILE_DISC;
+        reconnect();
+        result = skt->sendBufferStore(a);
+        if (!result)
+            status = E_PSI_FILE_DISC;
     }
     return result;
 }
@@ -473,18 +473,18 @@ getResponse(bufferStore & data)
     // which is the body of the response not counting the command (002a) and
     // the size word.
     if (skt->getBufferStore(data) != 1) {
-	cerr << "rfsv16::getResponse: duff response. "
-	    "getBufferStore failed." << endl;
+        cerr << "rfsv16::getResponse: duff response. "
+            "getBufferStore failed." << endl;
     } else if (data.getWord(0) == 0x2a &&
-	       data.getWord(2) == data.getLen()-4) {
-	Enum<rfsv::errs> ret = (enum errs)(int16_t)data.getWord(4);
-	data.discardFirstBytes(6);
-	return ret;
+               data.getWord(2) == data.getLen()-4) {
+        Enum<rfsv::errs> ret = (enum errs)(int16_t)data.getWord(4);
+        data.discardFirstBytes(6);
+        return ret;
     } else {
-	cerr << "rfsv16::getResponse: duff response. Size field:" <<
-	    data.getWord(2) << " Frame size:" <<
-	    data.getLen()-4 << " Result field:" <<
-	    data.getWord(4) << endl;
+        cerr << "rfsv16::getResponse: duff response. Size field:" <<
+            data.getWord(2) << " Frame size:" <<
+            data.getLen()-4 << " Result field:" <<
+            data.getWord(4) << endl;
     }
     status = E_PSI_FILE_DISC;
     return status;
@@ -499,31 +499,31 @@ fread(const uint32_t handle, unsigned char * const buf, const uint32_t len, uint
 
     count = 0;
     do {
-	bufferStore a;
+        bufferStore a;
 
-	// Read in blocks of 291 bytes; the maximum payload for
-	// an RFSV frame. ( As seen in traces ) - this isn't optimal:
-	// RFSV can handle fragmentation of frames, where only the
-	// first SIBO_FREAD RESPONSE frame has a RESPONSE (00 2A), SIZE
-	// and RESULT field. Every subsequent frame
-	// just has data, 297 bytes (or less) of it.
-	//
-	a.addWord(handle);
-	a.addWord((len - count) > RFSV16_MAXDATALEN
-		  ? RFSV16_MAXDATALEN
-		  : (len - count));
-	if (!sendCommand(SIBO_FREAD, a))
-	    return E_PSI_FILE_DISC;
-	if ((res = getResponse(a)) != E_PSI_GEN_NONE) {
-	    if (res == E_PSI_FILE_EOF)
-		return E_PSI_GEN_NONE;
-	    return res;
-	}
-	if ((l = a.getLen()) > 0) {
-	    memcpy(p, a.getString(), l);
-	    count += l;
-	    p += l;
-	}
+        // Read in blocks of 291 bytes; the maximum payload for
+        // an RFSV frame. ( As seen in traces ) - this isn't optimal:
+        // RFSV can handle fragmentation of frames, where only the
+        // first SIBO_FREAD RESPONSE frame has a RESPONSE (00 2A), SIZE
+        // and RESULT field. Every subsequent frame
+        // just has data, 297 bytes (or less) of it.
+        //
+        a.addWord(handle);
+        a.addWord((len - count) > RFSV16_MAXDATALEN
+                  ? RFSV16_MAXDATALEN
+                  : (len - count));
+        if (!sendCommand(SIBO_FREAD, a))
+            return E_PSI_FILE_DISC;
+        if ((res = getResponse(a)) != E_PSI_GEN_NONE) {
+            if (res == E_PSI_FILE_EOF)
+                return E_PSI_GEN_NONE;
+            return res;
+        }
+        if ((l = a.getLen()) > 0) {
+            memcpy(p, a.getString(), l);
+            count += l;
+            p += l;
+        }
     } while ((count < len) && (l > 0));
     return res;
 }
@@ -536,27 +536,27 @@ fwrite(const uint32_t handle, const unsigned char * const buf, const uint32_t le
 
     count = 0;
     while (count < len) {
-	bufferStore a;
-	int nbytes;
+        bufferStore a;
+        int nbytes;
 
-	// Write in blocks of 291 bytes; the maximum payload for
-	// an RFSV frame. ( As seen in traces ) - this isn't optimal:
-	// RFSV can handle fragmentation of frames, where only the
-	// first SIBO_FREAD RESPONSE frame has a RESPONSE (00 2A), SIZE
-	// and RESULT field. Every subsequent frame
-	// just has data, 297 bytes (or less) of it.
-	nbytes = (len - count) > RFSV16_MAXDATALEN
-	    ? RFSV16_MAXDATALEN
-	    : (len - count);
-	a.addWord(handle);
-	a.addBytes(p, nbytes);
-	if (!sendCommand(SIBO_FWRITE, a))
-	    return E_PSI_FILE_DISC;
-	if ((res = getResponse(a)) != E_PSI_GEN_NONE)
-	    return res;
+        // Write in blocks of 291 bytes; the maximum payload for
+        // an RFSV frame. ( As seen in traces ) - this isn't optimal:
+        // RFSV can handle fragmentation of frames, where only the
+        // first SIBO_FREAD RESPONSE frame has a RESPONSE (00 2A), SIZE
+        // and RESULT field. Every subsequent frame
+        // just has data, 297 bytes (or less) of it.
+        nbytes = (len - count) > RFSV16_MAXDATALEN
+            ? RFSV16_MAXDATALEN
+            : (len - count);
+        a.addWord(handle);
+        a.addBytes(p, nbytes);
+        if (!sendCommand(SIBO_FWRITE, a))
+            return E_PSI_FILE_DISC;
+        if ((res = getResponse(a)) != E_PSI_GEN_NONE)
+            return res;
 
-	count += nbytes;
-	p += nbytes;
+        count += nbytes;
+        p += nbytes;
     }
     return res;
 }
@@ -570,27 +570,27 @@ copyFromPsion(const char *from, const char *to, void *ptr, cpCallback_t cb)
     uint32_t total = 0;
 
     if ((res = fopen(P_FSHARE | P_FSTREAM, from, handle)) != E_PSI_GEN_NONE)
-	return res;
+        return res;
     ofstream op(to);
     if (!op) {
-	fclose(handle);
-	return E_PSI_GEN_FAIL;
+        fclose(handle);
+        return E_PSI_GEN_FAIL;
     }
     do {
-	unsigned char buf[RFSV_SENDLEN];
-	if ((res = fread(handle, buf, sizeof(buf), len)) == E_PSI_GEN_NONE) {
-	    if (len > 0)
-		op.write((char *)buf, len);
-	    total += len;
-	    if (cb && !cb(ptr, total))
-		res = E_PSI_FILE_CANCEL;
-	}
+        unsigned char buf[RFSV_SENDLEN];
+        if ((res = fread(handle, buf, sizeof(buf), len)) == E_PSI_GEN_NONE) {
+            if (len > 0)
+                op.write((char *)buf, len);
+            total += len;
+            if (cb && !cb(ptr, total))
+                res = E_PSI_FILE_CANCEL;
+        }
     } while (len > 0 && (res == E_PSI_GEN_NONE));
 
     fclose(handle);
     op.close();
     if (res == E_PSI_FILE_EOF)
-	res = E_PSI_GEN_NONE;
+        res = E_PSI_GEN_NONE;
     return res;
 }
 
@@ -603,22 +603,22 @@ copyFromPsion(const char *from, int fd, cpCallback_t cb)
     uint32_t total = 0;
 
     if ((res = fopen(P_FSHARE | P_FSTREAM, from, handle)) != E_PSI_GEN_NONE)
-	return res;
+        return res;
     do {
-	unsigned char buf[RFSV_SENDLEN];
-	if ((res = fread(handle, buf, sizeof(buf), len)) == E_PSI_GEN_NONE) {
-	    if (len > 0)
+        unsigned char buf[RFSV_SENDLEN];
+        if ((res = fread(handle, buf, sizeof(buf), len)) == E_PSI_GEN_NONE) {
+            if (len > 0)
                 // FIXME: return UNIX errors from this method.
-		ignore_value(write(fd, buf, len));
-	    total += len;
-	    if (cb && !cb(NULL, total))
-		res = E_PSI_FILE_CANCEL;
-	}
+                ignore_value(write(fd, buf, len));
+            total += len;
+            if (cb && !cb(NULL, total))
+                res = E_PSI_FILE_CANCEL;
+        }
     } while (len > 0 && (res == E_PSI_GEN_NONE));
 
     fclose(handle);
     if (res == E_PSI_FILE_EOF)
-	res = E_PSI_GEN_NONE;
+        res = E_PSI_GEN_NONE;
     return res;
 }
 
@@ -632,21 +632,21 @@ copyToPsion(const char *from, const char *to, void *ptr, cpCallback_t cb)
 
     ifstream ip(from);
     if (!ip)
-	return E_PSI_FILE_NXIST;
+        return E_PSI_FILE_NXIST;
     res = fcreatefile(P_FSTREAM | P_FUPDATE, to, handle);
     if (res != E_PSI_GEN_NONE) {
-	res = freplacefile(P_FSTREAM | P_FUPDATE, to, handle);
-	if (res != E_PSI_GEN_NONE)
-	    return res;
+        res = freplacefile(P_FSTREAM | P_FUPDATE, to, handle);
+        if (res != E_PSI_GEN_NONE)
+            return res;
     }
     unsigned char *buff = new unsigned char[RFSV_SENDLEN];
     while (res == E_PSI_GEN_NONE && ip && !ip.eof()) {
-	ip.read((char *)buff, RFSV_SENDLEN);
-	if ((res = fwrite(handle, buff, ip.gcount(), len)) == E_PSI_GEN_NONE) {
-	    total += len;
-	    if (cb && !cb(ptr, total))
-		res = E_PSI_FILE_CANCEL;
-	}
+        ip.read((char *)buff, RFSV_SENDLEN);
+        if ((res = fwrite(handle, buff, ip.gcount(), len)) == E_PSI_GEN_NONE) {
+            total += len;
+            if (cb && !cb(ptr, total))
+                res = E_PSI_FILE_CANCEL;
+        }
     }
     delete[]buff;
     fclose(handle);
@@ -665,29 +665,29 @@ copyOnPsion(const char *from, const char *to, void *ptr, cpCallback_t cb)
     Enum<rfsv::errs> res;
 
     if ((res = fopen(P_FSHARE | P_FSTREAM, from, handle_from)) != E_PSI_GEN_NONE)
-	return res;
+        return res;
     res = fcreatefile(P_FSTREAM | P_FUPDATE, to, handle_to);
     if (res != E_PSI_GEN_NONE) {
-	res = freplacefile(P_FSTREAM | P_FUPDATE, to, handle_to);
-	if (res != E_PSI_GEN_NONE)
-	    return res;
+        res = freplacefile(P_FSTREAM | P_FUPDATE, to, handle_to);
+        if (res != E_PSI_GEN_NONE)
+            return res;
     }
     do {
-	unsigned char buf[RFSV_SENDLEN];
-	if ((res = fread(handle_from, buf, sizeof(buf), len)) == E_PSI_GEN_NONE) {
-	    if (len > 0) {
-		if ((res = fwrite(handle_to, buf, len, wlen)) == E_PSI_GEN_NONE) {
-		    total += wlen;
-		    if (cb && !cb(ptr, total))
-			res = E_PSI_FILE_CANCEL;
-		}
-	    }
-	}
+        unsigned char buf[RFSV_SENDLEN];
+        if ((res = fread(handle_from, buf, sizeof(buf), len)) == E_PSI_GEN_NONE) {
+            if (len > 0) {
+                if ((res = fwrite(handle_to, buf, len, wlen)) == E_PSI_GEN_NONE) {
+                    total += wlen;
+                    if (cb && !cb(ptr, total))
+                        res = E_PSI_FILE_CANCEL;
+                }
+            }
+        }
     } while (len > 0 && wlen > 0 && (res == E_PSI_GEN_NONE));
     fclose(handle_from);
     fclose(handle_to);
     if (res == E_PSI_FILE_EOF)
-	res = E_PSI_GEN_NONE;
+        res = E_PSI_GEN_NONE;
     return res;
 }
 
@@ -708,7 +708,7 @@ fsetsize(uint32_t handle, uint32_t size)
     a.addWord(handle & 0xffff);
     a.addDWord(size);
     if (!sendCommand(SIBO_FSETEOF, a))
-	return E_PSI_FILE_DISC;
+        return E_PSI_FILE_DISC;
     return getResponse(a);
 }
 
@@ -740,75 +740,75 @@ fseek(const uint32_t handle, const int32_t pos, const uint32_t mode, uint32_t &r
 */
 
     if ((mode < PSI_SEEK_SET) || (mode > PSI_SEEK_END))
-	return E_PSI_GEN_ARG;
+        return E_PSI_GEN_ARG;
 
     if ((mode == PSI_SEEK_CUR) && (pos >= 0)) {
-	/* get and save current position */
-	a.init();
-	a.addWord(handle);
-	a.addDWord(0);
-	a.addWord(PSI_SEEK_CUR);
-	if (!sendCommand(SIBO_FSEEK, a))
-	    return E_PSI_FILE_DISC;
-	if ((res = getResponse(a)) != E_PSI_GEN_NONE)
-	    return res;
-	savpos = a.getDWord(0);
-	if (pos == 0) {
-	    resultpos = savpos;
-	    return res;
-	}
+        /* get and save current position */
+        a.init();
+        a.addWord(handle);
+        a.addDWord(0);
+        a.addWord(PSI_SEEK_CUR);
+        if (!sendCommand(SIBO_FSEEK, a))
+            return E_PSI_FILE_DISC;
+        if ((res = getResponse(a)) != E_PSI_GEN_NONE)
+            return res;
+        savpos = a.getDWord(0);
+        if (pos == 0) {
+            resultpos = savpos;
+            return res;
+        }
     }
     if ((mode == PSI_SEEK_END) && (pos >= 0)) {
-	/* get and save end position */
-	a.init();
-	a.addWord(handle);
-	a.addDWord(0);
-	a.addWord(PSI_SEEK_END);
-	if (!sendCommand(SIBO_FSEEK, a))
-	    return E_PSI_FILE_DISC;
-	if ((res = getResponse(a)) != E_PSI_GEN_NONE)
-	    return res;
-	savpos = a.getDWord(0);
-	if (pos == 0) {
-	    resultpos = savpos;
-	    return res;
-	}
+        /* get and save end position */
+        a.init();
+        a.addWord(handle);
+        a.addDWord(0);
+        a.addWord(PSI_SEEK_END);
+        if (!sendCommand(SIBO_FSEEK, a))
+            return E_PSI_FILE_DISC;
+        if ((res = getResponse(a)) != E_PSI_GEN_NONE)
+            return res;
+        savpos = a.getDWord(0);
+        if (pos == 0) {
+            resultpos = savpos;
+            return res;
+        }
     }
     /* Now the real seek */
     a.addWord(handle);
     a.addDWord(pos);
     a.addWord(mode);
     if (!sendCommand(SIBO_FSEEK, a))
-	return E_PSI_FILE_DISC;
+        return E_PSI_FILE_DISC;
     if ((res = getResponse(a)) != 0)
-	return res;
+        return res;
     realpos = a.getDWord(0);
     switch (mode) {
-	case PSI_SEEK_SET:
-	    calcpos = pos;
-	    break;
-	case PSI_SEEK_CUR:
-	    calcpos = savpos + pos;
-	    break;
-	case PSI_SEEK_END:
-	    resultpos = realpos;
-	    return res;
-	    break;
+        case PSI_SEEK_SET:
+            calcpos = pos;
+            break;
+        case PSI_SEEK_CUR:
+            calcpos = savpos + pos;
+            break;
+        case PSI_SEEK_END:
+            resultpos = realpos;
+            return res;
+            break;
     }
     if (calcpos > realpos) {
-	/* Beyond end of file */
-	res = fsetsize(handle, calcpos);
-	if (res != E_PSI_GEN_NONE)
-	    return res;
-	a.init();
-	a.addWord(handle);
-	a.addDWord(calcpos);
-	a.addWord(PSI_SEEK_SET);
-	if (!sendCommand(SIBO_FSEEK, a))
-	    return E_PSI_FILE_DISC;
-	if ((res = getResponse(a)) != 0)
-	    return res;
-	realpos = a.getDWord(0);
+        /* Beyond end of file */
+        res = fsetsize(handle, calcpos);
+        if (res != E_PSI_GEN_NONE)
+            return res;
+        a.init();
+        a.addWord(handle);
+        a.addDWord(calcpos);
+        a.addWord(PSI_SEEK_SET);
+        if (!sendCommand(SIBO_FSEEK, a))
+            return E_PSI_FILE_DISC;
+        if ((res = getResponse(a)) != 0)
+            return res;
+        realpos = a.getDWord(0);
     }
     resultpos = realpos;
     return res;
@@ -895,27 +895,27 @@ attr2std(uint32_t attr)
 
     // Common attributes
     if (!(attr & P_FAWRITE))
-	res |= PSI_A_RDONLY;
+        res |= PSI_A_RDONLY;
     if (attr & P_FAHIDDEN)
-	res |= PSI_A_HIDDEN;
+        res |= PSI_A_HIDDEN;
     if (attr & P_FASYSTEM)
-	res |= PSI_A_SYSTEM;
+        res |= PSI_A_SYSTEM;
     if (attr & P_FADIR)
-	res |= PSI_A_DIR;
+        res |= PSI_A_DIR;
     if (attr & P_FAMOD)
-	res |= PSI_A_ARCHIVE;
+        res |= PSI_A_ARCHIVE;
     if (attr & P_FAVOLUME)
-	res |= PSI_A_VOLUME;
+        res |= PSI_A_VOLUME;
 
     // SIBO-specific
     if (attr & P_FAREAD)
-	res |= PSI_A_READ;
+        res |= PSI_A_READ;
     if (attr & P_FAEXEC)
-	res |= PSI_A_EXEC;
+        res |= PSI_A_EXEC;
     if (attr & P_FASTREAM)
-	res |= PSI_A_STREAM;
+        res |= PSI_A_STREAM;
     if (attr & P_FATEXT)
-	res |= PSI_A_TEXT;
+        res |= PSI_A_TEXT;
 
     // Do what we can for EPOC
     res |= PSI_A_NORMAL;
@@ -933,27 +933,27 @@ std2attr(const uint32_t attr)
 
     // Common attributes
     if (!(attr & PSI_A_RDONLY))
-	res |= P_FAWRITE;
+        res |= P_FAWRITE;
     if (attr & PSI_A_HIDDEN)
-	res |= P_FAHIDDEN;
+        res |= P_FAHIDDEN;
     if (attr & PSI_A_SYSTEM)
-	res |= P_FASYSTEM;
+        res |= P_FASYSTEM;
     if (attr & PSI_A_DIR)
-	res |= P_FADIR;
+        res |= P_FADIR;
     if (attr & PSI_A_ARCHIVE)
-	res |= P_FAMOD;
+        res |= P_FAMOD;
     if (attr & PSI_A_VOLUME)
-	res |= P_FAVOLUME;
+        res |= P_FAVOLUME;
 
     // SIBO-specific
     if (attr & PSI_A_READ)
-	res |= P_FAREAD;
+        res |= P_FAREAD;
     if (attr & PSI_A_EXEC)
-	res |= P_FAEXEC;
+        res |= P_FAEXEC;
     if (attr & PSI_A_STREAM)
-	res |= P_FASTREAM;
+        res |= P_FASTREAM;
     if (attr & PSI_A_TEXT)
-	res |= P_FATEXT;
+        res |= P_FATEXT;
 
     return res;
 }

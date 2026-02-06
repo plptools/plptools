@@ -86,7 +86,7 @@ SISInstaller::createDirs(char* filename)
                         *end = 0;
                         if (logLevel >= 1)
                                 fprintf(stderr, "Checking for existance of %s\n", filename);
-//			if (!m_psion->dirExists(filename))
+//                        if (!m_psion->dirExists(filename))
                                 {
                                 if (logLevel >= 1)
                                         fprintf(stderr, "Creating dir %s\n", filename);
@@ -229,8 +229,8 @@ SISInstaller::installFile(SISFileRecord* fileRecord)
                         SISFile sisFile;
                         uint8_t* buf2 = fileRecord->getFilePtr(m_fileNo);
                         off_t len = fileRecord->m_fileLengths[m_fileNo];
-//			if (m_lastSisFile < fileptr + len)
-//				m_lastSisFile = fileptr + len;
+//                        if (m_lastSisFile < fileptr + len)
+//                                m_lastSisFile = fileptr + len;
                         SisRC rc = sisFile.fillFrom(buf2, len);
                         if (rc != SIS_OK)
                                 {
@@ -392,10 +392,10 @@ SISInstaller::run(SISFile* file, uint8_t* buf, off_t len, SISFile* parent)
                 }
         else
                 {
-//		This needs to check the _name_ of the language, since the
-//		recursive sis file might have a different language list.
-//		For now, defalt to 0.
-//		lang = parent->getLanguage();
+                // This needs to check the _name_ of the language, since the
+                // recursive sis file might have a different language list.
+                // For now, defalt to 0.
+                // lang = parent->getLanguage();
                 lang = 0;
                 if (logLevel >= 1)
                         fprintf(stderr, "Forcing language to %ld\n", lang);
@@ -467,10 +467,10 @@ SISInstaller::run(SISFile* file, uint8_t* buf, off_t len, SISFile* parent)
 
         if (uninstallFirst)
                 {
-//		printf("You should uninstall the previous version first.\n");
-//		if (!m_forced)
-//			return SIS_ABORTED;
-//		printf("Forced mode... Installing anyway!\n");
+//                printf("You should uninstall the previous version first.\n");
+//                if (!m_forced)
+//                        return SIS_ABORTED;
+//                printf("Forced mode... Installing anyway!\n");
                 if (oldFile == 0)
                         fprintf(stderr, "Already installed, but 0?\n");
                 else

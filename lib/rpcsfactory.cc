@@ -58,32 +58,32 @@ rpcs * rpcsfactory::create(bool reconnect)
     err = FACERR_NONE;
     a.addStringT("NCP$INFO");
     if (!skt->sendBufferStore(a)) {
-	if (!reconnect)
-	    err = FACERR_COULD_NOT_SEND;
-	else {
-	    skt->closeSocket();
-	    skt->reconnect();
-	    err = FACERR_AGAIN;
-	}
-	return NULL;
+        if (!reconnect)
+            err = FACERR_COULD_NOT_SEND;
+        else {
+            skt->closeSocket();
+            skt->reconnect();
+            err = FACERR_AGAIN;
+        }
+        return NULL;
     }
     if (skt->getBufferStore(a) == 1) {
-	if (a.getLen() > 8 && !strncmp(a.getString(), "Series 3", 8)) {
-	    return new rpcs16(skt);
-	}
-	else if (a.getLen() > 8 && !strncmp(a.getString(), "Series 5", 8)) {
-	    return new rpcs32(skt);
-	}
-	if ((a.getLen() > 8) && !strncmp(a.getString(), "No Psion", 8)) {
-	    skt->closeSocket();
-	    skt->reconnect();
-	    err = FACERR_NOPSION;
-	    return NULL;
-	}
-	// Invalid protocol version
-	err = FACERR_PROTVERSION;
+        if (a.getLen() > 8 && !strncmp(a.getString(), "Series 3", 8)) {
+            return new rpcs16(skt);
+        }
+        else if (a.getLen() > 8 && !strncmp(a.getString(), "Series 5", 8)) {
+            return new rpcs32(skt);
+        }
+        if ((a.getLen() > 8) && !strncmp(a.getString(), "No Psion", 8)) {
+            skt->closeSocket();
+            skt->reconnect();
+            err = FACERR_NOPSION;
+            return NULL;
+        }
+        // Invalid protocol version
+        err = FACERR_PROTVERSION;
     } else
-	err = FACERR_NORESPONSE;
+        err = FACERR_NORESPONSE;
 
     // No message returned.
     return NULL;

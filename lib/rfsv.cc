@@ -126,10 +126,10 @@ void rfsv::reset(void) {
     status = E_PSI_FILE_DISC;
     a.addStringT(getConnectName());
     if (skt->sendBufferStore(a)) {
-	if (skt->getBufferStore(a) == 1) {
-	    if (!strcmp(a.getString(0), "Ok"))
-		status = E_PSI_GEN_NONE;
-	}
+        if (skt->getBufferStore(a) == 1) {
+            if (!strcmp(a.getString(0), "Ok"))
+                status = E_PSI_GEN_NONE;
+        }
     }
 }
 
@@ -142,7 +142,7 @@ convertSlash(const string &name)
 {
     string tmp = "";
     for (const char *p = name.c_str(); *p; p++)
-	tmp += (*p == '/') ? '\\' : *p;
+        tmp += (*p == '/') ? '\\' : *p;
     return tmp;
 }
 
@@ -175,12 +175,12 @@ getSpeed()
     bufferStore a;
     a.addStringT("NCP$GSPD");
     if (!skt->sendBufferStore(a))
-	return -1;
+        return -1;
     if (skt->getBufferStore(a) != 1)
-	return -1;
+        return -1;
     if (a.getLen() != 5)
-	return -1;
+        return -1;
     if (a.getByte(0) != E_PSI_GEN_NONE)
-	return -1;
+        return -1;
     return a.getDWord(1);
 }

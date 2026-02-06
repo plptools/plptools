@@ -37,46 +37,46 @@ class SISComponentNameRecord
 {
 public:
 
-	SISComponentNameRecord();
-	virtual ~SISComponentNameRecord();
+    SISComponentNameRecord();
+    virtual ~SISComponentNameRecord();
 
-	/**
-	 * Populate the fields.
-	 *
-	 * @param buf The buffer to read data from.
-	 * @param base The index where we start reading data.
-	 * @param len The length of the buffer, for range checking.
-	 * @param sisFile The container sis file.
-	 */
-	SisRC fillFrom(uint8_t* buf, int* base, off_t len, SISFile* sisFile);
+    /**
+     * Populate the fields.
+     *
+     * @param buf The buffer to read data from.
+     * @param base The index where we start reading data.
+     * @param len The length of the buffer, for range checking.
+     * @param sisFile The container sis file.
+     */
+    SisRC fillFrom(uint8_t* buf, int* base, off_t len, SISFile* sisFile);
 
-	/**
-	 * Find out the end position for the last name in the file.
-	 */
-	uint32_t getLastEnd();
+    /**
+     * Find out the end position for the last name in the file.
+     */
+    uint32_t getLastEnd();
 
-	/**
-	 * Return the name for the given language.
-	 *
-	 * @param no The sequence number in the list of language records in
-	 * the sis file.
-	 */
-	uint8_t* getName(int no);
+    /**
+     * Return the name for the given language.
+     *
+     * @param no The sequence number in the list of language records in
+     * the sis file.
+     */
+    uint8_t* getName(int no);
 
 private:
 
-	uint32_t* m_nameLengths;
-	uint32_t* m_namePtrs;
+    uint32_t* m_nameLengths;
+    uint32_t* m_namePtrs;
 
-	/**
-	 * The extracted names, as zero terminated strings.
-	 */
-	uint8_t** m_names;
+    /**
+     * The extracted names, as zero terminated strings.
+     */
+    uint8_t** m_names;
 
-	/**
-	 * The number of names, so we know how much to delete.
-	 */
-	int m_nameCount;
+    /**
+     * The number of names, so we know how much to delete.
+     */
+    int m_nameCount;
 
 };
 

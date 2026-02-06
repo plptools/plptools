@@ -77,60 +77,60 @@ public:
 
 private:
     enum commands {
-	SIBO_FOPEN = 0, // File Open
-	SIBO_FCLOSE = 2, // File Close
-	SIBO_FREAD = 4, // File Read
-	SIBO_FDIRREAD = 6, // Read Directory entries
-	SIBO_FDEVICEREAD = 8, // Device Information
-	SIBO_FWRITE = 10, // File Write
-	SIBO_FSEEK = 12, // File Seek
-	SIBO_FFLUSH = 14, // Flush
-	SIBO_FSETEOF = 16,
-	SIBO_RENAME = 18,
-	SIBO_DELETE = 20,
-	SIBO_FINFO = 22,
-	SIBO_SFSTAT = 24,
-	SIBO_PARSE = 26,
-	SIBO_MKDIR = 28,
-	SIBO_OPENUNIQUE = 30,
-	SIBO_STATUSDEVICE = 32,
-	SIBO_PATHTEST = 34,
-	SIBO_STATUSSYSTEM = 36,
-	SIBO_CHANGEDIR = 38,
-	SIBO_SFDATE = 40,
-	SIBO_RESPONSE = 42
+        SIBO_FOPEN = 0, // File Open
+        SIBO_FCLOSE = 2, // File Close
+        SIBO_FREAD = 4, // File Read
+        SIBO_FDIRREAD = 6, // Read Directory entries
+        SIBO_FDEVICEREAD = 8, // Device Information
+        SIBO_FWRITE = 10, // File Write
+        SIBO_FSEEK = 12, // File Seek
+        SIBO_FFLUSH = 14, // Flush
+        SIBO_FSETEOF = 16,
+        SIBO_RENAME = 18,
+        SIBO_DELETE = 20,
+        SIBO_FINFO = 22,
+        SIBO_SFSTAT = 24,
+        SIBO_PARSE = 26,
+        SIBO_MKDIR = 28,
+        SIBO_OPENUNIQUE = 30,
+        SIBO_STATUSDEVICE = 32,
+        SIBO_PATHTEST = 34,
+        SIBO_STATUSSYSTEM = 36,
+        SIBO_CHANGEDIR = 38,
+        SIBO_SFDATE = 40,
+        SIBO_RESPONSE = 42
     };
 
     enum fopen_attrib {
-	P_FOPEN = 0x0000, /* Open file */
-	P_FCREATE = 0x0001, /* Create file */
-	P_FREPLACE = 0x0002, /* Replace file */
-	P_FAPPEND = 0x0003, /* Append records */
-	P_FUNIQUE = 0x0004, /* Unique file open */
-	P_FSTREAM = 0x0000, /* Stream access to a binary file */
-	P_FSTREAM_TEXT = 0x0010, /* Stream access to a text file */
-	P_FTEXT = 0x0020, /* Record access to a text file */
-	P_FDIR = 0x0030, /* Record access to a directory file */
-	P_FFORMAT = 0x0040, /* Format a device */
-	P_FDEVICE = 0x0050, /* Record access to device name list */
-	P_FNODE = 0x0060, /* Record access to node name list */
-	P_FUPDATE = 0x0100, /* Read and write access */
-	P_FRANDOM = 0x0200, /* Random access */
-	P_FSHARE = 0x0400 /* File can be shared */
+        P_FOPEN = 0x0000, /* Open file */
+        P_FCREATE = 0x0001, /* Create file */
+        P_FREPLACE = 0x0002, /* Replace file */
+        P_FAPPEND = 0x0003, /* Append records */
+        P_FUNIQUE = 0x0004, /* Unique file open */
+        P_FSTREAM = 0x0000, /* Stream access to a binary file */
+        P_FSTREAM_TEXT = 0x0010, /* Stream access to a text file */
+        P_FTEXT = 0x0020, /* Record access to a text file */
+        P_FDIR = 0x0030, /* Record access to a directory file */
+        P_FFORMAT = 0x0040, /* Format a device */
+        P_FDEVICE = 0x0050, /* Record access to device name list */
+        P_FNODE = 0x0060, /* Record access to node name list */
+        P_FUPDATE = 0x0100, /* Read and write access */
+        P_FRANDOM = 0x0200, /* Random access */
+        P_FSHARE = 0x0400 /* File can be shared */
     };
 
     enum status_enum {
-	P_FAWRITE  = 0x0001, /* can the file be written to? */
-	P_FAHIDDEN = 0x0002, /* set if file is hidden */
-	P_FASYSTEM = 0x0004, /* set if file is a system file */
-	P_FAVOLUME = 0x0008, /* set if the name is a volume name */
-	P_FADIR    = 0x0010, /* set if file is a directory file */
-	P_FAMOD    = 0x0020, /* has the file been modified? */
-	P_FAREAD   = 0x0100, /* can the file be read? */
-	P_FAEXEC   = 0x0200, /* is the file executable? */
-	P_FASTREAM = 0x0400, /* is the file a byte stream file? */
-	P_FATEXT   = 0x0800, /* is it a text file? */
-	P_FAMASK   = 0x0f3f  /* All of the above */
+        P_FAWRITE  = 0x0001, /* can the file be written to? */
+        P_FAHIDDEN = 0x0002, /* set if file is hidden */
+        P_FASYSTEM = 0x0004, /* set if file is a system file */
+        P_FAVOLUME = 0x0008, /* set if the name is a volume name */
+        P_FADIR    = 0x0010, /* set if file is a directory file */
+        P_FAMOD    = 0x0020, /* has the file been modified? */
+        P_FAREAD   = 0x0100, /* can the file be read? */
+        P_FAEXEC   = 0x0200, /* is the file executable? */
+        P_FASTREAM = 0x0400, /* is the file a byte stream file? */
+        P_FATEXT   = 0x0800, /* is it a text file? */
+        P_FAMASK   = 0x0f3f  /* All of the above */
     };
 
     /**

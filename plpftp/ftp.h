@@ -34,25 +34,25 @@ class bufferStore;
 class bufferArray;
 
 class ftp {
-	public:
-	ftp();
-	~ftp();
-        int session(rfsv & a, rpcs & r, rclip & rc, ppsocket & rclipSocket, std::vector<char *> argv);
-        bool canClip;
+    public:
+    ftp();
+    ~ftp();
+    int session(rfsv & a, rpcs & r, rclip & rc, ppsocket & rclipSocket, std::vector<char *> argv);
+    bool canClip;
 
-	private:
-	std::vector<char *> getCommand();
-	void initReadline(void);
-        int putClipText(rpcs & r, rfsv & a, rclip & rc, ppsocket & rclipSocket, const char *data);
-        int getClipData(rpcs & r, rfsv & a, rclip & rc, ppsocket & rclipSocket, const char *file);
-        bool checkClipConnection(rfsv &a, rclip & rc, ppsocket & rclipSocket);
+    private:
+    std::vector<char *> getCommand();
+    void initReadline(void);
+    int putClipText(rpcs & r, rfsv & a, rclip & rc, ppsocket & rclipSocket, const char *data);
+    int getClipData(rpcs & r, rfsv & a, rclip & rc, ppsocket & rclipSocket, const char *file);
+    bool checkClipConnection(rfsv &a, rclip & rc, ppsocket & rclipSocket);
 
-	// utilities
-	void resetUnixWd();
-	void usage();
+    // utilities
+    void resetUnixWd();
+    void usage();
 
-	char defDrive[9];
-	char *localDir;
+    char defDrive[9];
+    char *localDir;
 };
 
 #endif

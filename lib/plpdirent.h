@@ -97,7 +97,7 @@ public:
     * Initializing Constructor
     */
     PlpDirent(const uint32_t size, const uint32_t attr, const uint32_t tHi,
-	      const uint32_t tLo, const char * const name);
+              const uint32_t tLo, const char * const name);
 
     /**
     * Default destructor.

@@ -27,16 +27,16 @@
  * Return Codes.
  */
 enum SisRC {
-	SIS_OK = 0,
-	SIS_TRUNCATED,
-	SIS_TRUNCATEDDATA,
-	SIS_CORRUPTED,
-	SIS_FAILED,
-	SIS_ABORTED,
-	SIS_DIFFERENT_APP,
-	SIS_VER_EARLIER,
-	SIS_SAME_OR_LATER,
-	SIS_OTHER_VARIANT
+    SIS_OK = 0,
+    SIS_TRUNCATED,
+    SIS_TRUNCATEDDATA,
+    SIS_CORRUPTED,
+    SIS_FAILED,
+    SIS_ABORTED,
+    SIS_DIFFERENT_APP,
+    SIS_VER_EARLIER,
+    SIS_SAME_OR_LATER,
+    SIS_OTHER_VARIANT
 };
 
 extern uint16_t read16(uint8_t* p);
@@ -57,9 +57,9 @@ extern int logLevel;
  */
 struct LangTableEntry
 {
-	uint16_t m_no;
-	char   m_code[3];
-	const char*  m_name;
+    uint16_t m_no;
+    char   m_code[3];
+    const char*  m_name;
 };
 
 extern LangTableEntry langTable[];

@@ -36,7 +36,7 @@ bufferArray::bufferArray(const bufferArray & a)
     lenAllocd = a.lenAllocd;
     buff = new bufferStore[lenAllocd];
     for (int i = 0; i < len; i++)
-	buff[i] = a.buff[i];
+        buff[i] = a.buff[i];
 }
 
 bufferArray::~bufferArray()
@@ -49,11 +49,11 @@ pop()
 {
     bufferStore ret;
     if (len > 0) {
-	ret = buff[0];
-	len--;
-	for (long i = 0; i < len; i++) {
-	    buff[i] = buff[i + 1];
-	}
+        ret = buff[0];
+        len--;
+        for (long i = 0; i < len; i++) {
+            buff[i] = buff[i + 1];
+        }
     }
     return ret;
 }
@@ -62,13 +62,13 @@ void bufferArray::
 append(const bufferStore & b)
 {
     if (len == lenAllocd) {
-	lenAllocd += ALLOC_MIN;
-	bufferStore *nb = new bufferStore[lenAllocd];
-	for (long i = 0; i < len; i++) {
-	    nb[i] = buff[i];
-	}
-	delete []buff;
-	buff = nb;
+        lenAllocd += ALLOC_MIN;
+        bufferStore *nb = new bufferStore[lenAllocd];
+        for (long i = 0; i < len; i++) {
+            nb[i] = buff[i];
+        }
+        delete []buff;
+        buff = nb;
     }
     buff[len++] = b;
 }
@@ -77,10 +77,10 @@ void bufferArray::
 push(const bufferStore & b)
 {
     if (len == lenAllocd)
-	lenAllocd += ALLOC_MIN;
+        lenAllocd += ALLOC_MIN;
     bufferStore *nb = new bufferStore[lenAllocd];
     for (long i = len; i > 0; i--) {
-	nb[i] = buff[i - 1];
+        nb[i] = buff[i - 1];
     }
     nb[0] = b;
     delete[]buff;
@@ -111,7 +111,7 @@ operator =(const bufferArray & a)
     lenAllocd = a.lenAllocd;
     buff = new bufferStore[lenAllocd];
     for (int i = 0; i < len; i++)
-	buff[i] = a.buff[i];
+        buff[i] = a.buff[i];
     return *this;
 }
 
@@ -143,9 +143,9 @@ operator +=(const bufferArray &a)
     lenAllocd += a.lenAllocd;
     bufferStore *nb = new bufferStore[lenAllocd];
     for (int i = 0; i < len; i++)
-	nb[len + i] = buff[i];
+        nb[len + i] = buff[i];
     for (int i = 0; i < a.len; i++)
-	nb[len + i] = a.buff[i];
+        nb[len + i] = a.buff[i];
     len += a.len;
     delete []buff;
     buff = nb;

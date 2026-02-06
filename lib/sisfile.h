@@ -36,91 +36,91 @@ class SISFile
 {
 public:
 
-	SISFile();
+    SISFile();
 
-	virtual ~SISFile();
+    virtual ~SISFile();
 
-	/**
-	 * Compare uid and version number of this file, with another.
-	 *
-	 * @see SISFileHeader::compareApp()
-	 */
-	SisRC compareApp(SISFile* other);
+    /**
+     * Compare uid and version number of this file, with another.
+     *
+     * @see SISFileHeader::compareApp()
+     */
+    SisRC compareApp(SISFile* other);
 
-	/**
-	 * Populate the fields.
-	 *
-	 * @param buf The buffer to read from.
-	 * @param len The length of the buffer.
-	 */
-	SisRC fillFrom(uint8_t* buf, off_t len);
+    /**
+     * Populate the fields.
+     *
+     * @param buf The buffer to read from.
+     * @param len The length of the buffer.
+     */
+    SisRC fillFrom(uint8_t* buf, off_t len);
 
-	/**
-	 * Return the currently selected installation language.
-	 */
-	int getLanguage();
+    /**
+     * Return the currently selected installation language.
+     */
+    int getLanguage();
 
-	/**
-	 * Find a language entry, based on the sequence number in the SISLangRecord
-	 * part of the file.
-	 */
-	LangTableEntry* getLanguage(int i);
+    /**
+     * Find a language entry, based on the sequence number in the SISLangRecord
+     * part of the file.
+     */
+    LangTableEntry* getLanguage(int i);
 
-	/**
-	 * Get the name of this component, in the selected language.
-	 */
-	uint8_t* getName();
+    /**
+     * Get the name of this component, in the selected language.
+     */
+    uint8_t* getName();
 
-	/**
-	 * Get the number of bytes that should be copied to the residual sis
-	 * file on the psion.
-	 */
-	uint32_t getResidualEnd()
-		{
-		return m_end;
-		}
+    /**
+     * Get the number of bytes that should be copied to the residual sis
+     * file on the psion.
+     */
+    uint32_t getResidualEnd()
+        {
+        return m_end;
+        }
 
-	void ownBuffer()
-		{
-		m_ownBuffer = true;
-		}
+    void ownBuffer()
+        {
+        m_ownBuffer = true;
+        }
 
-	/**
-	 * Is this the same application?
-	 */
-	bool sameApp(SISFile* other);
+    /**
+     * Is this the same application?
+     */
+    bool sameApp(SISFile* other);
 
-	/**
-	 * Set the installed drive.
-	 */
-	void setDrive(char drive);
+    /**
+     * Set the installed drive.
+     */
+    void setDrive(char drive);
 
-	/**
-	 * Set the number of installed files.
-	 */
-	void setFiles(int nFiles);
+    /**
+     * Set the number of installed files.
+     */
+    void setFiles(int nFiles);
 
-	/**
-	 * Set the selected installation language.
-	 */
-	void setLanguage(int lang);
+    /**
+     * Set the selected installation language.
+     */
+    void setLanguage(int lang);
 
-	SISFileHeader m_header;
-	SISLangRecord* m_langRecords;
-	SISFileRecord* m_fileRecords;
-	SISReqRecord* m_reqRecords;
+    SISFileHeader m_header;
+    SISLangRecord* m_langRecords;
+    SISFileRecord* m_fileRecords;
+    SISReqRecord* m_reqRecords;
 
 private:
 
-	SISComponentNameRecord m_componentRecord;
+    SISComponentNameRecord m_componentRecord;
 
-	bool m_ownBuffer;
+    bool m_ownBuffer;
 
-	uint8_t* m_buf;
+    uint8_t* m_buf;
 
-	uint32_t m_end;
+    uint32_t m_end;
 
-	void updateEnd(uint32_t pos);
+    void updateEnd(uint32_t pos);
 
 };
 

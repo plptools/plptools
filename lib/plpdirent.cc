@@ -53,8 +53,8 @@ PlpDirent::PlpDirent(const PlpDirent &e) {
 }
 
 PlpDirent::PlpDirent(const uint32_t _size, const uint32_t _attr,
-		     const uint32_t tHi, const uint32_t tLo,
-		     const char * const _name) {
+                     const uint32_t tHi, const uint32_t tLo,
+                     const char * const _name) {
     size = _size;
     attr = _attr;
     time = PsiTime(tHi, tLo);
@@ -76,7 +76,7 @@ getAttr() {
 uint32_t PlpDirent::
 getUID(int uididx) {
     if ((uididx >= 0) && (uididx < 4))
-	return UID[uididx];
+        return UID[uididx];
     return 0;
 }
 
@@ -195,7 +195,7 @@ getDriveAttribute() {
 static void
 appendWithDelim(string &s1, const char * const s2) {
     if (!s1.empty())
-	s1 += ',';
+        s1 += ',';
     s1 += s2;
 }
 
@@ -203,17 +203,17 @@ void PlpDrive::
 getDriveAttribute(string &ret) {
     ret = "";
     if (driveattr & 1)
-	appendWithDelim(ret, _("local"));
+        appendWithDelim(ret, _("local"));
     if (driveattr & 2)
-	appendWithDelim(ret, _("ROM"));
+        appendWithDelim(ret, _("ROM"));
     if (driveattr & 4)
-	appendWithDelim(ret, _("redirected"));
+        appendWithDelim(ret, _("redirected"));
     if (driveattr & 8)
-	appendWithDelim(ret, _("substituted"));
+        appendWithDelim(ret, _("substituted"));
     if (driveattr & 16)
-	appendWithDelim(ret, _("internal"));
+        appendWithDelim(ret, _("internal"));
     if (driveattr & 32)
-	appendWithDelim(ret, _("removable"));
+        appendWithDelim(ret, _("removable"));
 }
 
 uint32_t PlpDrive::
@@ -226,13 +226,13 @@ getMediaAttribute(string &ret) {
     ret = "";
 
     if (mediaattr & 1)
-	appendWithDelim(ret, _("variable size"));
+        appendWithDelim(ret, _("variable size"));
     if (mediaattr & 2)
-	appendWithDelim(ret, _("dual density"));
+        appendWithDelim(ret, _("dual density"));
     if (mediaattr & 4)
-	appendWithDelim(ret, _("formattable"));
+        appendWithDelim(ret, _("formattable"));
     if (mediaattr & 8)
-	appendWithDelim(ret, _("write protected"));
+        appendWithDelim(ret, _("write protected"));
 }
 
 uint32_t PlpDrive::

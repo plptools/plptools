@@ -60,7 +60,7 @@ private:
     friend void * pump_run(void *);
 
     inline void addToCrc(unsigned char a, unsigned short *crc) {
-	*crc =  (*crc << 8) ^ crc_table[((*crc >> 8) ^ a) & 0xff];
+        *crc =  (*crc << 8) ^ crc_table[((*crc >> 8) ^ a) & 0xff];
     }
 
     void findSync();

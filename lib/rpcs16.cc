@@ -46,8 +46,8 @@ getCmdLine(const char *process, string &ret)
 
     a.addStringT(process);
     if (!sendCommand(rpcs::GET_CMDLINE, a))
-	return rfsv::E_PSI_FILE_DISC;
+        return rfsv::E_PSI_FILE_DISC;
     if ((res = getResponse(a, true)) == rfsv::E_PSI_GEN_NONE)
-	ret = a.getString(0);
+        ret = a.getString(0);
     return res;
 }

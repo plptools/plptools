@@ -59,89 +59,89 @@ static bufferStore owner;
 /* Translate EPOC/SIBO error to UNIX error code, leaving positive
    numbers alone */
 int epocerr_to_errno(long epocerr) {
-  int unixerr = (int)epocerr;
+    int unixerr = (int)epocerr;
 
-  if (epocerr < 0) {
-    switch (epocerr) {
-    case rfsv::E_PSI_GEN_NONE:
-      unixerr = 0;
-      break;
-    case rfsv::E_PSI_FILE_EXIST:
-      unixerr = -EEXIST;
-      break;
-    case rfsv::E_PSI_FILE_NXIST:
-    case rfsv::E_PSI_FILE_DIR:
-      unixerr = -ENOENT;
-      break;
-    case rfsv::E_PSI_FILE_WRITE:
-    case rfsv::E_PSI_FILE_READ:
-    case rfsv::E_PSI_FILE_EOF: // Can't err = EOF as it's not an error code
-    case rfsv::E_PSI_FILE_ALLOC: // FIXME: No idea what this is
-    case rfsv::E_PSI_FILE_UNKNOWN:
-    case rfsv::E_PSI_FILE_DIRFULL:
-      unixerr = -EPERM;
-      break;
-    case rfsv::E_PSI_FILE_FULL:
-      unixerr = -ENOSPC;
-      break;
-    case rfsv::E_PSI_FILE_NAME:
-    case rfsv::E_PSI_FILE_RECORD:
-    case rfsv::E_PSI_FILE_VOLUME:
-      unixerr = -EINVAL;
-      break;
-    case rfsv::E_PSI_FILE_ACCESS:
-    case rfsv::E_PSI_FILE_LOCKED:
-    case rfsv::E_PSI_FILE_RDONLY:
-    case rfsv::E_PSI_FILE_PROTECT:
-      unixerr = -EACCES;
-      break;
-    case rfsv::E_PSI_GEN_INUSE:
-    case rfsv::E_PSI_FILE_DEVICE:
-    case rfsv::E_PSI_FILE_PENDING:
-    case rfsv::E_PSI_FILE_NOTREADY:
-      unixerr = -EBUSY;
-      break;
-    case rfsv::E_PSI_FILE_INV:
-    case rfsv::E_PSI_FILE_RETRAN:
-    case rfsv::E_PSI_FILE_LINE:
-    case rfsv::E_PSI_FILE_INACT:
-    case rfsv::E_PSI_FILE_PARITY:
-    case rfsv::E_PSI_FILE_FRAME:
-    case rfsv::E_PSI_FILE_OVERRUN:
-    case rfsv::E_PSI_FILE_CORRUPT:
-    case rfsv::E_PSI_FILE_INVALID:
-    case rfsv::E_PSI_FILE_ABORT:
-    case rfsv::E_PSI_FILE_ERASE:
-    case rfsv::E_PSI_FILE_NDISC:
-    case rfsv::E_PSI_FILE_DRIVER:
-    case rfsv::E_PSI_FILE_COMPLETION:
-    default:
-      unixerr = -EIO;
-      break;
-    case rfsv::E_PSI_FILE_CANCEL:
-      unixerr = -EINTR;
-      break;
-    case rfsv::E_PSI_FILE_DISC:
-    case rfsv::E_PSI_FILE_CONNECT:
-      unixerr = -ENODEV;
-      break;
-    case rfsv::E_PSI_FILE_TOOBIG:
-      unixerr = -EFBIG;
-      break;
-    case rfsv::E_PSI_FILE_HANDLE:
-      unixerr = -EBADF;
-      break;
+    if (epocerr < 0) {
+        switch (epocerr) {
+        case rfsv::E_PSI_GEN_NONE:
+            unixerr = 0;
+            break;
+        case rfsv::E_PSI_FILE_EXIST:
+            unixerr = -EEXIST;
+            break;
+        case rfsv::E_PSI_FILE_NXIST:
+        case rfsv::E_PSI_FILE_DIR:
+            unixerr = -ENOENT;
+            break;
+        case rfsv::E_PSI_FILE_WRITE:
+        case rfsv::E_PSI_FILE_READ:
+        case rfsv::E_PSI_FILE_EOF: // Can't err = EOF as it's not an error code
+        case rfsv::E_PSI_FILE_ALLOC: // FIXME: No idea what this is
+        case rfsv::E_PSI_FILE_UNKNOWN:
+        case rfsv::E_PSI_FILE_DIRFULL:
+            unixerr = -EPERM;
+            break;
+        case rfsv::E_PSI_FILE_FULL:
+            unixerr = -ENOSPC;
+            break;
+        case rfsv::E_PSI_FILE_NAME:
+        case rfsv::E_PSI_FILE_RECORD:
+        case rfsv::E_PSI_FILE_VOLUME:
+            unixerr = -EINVAL;
+            break;
+        case rfsv::E_PSI_FILE_ACCESS:
+        case rfsv::E_PSI_FILE_LOCKED:
+        case rfsv::E_PSI_FILE_RDONLY:
+        case rfsv::E_PSI_FILE_PROTECT:
+            unixerr = -EACCES;
+            break;
+        case rfsv::E_PSI_GEN_INUSE:
+        case rfsv::E_PSI_FILE_DEVICE:
+        case rfsv::E_PSI_FILE_PENDING:
+        case rfsv::E_PSI_FILE_NOTREADY:
+            unixerr = -EBUSY;
+            break;
+        case rfsv::E_PSI_FILE_INV:
+        case rfsv::E_PSI_FILE_RETRAN:
+        case rfsv::E_PSI_FILE_LINE:
+        case rfsv::E_PSI_FILE_INACT:
+        case rfsv::E_PSI_FILE_PARITY:
+        case rfsv::E_PSI_FILE_FRAME:
+        case rfsv::E_PSI_FILE_OVERRUN:
+        case rfsv::E_PSI_FILE_CORRUPT:
+        case rfsv::E_PSI_FILE_INVALID:
+        case rfsv::E_PSI_FILE_ABORT:
+        case rfsv::E_PSI_FILE_ERASE:
+        case rfsv::E_PSI_FILE_NDISC:
+        case rfsv::E_PSI_FILE_DRIVER:
+        case rfsv::E_PSI_FILE_COMPLETION:
+        default:
+            unixerr = -EIO;
+            break;
+        case rfsv::E_PSI_FILE_CANCEL:
+            unixerr = -EINTR;
+            break;
+        case rfsv::E_PSI_FILE_DISC:
+        case rfsv::E_PSI_FILE_CONNECT:
+            unixerr = -ENODEV;
+            break;
+        case rfsv::E_PSI_FILE_TOOBIG:
+            unixerr = -EFBIG;
+            break;
+        case rfsv::E_PSI_FILE_HANDLE:
+            unixerr = -EBADF;
+            break;
+        }
     }
-  }
 
-  debuglog("EPOC error %ld became UNIX code %d", epocerr, unixerr);
-  return unixerr;
+    debuglog("EPOC error %ld became UNIX code %d", epocerr, unixerr);
+    return unixerr;
 }
 
 int rfsv_isalive(void) {
     if (!a) {
-	if (!(a = rf->create(true)))
-	    return 0;
+        if (!(a = rf->create(true)))
+            return 0;
     }
     return a->getStatus() == rfsv::E_PSI_GEN_NONE;
 }
@@ -152,51 +152,51 @@ int rfsv_dir(const char *file, dentry **e) {
     long ret;
 
     if (!a)
-	return -ENODEV;
+        return -ENODEV;
     ret = a->dir(file, entries);
 
     for (int i = 0; i < entries.size(); i++) {
-	PlpDirent pe = entries[i];
-	tmp = *e;
-	*e = (dentry *)calloc(1, sizeof(dentry));
-	if (!*e)
-	    return -ENODEV;
-	(*e)->time = pe.getPsiTime().getTime();
-	(*e)->size = pe.getSize();
-	(*e)->attr = pe.getAttr();
-	(*e)->name = strdup(pe.getName());
-	(*e)->next = tmp;
+        PlpDirent pe = entries[i];
+        tmp = *e;
+        *e = (dentry *)calloc(1, sizeof(dentry));
+        if (!*e)
+            return -ENODEV;
+        (*e)->time = pe.getPsiTime().getTime();
+        (*e)->size = pe.getSize();
+        (*e)->attr = pe.getAttr();
+        (*e)->name = strdup(pe.getName());
+        (*e)->next = tmp;
     }
     return epocerr_to_errno(ret);
 }
 
 int rfsv_dircount(const char *file, uint32_t *count) {
     if (!a)
-	return -ENODEV;
+        return -ENODEV;
     return epocerr_to_errno(a->dircount(file, *count));
 }
 
 int rfsv_rmdir(const char *name) {
     if (!a)
-	return -ENODEV;
+        return -ENODEV;
     return epocerr_to_errno(a->rmdir(name));
 }
 
 int rfsv_mkdir(const char *file) {
     if (!a)
-	return -ENODEV;
+        return -ENODEV;
     return epocerr_to_errno(a->mkdir(file));
 }
 
 int rfsv_remove(const char *file) {
     if (!a)
-	return -ENODEV;
+        return -ENODEV;
     return epocerr_to_errno(a->remove(file));
 }
 
 int rfsv_fclose(long handle) {
     if (!a)
-	return -ENODEV;
+        return -ENODEV;
     return epocerr_to_errno(a->fclose(handle));
 }
 
@@ -205,7 +205,7 @@ int rfsv_fcreate(long attr, const char *file, uint32_t *handle) {
     long ret;
 
     if (!a)
-	return -ENODEV;
+        return -ENODEV;
     ret = a->fcreatefile(attr, file, ph);
     *handle = ph;
     return epocerr_to_errno(ret);
@@ -215,7 +215,7 @@ int rfsv_open(const char *name, long mode, uint32_t *handle) {
     long ret, retry;
 
     if (!a)
-	return -ENODEV;
+        return -ENODEV;
     if (mode == O_RDONLY)
         mode = rfsv::PSI_O_RDONLY;
     else
@@ -229,13 +229,13 @@ int rfsv_read(char *buf, long offset, long len, const char *name) {
     uint32_t ret = 0, r_offset, handle;
 
     if (!a)
-	return -ENODEV;
+        return -ENODEV;
     if ((ret = rfsv_open(name, O_RDONLY, &handle)))
         return ret;
     if (a->fseek(handle, offset, rfsv::PSI_SEEK_SET, r_offset) != rfsv::E_PSI_GEN_NONE ||
         offset != r_offset ||
         a->fread(handle, (unsigned char *)buf, len, ret) != rfsv::E_PSI_GEN_NONE)
-	ret = -1;
+        ret = -1;
     rfsv_fclose(handle);
     return epocerr_to_errno(ret);
 }
@@ -244,20 +244,20 @@ int rfsv_write(const char *buf, long offset, long len, const char *name) {
     uint32_t ret = 0, r_offset, handle;
 
     if (!a)
-	return -ENODEV;
+        return -ENODEV;
     if ((ret = rfsv_open(name, O_RDWR, &handle)))
         return ret;
     if (a->fseek(handle, offset, rfsv::PSI_SEEK_SET, r_offset) != rfsv::E_PSI_GEN_NONE ||
         offset != r_offset ||
         a->fwrite(handle, (unsigned char *)buf, len, ret) != rfsv::E_PSI_GEN_NONE)
-	ret = -1;
+        ret = -1;
     rfsv_fclose(handle);
     return epocerr_to_errno(ret);
 }
 
 int rfsv_setmtime(const char *name, long time) {
     if (!a)
-	return -ENODEV;
+        return -ENODEV;
     return epocerr_to_errno(a->fsetmtime(name, PsiTime(time)));
 }
 
@@ -266,18 +266,18 @@ int rfsv_setsize(const char *name, long size) {
     long ret;
 
     if (!a)
-	return -ENODEV;
+        return -ENODEV;
     ret = a->fopen(a->opMode(rfsv::PSI_O_RDWR), name, ph);
     if (!ret) {
-	ret = a->fsetsize(ph, size);
-	a->fclose(ph);
+        ret = a->fsetsize(ph, size);
+        a->fclose(ph);
     }
     return epocerr_to_errno(ret);
 }
 
 int rfsv_setattr(const char *name, long sattr, long dattr) {
     if (!a)
-	return -ENODEV;
+        return -ENODEV;
     return epocerr_to_errno(a->fsetattr(name, sattr, dattr));
 }
 
@@ -286,7 +286,7 @@ int rfsv_getattr(const char *name, long *attr, long *size, long *time) {
     PlpDirent e;
 
     if (!a)
-	return -ENODEV;
+        return -ENODEV;
     res = a->fgeteattr(name, e);
     *attr = e.getAttr();
     *size = e.getSize();
@@ -296,7 +296,7 @@ int rfsv_getattr(const char *name, long *attr, long *size, long *time) {
 
 int rfsv_rename(const char *oldname, const char *newname) {
     if (!a)
-	return -ENODEV;
+        return -ENODEV;
     return epocerr_to_errno(a->rename(oldname, newname));
 }
 
@@ -307,27 +307,27 @@ int rfsv_drivelist(int *cnt, device **dlist) {
     int i;
 
     if (!a)
-	return -ENODEV;
+        return -ENODEV;
     ret = a->devlist(devbits);
     if (ret == 0)
-	for (i = 0; i < 26; i++) {
-	    PlpDrive drive;
+        for (i = 0; i < 26; i++) {
+            PlpDrive drive;
 
-	    if ((devbits & 1) &&
-		((a->devinfo(i + 'A', drive) == rfsv::E_PSI_GEN_NONE))) {
+            if ((devbits & 1) &&
+                ((a->devinfo(i + 'A', drive) == rfsv::E_PSI_GEN_NONE))) {
 
-		device *next = *dlist;
-		*dlist = (device *)malloc(sizeof(device));
-		(*dlist)->next = next;
-		(*dlist)->name = strdup(drive.getName().c_str());
-		(*dlist)->total = drive.getSize();
-		(*dlist)->free = drive.getSpace();
-		(*dlist)->letter = 'A' + i;
-		(*dlist)->attrib = drive.getMediaType();
-		(*cnt)++;
-	    }
-	    devbits >>= 1;
-	}
+                device *next = *dlist;
+                *dlist = (device *)malloc(sizeof(device));
+                (*dlist)->next = next;
+                (*dlist)->name = strdup(drive.getName().c_str());
+                (*dlist)->total = drive.getSize();
+                (*dlist)->free = drive.getSpace();
+                (*dlist)->letter = 'A' + i;
+                (*dlist)->attrib = drive.getMediaType();
+                (*cnt)++;
+            }
+            devbits >>= 1;
+        }
     return epocerr_to_errno(ret);
 }
 
@@ -335,17 +335,17 @@ static void
 help()
 {
     cerr << _(
-	"Usage: plpfuse [OPTION...] MOUNTPOINT\n"
-	"\n"
-	"plpfuse options:\n"
-	"\n"
-	"    -d, --debug             Increase debugging level\n"
-	"    -h, --help              Display this text\n"
-	"    -V, --version           Print version and exit\n"
-	"    -p, --port=[HOST:]PORT  Connect to port PORT on host HOST\n"
-	"                            Default for HOST is 127.0.0.1\n"
-	"                            Default for PORT is "
-	) << DPORT << "\n\n";
+        "Usage: plpfuse [OPTION...] MOUNTPOINT\n"
+        "\n"
+        "plpfuse options:\n"
+        "\n"
+        "    -d, --debug             Increase debugging level\n"
+        "    -h, --help              Display this text\n"
+        "    -V, --version           Print version and exit\n"
+        "    -p, --port=[HOST:]PORT  Connect to port PORT on host HOST\n"
+        "                            Default for HOST is 127.0.0.1\n"
+        "                            Default for PORT is "
+        ) << DPORT << "\n\n";
 }
 
 static struct option opts[] = {
@@ -360,29 +360,29 @@ static void
 parse_destination(const char *arg, const char **host, int *port)
 {
     if (!arg)
-	return;
+        return;
     // We don't want to modify argv, therefore copy it first ...
     char *argcpy = strdup(arg);
     char *pp = strchr(argcpy, ':');
 
     if (pp) {
-	// host.domain:400
-	// 10.0.0.1:400
-	*pp ++= '\0';
-	*host = argcpy;
+        // host.domain:400
+        // 10.0.0.1:400
+        *pp ++= '\0';
+        *host = argcpy;
     } else {
-	// 400
-	// host.domain
-	// host
-	// 10.0.0.1
-	if (strchr(argcpy, '.') || !isdigit(argcpy[0])) {
-	    *host = argcpy;
-	    pp = nullptr;
-	} else
-	    pp = argcpy;
+        // 400
+        // host.domain
+        // host
+        // 10.0.0.1
+        if (strchr(argcpy, '.') || !isdigit(argcpy[0])) {
+            *host = argcpy;
+            pp = nullptr;
+        } else
+            pp = argcpy;
     }
     if (pp)
-	*port = atoi(pp);
+        *port = atoi(pp);
 }
 
 int fuse(int argc, char *argv[])
@@ -414,7 +414,7 @@ int main(int argc, char**argv) {
     struct servent *se = getservbyname("psion", "tcp");
     endservent();
     if (se != nullptr)
-	sockNum = ntohs(se->s_port);
+        sockNum = ntohs(se->s_port);
 
     /* N.B. Option handling is kludged. Most of the options are shared
        with FUSE, except for -p/--port, which has to be removed from
@@ -423,7 +423,7 @@ int main(int argc, char**argv) {
        don't quit after issuing a version or help message. */
     opterr = 0; // Suppress errors from unknown options
     while ((c = getopt_long(argc, argv, "hVp:d", opts, NULL)) != -1) {
-	switch (c) {
+        switch (c) {
         case 'V':
             cout << _("plpfuse version ") << VERSION << endl;
             return 0;
@@ -439,7 +439,7 @@ int main(int argc, char**argv) {
             for (i = oldoptind; i < argc; i++)
               argv[i] = argv[i + (optind - oldoptind)];
             break;
-	}
+        }
         if (optind >= argc)
             break;
     }
@@ -447,7 +447,7 @@ int main(int argc, char**argv) {
     skt = new ppsocket();
     if (!skt->connect(host, sockNum)) {
         cerr << _("plpfuse: could not connect to ncpd") << endl;
-	return 1;
+        return 1;
     }
     skt2 = new ppsocket();
     if (!skt2->connect(host, sockNum)) {

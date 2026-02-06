@@ -49,21 +49,21 @@ static void
 help()
 {
     cout << _(
-	"Usage: plpftp [OPTIONS]... [FTPCOMMAND]\n"
-	"\n"
-	"If FTPCOMMAND is given, connect; run FTPCOMMAND and\n"
-	"terminate afterwards. If no FTPCOMMAND is given, start up\n"
-	"in interactive mode. For help on supported FTPCOMMANDs,\n"
-	"use `?' or `help' as FTPCOMMAND.\n"
-	"\n"
-	"Supported options:\n"
-	"\n"
-	" -h, --help              Display this text.\n"
-	" -V, --version           Print version and exit.\n"
-	" -p, --port=[HOST:]PORT  Connect to port PORT on host HOST.\n"
-	"                         Default for HOST is 127.0.0.1\n"
-	"                         Default for PORT is "
-	) << DPORT << "\n\n";
+        "Usage: plpftp [OPTIONS]... [FTPCOMMAND]\n"
+        "\n"
+        "If FTPCOMMAND is given, connect; run FTPCOMMAND and\n"
+        "terminate afterwards. If no FTPCOMMAND is given, start up\n"
+        "in interactive mode. For help on supported FTPCOMMANDs,\n"
+        "use `?' or `help' as FTPCOMMAND.\n"
+        "\n"
+        "Supported options:\n"
+        "\n"
+        " -h, --help              Display this text.\n"
+        " -V, --version           Print version and exit.\n"
+        " -p, --port=[HOST:]PORT  Connect to port PORT on host HOST.\n"
+        "                         Default for HOST is 127.0.0.1\n"
+        "                         Default for PORT is "
+        ) << DPORT << "\n\n";
 }
 
 static void
@@ -97,29 +97,29 @@ static void
 parse_destination(const char *arg, const char **host, int *port)
 {
     if (!arg)
-	return;
+        return;
     // We don't want to modify argv, therefore copy it first ...
     char *argcpy = strdup(arg);
     char *pp = strchr(argcpy, ':');
 
     if (pp) {
-	// host.domain:400
-	// 10.0.0.1:400
-	*pp ++= '\0';
-	*host = argcpy;
+        // host.domain:400
+        // 10.0.0.1:400
+        *pp ++= '\0';
+        *host = argcpy;
     } else {
-	// 400
-	// host.domain
-	// host
-	// 10.0.0.1
-	if (strchr(argcpy, '.') || !isdigit(argcpy[0])) {
-	    *host = argcpy;
-	    pp = 0L;
-	} else
-	    pp = argcpy;
+        // 400
+        // host.domain
+        // host
+        // 10.0.0.1
+        if (strchr(argcpy, '.') || !isdigit(argcpy[0])) {
+            *host = argcpy;
+            pp = 0L;
+        } else
+            pp = argcpy;
     }
     if (pp)
-	*port = atoi(pp);
+        *port = atoi(pp);
 }
 
 int
@@ -142,39 +142,39 @@ main(int argc, char **argv)
     struct servent *se = getservbyname("psion", "tcp");
     endservent();
     if (se != 0L)
-	sockNum = ntohs(se->s_port);
+        sockNum = ntohs(se->s_port);
 
     while (1) {
-	int c = getopt_long(argc, argv, "hVp:", opts, NULL);
-	if (c == -1)
-	    break;
-	switch (c) {
-	    case '?':
-		usage();
-		return -1;
-	    case 'V':
-		cout << _("plpftp Version ") << VERSION << endl;
-		return 0;
-	    case 'h':
-		help();
-		return 0;
-	    case 'p':
-		parse_destination(optarg, &host, &sockNum);
-		break;
-	}
+        int c = getopt_long(argc, argv, "hVp:", opts, NULL);
+        if (c == -1)
+            break;
+        switch (c) {
+            case '?':
+                usage();
+                return -1;
+            case 'V':
+                cout << _("plpftp Version ") << VERSION << endl;
+                return 0;
+            case 'h':
+                help();
+                return 0;
+            case 'p':
+                parse_destination(optarg, &host, &sockNum);
+                break;
+        }
     }
     if (optind == argc)
-	ftpHeader();
+        ftpHeader();
 
     skt = new ppsocket();
     if (!skt->connect(host, sockNum)) {
-	cout << _("plpftp: could not connect to ncpd") << endl;
-	return 1;
+        cout << _("plpftp: could not connect to ncpd") << endl;
+        return 1;
     }
     skt2 = new ppsocket();
     if (!skt2->connect(host, sockNum)) {
-	cout << _("plpftp: could not connect to ncpd") << endl;
-	return 1;
+        cout << _("plpftp: could not connect to ncpd") << endl;
+        return 1;
     }
     rfsvfactory *rf = new rfsvfactory(skt);
     rpcsfactory *rp = new rpcsfactory(skt2);
@@ -187,18 +187,18 @@ main(int argc, char **argv)
     f.canClip = rclipSocket && rc ? true : false;
     if ((a != NULL) && (r != NULL)) {
         vector<char *> args(argv + optind, argv + argc);
-	status = f.session(*a, *r, *rc, *rclipSocket, args);
-	delete r;
-	delete a;
-	delete skt;
-	delete skt2;
+        status = f.session(*a, *r, *rc, *rclipSocket, args);
+        delete r;
+        delete a;
+        delete skt;
+        delete skt2;
         if (rclipSocket)
             delete rclipSocket;
         if (rc)
             delete rc;
     } else {
-	cerr << "plpftp: " << rf->getError() << endl;
-	status = 1;
+        cerr << "plpftp: " << rf->getError() << endl;
+        status = 1;
     }
     delete rf;
     delete rp;

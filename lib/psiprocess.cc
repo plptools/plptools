@@ -38,7 +38,7 @@ PsiProcess::PsiProcess(const PsiProcess &p) {
 }
 
 PsiProcess::PsiProcess(int _pid, const char * const _name,
-		       const char * const _args, bool _s5mx) {
+                       const char * const _args, bool _s5mx) {
     pid  = _pid;
     name = _name;
     args = _args;
@@ -65,9 +65,9 @@ getProcId() {
     ostringstream tmp;
 
     if (s5mx)
-	tmp << name << ".$" << setw(2) << setfill('0') << pid << '\0';
+        tmp << name << ".$" << setw(2) << setfill('0') << pid << '\0';
     else
-	tmp << name << ".$" << pid << '\0';
+        tmp << name << ".$" << pid << '\0';
     return tmp.str().c_str();
 }
 

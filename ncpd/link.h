@@ -67,9 +67,9 @@ class Link {
 public:
 
     enum link_type {
-	LINK_TYPE_UNKNOWN = 0,
-	LINK_TYPE_SIBO    = 1,
-	LINK_TYPE_EPOC    = 2,
+        LINK_TYPE_UNKNOWN = 0,
+        LINK_TYPE_SIBO    = 1,
+        LINK_TYPE_EPOC    = 2,
     };
 
     /**

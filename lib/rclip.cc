@@ -57,12 +57,12 @@ reset(void)
     status = rfsv::E_PSI_FILE_DISC;
     a.addStringT(getConnectName());
     if (skt->sendBufferStore(a)) {
-	if (skt->getBufferStore(a) == 1) {
-	    if (!strcmp(a.getString(0), "NAK"))
-		status = rfsv::E_PSI_GEN_NSUP;
-	    if (!strcmp(a.getString(0), "Ok"))
-		status = rfsv::E_PSI_GEN_NONE;
-	}
+        if (skt->getBufferStore(a) == 1) {
+            if (!strcmp(a.getString(0), "NAK"))
+                status = rfsv::E_PSI_GEN_NSUP;
+            if (!strcmp(a.getString(0), "Ok"))
+                status = rfsv::E_PSI_GEN_NONE;
+        }
     }
 }
 
@@ -85,29 +85,29 @@ bool rclip::
 sendCommand(enum commands cc)
 {
     if (status == rfsv::E_PSI_FILE_DISC) {
-	reconnect();
-	if (status == rfsv::E_PSI_FILE_DISC)
-	    return false;
+        reconnect();
+        if (status == rfsv::E_PSI_FILE_DISC)
+            return false;
     }
     if (status != rfsv::E_PSI_GEN_NONE)
-	return false;
+        return false;
 
     bool result;
     bufferStore a;
     a.addByte(cc);
     switch (cc) {
-	case RCLIP_INIT:
-	    a.addWord(0x100);
-	    break;
-	case RCLIP_NOTIFY:
-	    a.addByte(0);
+        case RCLIP_INIT:
+            a.addWord(0x100);
+            break;
+        case RCLIP_NOTIFY:
+            a.addByte(0);
     }
     result = skt->sendBufferStore(a);
     if (!result) {
-	reconnect();
-	result = skt->sendBufferStore(a);
-	if (!result)
-	    status = rfsv::E_PSI_FILE_DISC;
+        reconnect();
+        result = skt->sendBufferStore(a);
+        if (!result)
+            status = rfsv::E_PSI_FILE_DISC;
     }
     return result;
 }
@@ -115,9 +115,9 @@ sendCommand(enum commands cc)
 Enum<rfsv::errs> rclip::
 sendListen() {
     if (sendCommand(RCLIP_LISTEN))
-	return rfsv::E_PSI_GEN_NONE;
+        return rfsv::E_PSI_GEN_NONE;
     else
-	return status;
+        return status;
 }
 
 Enum<rfsv::errs> rclip::
@@ -127,14 +127,14 @@ checkNotify() {
 
     int r = skt->getBufferStore(a, false);
     if (r < 0) {
-	ret = status = rfsv::E_PSI_FILE_DISC;
+        ret = status = rfsv::E_PSI_FILE_DISC;
     } else {
-	if (r == 0)
-	    ret = rfsv::E_PSI_FILE_EOF;
-	else {
-	    if ((a.getLen() != 1) || (a.getByte(0) != 0))
-		ret = rfsv::E_PSI_GEN_FAIL;
-	}
+        if (r == 0)
+            ret = rfsv::E_PSI_FILE_EOF;
+        else {
+            if ((a.getLen() != 1) || (a.getByte(0) != 0))
+                ret = rfsv::E_PSI_GEN_FAIL;
+        }
     }
     return ret;
 }
@@ -146,8 +146,8 @@ waitNotify() {
     bufferStore a;
     sendCommand(RCLIP_LISTEN);
     if ((ret = getResponse(a)) == rfsv::E_PSI_GEN_NONE) {
-	if ((a.getLen() != 1) || (a.getByte(0) != 0))
-	    ret = rfsv::E_PSI_GEN_FAIL;
+        if ((a.getLen() != 1) || (a.getByte(0) != 0))
+            ret = rfsv::E_PSI_GEN_FAIL;
     }
     return ret;
 }
@@ -159,8 +159,8 @@ notify() {
 
     sendCommand(RCLIP_NOTIFY);
     if ((ret = getResponse(a)) == rfsv::E_PSI_GEN_NONE) {
-	if ((a.getLen() != 1) || (a.getByte(0) != RCLIP_NOTIFY))
-	    ret = rfsv::E_PSI_GEN_FAIL;
+        if ((a.getLen() != 1) || (a.getByte(0) != RCLIP_NOTIFY))
+            ret = rfsv::E_PSI_GEN_FAIL;
     }
     return ret;
 }
@@ -171,13 +171,13 @@ initClipbd() {
     bufferStore a;
 
     if (status != rfsv::E_PSI_GEN_NONE)
-	return status;
+        return status;
 
     sendCommand(RCLIP_INIT);
     if ((ret = getResponse(a)) == rfsv::E_PSI_GEN_NONE) {
-	if ((a.getLen() != 3) || (a.getByte(0) != RCLIP_INIT) ||
-	    (a.getWord(1) != 0x100))
-	    ret = rfsv::E_PSI_GEN_FAIL;
+        if ((a.getLen() != 3) || (a.getByte(0) != RCLIP_INIT) ||
+            (a.getWord(1) != 0x100))
+            ret = rfsv::E_PSI_GEN_FAIL;
     }
     return ret;
 }
@@ -188,11 +188,11 @@ getResponse(bufferStore & data)
     Enum<rfsv::errs> ret = rfsv::E_PSI_GEN_NONE;
 
     if (status == rfsv::E_PSI_GEN_NSUP)
-	return status;
+        return status;
 
     if (skt->getBufferStore(data) == 1)
-	return ret;
+        return ret;
     else
-	status = rfsv::E_PSI_FILE_DISC;
+        status = rfsv::E_PSI_FILE_DISC;
     return status;
 }

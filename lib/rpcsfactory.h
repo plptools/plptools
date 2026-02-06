@@ -36,12 +36,12 @@ class rpcsfactory {
     * The known errors which can happen during @ref create .
     */
     enum errs {
-	FACERR_NONE = 0,
-	FACERR_COULD_NOT_SEND = 1,
-	FACERR_AGAIN = 2,
-	FACERR_NOPSION = 3,
-	FACERR_PROTVERSION = 4,
-	FACERR_NORESPONSE = 5
+        FACERR_NONE = 0,
+        FACERR_COULD_NOT_SEND = 1,
+        FACERR_AGAIN = 2,
+        FACERR_NOPSION = 3,
+        FACERR_PROTVERSION = 4,
+        FACERR_NORESPONSE = 5
     };
 
     /**

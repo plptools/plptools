@@ -78,137 +78,137 @@ public:
     * The kown modes for seek.
     */
     enum seek_mode {
-	PSI_SEEK_SET = 1,
-	PSI_SEEK_CUR = 2,
-	PSI_SEEK_END = 3
+        PSI_SEEK_SET = 1,
+        PSI_SEEK_CUR = 2,
+        PSI_SEEK_END = 3
     };
 
     /**
     * The known modes for file open.
     */
     enum open_flags {
-	PSI_O_RDONLY = 0000,
-	PSI_O_WRONLY = 0001,
-	PSI_O_RDWR   = 0002
+        PSI_O_RDONLY = 0000,
+        PSI_O_WRONLY = 0001,
+        PSI_O_RDWR   = 0002
     };
 
     /**
     * The known modes for file creation.
     */
     enum open_mode {
-	PSI_O_CREAT  = 00100,
-	PSI_O_EXCL   = 00200,
-	PSI_O_TRUNC  = 01000,
-	PSI_O_APPEND = 02000,
-	PSI_O_SHARE  = 04000
+        PSI_O_CREAT  = 00100,
+        PSI_O_EXCL   = 00200,
+        PSI_O_TRUNC  = 01000,
+        PSI_O_APPEND = 02000,
+        PSI_O_SHARE  = 04000
     };
 
     /**
     * The known error codes.
     */
     enum errs {
-	E_PSI_GEN_NONE	= 0,
-	E_PSI_GEN_FAIL = -1,
-	E_PSI_GEN_ARG = -2,
-	E_PSI_GEN_OS = -3,
-	E_PSI_GEN_NSUP = -4,
-	E_PSI_GEN_UNDER = -5,
-	E_PSI_GEN_OVER = -6,
-	E_PSI_GEN_RANGE = -7,
-	E_PSI_GEN_DIVIDE = -8,
-	E_PSI_GEN_INUSE = -9,
-	E_PSI_GEN_NOMEMORY = - 10,
-	E_PSI_GEN_NOSEGMENTS = -11,
-	E_PSI_GEN_NOSEM = -12,
-	E_PSI_GEN_NOPROC = -13,
-	E_PSI_GEN_OPEN = -14,
-	E_PSI_GEN_NOTOPEN = -15,
-	E_PSI_GEN_IMAGE = -16,
-	E_PSI_GEN_RECEIVER = -17,
-	E_PSI_GEN_DEVICE = -18,
-	E_PSI_GEN_FSYS = -19,
-	E_PSI_GEN_START = -20,
-	E_PSI_GEN_NOFONT = -21,
-	E_PSI_GEN_TOOWIDE = -22,
-	E_PSI_GEN_TOOMANY = -23,
-	E_PSI_FILE_EXIST = -32,
-	E_PSI_FILE_NXIST = -33,
-	E_PSI_FILE_WRITE = -34,
-	E_PSI_FILE_READ = -35,
-	E_PSI_FILE_EOF = -36,
-	E_PSI_FILE_FULL = -37,
-	E_PSI_FILE_NAME = -38,
-	E_PSI_FILE_ACCESS = -39,
-	E_PSI_FILE_LOCKED = -40,
-	E_PSI_FILE_DEVICE = -41,
-	E_PSI_FILE_DIR = -42,
-	E_PSI_FILE_RECORD = -43,
-	E_PSI_FILE_RDONLY = -44,
-	E_PSI_FILE_INV = -45,
-	E_PSI_FILE_PENDING = -46,
-	E_PSI_FILE_VOLUME = -47,
-	E_PSI_FILE_CANCEL = -48,
-	E_PSI_FILE_ALLOC = -49,
-	E_PSI_FILE_DISC = -50,
-	E_PSI_FILE_CONNECT = -51,
-	E_PSI_FILE_RETRAN = -52,
-	E_PSI_FILE_LINE = -53,
-	E_PSI_FILE_INACT = -54,
-	E_PSI_FILE_PARITY = -55,
-	E_PSI_FILE_FRAME = -56,
-	E_PSI_FILE_OVERRUN = -57,
-	E_PSI_MDM_CONFAIL = -58,
-	E_PSI_MDM_BUSY = -59,
-	E_PSI_MDM_NOANS = -60,
-	E_PSI_MDM_BLACKLIST = -61,
-	E_PSI_FILE_NOTREADY = -62,
-	E_PSI_FILE_UNKNOWN = -63,
-	E_PSI_FILE_DIRFULL = -64,
-	E_PSI_FILE_PROTECT = -65,
-	E_PSI_FILE_CORRUPT = -66,
-	E_PSI_FILE_ABORT = -67,
-	E_PSI_FILE_ERASE = -68,
-	E_PSI_FILE_INVALID = -69,
-	E_PSI_GEN_POWER = -100,
-	E_PSI_FILE_TOOBIG = -101,
-	E_PSI_GEN_DESCR = -102,
-	E_PSI_GEN_LIB = -103,
-	E_PSI_FILE_NDISC = -104,
-	E_PSI_FILE_DRIVER = -105,
-	E_PSI_FILE_COMPLETION = -106,
-	E_PSI_GEN_BUSY = -107,
-	E_PSI_GEN_TERMINATED = -108,
-	E_PSI_GEN_DIED = -109,
-	E_PSI_FILE_HANDLE = -110,
+        E_PSI_GEN_NONE = 0,
+        E_PSI_GEN_FAIL = -1,
+        E_PSI_GEN_ARG = -2,
+        E_PSI_GEN_OS = -3,
+        E_PSI_GEN_NSUP = -4,
+        E_PSI_GEN_UNDER = -5,
+        E_PSI_GEN_OVER = -6,
+        E_PSI_GEN_RANGE = -7,
+        E_PSI_GEN_DIVIDE = -8,
+        E_PSI_GEN_INUSE = -9,
+        E_PSI_GEN_NOMEMORY = - 10,
+        E_PSI_GEN_NOSEGMENTS = -11,
+        E_PSI_GEN_NOSEM = -12,
+        E_PSI_GEN_NOPROC = -13,
+        E_PSI_GEN_OPEN = -14,
+        E_PSI_GEN_NOTOPEN = -15,
+        E_PSI_GEN_IMAGE = -16,
+        E_PSI_GEN_RECEIVER = -17,
+        E_PSI_GEN_DEVICE = -18,
+        E_PSI_GEN_FSYS = -19,
+        E_PSI_GEN_START = -20,
+        E_PSI_GEN_NOFONT = -21,
+        E_PSI_GEN_TOOWIDE = -22,
+        E_PSI_GEN_TOOMANY = -23,
+        E_PSI_FILE_EXIST = -32,
+        E_PSI_FILE_NXIST = -33,
+        E_PSI_FILE_WRITE = -34,
+        E_PSI_FILE_READ = -35,
+        E_PSI_FILE_EOF = -36,
+        E_PSI_FILE_FULL = -37,
+        E_PSI_FILE_NAME = -38,
+        E_PSI_FILE_ACCESS = -39,
+        E_PSI_FILE_LOCKED = -40,
+        E_PSI_FILE_DEVICE = -41,
+        E_PSI_FILE_DIR = -42,
+        E_PSI_FILE_RECORD = -43,
+        E_PSI_FILE_RDONLY = -44,
+        E_PSI_FILE_INV = -45,
+        E_PSI_FILE_PENDING = -46,
+        E_PSI_FILE_VOLUME = -47,
+        E_PSI_FILE_CANCEL = -48,
+        E_PSI_FILE_ALLOC = -49,
+        E_PSI_FILE_DISC = -50,
+        E_PSI_FILE_CONNECT = -51,
+        E_PSI_FILE_RETRAN = -52,
+        E_PSI_FILE_LINE = -53,
+        E_PSI_FILE_INACT = -54,
+        E_PSI_FILE_PARITY = -55,
+        E_PSI_FILE_FRAME = -56,
+        E_PSI_FILE_OVERRUN = -57,
+        E_PSI_MDM_CONFAIL = -58,
+        E_PSI_MDM_BUSY = -59,
+        E_PSI_MDM_NOANS = -60,
+        E_PSI_MDM_BLACKLIST = -61,
+        E_PSI_FILE_NOTREADY = -62,
+        E_PSI_FILE_UNKNOWN = -63,
+        E_PSI_FILE_DIRFULL = -64,
+        E_PSI_FILE_PROTECT = -65,
+        E_PSI_FILE_CORRUPT = -66,
+        E_PSI_FILE_ABORT = -67,
+        E_PSI_FILE_ERASE = -68,
+        E_PSI_FILE_INVALID = -69,
+        E_PSI_GEN_POWER = -100,
+        E_PSI_FILE_TOOBIG = -101,
+        E_PSI_GEN_DESCR = -102,
+        E_PSI_GEN_LIB = -103,
+        E_PSI_FILE_NDISC = -104,
+        E_PSI_FILE_DRIVER = -105,
+        E_PSI_FILE_COMPLETION = -106,
+        E_PSI_GEN_BUSY = -107,
+        E_PSI_GEN_TERMINATED = -108,
+        E_PSI_GEN_DIED = -109,
+        E_PSI_FILE_HANDLE = -110,
 
-	// Special error code for "Operation not permitted in RFSV16"
-	E_PSI_NOT_SIBO = -200,
-	// Special error code for "internal library error"
-	E_PSI_INTERNAL = -201
+        // Special error code for "Operation not permitted in RFSV16"
+        E_PSI_NOT_SIBO = -200,
+        // Special error code for "internal library error"
+        E_PSI_INTERNAL = -201
     };
 
     /**
     * The known file attributes
     */
     enum file_attribs {
-	/** Attributes, valid on both <em>EPOC</em> and <em>SIBO</em>. */
-	PSI_A_RDONLY     = 0x0001,
-	PSI_A_HIDDEN     = 0x0002,
-	PSI_A_SYSTEM     = 0x0004,
-	PSI_A_DIR        = 0x0008,
-	PSI_A_ARCHIVE    = 0x0010,
-	PSI_A_VOLUME     = 0x0020,
+        /** Attributes, valid on both <em>EPOC</em> and <em>SIBO</em>. */
+        PSI_A_RDONLY     = 0x0001,
+        PSI_A_HIDDEN     = 0x0002,
+        PSI_A_SYSTEM     = 0x0004,
+        PSI_A_DIR        = 0x0008,
+        PSI_A_ARCHIVE    = 0x0010,
+        PSI_A_VOLUME     = 0x0020,
 
-	/** Attributes, valid on EPOC <em>only</em>. */
-	PSI_A_NORMAL     = 0x0040,
-	PSI_A_TEMP       = 0x0080,
-	PSI_A_COMPRESSED = 0x0100,
+        /** Attributes, valid on EPOC <em>only</em>. */
+        PSI_A_NORMAL     = 0x0040,
+        PSI_A_TEMP       = 0x0080,
+        PSI_A_COMPRESSED = 0x0100,
 
-	/** Attributes, valid on SIBO <em>only</em>. */
-	PSI_A_READ       = 0x0200,
-	PSI_A_EXEC       = 0x0400,
-	PSI_A_STREAM     = 0x0800,
-	PSI_A_TEXT       = 0x1000
+        /** Attributes, valid on SIBO <em>only</em>. */
+        PSI_A_READ       = 0x0200,
+        PSI_A_EXEC       = 0x0400,
+        PSI_A_STREAM     = 0x0800,
+        PSI_A_TEXT       = 0x1000
     };
 
     virtual ~rfsv();
@@ -423,9 +423,10 @@ public:
     * @param from Name of the file on the Psion to be copied.
     * @param to Name of the destination file on the local machine.
     * @param func Pointer to a function which gets called on every read.
-    * 	This function can be used to show some progress etc. May be set
-    * 	to NULL, where no callback is performed. If the callback function
-    * 	returns 0, the operation is aborted and E_PSI_FILE_CANCEL is returned.
+    *             This function can be used to show some progress etc. May be
+    *             set to NULL, where no callback is performed. If the callback
+    *             function returns 0, the operation is aborted and
+    *             E_PSI_FILE_CANCEL is returned.
     *
     * @returns A Psion error code (One of enum @ref #errs ).
     */
@@ -442,9 +443,10 @@ public:
     * @param from Name of the file on the local machine to be copied.
     * @param to Name of the destination file on the Psion.
     * @param func Pointer to a function which gets called on every read.
-    * 	This function can be used to show some progress etc. May be set
-    * 	to NULL, where no callback is performed. If the callback function
-    * 	returns 0, the operation is aborted and E_PSI_FILE_CANCEL is returned.
+    *             This function can be used to show some progress etc. May be
+    *             set to NULL, where no callback is performed. If the callback
+    *             function returns 0, the operation is aborted and
+    *             E_PSI_FILE_CANCEL is returned.
     *
     * @returns A Psion error code (One of enum @ref #errs ).
     */
@@ -459,9 +461,10 @@ public:
     * @param from Name of the file to be copied.
     * @param to Name of the destination file.
     * @param func Pointer to a function which gets called on every read.
-    * 	This function can be used to show some progress etc. May be set
-    * 	to NULL, where no callback is performed. If the callback function
-    * 	returns 0, the operation is aborted and E_PSI_FILE_CANCEL is returned.
+    *             This function can be used to show some progress etc. May be
+    *             set to NULL, where no callback is performed. If the callback
+    *             function returns 0, the operation is aborted and
+    *             E_PSI_FILE_CANCEL is returned.
     *
     * @returns A Psion error code (One of enum @ref #errs ).
     */
@@ -579,21 +582,21 @@ public:
     * listings. The first 7 characters are common to all
     * machine types:
     * <pre>
-    * 	Char Nr. Value
-    * 	0        'd' if a directory,                     '-' otherwise.
-    * 	1        'r' if file is readable,                '-' otherwise.
-    * 	2        'w' if file is writeable,               '-' otherwise.
-    * 	3        'h' if file is hidden,                  '-' otherwise.
-    * 	4        's' if file is a system file,           '-' otherwise.
-    * 	5        'a' if file is modified (archive flag), '-' otherwise.
-    * 	6        'v' if file is a volume name,           '-' otherwise.
+    *     Char Nr. Value
+    *     0        'd' if a directory,                     '-' otherwise.
+    *     1        'r' if file is readable,                '-' otherwise.
+    *     2        'w' if file is writeable,               '-' otherwise.
+    *     3        'h' if file is hidden,                  '-' otherwise.
+    *     4        's' if file is a system file,           '-' otherwise.
+    *     5        'a' if file is modified (archive flag), '-' otherwise.
+    *     6        'v' if file is a volume name,           '-' otherwise.
     * </pre>
     * The rest (3 characters) are machine specific:
     * <pre>
-    * 	Char Nr. EPOC Value          SIBO Value
-    * 	7        'n' if normal,      'x' if executable, '-' otherwise.
-    * 	8        't' if temporary,   'b' if a stream,   '-' otherwise.
-    * 	8        'c' if compressed,  't' if a textfile, '-' otherwise.
+    *     Char Nr. EPOC Value          SIBO Value
+    *     7        'n' if normal,      'x' if executable, '-' otherwise.
+    *     8        't' if temporary,   'b' if a stream,   '-' otherwise.
+    *     8        'c' if compressed,  't' if a textfile, '-' otherwise.
     * </pre>
     *
     * @param attr the generic file attribute.
