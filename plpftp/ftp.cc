@@ -644,6 +644,7 @@ static char *epoc_dirname(const char *path) {
 
 /* Compute new directory from path, which may be absolute or relative, and
    cwd. */
+// TODO: Move this into Path.
 static char *epoc_dir_from(const char *path) {
     char *f1;
 
@@ -664,29 +665,6 @@ static char *epoc_dir_from(const char *path) {
         char *f2 = xasprintf("%s%s", f1, "\\");
         free(f1);
         f1 = f2;
-    }
-
-    /* Convert forward slashes in new path to backslashes. */
-    for (char *p = f1; *p; p++)
-        if (*p == '/')
-            *p = '\\';
-
-    return f1;
-}
-
-static char *resolve_windows_path(const char *path, const char *relativeToPath) {
-    char *f1;
-
-    /* If we have asked for parent dir, get dirname of cwd. */
-    if (!strcmp(path, "..")) {
-        f1 = epoc_dirname(relativeToPath);
-    } else {
-        /* If path is relative, append it to cwd. */
-        if ((path[0] != '/') && (path[0] != '\\') && (path[1] != ':'))
-            f1 = xasprintf("%s%s", relativeToPath, path);
-        /* Otherwise, path is absolute, so duplicate it. */
-        else
-            f1 = xstrdup(path);
     }
 
     /* Convert forward slashes in new path to backslashes. */
@@ -981,8 +959,8 @@ session(rfsv & a, rpcs & r, rclip & rc, ppsocket & rclipSocket, vector<char *> a
             struct timeval etime;
             struct stat stbuf;
 
-            char *f1 = resolve_windows_path(argv[1], psionDir);
-            string basename = Path::getWindowsBasename(string(argv[1]));
+            char *f1 = Path::resolveEPOCPath(argv[1], psionDir);
+            string basename = Path::getEPOCBasename(string(argv[1]));
             char *f2 = xasprintf("%s%s%s", localDir, "/", argc == 2 ? basename.c_str() : argv[2]);
 
             cout << f1 << endl;

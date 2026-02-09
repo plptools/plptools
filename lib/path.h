@@ -32,11 +32,23 @@ class Path {
 public:
 
     /**
-     * Returns the last path component of a Windows path.
+     * Returns the last path component of an EPOC path.
      *
-     * If the path doesn't contain any Windows path separators (`\`), the returned string matches the path.
+     * If the path doesn't contain any EPOC path separators (`\`), the returned string matches the path.
      */
-    static std::string getWindowsBasename(std::string path);
+    static std::string getEPOCBasename(std::string path);
+
+    /**
+     * Compute parent directory of an EPOC directory.
+     */
+    static char *getEPOCDirname(const char *path);
+
+    /**
+     * Returns a new absolute EPOC path, determined by resolving `path` relative to `initialPath`.
+     *
+     * If `path` is already an absolute path, this returns `path`.
+     */
+    static char *resolveEPOCPath(const char *path, const char *initialPath);
 
 };
 
