@@ -4,6 +4,7 @@
  *  Copyright (C) 1999 Philip Proudman <philip.proudman@btinternet.com>
  *  Copyright (C) 1999-2002 Fritz Elfert <felfert@to.com>
  *  Copyright (C) 2006-2025 Reuben Thomas <rrt@sc3d.org>
+ *  Copyright (C) 2026 Jason Morley <hello@jbmorley.co.uk>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -529,6 +530,20 @@ ftp::putClipText(rpcs & r, rfsv & a, rclip & rc, ppsocket & rclipSocket, const c
 //     return img;
 // }
 
+
+/**
+ * Returns the last path component of a Windows path.
+ *
+ * If the path doesn't contain any Windows path separators (`\`), the returned string matches the path.
+ */
+string getWindowsBasename(string path) {
+    size_t end = path.find_last_of("\\");
+    if (end == string::npos) {
+        return string(path);
+    }
+    return path.substr(end+1);
+}
+
 int
 ftp::getClipData(rpcs & r, rfsv & a, rclip & rc, ppsocket & rclipSocket, const char *file) {
     Enum<rfsv::errs> res;
@@ -662,6 +677,29 @@ static char *epoc_dir_from(const char *path) {
         char *f2 = xasprintf("%s%s", f1, "\\");
         free(f1);
         f1 = f2;
+    }
+
+    /* Convert forward slashes in new path to backslashes. */
+    for (char *p = f1; *p; p++)
+        if (*p == '/')
+            *p = '\\';
+
+    return f1;
+}
+
+static char *resolve_windows_path(const char *path, const char *relativeToPath) {
+    char *f1;
+
+    /* If we have asked for parent dir, get dirname of cwd. */
+    if (!strcmp(path, "..")) {
+        f1 = epoc_dirname(relativeToPath);
+    } else {
+        /* If path is relative, append it to cwd. */
+        if ((path[0] != '/') && (path[0] != '\\') && (path[1] != ':'))
+            f1 = xasprintf("%s%s", relativeToPath, path);
+        /* Otherwise, path is absolute, so duplicate it. */
+        else
+            f1 = xstrdup(path);
     }
 
     /* Convert forward slashes in new path to backslashes. */
@@ -956,8 +994,13 @@ session(rfsv & a, rpcs & r, rclip & rc, ppsocket & rclipSocket, vector<char *> a
             struct timeval etime;
             struct stat stbuf;
 
-            char *f1 = xasprintf("%s%s", psionDir, argv[1]);
-            char *f2 = xasprintf("%s%s%s", localDir, "/", argc == 2 ? argv[1] : argv[2]);
+            char *f1 = resolve_windows_path(argv[1], psionDir);
+            string basename = getWindowsBasename(string(argv[1]));
+            char *f2 = xasprintf("%s%s%s", localDir, "/", argc == 2 ? basename.c_str() : argv[2]);
+
+            cout << f1 << endl;
+            cout << basename << endl;
+            cout << f2 << endl;
             gettimeofday(&stime, 0L);
             if ((res = a.copyFromPsion(f1, f2, NULL, cab)) != rfsv::E_PSI_GEN_NONE) {
                 if (hash)
