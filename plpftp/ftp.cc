@@ -619,35 +619,20 @@ ftp::getClipData(rpcs & r, rfsv & a, rclip & rc, ppsocket & rclipSocket, const c
     return 0;
 }
 
-/* Compute new directory from path, which may be absolute or relative, and
-   cwd. */
-// TODO: Move this into Path.
+/**
+ * Compute new directory from path, which may be absolute or relative, and cwd.
+*/
 static char *epoc_dir_from(const char *path) {
-    char *f1;
 
-    /* If we have asked for parent dir, get dirname of cwd. */
-    if (!strcmp(path, "..")) {
-        f1 = Path::getEPOCDirname(psionDir);
-    } else {
-        /* If path is relative, append it to cwd. */
-        if ((path[0] != '/') && (path[0] != '\\') && (path[1] != ':'))
-            f1 = xasprintf("%s%s", psionDir, path);
-        /* Otherwise, path is absolute, so duplicate it. */
-        else
-            f1 = xstrdup(path);
-    }
+    // Resolve the path against the current remote working directory (global).
+    char *f1 = Path::resolveEPOCPath(path, psionDir);
 
-    /* Ensure path ends with a slash. */
+    // Ensure path ends with a slash.
     if ((f1[strlen(f1) - 1] != '/') && (f1[strlen(f1) - 1] != '\\')) {
         char *f2 = xasprintf("%s%s", f1, "\\");
         free(f1);
         f1 = f2;
     }
-
-    /* Convert forward slashes in new path to backslashes. */
-    for (char *p = f1; *p; p++)
-        if (*p == '/')
-            *p = '\\';
 
     return f1;
 }
