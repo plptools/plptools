@@ -934,7 +934,7 @@ session(rfsv & a, rpcs & r, rclip & rc, ppsocket & rclipSocket, vector<char *> a
             } else {
                 if (hash)
                     cout << endl;
-                gettimeofday(&etime, 0L);
+                gettimeofday(&etime, nullptr);
                 long dsec = etime.tv_sec - stime.tv_sec;
                 long dhse = (etime.tv_usec / 10000) -
                     (stime.tv_usec /10000);
@@ -1015,7 +1015,7 @@ session(rfsv & a, rpcs & r, rclip & rc, ppsocket & rclipSocket, vector<char *> a
             } else {
                 if (hash)
                     cout << endl;
-                gettimeofday(&etime, 0L);
+                gettimeofday(&etime, nullptr);
                 long dsec = etime.tv_sec - stime.tv_sec;
                 long dhse = (etime.tv_usec / 10000) -
                     (stime.tv_usec /10000);

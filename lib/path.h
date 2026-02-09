@@ -21,8 +21,7 @@
  *
  */
 
-#ifndef _PATH_H_
-#define _PATH_H_
+#pragma once
 
 #include "config.h"
 
@@ -57,5 +56,3 @@ public:
     static char *resolveEPOCPath(const char *path, const char *initialPath);
 
 };
-
-#endif  // _PATH_H_
