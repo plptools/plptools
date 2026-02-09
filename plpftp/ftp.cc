@@ -925,9 +925,6 @@ session(rfsv & a, rpcs & r, rclip & rc, ppsocket & rclipSocket, vector<char *> a
             string basename = Path::getEPOCBasename(string(argv[1]));
             char *f2 = xasprintf("%s%s%s", localDir, "/", argc == 2 ? basename.c_str() : argv[2]);
 
-            cout << f1 << endl;
-            cout << basename << endl;
-            cout << f2 << endl;
             gettimeofday(&stime, 0L);
             if ((res = a.copyFromPsion(f1, f2, NULL, cab)) != rfsv::E_PSI_GEN_NONE) {
                 if (hash)
