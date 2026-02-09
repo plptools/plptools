@@ -25,10 +25,58 @@
 
 #include "path.h"
 
-std::string Path::getWindowsBasename(std::string path) {
+#include "xalloc.h"
+#include "xvasprintf.h"
+
+std::string Path::getEPOCBasename(std::string path) {
     size_t end = path.find_last_of("\\");
     if (end == std::string::npos) {
         return std::string(path);
     }
     return path.substr(end+1);
+}
+
+char *Path::getEPOCDirname(const char *path) {
+    char *f1 = xstrdup(path);
+    char *p = f1 + strlen(f1);
+
+    /* Skip trailing slash. */
+    if (p > f1)
+        *--p = '\0';
+
+    /* Skip backwards to next slash. */
+    while ((p > f1) && (*p != '/') && (*p != '\\'))
+        p--;
+
+    /* If we have just a drive letter, colon and slash, keep exactly that. */
+    if (p - f1 < 3)
+        p = f1 + 3;
+
+    /* Truncate the string at the current point, and return it. */
+    *p = '\0';
+
+    return f1;
+}
+
+char *Path::resolveEPOCPath(const char *path, const char *relativeToPath) {
+    char *f1;
+
+    /* If we have asked for parent dir, get dirname of cwd. */
+    if (!strcmp(path, "..")) {
+        f1 = getEPOCDirname(relativeToPath);
+    } else {
+        /* If path is relative, append it to cwd. */
+        if ((path[0] != '/') && (path[0] != '\\') && (path[1] != ':'))
+            f1 = xasprintf("%s%s", relativeToPath, path);
+        /* Otherwise, path is absolute, so duplicate it. */
+        else
+            f1 = xstrdup(path);
+    }
+
+    /* Convert forward slashes in new path to backslashes. */
+    for (char *p = f1; *p; p++)
+        if (*p == '/')
+            *p = '\\';
+
+    return f1;
 }

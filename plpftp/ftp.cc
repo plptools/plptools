@@ -619,29 +619,6 @@ ftp::getClipData(rpcs & r, rfsv & a, rclip & rc, ppsocket & rclipSocket, const c
     return 0;
 }
 
-/* Compute parent directory of an EPOC directory. */
-static char *epoc_dirname(const char *path) {
-    char *f1 = xstrdup(path);
-    char *p = f1 + strlen(f1);
-
-    /* Skip trailing slash. */
-    if (p > f1)
-        *--p = '\0';
-
-    /* Skip backwards to next slash. */
-    while ((p > f1) && (*p != '/') && (*p != '\\'))
-        p--;
-
-    /* If we have just a drive letter, colon and slash, keep exactly that. */
-    if (p - f1 < 3)
-        p = f1 + 3;
-
-    /* Truncate the string at the current point, and return it. */
-    *p = '\0';
-
-    return f1;
-}
-
 /* Compute new directory from path, which may be absolute or relative, and
    cwd. */
 // TODO: Move this into Path.
@@ -650,7 +627,7 @@ static char *epoc_dir_from(const char *path) {
 
     /* If we have asked for parent dir, get dirname of cwd. */
     if (!strcmp(path, "..")) {
-        f1 = epoc_dirname(psionDir);
+        f1 = Path::getEPOCDirname(psionDir);
     } else {
         /* If path is relative, append it to cwd. */
         if ((path[0] != '/') && (path[0] != '\\') && (path[1] != ':'))
