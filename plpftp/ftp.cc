@@ -23,14 +23,15 @@
 
 #include "config.h"
 
-#include <rfsv.h>
-#include <rpcs.h>
-#include <rclip.h>
-#include <plpintl.h>
-#include <ppsocket.h>
 #include <bufferarray.h>
 #include <bufferstore.h>
 #include <Enum.h>
+#include <path.h>
+#include <plpintl.h>
+#include <ppsocket.h>
+#include <rclip.h>
+#include <rfsv.h>
+#include <rpcs.h>
 
 #include <iostream>
 #include <fstream>
@@ -530,20 +531,6 @@ ftp::putClipText(rpcs & r, rfsv & a, rclip & rc, ppsocket & rclipSocket, const c
 //     return img;
 // }
 
-
-/**
- * Returns the last path component of a Windows path.
- *
- * If the path doesn't contain any Windows path separators (`\`), the returned string matches the path.
- */
-string getWindowsBasename(string path) {
-    size_t end = path.find_last_of("\\");
-    if (end == string::npos) {
-        return string(path);
-    }
-    return path.substr(end+1);
-}
-
 int
 ftp::getClipData(rpcs & r, rfsv & a, rclip & rc, ppsocket & rclipSocket, const char *file) {
     Enum<rfsv::errs> res;
@@ -995,7 +982,7 @@ session(rfsv & a, rpcs & r, rclip & rc, ppsocket & rclipSocket, vector<char *> a
             struct stat stbuf;
 
             char *f1 = resolve_windows_path(argv[1], psionDir);
-            string basename = getWindowsBasename(string(argv[1]));
+            string basename = Path::getWindowsBasename(string(argv[1]));
             char *f2 = xasprintf("%s%s%s", localDir, "/", argc == 2 ? basename.c_str() : argv[2]);
 
             cout << f1 << endl;
