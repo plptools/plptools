@@ -262,12 +262,20 @@ fgeteattr(const char * const name, PlpDirent &e)
     if (res != E_PSI_GEN_NONE)
         return res;
     else if (a.getLen() == 16) {
+
+        // Get the filename.
         const char *p = strrchr(realName.c_str(), '\\');
-        if (p)
+        if (p) {
             p++;
-        else
+        } else {
             p = realName.c_str();
-        e.name = p;
+        }
+
+        // Uppercase the resulting filename as, while EPOC16 is case insensitive, it returns all responses as uppercase.
+        string name = p;
+        std::transform(name.begin(), name.end(), name.begin(), ::toupper);
+
+        e.name = name;
         e.attr = attr2std((long)a.getWord(2));
         e.size = a.getDWord(4);
         e.time.setSiboTime(a.getDWord(8));
