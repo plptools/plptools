@@ -26,6 +26,7 @@
 #include "ppsocket.h"
 #include "bufferarray.h"
 
+#include <algorithm>
 #include <iostream>
 #include <fstream>
 
