@@ -40,7 +40,7 @@ ENUM_DEFINITION_BEGIN(rpcs::machs, rpcs::PSI_MACH_UNKNOWN)
     stringRep.add(rpcs::PSI_MACH_S3,        N_("Series 3"));
     stringRep.add(rpcs::PSI_MACH_S3A,       N_("Series 3a, 3c or 3mx"));
     stringRep.add(rpcs::PSI_MACH_WORKABOUT, N_("Workabout"));
-    stringRep.add(rpcs::PSI_MACH_SIENA,    N_("Sienna"));
+    stringRep.add(rpcs::PSI_MACH_SIENA,     N_("Siena"));
     stringRep.add(rpcs::PSI_MACH_S3C,       N_("Series 3c"));
     stringRep.add(rpcs::PSI_MACH_S5,        N_("Series 5"));
     stringRep.add(rpcs::PSI_MACH_WINC,      N_("WinC"));
