@@ -61,7 +61,7 @@ public:
         PSI_MACH_S3 = 4,
         PSI_MACH_S3A = 5,
         PSI_MACH_WORKABOUT = 6,
-        PSI_MACH_SIENNA = 7,
+        PSI_MACH_SIENA = 7,
         PSI_MACH_S3C = 8,
         PSI_MACH_S5 = 32,
         PSI_MACH_WINC = 33

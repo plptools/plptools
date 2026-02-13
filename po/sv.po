@@ -340,8 +340,8 @@ msgid "Workabout"
 msgstr ""
 
 #: lib/rpcs.cc:43
-msgid "Sienna"
-msgstr ""
+msgid "Siena"
+msgstr "Siena"
 
 #: lib/rpcs.cc:44
 msgid "Series 3c"
