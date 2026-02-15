@@ -269,7 +269,7 @@ public:
     *
     * @returns A psion error code. 0 = Ok.
     */
-    Enum<rfsv::errs> getOwnerInfo(bufferArray &owner);
+    virtual Enum<rfsv::errs> getOwnerInfo(bufferArray &owner) = 0;
 
     /**
     * Retrieves the type of machine on the remote side

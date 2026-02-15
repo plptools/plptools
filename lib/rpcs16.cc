@@ -51,3 +51,31 @@ getCmdLine(const char *process, string &ret)
         ret = a.getString(0);
     return res;
 }
+
+Enum<rfsv::errs> rpcs16::
+getOwnerInfo(bufferArray &owner)
+{
+    Enum<rfsv::errs> res;
+    bufferStore a;
+
+    if (!sendCommand(GET_OWNERINFO, a)) {
+        return rfsv::E_PSI_FILE_DISC;
+    }
+    if ((res = (enum rfsv::errs)getResponse(a, true)) != rfsv::E_PSI_GEN_NONE) {
+        return res;
+    }
+
+    // Ensure the resulting buffer is null terminated.
+    a.addByte(0);
+
+    // It looks like the EPOC16 implementation returns a null-padded buffer with strings at fixed (52-character)
+    // offsets, so we read these into four separate strings and append them to our resulting array.
+    owner.clear();
+    for (int i = 0; i < 4; i++) {
+        bufferStore b;
+        b.addString(a.getString(52 * i));
+        owner += b;
+    }
+
+    return rfsv::E_PSI_GEN_NONE;
+}

@@ -126,6 +126,35 @@ getMachineInfo(machineInfo &mi)
 }
 
 Enum<rfsv::errs> rpcs32::
+getOwnerInfo(bufferArray &owner)
+{
+    Enum<rfsv::errs> res;
+    bufferStore a;
+
+    if (!sendCommand(GET_OWNERINFO, a))
+        return rfsv::E_PSI_FILE_DISC;
+    if ((res = (enum rfsv::errs)getResponse(a, true)) != rfsv::E_PSI_GEN_NONE)
+        return res;
+    a.addByte(0);
+    string s = a.getString(0);
+    owner.clear();
+    int p = 0;
+    int l;
+    while ((l = s.find('\006', p)) != s.npos) {
+        bufferStore b;
+        b.addStringT(s.substr(p, l - p).c_str());
+        owner += b;
+        p = l + 1;
+    }
+    if (s.substr(p).length()) {
+        bufferStore b;
+        b.addStringT(s.substr(p).c_str());
+        owner += b;
+    }
+    return res;
+}
+
+Enum<rfsv::errs> rpcs32::
 regOpenIter(uint32_t uid, char *match, uint16_t &handle)
 {
     bufferStore a;
