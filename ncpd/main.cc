@@ -43,7 +43,6 @@
 
 #include "ncp.h"
 #include "socketchan.h"
-#include "linkchan.h"
 #include "link.h"
 #include "packet.h"
 
@@ -246,6 +245,57 @@ link_thread(void *arg)
     return NULL;
 }
 
+/**
+ * Creates and manages all the threads necessary to run a full session for communicating with a Psion and exposing that
+ * to clients via the a TCP socket.
+ *
+ * This is a blocking function. Cancellation is expected to be performed using interrupt handlers. SIGINT will cause
+ * the various `select` calls to interrupt and, in the current implementation, this will check the global `active`
+ * boolean to determine if it should keep running.
+ */
+void run_ncp_session(int sockNum,
+                     int baudRate,
+                     const char *host,
+                     const char *serialDevice,
+                     unsigned short nverbose) {
+
+    skt.setWatch(&accept_iow);
+    if (!skt.listen(host, sockNum)) {
+        cerr << "listen on " << host << ":" << sockNum << ": " << strerror(errno) << endl;
+        return;
+    }
+    linf << _("Listening at ") << host << ":" << sockNum << _(" using device ") << serialDevice << endl;
+
+    memset(scp, 0, sizeof(scp));
+    theNCP = new ncp(serialDevice, baudRate, nverbose);
+    if (!theNCP) {
+        lerr << "Could not create NCP object" << endl;
+        exit(-1);
+    }
+    pthread_t thr_a, thr_b;
+    if (pthread_create(&thr_a, NULL, link_thread, NULL) != 0) {
+        lerr << "Could not create Link thread" << endl;
+        exit(-1);
+    }
+    if (pthread_create(&thr_b, NULL,
+                    pollSocketConnections, NULL) != 0) {
+        lerr << "Could not create Socket thread" << endl;
+        exit(-1);
+    }
+    while (active)
+        checkForNewSocketConnection();
+    linf << _("terminating") << endl;
+    void *ret;
+    pthread_join(thr_a, &ret);
+    linf << _("joined Link thread") << endl;
+    pthread_join(thr_b, &ret);
+    linf << _("joined Socket thread") << endl;
+    delete theNCP;
+    linf << _("shut down NCP") << endl;
+    skt.closeSocket();
+    linf << _("socket closed") << endl;
+}
+
 int
 main(int argc, char **argv)
 {
@@ -339,60 +389,29 @@ main(int argc, char **argv)
         case 0:
             signal(SIGTERM, term_handler);
             signal(SIGINT, int_handler);
-            skt.setWatch(&accept_iow);
-            if (!skt.listen(host, sockNum))
-                cerr << "listen on " << host << ":" << sockNum << ": "
-                     << strerror(errno) << endl;
-            else {
-                if (dofork) {
-                    openlog("ncpd", LOG_CONS|LOG_PID, LOG_DAEMON);
-                    dlog.setOn(true);
-                    elog.setOn(true);
-                    ilog.setOn(true);
-                    linf << _("daemon started. Listening at ") << host << ":"
-                         << sockNum << _(" using device ") << serialDevice
-                         << endl;
-                    setsid();
-                    ignore_value(chdir("/"));
-                    int devnull =
-                        open("/dev/null", O_RDWR, 0);
-                    if (devnull != -1) {
-                        dup2(devnull, STDIN_FILENO);
-                        dup2(devnull, STDOUT_FILENO);
-                        dup2(devnull, STDERR_FILENO);
-                        if (devnull > 2)
-                            close(devnull);
+
+            // Configure the daemon process before starting up.
+            if (dofork) {
+                openlog("ncpd", LOG_CONS|LOG_PID, LOG_DAEMON);
+                dlog.setOn(true);
+                elog.setOn(true);
+                ilog.setOn(true);
+                setsid();
+                ignore_value(chdir("/"));
+                int devnull = open("/dev/null", O_RDWR, 0);
+                if (devnull != -1) {
+                    dup2(devnull, STDIN_FILENO);
+                    dup2(devnull, STDOUT_FILENO);
+                    dup2(devnull, STDERR_FILENO);
+                    if (devnull > 2) {
+                        close(devnull);
                     }
                 }
-                memset(scp, 0, sizeof(scp));
-                theNCP = new ncp(serialDevice, baudRate, nverbose);
-                if (!theNCP) {
-                    lerr << "Could not create NCP object" << endl;
-                    exit(-1);
-                }
-                pthread_t thr_a, thr_b;
-                if (pthread_create(&thr_a, NULL, link_thread, NULL) != 0) {
-                    lerr << "Could not create Link thread" << endl;
-                    exit(-1);
-                }
-                if (pthread_create(&thr_b, NULL,
-                                   pollSocketConnections, NULL) != 0) {
-                    lerr << "Could not create Socket thread" << endl;
-                    exit(-1);
-                }
-                while (active)
-                    checkForNewSocketConnection();
-                linf << _("terminating") << endl;
-                void *ret;
-                pthread_join(thr_a, &ret);
-                linf << _("joined Link thread") << endl;
-                pthread_join(thr_b, &ret);
-                linf << _("joined Socket thread") << endl;
-                delete theNCP;
-                linf << _("shut down NCP") << endl;
             }
-            skt.closeSocket();
-            linf << _("socket closed") << endl;
+
+            // Once our process is fully configured, we can start the session.
+            run_ncp_session(sockNum, baudRate, host, serialDevice, nverbose);
+
             break;
         case -1:
             lerr << "fork: " << strerror(errno) << endl;
