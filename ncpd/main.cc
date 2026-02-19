@@ -58,16 +58,20 @@ using namespace std;
 static bool active = true;
 
 /**
- * State and configuration associated with a full NCP session.
+ * Configuration and state associated with an NCP session.
  *
  * This is shared between the different threads used to run the session and replaces historical global state. Care needs
  * to be taking when writing to this as the datatypes used are not inherently thread-safe.
  */
-struct ncp_session_state {
+struct ncp_session {
 
     // Configuration.
-    unsigned short verbose = 0;
+    int sockNum = 0;
+    int baudRate = 0;
+    string host;
+    string serialDevice;
     bool autoexit = false;
+    unsigned short nverbose = 0;
 
     // State.
     ncp *theNCP = nullptr;
@@ -102,19 +106,19 @@ int_handler(int)
 };
 
 void
-checkForNewSocketConnection(ncp_session_state *state)
+checkForNewSocketConnection(ncp_session *session)
 {
     string peer;
-    if (state->accept_iow.watch(5,0) <= 0) {
+    if (session->accept_iow.watch(5,0) <= 0) {
         return;
     }
-    ppsocket *next = state->skt.accept(&peer, &state->iow);
+    ppsocket *next = session->skt.accept(&peer, &session->iow);
     if (next != NULL) {
-        next->setWatch(&state->iow);
+        next->setWatch(&session->iow);
         // New connect
-        if (state->verbose & NCP_SESSION_LOG)
+        if (session->nverbose & NCP_SESSION_LOG)
             lout << "New socket connection from " << peer << endl;
-        if ((state->numScp >= state->theNCP->maxLinks()) || (!state->theNCP->gotLinkChannel())) {
+        if ((session->numScp >= session->theNCP->maxLinks()) || (!session->theNCP->gotLinkChannel())) {
             bufferStore a;
 
             // Give the client time to send its version request.
@@ -125,27 +129,27 @@ checkForNewSocketConnection(ncp_session_state *state)
             a.addStringT("No Psion Connected\n");
             next->sendBufferStore(a);
             delete next;
-            if (state->verbose & NCP_SESSION_LOG)
+            if (session->nverbose & NCP_SESSION_LOG)
                 lout << "rejected" << endl;
         } else
-            state->scp[state->numScp++] = new socketChan(next, state->theNCP);
+            session->scp[session->numScp++] = new socketChan(next, session->theNCP);
     }
 }
 
 void *
 pollSocketConnections(void *arg)
 {
-    ncp_session_state *state = (ncp_session_state *)arg;
+    ncp_session *session = (ncp_session *)arg;
     while (active) {
-        state->iow.watch(0, 10000);
-        for (int i = 0; i < state->numScp; i++) {
-            state->scp[i]->socketPoll();
-            if (state->scp[i]->terminate()) {
+        session->iow.watch(0, 10000);
+        for (int i = 0; i < session->numScp; i++) {
+            session->scp[i]->socketPoll();
+            if (session->scp[i]->terminate()) {
                 // Requested channel termination
-                delete state->scp[i];
-                state->numScp--;
-                for (int j = i; j < state->numScp; j++)
-                    state->scp[j] = state->scp[j + 1];
+                delete session->scp[i];
+                session->numScp--;
+                for (int j = i; j < session->numScp; j++)
+                    session->scp[j] = session->scp[j + 1];
                 i--;
             }
         }
@@ -242,19 +246,19 @@ parse_destination(const char *arg, const char **host, int *port)
 static void *
 link_thread(void *arg)
 {
-    ncp_session_state *state = (ncp_session_state *)arg;
+    ncp_session *session = (ncp_session *)arg;
     while (active) {
         // psion
-        state->iow.watch(1, 0);
-        if (state->theNCP->hasFailed()) {
-            if (state->autoexit) {
+        session->iow.watch(1, 0);
+        if (session->theNCP->hasFailed()) {
+            if (session->autoexit) {
                 active = false;
                 break;
             }
-            state->iow.watch(5, 0);
-            if (state->verbose & NCP_SESSION_LOG)
+            session->iow.watch(5, 0);
+            if (session->nverbose & NCP_SESSION_LOG)
                 lout << "ncp: restarting\n";
-            state->theNCP->reset();
+            session->theNCP->reset();
         }
     }
     return NULL;
@@ -268,53 +272,45 @@ link_thread(void *arg)
  * the various `select` calls to interrupt and, in the current implementation, this will check the global `active`
  * boolean to determine if it should keep running.
  */
-void run_ncp_session(int sockNum,
-                     int baudRate,
-                     const char *host,
-                     const char *serialDevice,
-                     unsigned short nverbose,
-                     bool autoexit) {
+void run_ncp_session(ncp_session *session) {
 
-    ncp_session_state *state = new ncp_session_state();
-    state->verbose = nverbose;
-    state->autoexit = autoexit;
-
-    state->skt.setWatch(&state->accept_iow);
-    if (!state->skt.listen(host, sockNum)) {
-        cerr << "listen on " << host << ":" << sockNum << ": " << strerror(errno) << endl;
-        delete state;
+    session->skt.setWatch(&session->accept_iow);
+    if (!session->skt.listen(session->host.c_str(), session->sockNum)) {
+        cerr << "listen on " << session->host << ":" << session->sockNum << ": " << strerror(errno) << endl;
         return;
     }
-    linf << _("Listening at ") << host << ":" << sockNum << _(" using device ") << serialDevice << endl;
+    linf
+        << _("Listening at ") << session->host << ":" << session->sockNum
+        << _(" using device ") << session->serialDevice << endl;
 
-    state->theNCP = new ncp(serialDevice, baudRate, nverbose);
-    if (!state->theNCP) {
+    session->theNCP = new ncp(session->serialDevice.c_str(), session->baudRate, session->nverbose);
+    if (!session->theNCP) {
         lerr << "Could not create NCP object" << endl;
         exit(-1);
     }
     pthread_t thr_a, thr_b;
-    if (pthread_create(&thr_a, NULL, link_thread, state) != 0) {
+    if (pthread_create(&thr_a, NULL, link_thread, session) != 0) {
         lerr << "Could not create Link thread" << endl;
         exit(-1);
     }
-    if (pthread_create(&thr_b, NULL, pollSocketConnections, state) != 0) {
+    if (pthread_create(&thr_b, NULL, pollSocketConnections, session) != 0) {
         lerr << "Could not create Socket thread" << endl;
         exit(-1);
     }
     while (active)
-        checkForNewSocketConnection(state);
+        checkForNewSocketConnection(session);
     linf << _("terminating") << endl;
     void *ret;
     pthread_join(thr_a, &ret);
     linf << _("joined Link thread") << endl;
     pthread_join(thr_b, &ret);
     linf << _("joined Socket thread") << endl;
-    delete state->theNCP;
+    delete session->theNCP;
     linf << _("shut down NCP") << endl;
-    state->skt.closeSocket();
+    session->skt.closeSocket();
     linf << _("socket closed") << endl;
 
-    delete state;
+    delete session;
 }
 
 int
@@ -409,6 +405,7 @@ main(int argc, char **argv)
         pid = 0;
     switch (pid) {
         case 0:
+            {
             signal(SIGTERM, term_handler);
             signal(SIGINT, int_handler);
 
@@ -431,10 +428,19 @@ main(int argc, char **argv)
                 }
             }
 
-            // Once our process is fully configured, we can start the session.
-            run_ncp_session(sockNum, baudRate, host, serialDevice, nverbose, autoexit);
+            // Once our process is fully set up, we can create an start the session.
+            ncp_session *session = new ncp_session();
+            session->sockNum = sockNum;
+            session->baudRate = baudRate;
+            session->host = host;
+            session->serialDevice = serialDevice;
+            session->nverbose = nverbose;
+            session->autoexit = autoexit;
+            run_ncp_session(session);
+            delete session;
 
             break;
+            }
         case -1:
             lerr << "fork: " << strerror(errno) << endl;
             break;
