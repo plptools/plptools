@@ -23,6 +23,8 @@
 
 #include <iostream>
 
+#define NCP_SESSION_LOG 128
+
 extern std::ostream lout;
 extern std::ostream lerr;
 extern std::ostream linf;
