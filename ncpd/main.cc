@@ -55,8 +55,6 @@
 
 using namespace std;
 
-static bool active = true;
-
 /**
  * Configuration and state associated with an NCP session.
  *
@@ -80,7 +78,12 @@ struct ncp_session {
     ppsocket skt;
     int numScp = 0;
     socketChan *scp[257] = {}; // MAX_CHANNELS_PSION + 1
+    volatile sig_atomic_t is_cancelled = false;
 };
+
+// Global session state specific to the `ncpd` process. This exists as a global solely for the purpose of accessing it
+// from the interrupt handlers.
+static ncp_session *shared_session;
 
 logbuf ilog(LOG_INFO, STDOUT_FILENO);
 logbuf dlog(LOG_DEBUG, STDOUT_FILENO);
@@ -94,7 +97,7 @@ term_handler(int)
 {
     linf << _("Got SIGTERM") << endl;
     signal(SIGTERM, term_handler);
-    active = false;
+    shared_session->is_cancelled = true;
 };
 
 static void
@@ -102,7 +105,7 @@ int_handler(int)
 {
     linf << _("Got SIGINT") << endl;
     signal(SIGINT, int_handler);
-    active = false;
+    shared_session->is_cancelled = true;
 };
 
 void
@@ -140,7 +143,7 @@ void *
 pollSocketConnections(void *arg)
 {
     ncp_session *session = (ncp_session *)arg;
-    while (active) {
+    while (!session->is_cancelled) {
         session->iow.watch(0, 10000);
         for (int i = 0; i < session->numScp; i++) {
             session->scp[i]->socketPoll();
@@ -247,12 +250,12 @@ static void *
 link_thread(void *arg)
 {
     ncp_session *session = (ncp_session *)arg;
-    while (active) {
+    while (!session->is_cancelled) {
         // psion
         session->iow.watch(1, 0);
         if (session->theNCP->hasFailed()) {
             if (session->autoexit) {
-                active = false;
+                session->is_cancelled = true;
                 break;
             }
             session->iow.watch(5, 0);
@@ -297,7 +300,7 @@ void run_ncp_session(ncp_session *session) {
         lerr << "Could not create Socket thread" << endl;
         exit(-1);
     }
-    while (active)
+    while (!session->is_cancelled)
         checkForNewSocketConnection(session);
     linf << _("terminating") << endl;
     void *ret;
@@ -429,15 +432,15 @@ main(int argc, char **argv)
             }
 
             // Once our process is fully set up, we can create an start the session.
-            ncp_session *session = new ncp_session();
-            session->sockNum = sockNum;
-            session->baudRate = baudRate;
-            session->host = host;
-            session->serialDevice = serialDevice;
-            session->nverbose = nverbose;
-            session->autoexit = autoexit;
-            run_ncp_session(session);
-            delete session;
+            shared_session = new ncp_session();
+            shared_session->sockNum = sockNum;
+            shared_session->baudRate = baudRate;
+            shared_session->host = host;
+            shared_session->serialDevice = serialDevice;
+            shared_session->nverbose = nverbose;
+            shared_session->autoexit = autoexit;
+            run_ncp_session(shared_session);
+            delete shared_session;
 
             break;
             }
