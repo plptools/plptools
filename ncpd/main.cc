@@ -20,7 +20,6 @@
  *
  */
 #include "config.h"
-#include "main.h"
 
 #include <string>
 #include <cstring>
