@@ -85,10 +85,6 @@ struct ncp_session {
 // from the interrupt handlers.
 static ncp_session *shared_session;
 
-// Global session state specific to the `ncpd` process. This exists as a global solely for the purpose of accessing it
-// from the interrupt handlers.
-static ncp_session *shared_session;
-
 static void
 term_handler(int)
 {
