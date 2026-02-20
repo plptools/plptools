@@ -23,6 +23,7 @@
 #include "ncp_log.h"
 
 #include <iostream>
+#include <unistd.h>
 
 #include <fcntl.h>
 
