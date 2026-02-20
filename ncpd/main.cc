@@ -287,10 +287,7 @@ void run_ncp_session(ncp_session *session) {
         << _(" using device ") << session->serialDevice << endl;
 
     session->theNCP = new ncp(session->serialDevice.c_str(), session->baudRate, session->nverbose);
-    if (!session->theNCP) {
-        lerr << "Could not create NCP object" << endl;
-        exit(-1);
-    }
+
     pthread_t thr_a, thr_b;
     if (pthread_create(&thr_a, NULL, link_thread, session) != 0) {
         lerr << "Could not create Link thread" << endl;
