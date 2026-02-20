@@ -2,7 +2,8 @@
  * This file is part of plptools.
  *
  *  Copyright (C) 1999 Philip Proudman <philip.proudman@btinternet.com>
- *  Copyright (C) 1999-2001 Fritz Elfert <felfert@to.com>
+ *  Copyright (C) 1999-2002 Fritz Elfert <felfert@to.com>
+ *  Copyright (C) 2026 Jason Morley <hello@jbmorley.co.uk>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -18,37 +19,32 @@
  *  along with this program; if not, see <https://www.gnu.org/licenses/>.
  *
  */
+#ifndef _ncp_log_h_
+#define _ncp_log_h_
+
 #include "config.h"
 
-#include "log.h"
+#include <log.h>
 
-#include "ignore-value.h"
+#define NCP_DEBUG_LOG 1
+#define NCP_DEBUG_DUMP 2
+#define LNK_DEBUG_LOG 4
+#define LNK_DEBUG_DUMP 8
+#define PKT_DEBUG_LOG 16
+#define PKT_DEBUG_DUMP 32
+#define PKT_DEBUG_HANDSHAKE 64
+#define NCP_SESSION_LOG 128
 
-#include <unistd.h>
+// Note that these logs are not thread-safe and there's nothing to ensure that log messages from different threads
+// aren't interlaced. Since these are ultimately written to using `write` logging shouldn't crash, but it's important to
+// understand the limitations.
 
-logbuf::logbuf(int loglevel, int fd) {
-    ptr = buf;
-    len = 0;
-    _use_syslog = true;
-    _level = loglevel;
-    _fd = fd;
-}
+extern logbuf ilog;
+extern logbuf dlog;
+extern logbuf elog;
 
-int logbuf::overflow(int c) {
-    if (c == '\n') {
-        *ptr++ = '\n';
-        *ptr = '\0';
-        if (_use_syslog)
-            syslog(_level, "%s", buf);
-        else if (_fd != -1)
-            ignore_value(write(_fd, buf, len + 1));
-        ptr = buf;
-        len = 0;
-        return 0;
-    }
-    if ((len + 2) >= sizeof(buf))
-        return EOF;
-    *ptr++ = c;
-    len++;
-    return 0;
-}
+extern std::ostream lout;
+extern std::ostream lerr;
+extern std::ostream linf;
+
+#endif

@@ -3,6 +3,7 @@
  *
  *  Copyright (C) 1999 Philip Proudman <philip.proudman@btinternet.com>
  *  Copyright (C) 1999-2001 Fritz Elfert <felfert@to.com>
+ *  Copyright (C) 2026 Jason Morley <hello@jbmorley.co.uk>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -45,10 +46,7 @@
  *     lerr << "Whoops, got an error" << endl;
  * </PRE>
  *
- * The second optional argument of the constructor can be used
- * to switch the output destination between syslog and some
- * file. If it is omitted or set to -1, logging can be switched on
- * or off. The initial state is on.
+ * Logging can be toggled between using syslog and writing to a file (see `useSyslog` and `useFileDescriptor`).
  */
 class logbuf : public std::streambuf {
 public:
@@ -61,14 +59,22 @@ public:
     * @param fd An optional file descriptor to use
     *   if switched off.
     */
-    logbuf(int loglevel, int fd = -1);
+    logbuf(int loglevel, int fd);
 
     /**
-    * Switches loggin on or off.
-    *
-    * @param newstate The desired state.
-    */
-    void setOn(bool newstate) { _on = newstate; }
+     * Write logs using syslog.
+     *
+     * When writing to syslog is enabled, logs will not be written to the file descriptor passed in the constructor.
+     */
+    void useSyslog() { _use_syslog = true; }
+
+    /**
+     * Write logs to the file descriptor passed in the constructor.
+     *
+     * When writing to the file descriptor, logs will not be written using syslog. If a file descriptor of -1 was
+     * specified, no logs will be written.
+     */
+    void useFileDescriptor() { _use_syslog = false; }
 
     /**
     * Modifies the loglevel of this instance.
@@ -76,20 +82,6 @@ public:
     * @param newlevel The new loglevel.
     */
     void setLevel(int newlevel) { _level = newlevel; }
-
-    /**
-    * Retrieve the current state.
-    *
-    * @returns The current state.
-    */
-    bool on() { return _on; }
-
-    /**
-    * Retrieves the current loglevel.
-    *
-    * @returns The current loglevel.
-    */
-    int level() { return _level; }
 
     /**
     * Called by the associated
@@ -126,7 +118,7 @@ private:
     /**
     * Log flag.
     */
-    bool _on;
+    bool _use_syslog;
 
     /**
     * The internal buffer for holding

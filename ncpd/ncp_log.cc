@@ -2,7 +2,8 @@
  * This file is part of plptools.
  *
  *  Copyright (C) 1999 Philip Proudman <philip.proudman@btinternet.com>
- *  Copyright (C) 1999-2002 Fritz Elfert <felfert@to.com>
+ *  Copyright (C) 1999-2001 Fritz Elfert <felfert@to.com>
+ *  Copyright (C) 2026 Jason Morley <hello@jbmorley.co.uk>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -18,15 +19,17 @@
  *  along with this program; if not, see <https://www.gnu.org/licenses/>.
  *
  */
-#ifndef _main_h_
-#define _main_h_
+#include "config.h"
+#include "ncp_log.h"
 
 #include <iostream>
 
-#define NCP_SESSION_LOG 128
+#include <fcntl.h>
 
-extern std::ostream lout;
-extern std::ostream lerr;
-extern std::ostream linf;
+logbuf ilog(LOG_INFO, STDOUT_FILENO);
+logbuf dlog(LOG_DEBUG, STDOUT_FILENO);
+logbuf elog(LOG_ERR, STDERR_FILENO);
 
-#endif
+std::ostream linf(&ilog);
+std::ostream lout(&dlog);
+std::ostream lerr(&elog);

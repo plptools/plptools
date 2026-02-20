@@ -32,9 +32,6 @@
 class Link;
 class channel;
 
-#define NCP_DEBUG_LOG  1
-#define NCP_DEBUG_DUMP 2
-
 /**
  * Representation of a server process on the PC
  * A dummy which does not allow connects for now.

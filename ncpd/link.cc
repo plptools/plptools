@@ -32,9 +32,9 @@
 #include "bufferarray.h"
 
 #include "link.h"
-#include "packet.h"
+#include "ncp_log.h"
 #include "ncp.h"
-#include "main.h"
+#include "packet.h"
 
 extern "C" {
     static void *expire_check(void *arg)

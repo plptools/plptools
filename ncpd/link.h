@@ -30,9 +30,6 @@
 #include "Enum.h"
 #include <vector>
 
-#define LNK_DEBUG_LOG  4
-#define LNK_DEBUG_DUMP 8
-
 class ncp;
 class packet;
 

@@ -28,11 +28,11 @@
 #include "bufferstore.h"
 #include "bufferarray.h"
 
-#include "rfsv.h"
-#include "ncp.h"
-#include "linkchan.h"
 #include "link.h"
-#include "main.h"
+#include "linkchan.h"
+#include "ncp_log.h"
+#include "ncp.h"
+#include "rfsv.h"
 
 #define MAX_CHANNELS_PSION 256
 #define MAX_CHANNELS_SIBO  8

@@ -35,10 +35,10 @@
 #include <termios.h>
 #include <signal.h>
 
-#include "mp_serial.h"
-#include "packet.h"
 #include "link.h"
-#include "main.h"
+#include "mp_serial.h"
+#include "ncp_log.h"
+#include "packet.h"
 
 #define BUFLEN 4096 // Must be a power of 2
 #define BUFMASK (BUFLEN-1)

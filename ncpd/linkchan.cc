@@ -28,8 +28,8 @@
 #include "bufferarray.h"
 
 #include "linkchan.h"
+#include "ncp_log.h"
 #include "ncp.h"
-#include "main.h"
 
 using namespace std;
 

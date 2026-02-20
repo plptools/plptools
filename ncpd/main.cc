@@ -20,7 +20,6 @@
  *
  */
 #include "config.h"
-#include "main.h"
 
 #include <string>
 #include <cstring>
@@ -43,10 +42,11 @@
 
 #include "ignore-value.h"
 
-#include "ncp.h"
-#include "socketchan.h"
 #include "link.h"
+#include "ncp_log.h"
+#include "ncp.h"
 #include "packet.h"
+#include "socketchan.h"
 
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE
@@ -84,13 +84,6 @@ struct ncp_session {
 // Global session state specific to the `ncpd` process. This exists as a global solely for the purpose of accessing it
 // from the interrupt handlers.
 static ncp_session *shared_session;
-
-logbuf ilog(LOG_INFO, STDOUT_FILENO);
-logbuf dlog(LOG_DEBUG, STDOUT_FILENO);
-logbuf elog(LOG_ERR, STDERR_FILENO);
-ostream linf(&ilog);
-ostream lout(&dlog);
-ostream lerr(&elog);
 
 static void
 term_handler(int)
@@ -330,11 +323,12 @@ main(int argc, char **argv)
     bool autoexit = false;
 
     struct servent *se = getservbyname("psion", "tcp");
-    dlog.setOn(false);
-    elog.setOn(false);
-    endservent();
-    if (se != 0L)
+    dlog.useFileDescriptor();
+    elog.useFileDescriptor();
+    if (se != 0L) {
         sockNum = ntohs(se->s_port);
+    }
+    endservent();
 
     while (1) {
         int c = getopt_long(argc, argv, "hdeVb:s:p:v:", opts, NULL);
@@ -415,9 +409,9 @@ main(int argc, char **argv)
             // Configure the daemon process before starting up.
             if (dofork) {
                 openlog("ncpd", LOG_CONS|LOG_PID, LOG_DAEMON);
-                dlog.setOn(true);
-                elog.setOn(true);
-                ilog.setOn(true);
+                dlog.useSyslog();
+                elog.useSyslog();
+                ilog.useSyslog();
                 setsid();
                 ignore_value(chdir("/"));
                 int devnull = open("/dev/null", O_RDWR, 0);

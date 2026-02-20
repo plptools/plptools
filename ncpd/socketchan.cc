@@ -25,11 +25,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "ncp_log.h"
+#include "ncp.h"
 #include "ppsocket.h"
 #include "rfsv.h"
 #include "socketchan.h"
-#include "ncp.h"
-#include "main.h"
 
 using namespace std;
 
