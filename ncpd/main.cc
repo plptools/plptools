@@ -20,6 +20,7 @@
  *
  */
 #include "config.h"
+#include "main.h"
 
 #include <string>
 #include <cstring>
@@ -80,6 +81,10 @@ struct ncp_session {
     socketChan *scp[257] = {}; // MAX_CHANNELS_PSION + 1
     volatile sig_atomic_t is_cancelled = false;
 };
+
+// Global session state specific to the `ncpd` process. This exists as a global solely for the purpose of accessing it
+// from the interrupt handlers.
+static ncp_session *shared_session;
 
 // Global session state specific to the `ncpd` process. This exists as a global solely for the purpose of accessing it
 // from the interrupt handlers.
@@ -280,10 +285,7 @@ void run_ncp_session(ncp_session *session) {
         << _(" using device ") << session->serialDevice << endl;
 
     session->theNCP = new ncp(session->serialDevice.c_str(), session->baudRate, session->nverbose);
-    if (!session->theNCP) {
-        lerr << "Could not create NCP object" << endl;
-        exit(-1);
-    }
+
     pthread_t thr_a, thr_b;
     if (pthread_create(&thr_a, NULL, link_thread, session) != 0) {
         lerr << "Could not create Link thread" << endl;
