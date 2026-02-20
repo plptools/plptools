@@ -431,7 +431,7 @@ main(int argc, char **argv)
                 }
             }
 
-            // Once our process is fully set up, we can create an start the session.
+            // Once our process is fully set up, we can create and start the session.
             shared_session = new ncp_session();
             shared_session->sockNum = sockNum;
             shared_session->baudRate = baudRate;
