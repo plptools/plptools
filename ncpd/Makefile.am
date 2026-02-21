@@ -23,7 +23,23 @@ ncpd_CPPFLAGS = -I$(top_srcdir)/lib -I$(top_srcdir)/libgnu -I$(top_builddir)/lib
 ncpd_CFLAGS = $(THREADED_CFLAGS)
 ncpd_CXXFLAGS = $(THREADED_CXXFLAGS)
 ncpd_LDADD = $(LIB_PLP) $(INTLLIBS) $(LIBPMULTITHREAD) $(LIBTHREAD) $(NANOSLEEP_LIB) $(PTHREAD_SIGMASK_LIB) $(SELECT_LIB) $(top_builddir)/libgnu/libgnu.a
-ncpd_SOURCES = channel.cc link.cc linkchan.cc main.cc \
-	ncp.cc packet.cc socketchan.cc mp_serial.c ncp_log.cc \
-	channel.h link.h linkchan.h mp_serial.h ncp.h packet.h \
-	socketchan.h ncp_log.h
+ncpd_SOURCES = \
+	channel.cc \
+	channel.h \
+	link.cc \
+	link.h  \
+	linkchan.cc \
+	linkchan.h \
+	main.cc \
+	mp_serial.c \
+	mp_serial.h \
+	ncp_log.cc \
+	ncp_log.h \
+	ncp_session.cc \
+	ncp_session.h \
+	ncp.cc \
+	ncp.h \
+	packet.cc \
+	packet.h \
+	socketchan.cc \
+	socketchan.h
