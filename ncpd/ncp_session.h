@@ -24,7 +24,9 @@
 
 #include "config.h"
 
+#include <signal.h>
 #include <string>
+
 #include <bufferstore.h>
 #include <ppsocket.h>
 #include <iowatch.h>
