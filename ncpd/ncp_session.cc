@@ -32,7 +32,7 @@
 using namespace std;
 
 static void *link_thread(void *arg) {
-    ncp_session *session = (ncp_session *)arg;
+    NCPSession *session = (NCPSession *)arg;
     while (!session->is_cancelled) {
         // psion
         session->iow.watch(1, 0);
@@ -51,7 +51,7 @@ static void *link_thread(void *arg) {
 }
 
 void *pollSocketConnections(void *arg) {
-    ncp_session *session = (ncp_session *)arg;
+    NCPSession *session = (NCPSession *)arg;
     while (!session->is_cancelled) {
         session->iow.watch(0, 10000);
         for (int i = 0; i < session->numScp; i++) {
@@ -69,7 +69,7 @@ void *pollSocketConnections(void *arg) {
     return NULL;
 }
 
-void checkForNewSocketConnection(ncp_session *session) {
+void checkForNewSocketConnection(NCPSession *session) {
     string peer;
     if (session->accept_iow.watch(5,0) <= 0) {
         return;
@@ -106,7 +106,7 @@ void checkForNewSocketConnection(ncp_session *session) {
  * the various `select` calls to interrupt and, in the current implementation, this will check the global `active`
  * boolean to determine if it should keep running.
  */
-void ncp_session_run(ncp_session *session) {
+void runNCPSession(NCPSession *session) {
 
     session->skt.setWatch(&session->accept_iow);
     if (!session->skt.listen(session->host.c_str(), session->sockNum)) {

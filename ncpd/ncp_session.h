@@ -38,7 +38,7 @@
  * This is shared between the different threads used to run the session and replaces historical global state. Care needs
  * to be taking when writing to this as the datatypes used are not inherently thread-safe.
  */
-struct ncp_session {
+struct NCPSession {
 
     // Configuration.
     int sockNum = 0;
@@ -58,6 +58,6 @@ struct ncp_session {
     volatile sig_atomic_t is_cancelled = false;
 };
 
-void ncp_session_run(ncp_session *session);
+void runNCPSession(NCPSession *session);
 
 #endif
