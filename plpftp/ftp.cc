@@ -922,7 +922,7 @@ session(rfsv & a, rpcs & r, rclip & rc, ppsocket & rclipSocket, vector<char *> a
             struct stat stbuf;
 
             char *f1 = Path::resolveEPOCPath(argv[1], psionDir);
-            string basename = Path::getEPOCBasename(string(argv[1]));
+            string basename = Path::getEPOCBasename(string(f1));
             char *f2 = xasprintf("%s%s%s", localDir, "/", argc == 2 ? basename.c_str() : argv[2]);
 
             gettimeofday(&stime, 0L);
