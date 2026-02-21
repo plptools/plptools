@@ -55,14 +55,14 @@ using namespace std;
 
 // Global session state specific to the `ncpd` process. This exists as a global solely for the purpose of accessing it
 // from the interrupt handlers.
-static NCPSession *shared_session;
+static NCPSession *sharedSession;
 
 static void
 term_handler(int)
 {
     linf << _("Got SIGTERM") << endl;
     signal(SIGTERM, term_handler);
-    shared_session->is_cancelled = true;
+    sharedSession->isCancelled = true;
 };
 
 static void
@@ -70,7 +70,7 @@ int_handler(int)
 {
     linf << _("Got SIGINT") << endl;
     signal(SIGINT, int_handler);
-    shared_session->is_cancelled = true;
+    sharedSession->isCancelled = true;
 };
 
 static void
@@ -276,15 +276,15 @@ main(int argc, char **argv)
             }
 
             // Once our process is fully set up, we can create and start the session.
-            shared_session = new NCPSession();
-            shared_session->sockNum = sockNum;
-            shared_session->baudRate = baudRate;
-            shared_session->host = host;
-            shared_session->serialDevice = serialDevice;
-            shared_session->nverbose = nverbose;
-            shared_session->autoexit = autoexit;
-            runNCPSession(shared_session);
-            delete shared_session;
+            sharedSession = new NCPSession();
+            sharedSession->sockNum = sockNum;
+            sharedSession->baudRate = baudRate;
+            sharedSession->host = host;
+            sharedSession->serialDevice = serialDevice;
+            sharedSession->nverbose = nverbose;
+            sharedSession->autoexit = autoexit;
+            runNCPSession(sharedSession);
+            delete sharedSession;
 
             break;
             }

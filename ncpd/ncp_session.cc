@@ -31,14 +31,14 @@
 
 using namespace std;
 
-static void *link_thread(void *arg) {
+static void *linkThread(void *arg) {
     NCPSession *session = (NCPSession *)arg;
-    while (!session->is_cancelled) {
+    while (!session->isCancelled) {
         // psion
         session->iow.watch(1, 0);
         if (session->theNCP->hasFailed()) {
             if (session->autoexit) {
-                session->is_cancelled = true;
+                session->isCancelled = true;
                 break;
             }
             session->iow.watch(5, 0);
@@ -52,7 +52,7 @@ static void *link_thread(void *arg) {
 
 void *pollSocketConnections(void *arg) {
     NCPSession *session = (NCPSession *)arg;
-    while (!session->is_cancelled) {
+    while (!session->isCancelled) {
         session->iow.watch(0, 10000);
         for (int i = 0; i < session->numScp; i++) {
             session->scp[i]->socketPoll();
@@ -71,7 +71,7 @@ void *pollSocketConnections(void *arg) {
 
 void checkForNewSocketConnection(NCPSession *session) {
     string peer;
-    if (session->accept_iow.watch(5,0) <= 0) {
+    if (session->acceptIOW.watch(5,0) <= 0) {
         return;
     }
     ppsocket *next = session->skt.accept(&peer, &session->iow);
@@ -108,7 +108,7 @@ void checkForNewSocketConnection(NCPSession *session) {
  */
 void runNCPSession(NCPSession *session) {
 
-    session->skt.setWatch(&session->accept_iow);
+    session->skt.setWatch(&session->acceptIOW);
     if (!session->skt.listen(session->host.c_str(), session->sockNum)) {
         lerr << "listen on " << session->host << ":" << session->sockNum << ": " << strerror(errno) << endl;
         return;
@@ -120,7 +120,7 @@ void runNCPSession(NCPSession *session) {
     session->theNCP = new ncp(session->serialDevice.c_str(), session->baudRate, session->nverbose);
 
     pthread_t thr_a, thr_b;
-    if (pthread_create(&thr_a, NULL, link_thread, session) != 0) {
+    if (pthread_create(&thr_a, NULL, linkThread, session) != 0) {
         lerr << "Could not create Link thread" << endl;
         exit(-1);
     }
@@ -128,7 +128,7 @@ void runNCPSession(NCPSession *session) {
         lerr << "Could not create Socket thread" << endl;
         exit(-1);
     }
-    while (!session->is_cancelled)
+    while (!session->isCancelled)
         checkForNewSocketConnection(session);
     linf << _("terminating") << endl;
     void *ret;

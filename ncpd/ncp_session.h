@@ -51,11 +51,11 @@ struct NCPSession {
     // State.
     ncp *theNCP = nullptr;
     IOWatch iow;
-    IOWatch accept_iow;
+    IOWatch acceptIOW;
     ppsocket skt;
     int numScp = 0;
     socketChan *scp[257] = {}; // MAX_CHANNELS_PSION + 1
-    volatile sig_atomic_t is_cancelled = false;
+    volatile sig_atomic_t isCancelled = false;
 };
 
 void runNCPSession(NCPSession *session);
