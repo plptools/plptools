@@ -84,13 +84,9 @@ Link::Link(const char *fname, int baud, NCP *_ncp, unsigned short _verbose, cons
 
 Link::~Link()
 {
-    // flush();
-    // pthread_cancel(checkthread);
-    // pthread_mutex_destroy(&queueMutex);
-    // delete p;
-    purgeAllQueues();
+    flush();
     pthread_cancel(checkthread);
-    pthread_join(checkthread, NULL);   // must complete before either of these
+    pthread_join(checkthread, NULL);
     pthread_mutex_destroy(&queueMutex);
     delete p;
 }
