@@ -33,7 +33,7 @@
 
 using namespace std;
 
-socketChan:: socketChan(ppsocket * _skt, ncp * _ncpController):
+socketChan:: socketChan(ppsocket* _skt, NCP* _ncpController):
     channel(_ncpController)
 {
     skt = _skt;

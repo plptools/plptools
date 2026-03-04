@@ -29,7 +29,7 @@
 
 class linkChan : public channel {
 public:
-    linkChan(ncp *ncpController, int ncpChannel = -1);
+    linkChan(NCP *ncpController, int ncpChannel = -1);
 
     void ncpDataCallback(bufferStore &a);
     const char *getNcpRegisterName();

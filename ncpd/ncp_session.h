@@ -24,9 +24,7 @@
 
 #include "config.h"
 
-#include <signal.h>
 #include <string>
-
 #include <bufferstore.h>
 #include <ppsocket.h>
 #include <iowatch.h>
@@ -34,32 +32,70 @@
 #include "ncp.h"
 #include "socketchan.h"
 
-/**
- * Configuration and state associated with an NCP session.
- *
- * This is shared between the different threads used to run the session and replaces historical global state. Care needs
- * to be taking when writing to this as the datatypes used are not inherently thread-safe.
- */
-struct NCPSession {
+class NCPSession {
+public:
+
+    NCPSession(int _sockNum,
+               int _baudRate,
+               std::string _host,
+               std::string _serialDevice,
+               bool _autoexit,
+               unsigned short _nverbose)
+    : sockNum(_sockNum)
+    , baudRate(_baudRate)
+    , host(_host)
+    , serialDevice(_serialDevice)
+    , autoexit(_autoexit)
+    , nverbose(_nverbose) {}
+
+    ~NCPSession();
+
+    /**
+     * Creates and manages all the threads necessary to run a full session for communicating with a Psion and exposing
+     * that to clients via the a TCP socket.
+     *
+     * This is a non-blocking function. The session should be stopped by calling `stop` or cancelling the session using
+     * `cancel` interrupting the session thread with `SIGINT`.
+     */
+    int start();
+
+    /**
+     * Mark the session as cancelled.
+     *
+     * It is anticipated that this method be called from within an interrupt handler in CLI apps. When using `cancel` to
+     * initiate session shutdown, it should be paired with `wait`.
+     */
+    void cancel();
+
+    /**
+     * Wait for the session to terminate.
+     *
+     * A typical usage pattern might call `stop`, followed by, `wait` to ensure the session is fully terminated and
+     * cleaned up before doing further work (e.g., starting a new session with a different configuration).
+     */
+    void wait();
+
+// private:
+
+    bool isCancelled();
 
     // Configuration.
-    int sockNum = 0;
-    int baudRate = 0;
+    int sockNum;
+    int baudRate;
     std::string host;
     std::string serialDevice;
-    bool autoexit = false;
-    unsigned short nverbose = 0;
+    bool autoexit;
+    unsigned short nverbose;
 
     // State.
-    ncp *theNCP = nullptr;
+    pthread_t threadId_ = 0;
+    NCP *ncp = nullptr;
     IOWatch iow;
     IOWatch acceptIOW;
     ppsocket skt;
     int numScp = 0;
     socketChan *scp[257] = {}; // MAX_CHANNELS_PSION + 1
-    volatile sig_atomic_t isCancelled = false;
+    int cancellationPipe[2] = { -1, -1 };
 };
-
-void runNCPSession(NCPSession *session);
 
 #endif

@@ -27,7 +27,7 @@ class ppsocket;
 
 class socketChan : public channel {
 public:
-  socketChan(ppsocket* comms, ncp* ncpController);
+  socketChan(ppsocket* comms, NCP* ncpController);
   virtual ~socketChan();
 
   void ncpDataCallback(bufferStore& a);

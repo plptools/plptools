@@ -26,6 +26,7 @@
 #include <iostream>
 
 #include <plpintl.h>
+#include <pthread.h>
 
 #include "ncp_log.h"
 
@@ -33,18 +34,21 @@ using namespace std;
 
 static void *linkThread(void *arg) {
     NCPSession *session = (NCPSession *)arg;
-    while (!session->isCancelled) {
+    while (!session->isCancelled()) {
         // psion
-        session->iow.watch(1, 0);
-        if (session->theNCP->hasFailed()) {
+        session->iow.watch(1, 0, session->cancellationPipe[0]);
+        if (session->ncp->hasFailed()) {
             if (session->autoexit) {
-                session->isCancelled = true;
+                session->cancel();
                 break;
             }
-            session->iow.watch(5, 0);
+            session->iow.watch(5, 0, session->cancellationPipe[0]);
+            if (session->isCancelled()) {
+                break;
+            }
             if (session->nverbose & NCP_SESSION_LOG)
                 lout << "ncp: restarting\n";
-            session->theNCP->reset();
+            session->ncp->reset();
         }
     }
     return NULL;
@@ -52,8 +56,8 @@ static void *linkThread(void *arg) {
 
 void *pollSocketConnections(void *arg) {
     NCPSession *session = (NCPSession *)arg;
-    while (!session->isCancelled) {
-        session->iow.watch(0, 10000);
+    while (!session->isCancelled()) {
+        session->iow.watch(0, 10000, session->cancellationPipe[0]);
         for (int i = 0; i < session->numScp; i++) {
             session->scp[i]->socketPoll();
             if (session->scp[i]->terminate()) {
@@ -71,7 +75,10 @@ void *pollSocketConnections(void *arg) {
 
 void checkForNewSocketConnection(NCPSession *session) {
     string peer;
-    if (session->acceptIOW.watch(5,0) <= 0) {
+    if (session->acceptIOW.watch(5, 0, session->cancellationPipe[0]) <= 0) {
+        return;
+    }
+    if (session->isCancelled()) {
         return;
     }
     ppsocket *next = session->skt.accept(&peer, &session->iow);
@@ -80,7 +87,7 @@ void checkForNewSocketConnection(NCPSession *session) {
         // New connect
         if (session->nverbose & NCP_SESSION_LOG)
             lout << "New socket connection from " << peer << endl;
-        if ((session->numScp >= session->theNCP->maxLinks()) || (!session->theNCP->gotLinkChannel())) {
+        if ((session->numScp >= session->ncp->maxLinks()) || (!session->ncp->gotLinkChannel())) {
             bufferStore a;
 
             // Give the client time to send its version request.
@@ -94,31 +101,26 @@ void checkForNewSocketConnection(NCPSession *session) {
             if (session->nverbose & NCP_SESSION_LOG)
                 lout << "rejected" << endl;
         } else
-            session->scp[session->numScp++] = new socketChan(next, session->theNCP);
+            session->scp[session->numScp++] = new socketChan(next, session->ncp);
     }
 }
 
-/**
- * Creates and manages all the threads necessary to run a full session for communicating with a Psion and exposing that
- * to clients via the a TCP socket.
- *
- * This is a blocking function. Cancellation is expected to be performed using interrupt handlers. SIGINT will cause
- * the various `select` calls to interrupt and, in the current implementation, this will check the global `active`
- * boolean to determine if it should keep running.
- */
-void runNCPSession(NCPSession *session) {
+void *runNCPSession(void *arg) {
+    NCPSession *session = (NCPSession *)arg;
 
     session->skt.setWatch(&session->acceptIOW);
     if (!session->skt.listen(session->host.c_str(), session->sockNum)) {
         lerr << "listen on " << session->host << ":" << session->sockNum << ": " << strerror(errno) << endl;
-        return;
+        return nullptr;
     }
     linf
         << _("Listening at ") << session->host << ":" << session->sockNum
         << _(" using device ") << session->serialDevice << endl;
 
-    session->theNCP = new ncp(session->serialDevice.c_str(), session->baudRate, session->nverbose);
-
+    session->ncp = new NCP(session->serialDevice.c_str(),
+                           session->baudRate,
+                           session->nverbose,
+                           session->cancellationPipe[0]);
     pthread_t thr_a, thr_b;
     if (pthread_create(&thr_a, NULL, linkThread, session) != 0) {
         lerr << "Could not create Link thread" << endl;
@@ -128,7 +130,7 @@ void runNCPSession(NCPSession *session) {
         lerr << "Could not create Socket thread" << endl;
         exit(-1);
     }
-    while (!session->isCancelled)
+    while (!session->isCancelled())
         checkForNewSocketConnection(session);
     linf << _("terminating") << endl;
     void *ret;
@@ -136,10 +138,46 @@ void runNCPSession(NCPSession *session) {
     linf << _("joined Link thread") << endl;
     pthread_join(thr_b, &ret);
     linf << _("joined Socket thread") << endl;
-    delete session->theNCP;
+    delete session->ncp;
     linf << _("shut down NCP") << endl;
     session->skt.closeSocket();
     linf << _("socket closed") << endl;
 
-    delete session;
+    return nullptr;
+}
+
+NCPSession::~NCPSession() {
+    close(cancellationPipe[0]);
+    close(cancellationPipe[1]);
+    cancellationPipe[0] = -1;
+    cancellationPipe[1] = -1;
+}
+
+int NCPSession::start() {
+    int result = pipe(cancellationPipe);
+    if (result != 0) {
+        return result;
+    }
+    return pthread_create(&threadId_, NULL, runNCPSession, this);
+}
+
+void NCPSession::cancel() {
+    char b = 0;
+    write(cancellationPipe[1], &b, 1);
+}
+
+bool NCPSession::isCancelled() {
+    linf << _("check cancelled");
+    if (cancellationPipe[0] == -1) {
+        return false;
+    }
+    fd_set fds;
+    FD_ZERO(&fds);
+    FD_SET(cancellationPipe[0], &fds);
+    struct timeval t = {0, 0};
+    return select(cancellationPipe[0] + 1, &fds, NULL, NULL, &t) > 0;
+}
+
+void NCPSession::wait() {
+    pthread_join(threadId_, 0);
 }

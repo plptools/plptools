@@ -27,7 +27,7 @@
 #include "channel.h"
 #include "ncp.h"
 
-channel::channel(ncp * _ncpController)
+channel::channel(NCP * _ncpController)
 {
     verbose = 0;
     ncpChannel = 0;
@@ -127,7 +127,7 @@ getNcpChannel()
 }
 
 void channel::
-newNcpController(ncp * _ncpController)
+newNcpController(NCP * _ncpController)
 {
     ncpController = _ncpController;
 }

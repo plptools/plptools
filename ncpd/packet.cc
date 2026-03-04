@@ -27,6 +27,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/param.h>
 #include <unistd.h>
 #include <sys/time.h>
 #include <sys/types.h>
@@ -64,12 +65,19 @@ static void usr1handler(int sig)
 }
 
 
+// TODO: `fd` isn't thread-safe.
 static void *pump_run(void *arg)
 {
     packet *p = (packet *)arg;
     pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
     while (1) {
-        if (p->fd != -1) {
+        if (p->fd == -1) {
+            fd_set r_set;
+            FD_ZERO(&r_set);
+            FD_SET(p->cancellationFd, &r_set);
+            struct timeval tv = {1, 0};
+            select(p->cancellationFd + 1, &r_set, NULL, NULL, &tv);
+        } else {
             fd_set r_set;
             fd_set w_set;
             int res;
@@ -77,11 +85,13 @@ static void *pump_run(void *arg)
 
             FD_ZERO(&r_set);
             w_set = r_set;
+            FD_SET(p->cancellationFd, &r_set);
             if (hasSpace(p->in))
                 FD_SET(p->fd, &r_set);
             if (hasData(p->out))
                 FD_SET(p->fd, &w_set);
-            res = select(p->fd+1, &r_set, &w_set, NULL, NULL);
+            struct timeval tv = {1, 0};
+            res = select(MAX(p->fd, p->cancellationFd) + 1, &r_set, &w_set, NULL, &tv);
             switch (res) {
                 case 0:
                     break;
@@ -148,7 +158,8 @@ static const int baud_table[] = {
 using namespace std;
 
 packet::
-packet(const char *fname, int _baud, Link *_link, unsigned short _verbose)
+packet(const char *fname, int _baud, Link *_link, unsigned short _verbose, const int _cancellationFd)
+: cancellationFd(_cancellationFd)
 {
     verbose = pumpverbose = _verbose;
     devname = strdup(fname);

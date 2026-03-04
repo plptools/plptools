@@ -37,7 +37,7 @@ class Link;
 class packet
 {
 public:
-    packet(const char *fname, int baud, Link *_link, unsigned short verbose = 0);
+    packet(const char *fname, int baud, Link *_link, unsigned short verbose, const int cancellationFd);
     ~packet();
 
     /**
@@ -101,6 +101,8 @@ private:
 
     char *devname;
     int baud;
+
+    const int cancellationFd;
 };
 
 #endif

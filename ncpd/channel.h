@@ -24,16 +24,16 @@
 #include "config.h"
 #include <stdio.h>
 
-class ncp;
+class NCP;
 class bufferStore;
 class PcServer;
 class ppsocket;
 
 class channel {
 public:
-    channel(ncp *ncpController);
+    channel(NCP *ncpController);
     virtual ~channel() = 0;
-    void newNcpController(ncp *ncpController);
+    void newNcpController(NCP *ncpController);
 
     void setNcpChannel(int chan);
     int getNcpChannel(void);
@@ -68,7 +68,7 @@ protected:
     const char *connectName;
 
 private:
-    ncp *ncpController;
+    NCP *ncpController;
     int ncpChannel;
     bool _terminate;
 };

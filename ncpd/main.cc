@@ -39,6 +39,7 @@
 #include <fcntl.h>
 #include <pthread.h>
 #include <plpintl.h>
+#include <unistd.h>
 
 #include "ignore-value.h"
 
@@ -61,16 +62,16 @@ static void
 term_handler(int)
 {
     linf << _("Got SIGTERM") << endl;
+    sharedSession->cancel();
     signal(SIGTERM, term_handler);
-    sharedSession->isCancelled = true;
 };
 
 static void
 int_handler(int)
 {
     linf << _("Got SIGINT") << endl;
+    sharedSession->cancel();
     signal(SIGINT, int_handler);
-    sharedSession->isCancelled = true;
 };
 
 static void
@@ -175,6 +176,7 @@ main(int argc, char **argv)
     struct servent *se = getservbyname("psion", "tcp");
     dlog.useFileDescriptor();
     elog.useFileDescriptor();
+    ilog.useFileDescriptor();
     if (se != 0L) {
         sockNum = ntohs(se->s_port);
     }
@@ -276,14 +278,14 @@ main(int argc, char **argv)
             }
 
             // Once our process is fully set up, we can create and start the session.
-            sharedSession = new NCPSession();
-            sharedSession->sockNum = sockNum;
-            sharedSession->baudRate = baudRate;
-            sharedSession->host = host;
-            sharedSession->serialDevice = serialDevice;
-            sharedSession->nverbose = nverbose;
-            sharedSession->autoexit = autoexit;
-            runNCPSession(sharedSession);
+            sharedSession = new NCPSession(sockNum,
+                                           baudRate,
+                                           host,
+                                           serialDevice,
+                                           autoexit,
+                                           nverbose);
+            sharedSession->start();
+            sharedSession->wait();
             delete sharedSession;
 
             break;

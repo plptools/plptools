@@ -40,7 +40,7 @@
 
 using namespace std;
 
-ncp::ncp(const char *fname, int baud, unsigned short _verbose)
+NCP::NCP(const char *fname, int baud, unsigned short _verbose, const int cancellationFd)
 {
     channelPtr = new channel*[MAX_CHANNELS_PSION + 1];
     messageList = new bufferStore[MAX_CHANNELS_PSION + 1];
@@ -58,10 +58,10 @@ ncp::ncp(const char *fname, int baud, unsigned short _verbose)
     for (int i = 0; i < MAX_CHANNELS_PSION; i++)
         channelPtr[i] = NULL;
 
-    l = new Link(fname, baud, this, verbose);
+    l = new Link(fname, baud, this, verbose, cancellationFd);
 }
 
-ncp::~ncp()
+NCP::~NCP()
 {
     bufferStore b;
     for (int i = 0; i < maxLinks(); i++) {
@@ -79,12 +79,12 @@ ncp::~ncp()
     delete [] messageList;
 }
 
-int ncp::
+int NCP::
 maxLinks() {
     return maxChannels;
 }
 
-void ncp::
+void NCP::
 reset() {
     for (int i = 0; i < maxLinks(); i++) {
         if (isValidChannel(i))
@@ -99,26 +99,26 @@ reset() {
     l->reset();
 }
 
-unsigned short ncp::
+unsigned short NCP::
 getVerbose()
 {
     return verbose;
 }
 
-void ncp::
+void NCP::
 setVerbose(unsigned short _verbose)
 {
     verbose = _verbose;
     l->setVerbose(verbose);
 }
 
-short int ncp::
+short int NCP::
 getProtocolVersion()
 {
     return protocolVersion;
 }
 
-void ncp::
+void NCP::
 receive(bufferStore s) {
     if (s.getLen() > 1) {
         int channel = s.getByte(0);
@@ -149,7 +149,7 @@ receive(bufferStore s) {
         lerr << "Got null message\n";
 }
 
-void ncp::
+void NCP::
 controlChannel(int chan, enum interControllerMessageType t, bufferStore & command)
 {
     bufferStore open;
@@ -163,7 +163,7 @@ controlChannel(int chan, enum interControllerMessageType t, bufferStore & comman
     l->send(open);
 }
 
-PcServer *ncp::
+PcServer *NCP::
 findPcServer(const char *name)
 {
     if (name) {
@@ -175,12 +175,12 @@ findPcServer(const char *name)
     return NULL;
 }
 
-void ncp::
+void NCP::
 registerPcServer(ppsocket *skt, const char *name) {
     pcServers.push_back(PcServer(skt, name));
 }
 
-void ncp::
+void NCP::
 unregisterPcServer(PcServer *server) {
     if (server) {
         vector<PcServer>::iterator i;
@@ -192,7 +192,7 @@ unregisterPcServer(PcServer *server) {
     }
 }
 
-void ncp::
+void NCP::
 decodeControlMessage(bufferStore & buff)
 {
     int remoteChan = buff.getByte(0);
@@ -360,7 +360,7 @@ decodeControlMessage(bufferStore & buff)
     }
 }
 
-int ncp::
+int NCP::
 getFirstUnusedChan()
 {
     for (int cNum = 1; cNum < maxLinks(); cNum++) {
@@ -374,13 +374,13 @@ getFirstUnusedChan()
     return 0;
 }
 
-bool ncp::
+bool NCP::
 isValidChannel(int channel)
 {
     return (channelPtr[channel] && ((long)channelPtr[channel] != 0xdeadbeef));
 }
 
-void ncp::
+void NCP::
 RegisterAck(int chan, const char *name)
 {
     if (verbose & NCP_DEBUG_LOG)
@@ -396,7 +396,7 @@ RegisterAck(int chan, const char *name)
     lerr << "ncp: RegisterAck: no channel to deliver" << endl;
 }
 
-void ncp::
+void NCP::
 Register(channel * ch)
 {
     if (lChan) {
@@ -413,7 +413,7 @@ Register(channel * ch)
         lerr << "ncp: Register without established lChan" << endl;
 }
 
-int ncp::
+int NCP::
 connect(channel * ch)
 {
     // look for first unused chan
@@ -438,7 +438,7 @@ connect(channel * ch)
     return -1;
 }
 
-void ncp::
+void NCP::
 send(int channel, bufferStore & a)
 {
     bool last;
@@ -465,7 +465,7 @@ send(int channel, bufferStore & a)
     lastSentChannel = channel;
 }
 
-void ncp::
+void NCP::
 disconnect(int channel)
 {
     if (!isValidChannel(channel)) {
@@ -481,13 +481,13 @@ disconnect(int channel)
     controlChannel(channel, NCON_MSG_CHANNEL_DISCONNECT, b);
 }
 
-bool ncp::
+bool NCP::
 stuffToSend()
 {
     return l->stuffToSend();
 }
 
-bool ncp::
+bool NCP::
 hasFailed()
 {
     bool lfailed = l->hasFailed();
@@ -506,19 +506,19 @@ hasFailed()
     return failed;
 }
 
-bool ncp::
+bool NCP::
 gotLinkChannel()
 {
     return (lChan != NULL);
 }
 
-int ncp::
+int NCP::
 getSpeed()
 {
     return l->getSpeed();
 }
 
-const char *ncp::
+const char *NCP::
 ctrlMsgName(unsigned char msgType)
 {
     switch (msgType) {

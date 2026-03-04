@@ -58,22 +58,21 @@ void IOWatch::remIO(const int fd) {
     }
 }
 
-bool IOWatch::watch(const long secs, const long usecs) {
-    if (num > 0) {
-        int maxfd = 0;
-        fd_set iop;
-        FD_ZERO(&iop);
-        for (int i = 0; i < num; i++) {
-            FD_SET(io[i], &iop);
-            if (io[i] > maxfd)
-                maxfd = io[i];
-        }
-        struct timeval t;
-        t.tv_usec = usecs;
-        t.tv_sec = secs;
-        return (select(maxfd+1, &iop, NULL, NULL, &t) > 0);
+bool IOWatch::watch(const long secs, const long usecs, const int cancellationFd) {
+    int maxfd = 0;
+    fd_set iop;
+    FD_ZERO(&iop);
+    for (int i = 0; i < num; i++) {
+        FD_SET(io[i], &iop);
+        if (io[i] > maxfd)
+            maxfd = io[i];
     }
-    sleep(secs);
-    usleep(usecs);
-    return false;
+    FD_SET(cancellationFd, &iop);
+    if (cancellationFd > maxfd) {
+        maxfd = cancellationFd;
+    }
+    struct timeval t;
+    t.tv_usec = usecs;
+    t.tv_sec = secs;
+    return select(maxfd + 1, &iop, NULL, NULL, &t);
 }

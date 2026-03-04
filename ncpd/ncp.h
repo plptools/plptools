@@ -47,10 +47,10 @@ private:
     std::string name;
 };
 
-class ncp {
+class NCP {
 public:
-    ncp(const char *fname, int baud, unsigned short _verbose = 0);
-    ~ncp();
+    NCP(const char *fname, int baud, unsigned short verbose, const int cancellationFd);
+    ~NCP();
 
     int connect(channel *c); // returns channel, or -1 if failure
     void Register(channel *c);
