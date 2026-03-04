@@ -8,6 +8,7 @@ Makefile
 /ABOUT-NLS
 /aclocal.m4
 /autom4te.cache
+/build
 /ChangeLog
 /compile
 /compile_commands.json
