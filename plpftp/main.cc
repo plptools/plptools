@@ -30,7 +30,6 @@
 #include <bufferstore.h>
 
 #include <iostream>
-#include <string>
 #include <vector>
 
 #include <stdlib.h>
@@ -72,10 +71,10 @@ usage() {
 }
 
 static struct option opts[] = {
-    {"help",     no_argument,       0, 'h'},
-    {"version",  no_argument,       0, 'V'},
-    {"port",     required_argument, 0, 'p'},
-    {NULL,       0,                 0,  0 }
+    {"help",     no_argument,       nullptr, 'h'},
+    {"version",  no_argument,       nullptr, 'V'},
+    {"port",     required_argument, nullptr, 'p'},
+    {NULL,       0,                 nullptr,  0 }
 };
 
 void
@@ -114,7 +113,7 @@ parse_destination(const char *arg, const char **host, int *port)
         // 10.0.0.1
         if (strchr(argcpy, '.') || !isdigit(argcpy[0])) {
             *host = argcpy;
-            pp = 0L;
+            pp = nullptr;
         } else
             pp = argcpy;
     }

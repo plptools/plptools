@@ -34,7 +34,6 @@
 #include <rpcs.h>
 
 #include <iostream>
-#include <fstream>
 #include <string>
 #include <iomanip>
 
@@ -173,13 +172,13 @@ checkAbortHash(void *, uint32_t)
 }
 
 static void
-sigint_handler(int i) {
+sigint_handler(int) {
     continueRunning = 0;
     signal(SIGINT, sigint_handler);
 }
 
 static void
-sigint_handler2(int i) {
+sigint_handler2(int) {
     continueRunning = 0;
     fclose(stdin);
     signal(SIGINT, sigint_handler2);
@@ -205,18 +204,18 @@ stopPrograms(rpcs & r, const char *file) {
         fputc('\n', fp);
     }
     fclose(fp);
-    time_t tstart = time(0) + 5;
+    time_t tstart = time(nullptr) + 5;
     while (!tmp.empty()) {
         for (processList::iterator i = tmp.begin(); i != tmp.end(); i++) {
             r.stopProgram(i->getProcId());
         }
         usleep(100000);
-        if (time(0) > tstart) {
+        if (time(nullptr) > tstart) {
             cerr << _(
                       "Could not stop all processes. Please stop running\n"
                       "programs manually on the Psion, then hit return.") << flush;
             cin.getline((char *)&tstart, 1);
-            tstart = time(0) + 5;
+            tstart = time(nullptr) + 5;
         }
         if ((res = r.queryPrograms(tmp)) != rfsv::E_PSI_GEN_NONE) {
             cerr << _("Could not get process list, Error: ") << res << endl;
@@ -326,7 +325,7 @@ startPrograms(rpcs & r, rfsv & a, const char *file) {
 }
 
 bool
-ftp::checkClipConnection(rfsv &a, rclip & rc, ppsocket & rclipSocket)
+ftp::checkClipConnection(rfsv &a, rclip & rc, ppsocket &)
 {
     if (canClip == false)
         return false;
@@ -404,7 +403,7 @@ slurp(FILE *fp, size_t *final_len)
 }
 
 int
-ftp::putClipText(rpcs & r, rfsv & a, rclip & rc, ppsocket & rclipSocket, const char *file)
+ftp::putClipText(rpcs &, rfsv & a, rclip & rc, ppsocket & rclipSocket, const char *file)
 {
     Enum<rfsv::errs> res;
     uint32_t fh;
@@ -532,7 +531,7 @@ ftp::putClipText(rpcs & r, rfsv & a, rclip & rc, ppsocket & rclipSocket, const c
 // }
 
 int
-ftp::getClipData(rpcs & r, rfsv & a, rclip & rc, ppsocket & rclipSocket, const char *file) {
+ftp::getClipData(rpcs &, rfsv & a, rclip &, ppsocket &, const char *file) {
     Enum<rfsv::errs> res;
     PlpDirent de;
     uint32_t fh;
@@ -558,7 +557,7 @@ ftp::getClipData(rpcs & r, rfsv & a, rclip & rc, ppsocket & rclipSocket, const c
                 if ((res == rfsv::E_PSI_GEN_NONE) && (tmp == len)) {
                     char *p = buf;
                     int lcount;
-                    uint32_t     *ti = (uint32_t*)buf;
+                    uint32_t *ti = (uint32_t*)buf;
 
                     // Check base header
                     if (*ti++ != 0x10000037) {
@@ -925,7 +924,7 @@ session(rfsv & a, rpcs & r, rclip & rc, ppsocket & rclipSocket, vector<char *> a
             string basename = Path::getEPOCBasename(string(f1));
             char *f2 = xasprintf("%s%s%s", localDir, "/", argc == 2 ? basename.c_str() : argv[2]);
 
-            gettimeofday(&stime, 0L);
+            gettimeofday(&stime, nullptr);
             if ((res = a.copyFromPsion(f1, f2, NULL, cab)) != rfsv::E_PSI_GEN_NONE) {
                 if (hash)
                     cout << endl;
@@ -961,7 +960,7 @@ session(rfsv & a, rpcs & r, rclip & rc, ppsocket & rclipSocket, vector<char *> a
                 cerr << _("Error: ") << res << endl;
                 continue;
             }
-            for (int i = 0; i < files.size(); i++) {
+            for (size_t i = 0; i < files.size(); i++) {
                 PlpDirent e = files[i];
                 long attr = e.getAttr();
 
@@ -1006,7 +1005,7 @@ session(rfsv & a, rpcs & r, rclip & rc, ppsocket & rclipSocket, vector<char *> a
 
             char *f1 = xasprintf("%s%s%s", localDir, "/", argv[1]);
             char *f2 = xasprintf("%s%s", psionDir, argc == 2 ? argv[1] : argv[2]);
-            gettimeofday(&stime, 0L);
+            gettimeofday(&stime, nullptr);
             if ((res = a.copyToPsion(f1, f2, NULL, cab)) != rfsv::E_PSI_GEN_NONE) {
                 if (hash)
                     cout << endl;
@@ -1422,7 +1421,7 @@ static char * null_completion(const char *, int) {
 }
 
 static char **
-do_completion(const char *text, int start, int end)
+do_completion(const char *text, int start, int)
 {
     char **matches = NULL;
 
