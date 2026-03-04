@@ -4,11 +4,13 @@ Makefile.in
 Makefile
 .deps
 .libs
+/.cache
 /ABOUT-NLS
 /aclocal.m4
 /autom4te.cache
 /ChangeLog
 /compile
+/compile_commands.json
 /config.cache
 /config.guess
 /config.h
