@@ -25,6 +25,7 @@
 #include <cstring>
 #include <iostream>
 
+#include <cli.h>
 #include <bufferstore.h>
 #include <ppsocket.h>
 #include <iowatch.h>
@@ -166,21 +167,16 @@ main(int argc, char **argv)
     int pid;
     bool dofork = true;
 
-    int sockNum = DPORT;
+    int sockNum = CLI::lookup_default_port();
     int baudRate = DSPEED;
     const char *host = "127.0.0.1";
     const char *serialDevice = NULL;
     unsigned short nverbose = 0;
     bool autoexit = false;
 
-    struct servent *se = getservbyname("psion", "tcp");
     dlog.useFileDescriptor();
     elog.useFileDescriptor();
     ilog.useFileDescriptor();
-    if (se != 0L) {
-        sockNum = ntohs(se->s_port);
-    }
-    endservent();
 
     while (1) {
         int c = getopt_long(argc, argv, "hdeVb:s:p:v:", opts, NULL);

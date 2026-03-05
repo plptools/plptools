@@ -21,6 +21,7 @@
 
 #include "config.h"
 
+#include <cli.h>
 #include <rfsv.h>
 #include <rpcs.h>
 #include <rfsvfactory.h>
@@ -411,10 +412,7 @@ int main(int argc, char**argv) {
     const char *host = "127.0.0.1";
     int sockNum = DPORT, i, c, oldoptind = 1;
 
-    struct servent *se = getservbyname("psion", "tcp");
-    endservent();
-    if (se != nullptr)
-        sockNum = ntohs(se->s_port);
+    sockNum = CLI::lookup_default_port();
 
     /* N.B. Option handling is kludged. Most of the options are shared
        with FUSE, except for -p/--port, which has to be removed from

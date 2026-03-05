@@ -33,3 +33,4 @@ Makefile
 /plptools-*.tar.gz
 /stamp-h.in
 /stamp-h1
+/tests/tests

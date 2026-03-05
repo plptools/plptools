@@ -20,6 +20,7 @@
  */
 #include "config.h"
 
+#include <cli.h>
 #include <rfsv.h>
 #include <rfsvfactory.h>
 #include <rpcs.h>
@@ -133,15 +134,10 @@ main(int argc, char **argv)
     ftp f;
     const char *host = "127.0.0.1";
     int status = 0;
-    int sockNum = DPORT;
+    int sockNum = CLI::lookup_default_port();
 
     setlocale (LC_ALL, "");
     textdomain(PACKAGE);
-
-    struct servent *se = getservbyname("psion", "tcp");
-    endservent();
-    if (se != 0L)
-        sockNum = ntohs(se->s_port);
 
     while (1) {
         int c = getopt_long(argc, argv, "hVp:", opts, NULL);

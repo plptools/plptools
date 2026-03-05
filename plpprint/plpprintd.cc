@@ -19,6 +19,7 @@
  */
 #include "config.h"
 
+#include <cli.h>
 #include <ppsocket.h>
 #include <wprt.h>
 #include <psibitmap.h>
@@ -951,14 +952,9 @@ main(int argc, char **argv)
 {
     ppsocket *skt;
     const char *host = "127.0.0.1";
-    int sockNum = DPORT;
+    int sockNum = CLI::lookup_default_port();
     int ret = 0;
     int c;
-
-    struct servent *se = getservbyname("psion", "tcp");
-    endservent();
-    if (se != nullptr)
-        sockNum = ntohs(se->s_port);
 
     while (1) {
         c = getopt_long(argc, argv, "dhVvp:s:c:", opts, NULL);

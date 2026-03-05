@@ -21,6 +21,7 @@
 
 #include "psion.h"
 
+#include <cli.h>
 #include <plpintl.h>
 #include <rfsv.h>
 #include <rpcs.h>
@@ -43,17 +44,12 @@ Psion::~Psion()
 bool
 Psion::connect()
 {
-    int sockNum = DPORT;
+    int sockNum = CLI::lookup_default_port();
 
 #if 0
     setlocale (LC_ALL, "");
     textdomain(PACKAGE);
 #endif
-
-    struct servent *se = getservbyname("psion", "tcp");
-    endservent();
-    if (se != 0L)
-        sockNum = ntohs(se->s_port);
 
 #if 0
     // Command line parameter processing
