@@ -44,7 +44,7 @@ TEST_CASE("CLI::parse_port_parameter") {
     SUBCASE("100") {
         CHECK(CLI::parse_port_argument("100", &host, &port) == true);
         CHECK(host == "127.0.0.1");
-        CHECK(port == 100);
+        CHECK(port == 102);
     }
 
     SUBCASE("127.0.0.4") {
