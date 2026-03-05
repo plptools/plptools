@@ -948,7 +948,10 @@ main(int argc, char **argv)
                 help();
                 return 0;
             case 'p':
-                CLI::parsePort(optarg, &host, &sockNum);
+                if (!CLI::parsePort(optarg, &host, &sockNum)) {
+                    cout << _("Invalid port definition.") << endl;
+                    return 1;
+                }
                 break;
             case 's':
                 spooldir = strdup(optarg);

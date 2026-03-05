@@ -403,7 +403,10 @@ int main(int argc, char**argv) {
             debug++;
             break;
         case 'p':
-            CLI::parsePort(optarg, &host, &sockNum);
+            if (!CLI::parsePort(optarg, &host, &sockNum)) {
+                cout << _("Invalid port definition.") << endl;
+                return 1;
+            }
             argc -= optind - oldoptind;
             for (i = oldoptind; i < argc; i++)
               argv[i] = argv[i + (optind - oldoptind)];
