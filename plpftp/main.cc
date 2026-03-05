@@ -93,35 +93,6 @@ ftpHeader()
     cout << _("FTP like interface started. Type \"?\" for help.") << endl;
 }
 
-static void
-parse_destination(const char *arg, const char **host, int *port)
-{
-    if (!arg)
-        return;
-    // We don't want to modify argv, therefore copy it first ...
-    char *argcpy = strdup(arg);
-    char *pp = strchr(argcpy, ':');
-
-    if (pp) {
-        // host.domain:400
-        // 10.0.0.1:400
-        *pp ++= '\0';
-        *host = argcpy;
-    } else {
-        // 400
-        // host.domain
-        // host
-        // 10.0.0.1
-        if (strchr(argcpy, '.') || !isdigit(argcpy[0])) {
-            *host = argcpy;
-            pp = nullptr;
-        } else
-            pp = argcpy;
-    }
-    if (pp)
-        *port = atoi(pp);
-}
-
 int
 main(int argc, char **argv)
 {
@@ -132,7 +103,7 @@ main(int argc, char **argv)
     ppsocket *rclipSocket;
     rclip *rc;
     ftp f;
-    const char *host = "127.0.0.1";
+    string host = "127.0.0.1";
     int status = 0;
     int sockNum = CLI::lookupDefaultPort();
 
@@ -154,7 +125,7 @@ main(int argc, char **argv)
                 help();
                 return 0;
             case 'p':
-                parse_destination(optarg, &host, &sockNum);
+                CLI::parsePort(optarg, &host, &sockNum);
                 break;
         }
     }
@@ -162,12 +133,12 @@ main(int argc, char **argv)
         ftpHeader();
 
     skt = new ppsocket();
-    if (!skt->connect(host, sockNum)) {
+    if (!skt->connect(host.c_str(), sockNum)) {
         cout << _("plpftp: could not connect to ncpd") << endl;
         return 1;
     }
     skt2 = new ppsocket();
-    if (!skt2->connect(host, sockNum)) {
+    if (!skt2->connect(host.c_str(), sockNum)) {
         cout << _("plpftp: could not connect to ncpd") << endl;
         return 1;
     }
