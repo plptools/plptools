@@ -25,9 +25,9 @@
 
 #include "cli.h"
 
+#include <algorithm>
 #include <cctype>
 #include <cstring>
-#include <iostream>
 #include <stdlib.h>
 
 #include <netdb.h>
