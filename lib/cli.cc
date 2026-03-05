@@ -21,7 +21,6 @@
  */
 
 #include "config.h"
-#include "ncpd/ncp_log.h"
 
 #include "cli.h"
 
