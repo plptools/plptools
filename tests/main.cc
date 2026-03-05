@@ -31,7 +31,7 @@
 TEST_CASE("CLI::lookup_default_port") {
 
     SUBCASE("default value is 7501") {
-        CHECK(CLI::lookup_default_port() == DPORT);
+        CHECK(CLI::lookupDefaultPort() == DPORT);
     }
 
 }
@@ -42,44 +42,44 @@ TEST_CASE("CLI::parse_port_parameter") {
     int port = 7501;
 
     SUBCASE("100") {
-        CHECK(CLI::parse_port_argument("100", &host, &port) == true);
+        CHECK(CLI::parsePort("100", &host, &port) == true);
         CHECK(host == "127.0.0.1");
-        CHECK(port == 102);
+        CHECK(port == 100);
     }
 
     SUBCASE("127.0.0.4") {
-        CHECK(CLI::parse_port_argument("127.0.0.4", &host, &port) == true);
+        CHECK(CLI::parsePort("127.0.0.4", &host, &port) == true);
         CHECK(host == "127.0.0.4");
         CHECK(port == 7501);
     }
 
     SUBCASE("192.168.0.1:3498") {
-        CHECK(CLI::parse_port_argument("192.168.0.1:3498", &host, &port) == true);
+        CHECK(CLI::parsePort("192.168.0.1:3498", &host, &port) == true);
         CHECK(host == "192.168.0.1");
         CHECK(port == 3498);
     }
 
     SUBCASE("empty string") {
-        CHECK(CLI::parse_port_argument("", &host, &port) == true);
+        CHECK(CLI::parsePort("", &host, &port) == true);
         CHECK(host == "127.0.0.1");
         CHECK(port == 7501);
     }
 
     SUBCASE("null result arguments") {
-        CHECK(CLI::parse_port_argument("127.0.0.1", nullptr, &port) == false);
-        CHECK(CLI::parse_port_argument("127.0.0.1", &host, nullptr) == false);
+        CHECK(CLI::parsePort("127.0.0.1", nullptr, &port) == false);
+        CHECK(CLI::parsePort("127.0.0.1", &host, nullptr) == false);
     }
 
     SUBCASE("missing host") {
-        CHECK(CLI::parse_port_argument(":12", &host, &port) == false);
+        CHECK(CLI::parsePort(":12", &host, &port) == false);
     }
 
     SUBCASE("valid host and non-numeric port") {
-        CHECK(CLI::parse_port_argument("127.0.0.1:230a3", &host, &port) == false);
+        CHECK(CLI::parsePort("127.0.0.1:230a3", &host, &port) == false);
     }
 
     SUBCASE("unqualified hostname") {
-        CHECK(CLI::parse_port_argument("computer", &host, &port) == true);
+        CHECK(CLI::parsePort("computer", &host, &port) == true);
         CHECK(host == "computer");
         CHECK(port == 7501);
     }

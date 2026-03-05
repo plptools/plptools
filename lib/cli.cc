@@ -31,7 +31,7 @@
 
 #include <netdb.h>
 
-int CLI::lookup_default_port() {
+int CLI::lookupDefaultPort() {
     struct servent *se = getservbyname("psion", "tcp");
     endservent();
     if (se == nullptr) {
@@ -40,11 +40,11 @@ int CLI::lookup_default_port() {
     return ntohs(se->s_port);
 }
 
-bool is_number(const std::string &s) {
+bool isNumber(const std::string &s) {
     return std::all_of(s.begin(), s.end(), ::isdigit);
 }
 
-bool CLI::parse_port_argument(const std::string &arg, std::string *host, int *port) {
+bool CLI::parsePort(const std::string &arg, std::string *host, int *port) {
 
     if (host == nullptr || port == nullptr) {
         return false;
@@ -62,24 +62,24 @@ bool CLI::parse_port_argument(const std::string &arg, std::string *host, int *po
 
         std::string hostComponent = arg.substr(0, pos);
         std::string portComponent = arg.substr(pos + 1);
-        if (hostComponent.empty() || portComponent.empty() || !is_number(portComponent)) {
+        if (hostComponent.empty() || portComponent.empty() || !isNumber(portComponent)) {
             return false;
         }
 
         *host = arg.substr(0, pos);
         *port = atoi(arg.substr(pos + 1).c_str());
 
-    } else if (is_number(arg)) {
+    } else if (isNumber(arg)) {
 
-        // host.domain
-        // host
-        // 10.0.0.1
+        // 400
 
         *port = atoi(arg.c_str());
 
     } else {
 
-        // 400
+        // host.domain
+        // host
+        // 10.0.0.1
 
         *host = arg;
 

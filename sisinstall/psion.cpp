@@ -44,7 +44,7 @@ Psion::~Psion()
 bool
 Psion::connect()
 {
-    int sockNum = CLI::lookup_default_port();
+    int sockNum = CLI::lookupDefaultPort();
 
 #if 0
     setlocale (LC_ALL, "");

@@ -29,8 +29,8 @@
 class CLI {
 public:
 
-    static int lookup_default_port();
-    static bool parse_port_argument(const std::string &arg, std::string *host, int *port);
-    static bool parse_port_argument(std::nullptr_t, std::string*, int*) = delete;
+    static int lookupDefaultPort();
+    static bool parsePort(const std::string &arg, std::string *host, int *port);
+    static bool parsePort(std::nullptr_t, std::string*, int*) = delete;
 
 };

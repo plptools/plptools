@@ -9,6 +9,7 @@ Makefile
 /aclocal.m4
 /autom4te.cache
 /build
+/build-aux/test-driver
 /ChangeLog
 /compile
 /compile_commands.json
@@ -30,7 +31,11 @@ Makefile
 /libtool
 /ltmain.sh
 /missing
+/plpbackup/plpbackup
 /plptools-*.tar.gz
 /stamp-h.in
 /stamp-h1
+/tests/test-suite.log
 /tests/tests
+/tests/tests.log
+/tests/tests.trs

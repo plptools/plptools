@@ -412,7 +412,7 @@ int main(int argc, char**argv) {
     const char *host = "127.0.0.1";
     int sockNum = DPORT, i, c, oldoptind = 1;
 
-    sockNum = CLI::lookup_default_port();
+    sockNum = CLI::lookupDefaultPort();
 
     /* N.B. Option handling is kludged. Most of the options are shared
        with FUSE, except for -p/--port, which has to be removed from

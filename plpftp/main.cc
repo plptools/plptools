@@ -134,7 +134,7 @@ main(int argc, char **argv)
     ftp f;
     const char *host = "127.0.0.1";
     int status = 0;
-    int sockNum = CLI::lookup_default_port();
+    int sockNum = CLI::lookupDefaultPort();
 
     setlocale (LC_ALL, "");
     textdomain(PACKAGE);

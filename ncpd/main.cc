@@ -167,7 +167,7 @@ main(int argc, char **argv)
     int pid;
     bool dofork = true;
 
-    int sockNum = CLI::lookup_default_port();
+    int sockNum = CLI::lookupDefaultPort();
     int baudRate = DSPEED;
     const char *host = "127.0.0.1";
     const char *serialDevice = NULL;

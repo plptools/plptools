@@ -952,7 +952,7 @@ main(int argc, char **argv)
 {
     ppsocket *skt;
     const char *host = "127.0.0.1";
-    int sockNum = CLI::lookup_default_port();
+    int sockNum = CLI::lookupDefaultPort();
     int ret = 0;
     int c;
 
