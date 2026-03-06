@@ -74,5 +74,5 @@ bool IOWatch::watch(const long secs, const long usecs, const int cancellationFd)
     struct timeval t;
     t.tv_usec = usecs;
     t.tv_sec = secs;
-    return select(maxfd + 1, &iop, NULL, NULL, &t);
+    return select(maxfd + 1, &iop, NULL, NULL, &t) > 0;
 }

@@ -75,10 +75,11 @@ void *pollSocketConnections(void *arg) {
 
 void checkForNewSocketConnection(NCPSession *session) {
     string peer;
-    if (session->acceptIOW.watch(5, 0, session->cancellationPipe[0]) <= 0) {
-        return;
-    }
-    if (session->isCancelled()) {
+
+    // This watch returns false in the case of a time out or cancellation due to a signal, and true in the case of
+    // cancellation or one of the file descriptors becoming readable. In the cause a timeout or interrupt, we return
+    // flow of control to our calling code.
+    if (!session->acceptIOW.watch(5, 0, session->cancellationPipe[0]) || session->isCancelled()) {
         return;
     }
     ppsocket *next = session->skt.accept(&peer, &session->iow);
