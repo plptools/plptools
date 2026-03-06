@@ -66,7 +66,7 @@ public:
     *
     * @return true, if any of the descriptors is readable; false if the underlying select returned an error or the timeout expired.
     */
-    bool watch(const long secs, const long usecs, const int cancellationFd);
+    bool watch(const long secs, const long usecs);
 
 private:
     int num;
