@@ -31,6 +31,13 @@
 
 #include <netdb.h>
 
+bool cli_utils::is_number(const std::string &s) {
+    if (s.empty()) {
+        return false;
+    }
+    return std::all_of(s.begin(), s.end(), ::isdigit);
+}
+
 int cli_utils::lookup_default_port() {
     struct servent *se = getservbyname("psion", "tcp");
     endservent();
@@ -38,10 +45,6 @@ int cli_utils::lookup_default_port() {
         return DPORT;
     }
     return ntohs(se->s_port);
-}
-
-bool isNumber(const std::string &s) {
-    return std::all_of(s.begin(), s.end(), ::isdigit);
 }
 
 bool cli_utils::parse_port(const std::string &arg, std::string *host, int *port) {
@@ -62,14 +65,14 @@ bool cli_utils::parse_port(const std::string &arg, std::string *host, int *port)
 
         std::string hostComponent = arg.substr(0, pos);
         std::string portComponent = arg.substr(pos + 1);
-        if (hostComponent.empty() || portComponent.empty() || !isNumber(portComponent)) {
+        if (hostComponent.empty() || portComponent.empty() || !cli_utils::is_number(portComponent)) {
             return false;
         }
 
         *host = hostComponent;
         *port = atoi(portComponent.c_str());
 
-    } else if (isNumber(arg)) {
+    } else if (cli_utils::is_number(arg)) {
 
         // 400
 

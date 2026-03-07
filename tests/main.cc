@@ -28,6 +28,17 @@
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 #include "doctest.h"
 
+TEST_CASE("cli_utils::is_number") {
+
+    CHECK(cli_utils::is_number("12987"));
+    CHECK(!cli_utils::is_number(""));
+    CHECK(!cli_utils::is_number("aslue"));
+    CHECK(!cli_utils::is_number("12dsd"));
+    CHECK(!cli_utils::is_number("dsd2323"));
+    CHECK(!cli_utils::is_number("230xsd2039"));
+
+}
+
 TEST_CASE("cli_utils::lookup_default_port") {
 
     SUBCASE("default value is 7501") {

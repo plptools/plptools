@@ -28,6 +28,7 @@
 
 namespace cli_utils {
 
+    extern bool is_number(const std::string &s);
     extern int lookup_default_port();
     extern bool parse_port(const std::string &arg, std::string *host, int *port);
     extern bool parse_port(std::nullptr_t, std::string*, int*) = delete;
