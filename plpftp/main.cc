@@ -105,7 +105,7 @@ main(int argc, char **argv)
     ftp f;
     string host = "127.0.0.1";
     int status = 0;
-    int sockNum = CLI::lookupDefaultPort();
+    int sockNum = cli::lookup_default_port();
 
     setlocale (LC_ALL, "");
     textdomain(PACKAGE);
@@ -125,7 +125,7 @@ main(int argc, char **argv)
                 help();
                 return 0;
             case 'p':
-                if (!CLI::parsePort(optarg, &host, &sockNum)) {
+                if (!cli::parse_port(optarg, &host, &sockNum)) {
                     cout << _("Invalid port definition.") << endl;
                     return 1;
                 }

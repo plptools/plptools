@@ -26,11 +26,10 @@
 
 #include <string>
 
-class CLI {
-public:
+namespace cli {
 
-    static int lookupDefaultPort();
-    static bool parsePort(const std::string &arg, std::string *host, int *port);
-    static bool parsePort(std::nullptr_t, std::string*, int*) = delete;
+    extern int lookup_default_port();
+    extern bool parse_port(const std::string &arg, std::string *host, int *port);
+    extern bool parse_port(std::nullptr_t, std::string*, int*) = delete;
 
 };

@@ -31,7 +31,6 @@ Makefile
 /libtool
 /ltmain.sh
 /missing
-/plpbackup/plpbackup
 /plptools-*.tar.gz
 /stamp-h.in
 /stamp-h1

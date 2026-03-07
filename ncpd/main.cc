@@ -138,7 +138,7 @@ main(int argc, char **argv)
     int pid;
     bool dofork = true;
 
-    int sockNum = CLI::lookupDefaultPort();
+    int sockNum = cli::lookup_default_port();
     int baudRate = DSPEED;
     string host = "127.0.0.1";
     const char *serialDevice = NULL;
@@ -203,7 +203,7 @@ main(int argc, char **argv)
                 serialDevice = optarg;
                 break;
             case 'p':
-                if (!CLI::parsePort(optarg, &host, &sockNum)) {
+                if (!cli::parse_port(optarg, &host, &sockNum)) {
                     cout << _("Invalid port definition.") << endl;
                     return 1;
                 }
