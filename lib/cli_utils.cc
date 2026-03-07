@@ -66,8 +66,8 @@ bool cli_utils::parse_port(const std::string &arg, std::string *host, int *port)
             return false;
         }
 
-        *host = arg.substr(0, pos);
-        *port = atoi(arg.substr(pos + 1).c_str());
+        *host = hostComponent;
+        *port = atoi(portComponent.c_str());
 
     } else if (isNumber(arg)) {
 

@@ -84,4 +84,8 @@ TEST_CASE("cli_utils::parse_port") {
         CHECK(port == 7501);
     }
 
+    SUBCASE("empty port") {
+        CHECK(cli_utils::parse_port("127.0.0.1:", &host, &port) == false);
+    }
+
 }
