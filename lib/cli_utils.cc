@@ -22,7 +22,7 @@
 
 #include "config.h"
 
-#include "cli.h"
+#include "cli_utils.h"
 
 #include <algorithm>
 #include <cctype>
@@ -31,7 +31,7 @@
 
 #include <netdb.h>
 
-int cli::lookup_default_port() {
+int cli_utils::lookup_default_port() {
     struct servent *se = getservbyname("psion", "tcp");
     endservent();
     if (se == nullptr) {
@@ -44,7 +44,7 @@ bool isNumber(const std::string &s) {
     return std::all_of(s.begin(), s.end(), ::isdigit);
 }
 
-bool cli::parse_port(const std::string &arg, std::string *host, int *port) {
+bool cli_utils::parse_port(const std::string &arg, std::string *host, int *port) {
 
     if (host == nullptr || port == nullptr) {
         return false;

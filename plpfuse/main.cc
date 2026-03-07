@@ -21,7 +21,7 @@
 
 #include "config.h"
 
-#include <cli.h>
+#include <cli_utils.h>
 #include <rfsv.h>
 #include <rpcs.h>
 #include <rfsvfactory.h>
@@ -383,7 +383,7 @@ int main(int argc, char**argv) {
     string host = "127.0.0.1";
     int sockNum = DPORT, i, c, oldoptind = 1;
 
-    sockNum = cli::lookup_default_port();
+    sockNum = cli_utils::lookup_default_port();
 
     /* N.B. Option handling is kludged. Most of the options are shared
        with FUSE, except for -p/--port, which has to be removed from
@@ -403,7 +403,7 @@ int main(int argc, char**argv) {
             debug++;
             break;
         case 'p':
-            if (!cli::parse_port(optarg, &host, &sockNum)) {
+            if (!cli_utils::parse_port(optarg, &host, &sockNum)) {
                 cout << _("Invalid port definition.") << endl;
                 return 1;
             }

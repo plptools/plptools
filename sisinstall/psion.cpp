@@ -21,7 +21,7 @@
 
 #include "psion.h"
 
-#include <cli.h>
+#include <cli_utils.h>
 #include <plpintl.h>
 #include <rfsv.h>
 #include <rpcs.h>
@@ -44,7 +44,7 @@ Psion::~Psion()
 bool
 Psion::connect()
 {
-    int sockNum = cli::lookup_default_port();
+    int sockNum = cli_utils::lookup_default_port();
 
 #if 0
     setlocale (LC_ALL, "");

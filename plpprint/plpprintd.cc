@@ -19,7 +19,7 @@
  */
 #include "config.h"
 
-#include <cli.h>
+#include <cli_utils.h>
 #include <ppsocket.h>
 #include <wprt.h>
 #include <psibitmap.h>
@@ -923,7 +923,7 @@ main(int argc, char **argv)
 {
     ppsocket *skt;
     string host = "127.0.0.1";
-    int sockNum = cli::lookup_default_port();
+    int sockNum = cli_utils::lookup_default_port();
     int ret = 0;
     int c;
 
@@ -948,7 +948,7 @@ main(int argc, char **argv)
                 help();
                 return 0;
             case 'p':
-                if (!cli::parse_port(optarg, &host, &sockNum)) {
+                if (!cli_utils::parse_port(optarg, &host, &sockNum)) {
                     cout << _("Invalid port definition.") << endl;
                     return 1;
                 }

@@ -26,7 +26,7 @@
 
 #include <string>
 
-namespace cli {
+namespace cli_utils {
 
     extern int lookup_default_port();
     extern bool parse_port(const std::string &arg, std::string *host, int *port);
