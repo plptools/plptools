@@ -22,6 +22,7 @@
 #include "config.h"
 #include "ncp_session.h"
 
+#include <cassert>
 #include <cstring>
 #include <iostream>
 
@@ -36,13 +37,13 @@ static void *linkThread(void *arg) {
     NCPSession *session = (NCPSession *)arg;
     while (!session->isCancelled()) {
         // psion
-        session->iow.watch(1, 0, session->cancellationPipe[0]);
+        session->iow.watch(1, 0);
         if (session->ncp->hasFailed()) {
             if (session->autoexit) {
                 session->cancel();
                 break;
             }
-            session->iow.watch(5, 0, session->cancellationPipe[0]);
+            session->iow.watch(5, 0);
             if (session->isCancelled()) {
                 break;
             }
@@ -57,7 +58,7 @@ static void *linkThread(void *arg) {
 void *pollSocketConnections(void *arg) {
     NCPSession *session = (NCPSession *)arg;
     while (!session->isCancelled()) {
-        session->iow.watch(0, 10000, session->cancellationPipe[0]);
+        session->iow.watch(0, 10000);
         for (int i = 0; i < session->numScp; i++) {
             session->scp[i]->socketPoll();
             if (session->scp[i]->terminate()) {
@@ -75,10 +76,11 @@ void *pollSocketConnections(void *arg) {
 
 void checkForNewSocketConnection(NCPSession *session) {
     string peer;
-    if (session->acceptIOW.watch(5, 0, session->cancellationPipe[0]) <= 0) {
-        return;
-    }
-    if (session->isCancelled()) {
+
+    // This watch returns false in the case of a time out or cancellation due to a signal, and true in the case of
+    // cancellation or one of the file descriptors becoming readable. In the cause a timeout or interrupt, we return
+    // flow of control to our calling code.
+    if (!session->acceptIOW.watch(5, 0) || session->isCancelled()) {
         return;
     }
     ppsocket *next = session->skt.accept(&peer, &session->iow);
@@ -154,11 +156,14 @@ NCPSession::~NCPSession() {
 }
 
 int NCPSession::start() {
+    assert(threadId == 0);
     int result = pipe(cancellationPipe);
     if (result != 0) {
         return result;
     }
-    return pthread_create(&threadId_, NULL, runNCPSession, this);
+    iow.addIO(cancellationPipe[0]);
+    acceptIOW.addIO(cancellationPipe[0]);
+    return pthread_create(&threadId, NULL, runNCPSession, this);
 }
 
 void NCPSession::cancel() {
@@ -179,5 +184,5 @@ bool NCPSession::isCancelled() {
 }
 
 void NCPSession::wait() {
-    pthread_join(threadId_, 0);
+    pthread_join(threadId, 0);
 }

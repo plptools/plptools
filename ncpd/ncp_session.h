@@ -88,7 +88,7 @@ public:
     unsigned short nverbose;
 
     // State.
-    pthread_t threadId_ = 0;
+    pthread_t threadId = 0;
     NCP *ncp = nullptr;
     IOWatch iow;
     IOWatch acceptIOW;
