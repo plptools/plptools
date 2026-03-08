@@ -35,7 +35,9 @@ bool cli_utils::is_number(const std::string &s) {
     if (s.empty()) {
         return false;
     }
-    return std::all_of(s.begin(), s.end(), [](unsigned char c) { return ::isdigit(c); }));
+    return std::all_of(s.begin(), s.end(), [](unsigned char c) {
+        return ::isdigit(c);
+    });
 }
 
 int cli_utils::lookup_default_port() {
