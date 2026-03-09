@@ -48,10 +48,17 @@ public:
     /**
     * Constructs a rfsvfactory.
     *
+    * Does not take ownership of the socket.
+    *
     * @param skt The socket to be used for connecting
     * to the ncpd daemon.
     */
     rfsvfactory(ppsocket * skt);
+
+    /**
+     * Delete the rfsvfactory, cleaning up any resources.
+     */
+    virtual ~rfsvfactory();
 
     /**
     * Creates a new @ref rfsv instance.

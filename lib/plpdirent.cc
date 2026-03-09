@@ -183,7 +183,7 @@ static const char * const media_types[] = {
 };
 
 void PlpDrive::
-getMediaType(string &ret) {
+getMediaType(std::string &ret) {
     ret = media_types[mediatype];
 }
 
@@ -200,7 +200,7 @@ appendWithDelim(string &s1, const char * const s2) {
 }
 
 void PlpDrive::
-getDriveAttribute(string &ret) {
+getDriveAttribute(std::string &ret) {
     ret = "";
     if (driveattr & 1)
         appendWithDelim(ret, _("local"));
@@ -222,7 +222,7 @@ getMediaAttribute() {
 }
 
 void PlpDrive::
-getMediaAttribute(string &ret) {
+getMediaAttribute(std::string &ret) {
     ret = "";
 
     if (mediaattr & 1)

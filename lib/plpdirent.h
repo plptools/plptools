@@ -114,7 +114,7 @@ public:
     /**
     * Retrieves the file attributes of a directory entry.
     *
-    * @returns The generic attributes ( @ref rfsv:file_attribs ).
+    * @returns The generic attributes ( @ref rfsv::file_attribs ).
     */
     uint32_t getAttr();
 

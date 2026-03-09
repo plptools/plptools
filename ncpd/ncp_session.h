@@ -32,6 +32,12 @@
 #include "ncp.h"
 #include "socketchan.h"
 
+/**
+* Responsible for orchestrating the high-level life cycle of a daemon-side %NCP server and multiplexing connections
+* over a single hardware comms channel (serial port, etc). Creates and manages three threads (@ref runNCPSession,
+* @ref linkThread, and @ref pollSocketConnections) that drive the serial ports and accept multiple incoming TCP
+* connections from clients.
+*/
 class NCPSession {
 public:
 
@@ -51,28 +57,28 @@ public:
     ~NCPSession();
 
     /**
-     * Creates and manages all the threads necessary to run a full session for communicating with a Psion and exposing
-     * that to clients via the a TCP socket.
-     *
-     * This is a non-blocking function. The session should be stopped by calling `stop` or cancelling the session using
-     * `cancel` interrupting the session thread with `SIGINT`.
-     */
+    * Creates and manages all the threads necessary to run a full session for communicating with a Psion and exposing
+    * that to clients via the a TCP socket.
+    *
+    * This is a non-blocking function. The session should be stopped by calling `stop` or cancelling the session using
+    * `cancel` interrupting the session thread with `SIGINT`.
+    */
     int start();
 
     /**
-     * Mark the session as cancelled.
-     *
-     * It is anticipated that this method be called from within an interrupt handler in CLI apps. When using `cancel` to
-     * initiate session shutdown, it should be paired with `wait`.
-     */
+    * Mark the session as cancelled.
+    *
+    * It is anticipated that this method be called from within an interrupt handler in CLI apps. When using `cancel` to
+    * initiate session shutdown, it should be paired with `wait`.
+    */
     void cancel();
 
     /**
-     * Wait for the session to terminate.
-     *
-     * A typical usage pattern might call `stop`, followed by, `wait` to ensure the session is fully terminated and
-     * cleaned up before doing further work (e.g., starting a new session with a different configuration).
-     */
+    * Wait for the session to terminate.
+    *
+    * A typical usage pattern might call `stop`, followed by, `wait` to ensure the session is fully terminated and
+    * cleaned up before doing further work (e.g., starting a new session with a different configuration).
+    */
     void wait();
 
 // private:

@@ -28,31 +28,31 @@
 #include <string>
 
 /**
- * Conveniences for working with paths.
- *
- * These methods currently have a mishmash of C and C++ as they're a collection of various utilities from around
- * plptools. Hopefully they can be unified in the future.
- */
+* Conveniences for working with paths.
+*
+* These methods currently have a mishmash of C and C++ as they're a collection of various utilities from around
+* plptools. Hopefully they can be unified in the future.
+*/
 class Path {
 public:
 
     /**
-     * Returns the last path component of an EPOC path.
-     *
-     * If the path doesn't contain any EPOC path separators (`\`), the returned string matches the path.
-     */
+    * Returns the last path component of an EPOC path.
+    *
+    * If the path doesn't contain any EPOC path separators (`\`), the returned string matches the path.
+    */
     static std::string getEPOCBasename(std::string path);
 
     /**
-     * Compute parent directory of an EPOC directory.
-     */
+    * Compute parent directory of an EPOC directory.
+    */
     static char *getEPOCDirname(const char *path);
 
     /**
-     * Returns a new absolute EPOC path, determined by resolving `path` relative to `initialPath`.
-     *
-     * If `path` is already an absolute path, this returns `path`.
-     */
+    * Returns a new absolute EPOC path, determined by resolving `path` relative to `initialPath`.
+    *
+    * If `path` is already an absolute path, this returns `path`.
+    */
     static char *resolveEPOCPath(const char *path, const char *initialPath);
 
 };
