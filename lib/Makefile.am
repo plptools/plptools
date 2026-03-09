@@ -24,13 +24,13 @@ LDADD = $(HOSTENT_LIB) $(LIBSOCKET)
 
 pkglib_LTLIBRARIES = libplp.la
 
-libplp_la_SOURCES = bufferarray.cc  bufferstore.cc iowatch.cc ppsocket.cc \
+libplp_la_SOURCES = bufferarray.cc  bufferstore.cc iowatch.cc tcpsocket.cc \
 	rfsv16.cc rfsv32.cc rfsvfactory.cc log.cc rfsv.cc rpcs32.cc rpcs16.cc \
 	rpcs.cc rpcsfactory.cc psitime.cc Enum.cc plpdirent.cc wprt.cc \
 	rclip.cc siscomponentrecord.cpp  sisfile.cpp sisfileheader.cpp \
 	sisfilerecord.cpp sislangrecord.cpp sisreqrecord.cpp sistypes.cpp \
 	psibitmap.cpp psiprocess.cc path.cc cli_utils.cc
-noinst_HEADERS = bufferarray.h bufferstore.h iowatch.h ppsocket.h \
+noinst_HEADERS = bufferarray.h bufferstore.h iowatch.h tcpsocket.h \
 	rfsv.h rfsv16.h rfsv32.h rfsvfactory.h log.h rpcs32.h rpcs16.h rpcs.h \
 	rpcsfactory.h psitime.h Enum.h plpdirent.h wprt.h plpintl.h rclip.h \
 	siscomponentrecord.h sisfile.h sisfileheader.h sisfilerecord.h \

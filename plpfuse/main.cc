@@ -28,7 +28,7 @@
 #include <rpcsfactory.h>
 #include <bufferstore.h>
 #include <bufferarray.h>
-#include <ppsocket.h>
+#include <tcpsocket.h>
 
 #include <iostream>
 #include <string>
@@ -379,7 +379,7 @@ int fuse(int argc, char *argv[])
 }
 
 int main(int argc, char**argv) {
-    ppsocket *skt, *skt2;
+    TCPSocket *skt, *skt2;
     string host = "127.0.0.1";
     int sockNum = DPORT, i, c, oldoptind = 1;
 
@@ -416,12 +416,12 @@ int main(int argc, char**argv) {
             break;
     }
 
-    skt = new ppsocket();
+    skt = new TCPSocket();
     if (!skt->connect(host.c_str(), sockNum)) {
         cerr << _("plpfuse: could not connect to ncpd") << endl;
         return 1;
     }
-    skt2 = new ppsocket();
+    skt2 = new TCPSocket();
     if (!skt2->connect(host.c_str(), sockNum)) {
         cerr << _("plpfuse: could not connect to ncpd") << endl;
         return 1;

@@ -100,7 +100,7 @@ void check_for_new_socket_connection(NCPSession *session) {
     if (!session->connectionListenerWatch_.watch(5, 0) || session->isCancelled()) {
         return;
     }
-    ppsocket *next = session->skt_.accept(&peer, &session->socketChannelWatch_);
+    TCPSocket *next = session->skt_.accept(&peer, &session->socketChannelWatch_);
     if (next != NULL) {
         next->setWatch(&session->socketChannelWatch_);
         // New connect

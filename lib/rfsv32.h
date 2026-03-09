@@ -190,7 +190,7 @@ private:
     * Private constructor. Shall be called by
     * rfsvfactory only.
     */
-    rfsv32(ppsocket *);
+    rfsv32(TCPSocket *);
 
     Enum<rfsv::errs> err2psierr(int32_t);
     Enum<rfsv::errs> fopendir(const uint32_t, const char *, uint32_t &);

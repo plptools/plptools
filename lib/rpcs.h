@@ -27,7 +27,7 @@
 
 #include <vector>
 
-class ppsocket;
+class TCPSocket;
 class bufferStore;
 class bufferArray;
 
@@ -417,7 +417,7 @@ protected:
     * The socket, used for communication
     * with ncpd.
     */
-    ppsocket *skt;
+    TCPSocket *skt;
 
     /**
     * The current status of the connection.

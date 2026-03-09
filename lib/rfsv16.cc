@@ -23,7 +23,7 @@
 
 #include "rfsv16.h"
 #include "bufferstore.h"
-#include "ppsocket.h"
+#include "tcpsocket.h"
 #include "bufferarray.h"
 
 #include <algorithm>
@@ -39,7 +39,7 @@
 
 using namespace std;
 
-rfsv16::rfsv16(ppsocket *_skt)
+rfsv16::rfsv16(TCPSocket *_skt)
 {
     serNum = 0;
     status = rfsv::E_PSI_FILE_DISC;

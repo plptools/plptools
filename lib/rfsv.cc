@@ -22,7 +22,7 @@
 #include "config.h"
 
 #include "rfsv.h"
-#include "ppsocket.h"
+#include "tcpsocket.h"
 #include "bufferstore.h"
 #include "Enum.h"
 

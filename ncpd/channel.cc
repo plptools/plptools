@@ -91,7 +91,7 @@ ncpFindPcServer(const char *name)
 }
 
 void channel::
-ncpRegisterPcServer(ppsocket *skt, const char *name)
+ncpRegisterPcServer(TCPSocket *skt, const char *name)
 {
     ncpController->registerPcServer(skt, name);
 }

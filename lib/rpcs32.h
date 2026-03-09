@@ -23,7 +23,7 @@
 
 #include "rpcs.h"
 
-class ppsocket;
+class TCPSocket;
 class rpcsfactory;
 
 /**
@@ -59,7 +59,7 @@ protected:
     Enum<rfsv::errs> configOpen(uint16_t &, uint32_t);
 
  private:
-    rpcs32(ppsocket *);
+    rpcs32(TCPSocket *);
 };
 
 #endif

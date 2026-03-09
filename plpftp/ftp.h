@@ -37,15 +37,15 @@ class ftp {
     public:
     ftp();
     ~ftp();
-    int session(rfsv & a, rpcs & r, rclip & rc, ppsocket & rclipSocket, std::vector<char *> argv);
+    int session(rfsv & a, rpcs & r, rclip & rc, TCPSocket & rclipSocket, std::vector<char *> argv);
     bool canClip;
 
     private:
     std::vector<char *> getCommand();
     void initReadline(void);
-    int putClipText(rpcs & r, rfsv & a, rclip & rc, ppsocket & rclipSocket, const char *data);
-    int getClipData(rpcs & r, rfsv & a, rclip & rc, ppsocket & rclipSocket, const char *file);
-    bool checkClipConnection(rfsv &a, rclip & rc, ppsocket & rclipSocket);
+    int putClipText(rpcs & r, rfsv & a, rclip & rc, TCPSocket & rclipSocket, const char *data);
+    int getClipData(rpcs & r, rfsv & a, rclip & rc, TCPSocket & rclipSocket, const char *file);
+    bool checkClipConnection(rfsv &a, rclip & rc, TCPSocket & rclipSocket);
 
     // utilities
     void resetUnixWd();

@@ -137,7 +137,7 @@ private:
     * Private constructor. Shall be called by
     * rfsvfactory only.
     */
-    rfsv16(ppsocket *);
+    rfsv16(TCPSocket *);
 
     // Miscellaneous
     Enum<rfsv::errs> fopendir(const char * const, uint32_t &);

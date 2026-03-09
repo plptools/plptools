@@ -27,7 +27,7 @@
 
 #include <cli_utils.h>
 #include <bufferstore.h>
-#include <ppsocket.h>
+#include <tcpsocket.h>
 #include <iowatch.h>
 #include <log.h>
 

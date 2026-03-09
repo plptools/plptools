@@ -24,7 +24,7 @@
 
 #include "rfsv.h"
 
-class ppsocket;
+class TCPSocket;
 
 /**
  * A factory for automatically instantiating the correct
@@ -53,7 +53,7 @@ public:
     * @param skt The socket to be used for connecting
     * to the ncpd daemon.
     */
-    rfsvfactory(ppsocket * skt);
+    rfsvfactory(TCPSocket *skt);
 
     /**
      * Delete the rfsvfactory, cleaning up any resources.
@@ -84,7 +84,7 @@ private:
     * The socket to be used for connecting to the
     * ncpd daemon.
     */
-    ppsocket *skt;
+    TCPSocket *skt;
     int serNum;
     Enum<errs> err;
 };

@@ -27,7 +27,7 @@
 class NCP;
 class bufferStore;
 class PcServer;
-class ppsocket;
+class TCPSocket;
 
 class channel {
 public:
@@ -59,7 +59,7 @@ public:
     void terminateWhenAsked();
 
     PcServer *ncpFindPcServer(const char *name);
-    void ncpRegisterPcServer(ppsocket *skt, const char *name);
+    void ncpRegisterPcServer(TCPSocket *skt, const char *name);
     void ncpUnregisterPcServer(PcServer *server);
     int ncpGetSpeed();
 

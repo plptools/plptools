@@ -26,7 +26,7 @@
 
 #include <string>
 #include <bufferstore.h>
-#include <ppsocket.h>
+#include <tcpsocket.h>
 #include <iowatch.h>
 
 #include "ncp.h"
@@ -121,7 +121,7 @@ private:
     */
     IOWatch connectionListenerWatch_;
 
-    ppsocket skt_;
+    TCPSocket skt_;
     int socketChannelCount_ = 0;
     SocketChannel *socketChannels_[MAX_CHANNELS_PSION + 1] = {};
     int cancellationPipe_[2] = { -1, -1 };

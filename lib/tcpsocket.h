@@ -34,24 +34,24 @@ class IOWatch;
 /**
  * A class for dealing with sockets.
  */
-class ppsocket
+class TCPSocket
 {
 
 public:
     /**
-    * Constructs a ppsocket
+    * Constructs a TCPSocket
     */
-    ppsocket();
+    TCPSocket();
 
     /**
     * Copy constructor
     */
-    ppsocket(const ppsocket&);
+    TCPSocket(const TCPSocket&);
 
     /**
     * Destructor
     */
-    virtual ~ppsocket();
+    virtual ~TCPSocket();
 
     /**
     * Connects to a given host.
@@ -73,7 +73,7 @@ public:
     virtual bool reconnect();
 
     /**
-    * Retrieve a string representation of the ppsocket.
+    * Retrieve a string representation of the TCPSocket.
     *
     * @returns a string in the form "<host>:<hostport> -> <peer>:<peerport>"
     *          where elements not known, are replaced by "???" and none-existing
@@ -99,7 +99,7 @@ public:
     * @returns A pointer to a new instance for the accepted connection or NULL
     *          if an error happened.
     */
-    ppsocket *accept(std::string *Peer, IOWatch *);
+    TCPSocket *accept(std::string *Peer, IOWatch *);
 
     /**
     * Check and optionally wait for incoming data.

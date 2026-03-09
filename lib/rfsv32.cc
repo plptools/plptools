@@ -22,7 +22,7 @@
 
 #include "rfsv32.h"
 #include "bufferstore.h"
-#include "ppsocket.h"
+#include "tcpsocket.h"
 #include "bufferarray.h"
 #include "plpdirent.h"
 
@@ -36,7 +36,7 @@
 
 using namespace std;
 
-rfsv32::rfsv32(ppsocket * _skt)
+rfsv32::rfsv32(TCPSocket *_skt)
 {
     skt = _skt;
     serNum = 0;

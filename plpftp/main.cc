@@ -27,7 +27,7 @@
 #include <rpcsfactory.h>
 #include <rclip.h>
 #include <plpintl.h>
-#include <ppsocket.h>
+#include <tcpsocket.h>
 #include <bufferstore.h>
 
 #include <iostream>
@@ -96,11 +96,11 @@ ftpHeader()
 int
 main(int argc, char **argv)
 {
-    ppsocket *skt;
-    ppsocket *skt2;
+    TCPSocket *skt;
+    TCPSocket *skt2;
     rfsv *a;
     rpcs *r;
-    ppsocket *rclipSocket;
+    TCPSocket *rclipSocket;
     rclip *rc;
     ftp f;
     string host = "127.0.0.1";
@@ -135,12 +135,12 @@ main(int argc, char **argv)
     if (optind == argc)
         ftpHeader();
 
-    skt = new ppsocket();
+    skt = new TCPSocket();
     if (!skt->connect(host.c_str(), sockNum)) {
         cout << _("plpftp: could not connect to ncpd") << endl;
         return 1;
     }
-    skt2 = new ppsocket();
+    skt2 = new TCPSocket();
     if (!skt2->connect(host.c_str(), sockNum)) {
         cout << _("plpftp: could not connect to ncpd") << endl;
         return 1;
@@ -149,7 +149,7 @@ main(int argc, char **argv)
     rpcsfactory *rp = new rpcsfactory(skt2);
     a = rf->create(false);
     r = rp->create(false);
-    rclipSocket = new ppsocket();
+    rclipSocket = new TCPSocket();
     rclipSocket->connect(NULL, sockNum);
     if (rclipSocket)
         rc = new rclip(rclipSocket);
