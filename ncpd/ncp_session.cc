@@ -35,6 +35,15 @@
 
 using namespace std;
 
+/**
+* @todo There's something really nuanced going on with the use of the @ref NCPSession::socketChannelWatch_ here.
+* Specifically, while it might look like it's just being used as a timeout (which _might_ be the intent), new TCP
+* sockets are added to it on a successful accept, meaning that this will wake up frequently whenever there's activity on
+* the socket. This will cause frequent @ref NCP::hasFailed checks, and very timely resets (@ref NCP::reset) whenever a
+* client is connected. It's possible this was introduced as a work-around to connectivity issues. It is also worth
+* noting that @ref IOWatch is _not_ thread-safe, so using it in @ref link_thread, and adding to it in
+* @ref ncp_session_main_thread (as we are doing) is definitely a bad thing.
+*/
 void *link_thread(void *arg) {
     NCPSession *session = (NCPSession *)arg;
     while (!session->isCancelled()) {
