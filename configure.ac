@@ -201,6 +201,7 @@ AC_CONFIG_FILES(
         plpprint/Makefile
         plpprint/prolog.ps
         sisinstall/Makefile
+        tests/Makefile
         doc/Makefile
         etc/plptools
         doc/ncpd.man

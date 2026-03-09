@@ -79,3 +79,9 @@ git clone https://github.com/plptools/plptools.git
 ```
 
 To make a release you need the GitHub CLI (see https://cli.github.com).
+
+## License
+
+plptools is licensed under the GNU General Public License (GPL) version 2. It includes the following separately licensed third-party libraries and components:
+
+- [doctest](https://github.com/doctest/doctest) (/tests/doctest.h), MIT License

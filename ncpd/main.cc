@@ -25,6 +25,7 @@
 #include <cstring>
 #include <iostream>
 
+#include <cli_utils.h>
 #include <bufferstore.h>
 #include <ppsocket.h>
 #include <iowatch.h>
@@ -131,56 +132,22 @@ static struct option opts[] = {
     {NULL,         0,                 0,  0 }
 };
 
-static void
-parse_destination(const char *arg, const char **host, int *port)
-{
-    if (!arg)
-        return;
-    // We don't want to modify argv, therefore copy it first ...
-    char *argcpy = strdup(arg);
-    char *pp = strchr(argcpy, ':');
-
-    if (pp) {
-        // host.domain:400
-        // 10.0.0.1:400
-        *pp ++= '\0';
-        *host = argcpy;
-    } else {
-        // 400
-        // host.domain
-        // host
-        // 10.0.0.1
-        if (strchr(argcpy, '.') || !isdigit(argcpy[0])) {
-            *host = argcpy;
-            pp = 0L;
-        } else
-            pp = argcpy;
-    }
-    if (pp)
-        *port = atoi(pp);
-}
-
 int
 main(int argc, char **argv)
 {
     int pid;
     bool dofork = true;
 
-    int sockNum = DPORT;
+    int sockNum = cli_utils::lookup_default_port();
     int baudRate = DSPEED;
-    const char *host = "127.0.0.1";
+    string host = "127.0.0.1";
     const char *serialDevice = NULL;
     unsigned short nverbose = 0;
     bool autoexit = false;
 
-    struct servent *se = getservbyname("psion", "tcp");
     dlog.useFileDescriptor();
     elog.useFileDescriptor();
     ilog.useFileDescriptor();
-    if (se != 0L) {
-        sockNum = ntohs(se->s_port);
-    }
-    endservent();
 
     while (1) {
         int c = getopt_long(argc, argv, "hdeVb:s:p:v:", opts, NULL);
@@ -236,7 +203,10 @@ main(int argc, char **argv)
                 serialDevice = optarg;
                 break;
             case 'p':
-                parse_destination(optarg, &host, &sockNum);
+                if (!cli_utils::parse_port(optarg, &host, &sockNum)) {
+                    cout << _("Invalid port definition.") << endl;
+                    return 1;
+                }
                 break;
         }
     }

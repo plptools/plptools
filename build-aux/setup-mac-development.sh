@@ -48,4 +48,4 @@ export LDFLAGS="-L$(brew --prefix gettext)/lib -L$(brew --prefix readline)/lib"
     CXXFLAGS="-g -O0"
 
 # Generate compile-commands.json.
-compiledb make
+compiledb make check TESTS=

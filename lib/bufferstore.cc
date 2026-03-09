@@ -121,7 +121,7 @@ const char * bufferStore::getString(long pos) const {
     return (const char *)buff + pos + start;
 }
 
-ostream &operator<<(ostream &s, const bufferStore &m) {
+ostream &operator<<(std::ostream &s, const bufferStore &m) {
     // save stream flags
     ostream::fmtflags old = s.flags();
 

@@ -19,6 +19,7 @@
  */
 #include "config.h"
 
+#include <cli_utils.h>
 #include <ppsocket.h>
 #include <wprt.h>
 #include <psibitmap.h>
@@ -917,48 +918,14 @@ static struct option opts[] = {
     {nullptr,    0,                 nullptr,  0 }
 };
 
-static void
-parse_destination(const char *arg, const char **host, int *port)
-{
-    if (!arg)
-        return;
-    // We don't want to modify argv, therefore copy it first ...
-    char *argcpy = strdup(arg);
-    char *pp = strchr(argcpy, ':');
-
-    if (pp) {
-        // host.domain:400
-        // 10.0.0.1:400
-        *pp ++= '\0';
-        *host = argcpy;
-    } else {
-        // 400
-        // host.domain
-        // host
-        // 10.0.0.1
-        if (strchr(argcpy, '.') || !isdigit(argcpy[0])) {
-            *host = argcpy;
-            pp = nullptr;
-        } else
-            pp = argcpy;
-    }
-    if (pp)
-        *port = atoi(pp);
-}
-
 int
 main(int argc, char **argv)
 {
     ppsocket *skt;
-    const char *host = "127.0.0.1";
-    int sockNum = DPORT;
+    string host = "127.0.0.1";
+    int sockNum = cli_utils::lookup_default_port();
     int ret = 0;
     int c;
-
-    struct servent *se = getservbyname("psion", "tcp");
-    endservent();
-    if (se != nullptr)
-        sockNum = ntohs(se->s_port);
 
     while (1) {
         c = getopt_long(argc, argv, "dhVvp:s:c:", opts, NULL);
@@ -981,7 +948,10 @@ main(int argc, char **argv)
                 help();
                 return 0;
             case 'p':
-                parse_destination(optarg, &host, &sockNum);
+                if (!cli_utils::parse_port(optarg, &host, &sockNum)) {
+                    cout << _("Invalid port definition.") << endl;
+                    return 1;
+                }
                 break;
             case 's':
                 spooldir = strdup(optarg);
@@ -1000,7 +970,7 @@ main(int argc, char **argv)
     }
 
     skt = new ppsocket();
-    if (!skt->connect(host, sockNum)) {
+    if (!skt->connect(host.c_str(), sockNum)) {
         cout << _("plpprintd: could not connect to ncpd") << endl;
         return 1;
     }

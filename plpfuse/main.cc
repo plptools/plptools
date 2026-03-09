@@ -21,6 +21,7 @@
 
 #include "config.h"
 
+#include <cli_utils.h>
 #include <rfsv.h>
 #include <rpcs.h>
 #include <rfsvfactory.h>
@@ -356,35 +357,6 @@ static struct option opts[] = {
     {nullptr,      0,                 nullptr,  0 }
 };
 
-static void
-parse_destination(const char *arg, const char **host, int *port)
-{
-    if (!arg)
-        return;
-    // We don't want to modify argv, therefore copy it first ...
-    char *argcpy = strdup(arg);
-    char *pp = strchr(argcpy, ':');
-
-    if (pp) {
-        // host.domain:400
-        // 10.0.0.1:400
-        *pp ++= '\0';
-        *host = argcpy;
-    } else {
-        // 400
-        // host.domain
-        // host
-        // 10.0.0.1
-        if (strchr(argcpy, '.') || !isdigit(argcpy[0])) {
-            *host = argcpy;
-            pp = nullptr;
-        } else
-            pp = argcpy;
-    }
-    if (pp)
-        *port = atoi(pp);
-}
-
 int fuse(int argc, char *argv[])
 {
     struct fuse_args args = FUSE_ARGS_INIT(argc, argv);
@@ -408,13 +380,10 @@ int fuse(int argc, char *argv[])
 
 int main(int argc, char**argv) {
     ppsocket *skt, *skt2;
-    const char *host = "127.0.0.1";
+    string host = "127.0.0.1";
     int sockNum = DPORT, i, c, oldoptind = 1;
 
-    struct servent *se = getservbyname("psion", "tcp");
-    endservent();
-    if (se != nullptr)
-        sockNum = ntohs(se->s_port);
+    sockNum = cli_utils::lookup_default_port();
 
     /* N.B. Option handling is kludged. Most of the options are shared
        with FUSE, except for -p/--port, which has to be removed from
@@ -434,7 +403,10 @@ int main(int argc, char**argv) {
             debug++;
             break;
         case 'p':
-            parse_destination(optarg, &host, &sockNum);
+            if (!cli_utils::parse_port(optarg, &host, &sockNum)) {
+                cout << _("Invalid port definition.") << endl;
+                return 1;
+            }
             argc -= optind - oldoptind;
             for (i = oldoptind; i < argc; i++)
               argv[i] = argv[i + (optind - oldoptind)];
@@ -445,12 +417,12 @@ int main(int argc, char**argv) {
     }
 
     skt = new ppsocket();
-    if (!skt->connect(host, sockNum)) {
+    if (!skt->connect(host.c_str(), sockNum)) {
         cerr << _("plpfuse: could not connect to ncpd") << endl;
         return 1;
     }
     skt2 = new ppsocket();
-    if (!skt2->connect(host, sockNum)) {
+    if (!skt2->connect(host.c_str(), sockNum)) {
         cerr << _("plpfuse: could not connect to ncpd") << endl;
         return 1;
     }

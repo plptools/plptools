@@ -21,6 +21,8 @@
 #ifndef _BUFFERSTORE_H_
 #define _BUFFERSTORE_H_
 
+#include "config.h"
+
 #include <iostream>
 #include <cstdint>
 
@@ -129,14 +131,12 @@ public:
     /**
     * Prints a dump of the content.
     *
-    * Mainly used for debugging purposes.
-    *
     * @param s The stream to write to.
-    * @param b The bufferStore do be dumped.
+    * @param m The bufferStore do be dumped.
     *
     * @returns The stream.
     */
-    friend std::ostream &operator<<(std::ostream &s, const bufferStore &b);
+    friend std::ostream &operator<<(std::ostream &s, const bufferStore &m);
 
     /**
     * Tests if the bufferStore is empty.

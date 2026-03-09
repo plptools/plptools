@@ -20,7 +20,7 @@
 
 ACLOCAL_AMFLAGS = -I m4
 
-SUBDIRS = po libgnu lib ncpd plpftp plpprint sisinstall doc
+SUBDIRS = po libgnu lib ncpd plpftp plpprint sisinstall tests doc
 if BUILD_PLPFUSE
 SUBDIRS += plpfuse
 endif
