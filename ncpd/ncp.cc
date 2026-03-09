@@ -34,10 +34,6 @@
 #include "ncp.h"
 #include "rfsv.h"
 
-#define MAX_CHANNELS_PSION 256
-#define MAX_CHANNELS_SIBO  8
-#define NCP_SENDLEN 250
-
 using namespace std;
 
 NCP::NCP(const char *fname, int baud, unsigned short _verbose, const int cancellationFd)

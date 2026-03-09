@@ -47,6 +47,10 @@ rfsvfactory::rfsvfactory(ppsocket *_skt) : serNum(0)
     skt = _skt;
 }
 
+rfsvfactory::~rfsvfactory()
+{
+}
+
 rfsv * rfsvfactory::create(bool reconnect)
 {
     // skt is connected to the ncp daemon, which will have (hopefully) seen

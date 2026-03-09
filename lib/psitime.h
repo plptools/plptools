@@ -209,7 +209,7 @@ public:
     /**
     * Sets the value of this instance.
     *
-    * @param _utv The new Unix time representation.
+    * @param time The new Unix time representation.
     */
     void setUnixTime(time_t time);
 

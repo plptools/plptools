@@ -28,10 +28,10 @@ class bufferStore;
 class bufferArray;
 
 /**
- * Remote ClipBoard services via PLP
+ * Remote ClipBoard services via PLP.
  *
  * This class implements access to the remote clipboard notification
- * feature of the Psion. The Psion uses a file C:\System\Data\Clpboard.cbd
+ * feature of the Psion. The Psion uses the file 'C:\\System\\Data\\Clpboard.cbd'
  * for storing the content of its clipboard. This file can be accessed like
  * any other regular file on the Psion using the @ref rfsv implementation.
  * This class handles notification about changes of this file.
@@ -50,7 +50,7 @@ public:
     rclip(ppsocket *skt);
 
     /**
-    * destructor.
+    * Destructor.
     */
     ~rclip();
 

@@ -16,7 +16,7 @@ See the man pages for documentation: ncpd(8), plpftp(1), sisinstall(1),
 plpprintd(8), and, where installed, plpfuse(8).
 
 
-## Building from source
+## Building From Source
 
 To build plpfuse, the following packages are required:
 
@@ -32,7 +32,7 @@ If building from a git checkout, you’ll need the following packages installed:
 
 Then run:
 
-```
+```shell
 ./bootstrap --skip-po
 ```
 
@@ -40,7 +40,7 @@ Some extra packages are needed; `bootstrap` will tell you what you need to insta
 
 plptools uses GNU autotools, so the usual sequence of commands works:
 
-```
+```shell
 ./configure
 make
 make install
@@ -48,26 +48,37 @@ make install
 
 In addition to the usual options, `configure` understands the following:
 
-<dl>
-<dt><tt>--with-serial=/dev/sometty</tt></dt>
-<dd>sets the default serial device for ncpd. Without this option, ncpd tries automagically to find a serial device.</dd>
-<dt><tt>--with-speed=baudrate</tt></dt>
-<dd>sets the default serial speed (normally 115200 baud).</dd>
-<dt><tt>--with-port=portnum</tt></dt>
-<dd>sets the default port on which ncpd listens and to which plpftp and plpfuse connect (default 7501).</dd>
-<dt><tt>--with-drive=drivespec</tt></dt>
-<dd>sets the default drive for plpftp. The default <tt>AUTO</tt> triggers a drive-scan on the psion and sets the drive to the first drive found. If you don't want that, specify <tt>C:</tt> for example.</dd>
-<dt><tt>--with-basedir=dirspec</tt></dt>
-<dd>overrides the default directory for plpftp. The default is <tt>\</tt>,  which means the root directory. Note: since backslashes need to be doubled once for C escaping and once for shell escaping, this value is actually supplied as <tt>\\\\</tt>.</dd>
+- `--with-serial=/dev/sometty`
 
+  Sets the default serial device for ncpd. Without this option, ncpd tries automagically to find a serial device.
 
-## Information for developers
+- `--with-speed=baudrate`
+
+  Sets the default serial speed (normally 115200 baud).
+
+- `--with-port=portnum`
+
+  Sets the default port on which ncpd listens and to which plpftp and plpfuse connect (default 7501).
+
+- `--with-drive=drivespec`
+
+  Sets the default drive for plpftp. The default <tt>AUTO</tt> triggers a drive-scan on the psion and sets the drive to the first drive found. If you don't want that, specify <tt>C:</tt> for example.
+
+- `--with-basedir=dirspec`
+
+    Overrides the default directory for plpftp. The default is `\`,  which means the root directory.
+
+    Note: since backslashes need to be doubled once for C escaping and once for shell escaping, this value is actually supplied as `\\\\`.
+
+## Development
 
 The git repository can be cloned with:
 
+```shell
 git clone https://github.com/plptools/plptools.git
+```
 
-To make a release you need gh: https://cli.github.com
+To make a release you need the GitHub CLI (see https://cli.github.com).
 
 ## License
 
