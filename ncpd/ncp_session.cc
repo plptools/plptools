@@ -33,7 +33,7 @@
 
 using namespace std;
 
-static void *linkThread(void *arg) {
+void *linkThread(void *arg) {
     NCPSession *session = (NCPSession *)arg;
     while (!session->isCancelled()) {
         // psion
