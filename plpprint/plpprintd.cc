@@ -20,7 +20,7 @@
 #include "config.h"
 
 #include <cli_utils.h>
-#include <ppsocket.h>
+#include <tcpsocket.h>
 #include <wprt.h>
 #include <psibitmap.h>
 
@@ -921,7 +921,7 @@ static struct option opts[] = {
 int
 main(int argc, char **argv)
 {
-    ppsocket *skt;
+    TCPSocket *skt;
     string host = "127.0.0.1";
     int sockNum = cli_utils::lookup_default_port();
     int ret = 0;
@@ -969,7 +969,7 @@ main(int argc, char **argv)
         return -1;
     }
 
-    skt = new ppsocket();
+    skt = new TCPSocket();
     if (!skt->connect(host.c_str(), sockNum)) {
         cout << _("plpprintd: could not connect to ncpd") << endl;
         return 1;

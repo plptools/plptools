@@ -172,7 +172,7 @@ findPcServer(const char *name)
 }
 
 void NCP::
-registerPcServer(ppsocket *skt, const char *name) {
+registerPcServer(TCPSocket *skt, const char *name) {
     pcServers.push_back(PcServer(skt, name));
 }
 

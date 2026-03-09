@@ -24,7 +24,7 @@
 #include "rfsv32.h"
 #include "rfsvfactory.h"
 #include "bufferstore.h"
-#include "ppsocket.h"
+#include "tcpsocket.h"
 #include "Enum.h"
 
 #include <stdlib.h>
@@ -41,7 +41,7 @@ ENUM_DEFINITION_BEGIN(rfsvfactory::errs, rfsvfactory::FACERR_NONE)
     stringRep.add(rfsvfactory::FACERR_NORESPONSE,     N_("no response from ncpd"));
 ENUM_DEFINITION_END(rfsvfactory::errs)
 
-rfsvfactory::rfsvfactory(ppsocket *_skt) : serNum(0)
+rfsvfactory::rfsvfactory(TCPSocket *_skt) : serNum(0)
 {
     err = FACERR_NONE;
     skt = _skt;

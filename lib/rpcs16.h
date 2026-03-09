@@ -23,7 +23,7 @@
 
 #include "rpcs.h"
 
-class ppsocket;
+class TCPSocket;
 class bufferStore;
 class rpcsfactory;
 
@@ -43,7 +43,7 @@ class rpcs16 : public rpcs {
 
 
  private:
-    rpcs16(ppsocket *);
+    rpcs16(TCPSocket *);
 };
 
 #endif

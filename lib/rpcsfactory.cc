@@ -23,7 +23,7 @@
 #include "rpcs32.h"
 #include "rpcsfactory.h"
 #include "bufferstore.h"
-#include "ppsocket.h"
+#include "tcpsocket.h"
 #include "Enum.h"
 
 #include <stdlib.h>
@@ -38,7 +38,7 @@ ENUM_DEFINITION_BEGIN(rpcsfactory::errs, rpcsfactory::FACERR_NONE)
     stringRep.add(rpcsfactory::FACERR_NORESPONSE,     N_("no response from ncpd"));
 ENUM_DEFINITION_END(rpcsfactory::errs)
 
-rpcsfactory::rpcsfactory(ppsocket *_skt)
+rpcsfactory::rpcsfactory(TCPSocket *_skt)
 {
     err = FACERR_NONE;
     skt = _skt;

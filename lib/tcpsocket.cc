@@ -21,7 +21,7 @@
 #include "config.h"
 
 #include "bufferstore.h"
-#include "ppsocket.h"
+#include "tcpsocket.h"
 #include "iowatch.h"
 
 #include <cstring>
@@ -48,7 +48,7 @@
 
 using namespace std;
 
-ppsocket::ppsocket(const ppsocket & another)
+TCPSocket::TCPSocket(const TCPSocket & another)
 {
     m_Socket = another.m_Socket;
     m_HostAddr = another.m_HostAddr;
@@ -59,7 +59,7 @@ ppsocket::ppsocket(const ppsocket & another)
 }
 
 
-ppsocket::ppsocket()
+TCPSocket::TCPSocket()
 {
     m_Socket = INVALID_SOCKET;
 
@@ -74,7 +74,7 @@ ppsocket::ppsocket()
     myWatch = 0L;
 }
 
-ppsocket::~ppsocket()
+TCPSocket::~TCPSocket()
 {
     if (m_Socket != INVALID_SOCKET) {
         if (myWatch)
@@ -84,7 +84,7 @@ ppsocket::~ppsocket()
     }
 }
 
-void ppsocket::
+void TCPSocket::
 setWatch(IOWatch *watch) {
     if (watch) {
         if (myWatch && (m_Socket != INVALID_SOCKET))
@@ -93,7 +93,7 @@ setWatch(IOWatch *watch) {
     }
 }
 
-bool ppsocket::
+bool TCPSocket::
 reconnect()
 {
     if (m_Socket != INVALID_SOCKET) {
@@ -120,7 +120,7 @@ reconnect()
     return (true);
 }
 
-string ppsocket::
+string TCPSocket::
 toString()
 {
     string ret = "";
@@ -145,7 +145,7 @@ toString()
     return ret;
 }
 
-bool ppsocket::
+bool TCPSocket::
 connect(const char * const Peer, int PeerPort, const char * const Host, int HostPort)
 {
     //****************************************************
@@ -175,7 +175,7 @@ connect(const char * const Peer, int PeerPort, const char * const Host, int Host
     return (true);
 }
 
-bool ppsocket::
+bool TCPSocket::
 listen(const char * const Host, int Port)
 {
     //****************************************************
@@ -200,17 +200,17 @@ listen(const char * const Host, int Port)
     return (true);
 }
 
-ppsocket *ppsocket::
+TCPSocket *TCPSocket::
 accept(string *Peer, IOWatch *iow)
 {
     socklen_t len;
-    ppsocket *accepted;
+    TCPSocket *accepted;
     char *peer;
 
     //*****************************************************
     //* Allocate a new object to hold the accepted socket *
     //*****************************************************
-    accepted = new ppsocket;
+    accepted = new TCPSocket;
 
     if (!iow)
         iow = myWatch;
@@ -258,7 +258,7 @@ accept(string *Peer, IOWatch *iow)
     return accepted;
 }
 
-bool ppsocket::
+bool TCPSocket::
 dataToGet(int sec, int usec) const
 {
     fd_set io;
@@ -270,7 +270,7 @@ dataToGet(int sec, int usec) const
     return (select(m_Socket + 1, &io, NULL, NULL, &t) != 0) ? true : false;
 }
 
-int ppsocket::
+int TCPSocket::
 getBufferStore(bufferStore & a, bool wait)
 {
     /* Returns a 0 for for no message,
@@ -306,7 +306,7 @@ getBufferStore(bufferStore & a, bool wait)
     return (a.getLen() == 0) ? 0 : 1;
 }
 
-bool ppsocket::
+bool TCPSocket::
 sendBufferStore(const bufferStore & a)
 {
     long l = a.getLen();
@@ -333,7 +333,7 @@ sendBufferStore(const bufferStore & a)
     return true;
 }
 
-int ppsocket::
+int TCPSocket::
 recv(void *buf, int len, int flags)
 {
     int i = ::recv(m_Socket, buf, len, flags);
@@ -344,7 +344,7 @@ recv(void *buf, int len, int flags)
     return (i);
 }
 
-int ppsocket::
+int TCPSocket::
 send(const void * const buf, int len, int flags)
 {
     int i = ::send(m_Socket, buf, len, flags);
@@ -355,7 +355,7 @@ send(const void * const buf, int len, int flags)
     return (i);
 }
 
-bool ppsocket::
+bool TCPSocket::
 closeSocket(void)
 {
     if (myWatch)
@@ -369,7 +369,7 @@ closeSocket(void)
     return true;
 }
 
-bool ppsocket::
+bool TCPSocket::
 bindSocket(const char * const Host, int Port)
 {
 
@@ -406,7 +406,7 @@ bindSocket(const char * const Host, int Port)
     return true;
 }
 
-bool ppsocket::
+bool TCPSocket::
 bindInRange(const char * const Host, int Low, int High, int Retries)
 {
     int port;
@@ -454,7 +454,7 @@ bindInRange(const char * const Host, int Low, int High, int Retries)
     return true;
 }
 
-bool ppsocket::
+bool TCPSocket::
 linger(bool LingerOn, int LingerTime)
 {
     int i;
@@ -483,7 +483,7 @@ linger(bool LingerOn, int LingerTime)
     return true;
 }
 
-bool ppsocket::
+bool TCPSocket::
 createSocket(void)
 {
     // If the socket has already been created just return true
@@ -504,7 +504,7 @@ createSocket(void)
     return true;
 }
 
-bool ppsocket::
+bool TCPSocket::
 setPeer(const char * const Peer, int Port)
 {
     struct hostent *he = NULL;
@@ -537,7 +537,7 @@ setPeer(const char * const Peer, int Port)
     return true;
 }
 
-bool ppsocket::
+bool TCPSocket::
 getPeer(string *Peer, int *Port)
 {
     char *peer;
@@ -555,7 +555,7 @@ getPeer(string *Peer, int *Port)
     return false;
 }
 
-bool ppsocket::
+bool TCPSocket::
 setHost(const char * const Host, int Port)
 {
     struct hostent *he;
@@ -590,7 +590,7 @@ setHost(const char * const Host, int Port)
     return true;
 }
 
-bool ppsocket::
+bool TCPSocket::
 getHost(string *Host, int *Port)
 {
     char *host;

@@ -22,7 +22,7 @@
 #include "rpcs32.h"
 #include "bufferstore.h"
 #include "bufferarray.h"
-#include "ppsocket.h"
+#include "tcpsocket.h"
 
 #include <iostream>
 
@@ -32,7 +32,7 @@
 
 using namespace std;
 
-rpcs32::rpcs32(ppsocket * _skt)
+rpcs32::rpcs32(TCPSocket * _skt)
 {
     skt = _skt;
     mtCacheS5mx = 0;

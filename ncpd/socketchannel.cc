@@ -25,13 +25,13 @@
 
 #include "ncp_log.h"
 #include "ncp.h"
-#include "ppsocket.h"
+#include "tcpsocket.h"
 #include "rfsv.h"
 #include "socketchannel.h"
 
 using namespace std;
 
-SocketChannel::SocketChannel(ppsocket* socket, NCP* ncp)
+SocketChannel::SocketChannel(TCPSocket* socket, NCP* ncp)
 : channel(ncp)
 , socket_(socket) {
     registerName_ = nullptr;

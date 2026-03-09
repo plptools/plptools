@@ -23,11 +23,11 @@
 #include "config.h"
 #include "channel.h"
 
-class ppsocket;
+class TCPSocket;
 
 class SocketChannel : public channel {
 public:
-  SocketChannel(ppsocket* socket, NCP* ncp);
+  SocketChannel(TCPSocket* socket, NCP* ncp);
   virtual ~SocketChannel();
 
   void ncpDataCallback(bufferStore& a);
@@ -44,7 +44,7 @@ private:
   enum protocolVersionType { PV_SERIES_5 = 6, PV_SERIES_3 = 3 };
   bool ncpCommand(bufferStore &a);
 
-  ppsocket* socket_;
+  TCPSocket* socket_;
   char* registerName_;
   bool isConnected_;
   int connectTry_;

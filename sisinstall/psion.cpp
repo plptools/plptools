@@ -29,7 +29,7 @@
 #include <rpcsfactory.h>
 #include <bufferarray.h>
 #include <bufferstore.h>
-#include <ppsocket.h>
+#include <tcpsocket.h>
 
 #include <dirent.h>
 #include <netdb.h>
@@ -61,11 +61,11 @@ Psion::connect()
     }
 #endif
 
-    m_skt = new ppsocket();
+    m_skt = new TCPSocket();
     if (!m_skt->connect(NULL, sockNum)) {
         return false;
     }
-    m_skt2 = new ppsocket();
+    m_skt2 = new TCPSocket();
     if (!m_skt2->connect(NULL, sockNum)) {
         return false;
     }

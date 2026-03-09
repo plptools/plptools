@@ -21,7 +21,7 @@
 
 #include "wprt.h"
 #include "bufferstore.h"
-#include "ppsocket.h"
+#include "tcpsocket.h"
 #include "bufferarray.h"
 #include "Enum.h"
 
@@ -32,7 +32,7 @@
 
 using namespace std;
 
-wprt::wprt(ppsocket * _skt)
+wprt::wprt(TCPSocket * _skt)
 {
     skt = _skt;
     reset();

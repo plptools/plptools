@@ -21,14 +21,14 @@
 
 #include "rclip.h"
 #include "bufferstore.h"
-#include "ppsocket.h"
+#include "tcpsocket.h"
 #include "bufferarray.h"
 #include "Enum.h"
 
 #include <stdlib.h>
 #include <time.h>
 
-rclip::rclip(ppsocket * _skt)
+rclip::rclip(TCPSocket *_skt)
 {
     skt = _skt;
     reset();

@@ -24,7 +24,7 @@
 #include <Enum.h>
 #include "rfsv.h"
 
-class ppsocket;
+class TCPSocket;
 class rfsvfactory;
 class rpcsfactory;
 class rpcs;
@@ -63,8 +63,8 @@ public:
 
 private:
 
-    ppsocket* m_skt;
-    ppsocket* m_skt2;
+    TCPSocket* m_skt;
+    TCPSocket* m_skt2;
     rfsvfactory* m_rfsvFactory;
     rpcsfactory* m_rpcsFactory;
     rpcs* m_rpcs;

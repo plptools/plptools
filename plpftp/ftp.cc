@@ -28,7 +28,7 @@
 #include <Enum.h>
 #include <path.h>
 #include <plpintl.h>
-#include <ppsocket.h>
+#include <tcpsocket.h>
 #include <rclip.h>
 #include <rfsv.h>
 #include <rpcs.h>
@@ -325,7 +325,7 @@ startPrograms(rpcs & r, rfsv & a, const char *file) {
 }
 
 bool
-ftp::checkClipConnection(rfsv &a, rclip & rc, ppsocket &)
+ftp::checkClipConnection(rfsv &a, rclip & rc, TCPSocket &)
 {
     if (canClip == false)
         return false;
@@ -403,7 +403,7 @@ slurp(FILE *fp, size_t *final_len)
 }
 
 int
-ftp::putClipText(rpcs &, rfsv & a, rclip & rc, ppsocket & rclipSocket, const char *file)
+ftp::putClipText(rpcs &, rfsv & a, rclip & rc, TCPSocket & rclipSocket, const char *file)
 {
     Enum<rfsv::errs> res;
     uint32_t fh;
@@ -531,7 +531,7 @@ ftp::putClipText(rpcs &, rfsv & a, rclip & rc, ppsocket & rclipSocket, const cha
 // }
 
 int
-ftp::getClipData(rpcs &, rfsv & a, rclip &, ppsocket &, const char *file) {
+ftp::getClipData(rpcs &, rfsv & a, rclip &, TCPSocket &, const char *file) {
     Enum<rfsv::errs> res;
     PlpDirent de;
     uint32_t fh;
@@ -637,7 +637,7 @@ static char *epoc_dir_from(const char *path) {
 }
 
 int ftp::
-session(rfsv & a, rpcs & r, rclip & rc, ppsocket & rclipSocket, vector<char *> argv)
+session(rfsv & a, rpcs & r, rclip & rc, TCPSocket & rclipSocket, vector<char *> argv)
 {
     Enum<rfsv::errs> res;
     bool prompt = true;

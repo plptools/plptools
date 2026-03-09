@@ -23,7 +23,7 @@
 #include "rpcs16.h"
 #include "bufferstore.h"
 #include "bufferarray.h"
-#include "ppsocket.h"
+#include "tcpsocket.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -31,7 +31,7 @@
 
 using namespace std;
 
-rpcs16::rpcs16(ppsocket * _skt)
+rpcs16::rpcs16(TCPSocket *_skt)
 {
     skt = _skt;
     mtCacheS5mx = 0;

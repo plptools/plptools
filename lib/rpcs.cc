@@ -21,7 +21,7 @@
 
 #include "rpcs.h"
 #include "bufferstore.h"
-#include "ppsocket.h"
+#include "tcpsocket.h"
 #include "bufferarray.h"
 #include "psiprocess.h"
 #include "Enum.h"

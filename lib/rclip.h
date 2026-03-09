@@ -23,7 +23,7 @@
 #include "rfsv.h"
 #include "Enum.h"
 
-class ppsocket;
+class TCPSocket;
 class bufferStore;
 class bufferArray;
 
@@ -47,7 +47,7 @@ public:
     *
     * @param skt The socket to be used by this object.
     */
-    rclip(ppsocket *skt);
+    rclip(TCPSocket *skt);
 
     /**
     * Destructor.
@@ -147,7 +147,7 @@ protected:
     * The socket, used for communication
     * with ncpd.
     */
-    ppsocket *skt;
+    TCPSocket *skt;
 
     /**
     * The current status of the connection.

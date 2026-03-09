@@ -23,7 +23,7 @@
 
 #include "rpcs.h"
 
-class ppsocket;
+class TCPSocket;
 
 /**
  * A factory for automatically instantiating the correct protocol
@@ -50,7 +50,7 @@ class rpcsfactory {
     * @param skt The socket to be used for connecting
     * to the ncpd daemon.
     */
-    rpcsfactory(ppsocket * skt);
+    rpcsfactory(TCPSocket *skt);
 
     /**
     * Creates a new rpcs instance.
@@ -76,7 +76,7 @@ class rpcsfactory {
     * The socket to be used for connecting to the
     * ncpd daemon.
     */
-    ppsocket *skt;
+    TCPSocket *skt;
     Enum<errs> err;
 };
 
