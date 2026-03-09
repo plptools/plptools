@@ -18,17 +18,17 @@
  *  along with this program; if not, see <https://www.gnu.org/licenses/>.
  *
  */
-#ifndef _socketchan_h_
-#define _socketchan_h_
+#pragma once
 
 #include "config.h"
 #include "channel.h"
+
 class ppsocket;
 
-class socketChan : public channel {
+class SocketChannel : public channel {
 public:
-  socketChan(ppsocket* comms, NCP* ncpController);
-  virtual ~socketChan();
+  SocketChannel(ppsocket* socket, NCP* ncp);
+  virtual ~SocketChannel();
 
   void ncpDataCallback(bufferStore& a);
   const char* getNcpRegisterName();
@@ -43,11 +43,10 @@ public:
 private:
   enum protocolVersionType { PV_SERIES_5 = 6, PV_SERIES_3 = 3 };
   bool ncpCommand(bufferStore &a);
-  ppsocket* skt;
-  char* registerName;
-  bool connected;
-  int connectTry;
-  int tryStamp;
-};
 
-#endif
+  ppsocket* socket_;
+  char* registerName_;
+  bool isConnected_;
+  int connectTry_;
+  int connectTryTimestamp_;
+};
