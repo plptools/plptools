@@ -22,6 +22,7 @@
 #include "config.h"
 #include "ncp_session.h"
 
+#include <algorithm>
 #include <cassert>
 #include <cstring>
 #include <iostream>
