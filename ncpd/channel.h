@@ -55,7 +55,11 @@ public:
     void setNcpConnectName(const char *);
 
     // The following two calls are used for destructing an instance
-    bool terminate(); // Mainloop will terminate this class if true
+
+    /**
+    * Indicates that the channel needs termination and should be cleaned-up.
+    */
+    bool shouldTerminate() const; // Mainloop will terminate this class if true
     void terminateWhenAsked();
 
     PcServer *ncpFindPcServer(const char *name);

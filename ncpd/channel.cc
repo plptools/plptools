@@ -49,7 +49,7 @@ ncpSend(bufferStore & a)
 }
 
 bool channel::
-terminate()
+shouldTerminate() const
 {
     return _terminate;
 }
