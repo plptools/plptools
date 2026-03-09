@@ -29,6 +29,10 @@
 #include "linkchan.h"
 #include "ppsocket.h"
 
+#define MAX_CHANNELS_PSION 256
+#define MAX_CHANNELS_SIBO  8
+#define NCP_SENDLEN 250
+
 class Link;
 class channel;
 
