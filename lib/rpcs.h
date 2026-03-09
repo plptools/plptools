@@ -326,7 +326,7 @@ public:
     * Retrieves the command line of a running process.
     *
     * This function works with both SIBO and EPOC.
-    * Note: @ref rfsv::getPrograms calls this method internally and sets
+    * Note: @ref rpcs::queryPrograms calls this method internally and sets
     * the args member of @ref PsiProcess , so you usually don't have to call
     * this method yourself.
     *

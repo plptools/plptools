@@ -355,8 +355,6 @@ public:
     virtual Enum<errs> fgeteattr(const char * const name, PlpDirent &e) =0;
 
     /**
-    * @param name
-    *
     * @returns A Psion error code (One of enum @ref #errs ).
     */
     virtual Enum<errs> fsetattr(const char * const name, const uint32_t seta, const uint32_t unseta) = 0;
@@ -613,7 +611,7 @@ public:
     * @param mode The generic open mode.
     *
     * @returns The machine specific representation for use with
-    *          @ref fopen , @ref fcreatefile and @freplacefile.
+    *          @ref fopen , @ref fcreatefile and @ref freplacefile.
     */
     virtual uint32_t opMode(const uint32_t mode) = 0;
 
