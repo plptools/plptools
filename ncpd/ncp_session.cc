@@ -172,7 +172,6 @@ void NCPSession::cancel() {
 }
 
 bool NCPSession::isCancelled() {
-    linf << _("check cancelled");
     if (cancellationPipe[0] == -1) {
         return false;
     }
