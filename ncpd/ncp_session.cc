@@ -120,7 +120,7 @@ void check_for_new_socket_connection(NCPSession *session) {
             if (session->nverbose_ & NCP_SESSION_LOG)
                 lout << "rejected" << endl;
         } else
-            session->socketChannels_[session->socketChannelCount_++] = new socketChan(next, session->ncp_);
+            session->socketChannels_[session->socketChannelCount_++] = new SocketChannel(next, session->ncp_);
     }
 }
 

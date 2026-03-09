@@ -20,8 +20,6 @@
  */
 #include "config.h"
 
-#include <string>
-
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -29,47 +27,39 @@
 #include "ncp.h"
 #include "ppsocket.h"
 #include "rfsv.h"
-#include "socketchan.h"
+#include "socketchannel.h"
 
 using namespace std;
 
-socketChan:: socketChan(ppsocket* _skt, NCP* _ncpController):
-    channel(_ncpController)
-{
-    skt = _skt;
-    registerName = 0;
-    connectTry = 0;
-    connected = false;
+SocketChannel::SocketChannel(ppsocket* socket, NCP* ncp)
+: channel(ncp)
+, socket_(socket) {
+    registerName_ = nullptr;
+    connectTry_ = 0;
+    isConnected_ = false;
 }
 
-socketChan::~socketChan()
-{
-    skt->closeSocket();
-    delete skt;
-    skt = 0;
-    if (registerName)
-        free(registerName);
+SocketChannel::~SocketChannel() {
+    socket_->closeSocket();
+    delete socket_;
+    socket_ = 0;
+    if (registerName_)
+        free(registerName_);
 }
 
-void socketChan::
-ncpDataCallback(bufferStore & a)
-{
-    if (registerName != 0) {
-        skt->sendBufferStore(a);
+void SocketChannel::ncpDataCallback(bufferStore & a) {
+    if (registerName_ != 0) {
+        socket_->sendBufferStore(a);
     } else
         lerr << "socketchan: Connect without name!!!\n";
 }
 
-const char *socketChan::
-getNcpRegisterName()
-{
-    return registerName;
+const char *SocketChannel::getNcpRegisterName() {
+    return registerName_;
 }
 
 // NCP Command processing
-bool socketChan::
-ncpCommand(bufferStore & a)
-{
+bool SocketChannel::ncpCommand(bufferStore & a) {
     // str is guaranteed to begin with NCP$, and all NCP commands are
     // greater than or equal to 8 characters in length.
     const char *str = a.getString(4);
@@ -91,7 +81,7 @@ ncpCommand(bufferStore & a)
                 a.addStringT("Unknown!");
                 break;
         }
-        skt->sendBufferStore(a);
+        socket_->sendBufferStore(a);
         ok = true;
     } else if (!strncmp(str, "CONN", 4)) {
         // Connect to a channel that was placed in 'pending' mode, by
@@ -115,80 +105,70 @@ ncpCommand(bufferStore & a)
         a.init();
         a.addByte(rfsv::E_PSI_GEN_NONE);
         a.addDWord(ncpGetSpeed());
-        skt->sendBufferStore(a);
+        socket_->sendBufferStore(a);
         ok = true;
-    } else if (!strncmp(str, "REGS", 4)) {
+    } else if (strncmp(str, "REGS", 4) == 0) {
+
         // Register a server-process on the PC side.
         a.init();
         const char *name = a.getString(8);
         if (ncpFindPcServer(name))
             a.addByte(rfsv::E_PSI_FILE_EXIST);
         else {
-            ncpRegisterPcServer(skt, name);
+            ncpRegisterPcServer(socket_, name);
             a.addByte(rfsv::E_PSI_GEN_NONE);
         }
-        skt->sendBufferStore(a);
+        socket_->sendBufferStore(a);
         ok = true;
     }
     if (!ok) {
-        lerr << "socketChan:: received unknown NCP command (" << a << ")" << endl;
+        lerr << "SocketChannel:: received unknown NCP command (" << a << ")" << endl;
         a.init();
         a.addByte(rfsv::E_PSI_GEN_NSUP);
-        skt->sendBufferStore(a);
+        socket_->sendBufferStore(a);
     }
     return ok;
 }
 
-
-void socketChan::
-ncpConnectAck()
-{
+void SocketChannel::ncpConnectAck() {
     bufferStore a;
     a.addStringT("Ok");
-    skt->sendBufferStore(a);
-    connected = true;
-    connectTry = 3;
+    socket_->sendBufferStore(a);
+    isConnected_ = true;
+    connectTry_ = 3;
 }
 
-void socketChan::
-ncpConnectTerminate()
-{
+void SocketChannel::ncpConnectTerminate() {
     bufferStore a;
     a.addStringT("NAK");
-    skt->sendBufferStore(a);
+    socket_->sendBufferStore(a);
     ncpDisconnect();
 }
 
-void socketChan::
-ncpRegisterAck()
-{
-    connectTry++;
+void SocketChannel::ncpRegisterAck() {
+    connectTry_++;
     ncpConnect();
 }
 
-void socketChan::
-ncpConnectNak()
-{
-    if (!registerName || (connectTry > 1))
+void SocketChannel::ncpConnectNak() {
+    if (!registerName_ || (connectTry_ > 1))
         ncpConnectTerminate();
     else {
-        connectTry++;
-        tryStamp = time(0);
+        connectTry_++;
+        connectTryTimestamp_ = time(0);
         ncpRegister();
     }
 }
 
-void socketChan::
-socketPoll()
-{
+void SocketChannel::socketPoll() {
     int res;
 
-    if (registerName == 0) {
+    if (registerName_ == 0) {
         bufferStore a;
-        res = skt->getBufferStore(a, false);
+        res = socket_->getBufferStore(a, false);
         switch (res) {
             case 1:
-                // A client has connected, and is announcing who it
+                // A client has isConnected_, and is announcing who it
                 // is...  e.g.  "SYS$RFSV.*"
                 //
                 // An NCP Channel can be in 'Control' or 'Data' mode.
@@ -228,15 +208,15 @@ socketPoll()
                 }
 
                 // This isn't a command, it's a remote process. Connect.
-                registerName = strdup(a.getString());
-                connectTry++;
+                registerName_ = strdup(a.getString());
+                connectTry_++;
 
                 // If this is SYS$RFSV, we immediately connect. In all
                 // other cases, we first perform a registration. Connect
                 // is then triggered by RegisterAck and uses the name
                 // we received from the Psion.
-                tryStamp = time(0);
-                if (strncmp(registerName, "SYS$RFSV", 8) == 0)
+                connectTryTimestamp_ = time(0);
+                if (strncmp(registerName_, "SYS$RFSV", 8) == 0)
                     ncpConnect();
                 else
                     ncpRegister();
@@ -245,12 +225,12 @@ socketPoll()
                 terminateWhenAsked();
                 break;
         }
-    } else if (connected) {
+    } else if (isConnected_) {
         bufferStore a;
-        res = skt->getBufferStore(a, false);
+        res = socket_->getBufferStore(a, false);
         if (res == -1) {
             ncpDisconnect();
-            skt->closeSocket();
+            socket_->closeSocket();
         } else if (res == 1) {
             if (a.getLen() > 8 && !strncmp(a.getString(), "NCP$", 4)) {
                 if (!ncpCommand(a))
@@ -260,12 +240,10 @@ socketPoll()
             }
             ncpSend(a);
         }
-    } else if (time(0) > (tryStamp + 15))
+    } else if (time(0) > (connectTryTimestamp_ + 15))
         terminateWhenAsked();
 }
 
-bool socketChan::
-isConnected()
-const {
-    return connected;
+bool SocketChannel::isConnected() const {
+    return isConnected_;
 }

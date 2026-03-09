@@ -30,7 +30,7 @@
 #include <iowatch.h>
 
 #include "ncp.h"
-#include "socketchan.h"
+#include "socketchannel.h"
 
 /**
 * Responsible for orchestrating the high-level life cycle of a daemon-side %NCP server and multiplexing connections
@@ -123,7 +123,7 @@ private:
 
     ppsocket skt_;
     int socketChannelCount_ = 0;
-    socketChan *socketChannels_[MAX_CHANNELS_PSION + 1] = {};
+    SocketChannel *socketChannels_[MAX_CHANNELS_PSION + 1] = {};
     int cancellationPipe_[2] = { -1, -1 };
 };
 
