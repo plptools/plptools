@@ -127,11 +127,9 @@ protected:
  * So there is no reason, <b>not</b> to use this class.
  * Alas, you've to provide a StringRepresentation for it, which may
  * be tedious for large enumerations. To make the Definition easier
- * and more readable, an ENUM_DEFINITION() macro is provided.
+ * and more readable, a macro is provided.
  *
- * FIXME: At the moment enumeration strings don't get translated by gettext
- *
- * @see #ENUM_DEFINITION
+ * @see @ref ENUM_DEFINITION_BEGIN and @ref ENUM_DEFINITION_END
  * @author Henner Zeller
  */
 template<typename E>
@@ -229,8 +227,8 @@ public:
     * there actually exists a String representation for it,
     * so this Enumeration is needed to be initialized properly
     * in its Enum<E>::sdata::sdata() constructor, you've to
-    * provide. For convenience, use the ENUM_DEFINITION() macro
-    * for this.
+    * provide. For convenience, use the @ref ENUM_DEFINITION_BEGIN
+    * and @ref ENUM_DEFINITION_END macros for this.
     */
     static bool inRange(long i) {
         return (staticData.stringRep.inRange(i));
@@ -281,15 +279,15 @@ template<typename E> typename Enum<E>::sdata Enum<E>::staticData;
  * };
  *
  * // definition of the Enum<E> with the appropriate string representations
- * ENUM_DEFINITION(rfsv::PSI_ERROR_CODES, rfsv::E_PSI_GEN_NONE) {
+ * ENUM_DEFINITION_BEGIN(rfsv::PSI_ERROR_CODES, rfsv::E_PSI_GEN_NONE)
  *     stringRep.add(rfsv::E_PSI_GEN_NONE, "no error");
  *     stringRep.add(rfsv::E_PSI_GEN_FAIL, "general");
  *     stringRep.add(rfsv::E_PSI_GEN_ARG,  "bad argument");
- * }
+ * ENUM_DEFINITION_END(rfsv::PSI_ERROR_CODES)
  * </pre>
  *
  * @param EnumName  The fully qualified Name of the enum type to be wrapped
- * @param init      The fully qualified Name of the initialization
+ * @param initWith  The fully qualified Name of the initialization
  *                  value.
  *
  * @author Henner Zeller
