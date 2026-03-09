@@ -22,6 +22,7 @@
 
 #include "iowatch.h"
 
+#include <mutex>
 #include <unistd.h>
 #include <stdio.h>
 #include <sys/time.h>
@@ -29,32 +30,34 @@
 #include <memory.h>
 
 IOWatch::IOWatch() {
-    num = 0;
-    io = new int [FD_SETSIZE];
-    memset(io, -1, FD_SETSIZE);
+    fileDescriptorCount_ = 0;
+    fileDescriptors_ = new int [FD_SETSIZE];
+    memset(fileDescriptors_, -1, FD_SETSIZE);
 }
 
 IOWatch::~IOWatch() {
-    delete [] io;
+    delete [] fileDescriptors_;
 }
 
 void IOWatch::addIO(const int fd) {
+    std::lock_guard<std::mutex> lock(lock_);
     int pos;
-    for (pos = 0; pos < num && fd < io[pos]; pos++);
-    if (io[pos] == fd)
+    for (pos = 0; pos < fileDescriptorCount_ && fd < fileDescriptors_[pos]; pos++);
+    if (fileDescriptors_[pos] == fd)
         return;
-    for (int i = num; i > pos; i--)
-        io[i] = io[i-1];
-    io[pos] = fd;
-    num++;
+    for (int i = fileDescriptorCount_; i > pos; i--)
+        fileDescriptors_[i] = fileDescriptors_[i-1];
+    fileDescriptors_[pos] = fd;
+    fileDescriptorCount_++;
 }
 
 void IOWatch::remIO(const int fd) {
+    std::lock_guard<std::mutex> lock(lock_);
     int pos;
-    for (pos = 0; pos < num && fd != io[pos]; pos++);
-    if (pos != num) {
-        num--;
-        for (int i = pos; i <num; i++) io[i] = io[i+1];
+    for (pos = 0; pos < fileDescriptorCount_ && fd != fileDescriptors_[pos]; pos++);
+    if (pos != fileDescriptorCount_) {
+        fileDescriptorCount_--;
+        for (int i = pos; i <fileDescriptorCount_; i++) fileDescriptors_[i] = fileDescriptors_[i+1];
     }
 }
 
@@ -62,10 +65,14 @@ bool IOWatch::watch(const long secs, const long usecs) {
     int maxfd = 0;
     fd_set iop;
     FD_ZERO(&iop);
-    for (int i = 0; i < num; i++) {
-        FD_SET(io[i], &iop);
-        if (io[i] > maxfd)
-            maxfd = io[i];
+    {
+        std::lock_guard<std::mutex> lock(lock_);
+        for (int i = 0; i < fileDescriptorCount_; i++) {
+            FD_SET(fileDescriptors_[i], &iop);
+            if (fileDescriptors_[i] > maxfd) {
+                maxfd = fileDescriptors_[i];
+            }
+        }
     }
     struct timeval t;
     t.tv_usec = usecs;
