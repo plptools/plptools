@@ -18,11 +18,12 @@
  *  along with this program; if not, see <https://www.gnu.org/licenses/>.
  *
  */
-#ifndef _IOWATCH_H_
-#define _IOWATCH_H_
+#pragma once
+
+#include <mutex>
 
 /**
- * A simple wrapper for select()
+ * A simple thread-safe wrapper for select()
  *
  * IOWatch is a simple wrapper for the select
  * system call. In particular, it takes care
@@ -69,8 +70,7 @@ public:
     bool watch(const long secs, const long usecs);
 
 private:
-    int num;
-    int *io;
+    std::mutex lock_;
+    int fileDescriptorCount_;
+    int *fileDescriptors_;
 };
-
-#endif
