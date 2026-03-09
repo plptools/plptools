@@ -81,7 +81,14 @@ public:
     */
     void wait();
 
-// private:
+private:
+
+    // Thread entry points.
+    friend void *linkThread(void *arg);
+    friend void *pollSocketConnections(void *arg);
+    friend void *runNCPSession(void *arg);
+
+    friend void checkForNewSocketConnection(NCPSession *session);
 
     bool isCancelled();
 
