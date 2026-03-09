@@ -34,25 +34,25 @@
 
 /**
 * Responsible for orchestrating the high-level life cycle of a daemon-side %NCP server and multiplexing connections
-* over a single hardware comms channel (serial port, etc). Creates and manages three threads (@ref runNCPSession,
-* @ref linkThread, and @ref pollSocketConnections) that drive the serial ports and accept multiple incoming TCP
-* connections from clients.
+* over a single hardware comms channel (serial port, etc). Creates and manages three threads
+* (@ref ncp_session_main_thread, @ref link_thread, and @ref socket_connection_polling_thread) that drive the serial
+* ports, accept incoming TCP connections from clients, and poll connected TCP sockets.
 */
 class NCPSession {
 public:
 
-    NCPSession(int _sockNum,
-               int _baudRate,
-               std::string _host,
-               std::string _serialDevice,
-               bool _autoexit,
-               unsigned short _nverbose)
-    : sockNum(_sockNum)
-    , baudRate(_baudRate)
-    , host(_host)
-    , serialDevice(_serialDevice)
-    , autoexit(_autoexit)
-    , nverbose(_nverbose) {}
+    NCPSession(int portNumber,
+               int baudRate,
+               std::string host,
+               std::string serialDevice,
+               bool autoexit,
+               unsigned short nverbose)
+    : portNumber_(portNumber)
+    , baudRate_(baudRate)
+    , host_(host)
+    , serialDevice_(serialDevice)
+    , autoexit_(autoexit)
+    , nverbose_(nverbose) {}
 
     ~NCPSession();
 
@@ -83,32 +83,48 @@ public:
 
 private:
 
-    // Thread entry points.
-    friend void *linkThread(void *arg);
-    friend void *pollSocketConnections(void *arg);
-    friend void *runNCPSession(void *arg);
+    // Thread entry points and helpers.
 
-    friend void checkForNewSocketConnection(NCPSession *session);
+    friend void *ncp_session_main_thread(void *arg);
+    friend void *link_thread(void *arg);
+    friend void *socket_connection_polling_thread(void *arg);
+    friend void check_for_new_socket_connection(NCPSession *session);
 
     bool isCancelled();
 
     // Configuration.
-    int sockNum;
-    int baudRate;
-    std::string host;
-    std::string serialDevice;
-    bool autoexit;
-    unsigned short nverbose;
+
+    int portNumber_;
+    int baudRate_;
+    std::string host_;
+    std::string serialDevice_;
+    bool autoexit_;
+    unsigned short nverbose_;
 
     // State.
-    pthread_t threadId = 0;
-    NCP *ncp = nullptr;
-    IOWatch iow;
-    IOWatch acceptIOW;
-    ppsocket skt;
-    int numScp = 0;
-    socketChan *scp[257] = {}; // MAX_CHANNELS_PSION + 1
-    int cancellationPipe[2] = { -1, -1 };
+
+    pthread_t sessionMainThreadId_ = 0;
+
+    /**
+    * @ref NCP instance.
+    */
+    NCP *ncp_ = nullptr;
+
+    /**
+    * Used to watch all active @ref socketChan instances (stored in @ref socketChannels_) to see if they're readable.
+    */
+    IOWatch socketChannelWatch_;
+
+    /**
+    * Used to watch for incoming TCP connections to indicate that we can safely (effectively non-blocking) accept a new
+    * TCP connection from a client.
+    */
+    IOWatch connectionListenerWatch_;
+
+    ppsocket skt_;
+    int socketChannelCount_ = 0;
+    socketChan *socketChannels_[MAX_CHANNELS_PSION + 1] = {};
+    int cancellationPipe_[2] = { -1, -1 };
 };
 
 #endif
