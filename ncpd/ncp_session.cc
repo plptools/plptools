@@ -65,9 +65,9 @@ void *link_thread(void *arg) {
 }
 
 /**
-* Responsible for driving the @ref socketChan instances (incoming TCP connections) by means of
-* @ref socketChan::socketPoll. This isn't likely to scale particularly well as it polls _all_ connected sockets whenever
-* a single one wakes up, but it seems to work (as we never have that many connected clients).
+* Responsible for driving the @ref SocketChannel instances (incoming TCP connections) by means of
+* @ref SocketChannel::socketPoll. This isn't likely to scale particularly well as it polls _all_ connected sockets
+* whenever a single one wakes up, but it seems to work (as we never have that many connected clients).
 *
 * @todo This thread mutates both @ref NCPSession::socketChannelWatch_ and @ref NCPSession::socketChannels_, neither of
 * which are thread-safe and are both accessed and mutated by @ref ncp_session_main_thread.

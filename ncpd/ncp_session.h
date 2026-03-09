@@ -111,7 +111,7 @@ private:
     NCP *ncp_ = nullptr;
 
     /**
-    * Used to watch all active @ref socketChan instances (stored in @ref socketChannels_) to see if they're readable.
+    * Used to watch all active @ref SocketChannel instances (stored in @ref socketChannels_) to see if they're readable.
     */
     IOWatch socketChannelWatch_;
 
