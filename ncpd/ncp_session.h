@@ -19,8 +19,7 @@
  *  along with this program; if not, see <https://www.gnu.org/licenses/>.
  *
  */
-#ifndef _ncp_session_h_
- #define _ncp_session_h_
+#pragma once
 
 #include "config.h"
 
@@ -116,16 +115,8 @@ private:
     */
     IOWatch socketChannelWatch_;
 
-    /**
-    * Used to watch for incoming TCP connections to indicate that we can safely (effectively non-blocking) accept a new
-    * TCP connection from a client.
-    */
-    IOWatch connectionListenerWatch_;
-
     TCPSocket skt_;
     std::mutex socketChannelLock_;
     std::vector<SocketChannel *>socketChannels_;
     int cancellationPipe_[2] = { -1, -1 };
 };
-
-#endif

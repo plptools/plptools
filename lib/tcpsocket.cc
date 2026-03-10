@@ -27,6 +27,7 @@
 #include <cstring>
 #include <iostream>
 
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
@@ -86,10 +87,12 @@ TCPSocket::~TCPSocket()
 
 void TCPSocket::
 setWatch(IOWatch *watch) {
-    if (watch) {
-        if (myWatch && (m_Socket != INVALID_SOCKET))
-           myWatch->remIO(m_Socket);
-        myWatch = watch;
+    if (myWatch) {
+       myWatch->remIO(m_Socket);
+   }
+    myWatch = watch;
+    if (myWatch && (m_Socket != INVALID_SOCKET)) {
+        myWatch->addIO(m_Socket);
     }
 }
 
@@ -115,8 +118,9 @@ reconnect()
         m_LastError = errno;
         return (false);
     }
-    if (myWatch)
+    if (myWatch) {
         myWatch->addIO(m_Socket);
+    }
     return (true);
 }
 
@@ -201,23 +205,15 @@ listen(const char * const Host, int Port)
 }
 
 TCPSocket *TCPSocket::
-accept(string *Peer, IOWatch *iow)
+accept(std::string *Peer)
 {
     socklen_t len;
-    TCPSocket *accepted;
-    char *peer;
 
     //*****************************************************
     //* Allocate a new object to hold the accepted socket *
     //*****************************************************
-    accepted = new TCPSocket;
+    TCPSocket *accepted = new TCPSocket();
 
-    if (!iow)
-        iow = myWatch;
-    if (!accepted) {
-        m_LastError = errno;
-        return NULL;
-    }
     //***********************
     //* Accept a connection *
     //***********************
@@ -247,15 +243,34 @@ accept(string *Peer, IOWatch *iow)
     //* If required get the name of the connected client *
     //****************************************************
     if (Peer) {
-        peer = inet_ntoa(((struct sockaddr_in *) &accepted->m_PeerAddr)->sin_addr);
-        if (peer)
-            *Peer = peer;
-    }
-    if (accepted && iow) {
-        accepted->setWatch(iow);
-        iow->addIO(accepted->m_Socket);
+        *Peer = inet_ntoa(((struct sockaddr_in *) &accepted->m_PeerAddr)->sin_addr);
     }
     return accepted;
+}
+
+TCPSocket *TCPSocket::accept(std::string *Peer, int cancellationFd) {
+    assert(m_Socket != INVALID_SOCKET);
+    while (true) {
+
+        fd_set fileDescriptorSet;
+        FD_ZERO(&fileDescriptorSet);
+        FD_SET(m_Socket, &fileDescriptorSet);
+        FD_SET(cancellationFd, &fileDescriptorSet);
+        int result = select(max(m_Socket, cancellationFd) + 1, &fileDescriptorSet, nullptr, nullptr, nullptr);
+
+        // Ignore interrupt.
+        if (result == -1 && errno == EINTR) {
+            continue;
+        }
+
+        // Respect cancellations.
+        if (FD_ISSET(cancellationFd, &fileDescriptorSet)) {
+            return nullptr;
+        }
+
+        // If we've got here, there should be a socket we can safely accept.
+        return accept(Peer);
+    }
 }
 
 bool TCPSocket::
