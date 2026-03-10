@@ -20,6 +20,7 @@
  */
 #include "config.h"
 
+#include <pthread.h>
 #include <string>
 #include <cstring>
 #include <fstream>
@@ -151,6 +152,7 @@ static const int baud_table[] = {
     57600,
     38400,
     19200,
+    9600,
     // Lower rates don't make sense ?!
 };
 #define BAUD_TABLE_SIZE (sizeof(baud_table) / sizeof(int))
@@ -167,7 +169,6 @@ packet(const char *fname, int _baud, Link *_link, unsigned short _verbose, const
     baud = _baud;
     theLINK = _link;
     isEPOC = false;
-    justStarted = true;
 
     // Initialize CRC table
     crc_table[0] = 0;
@@ -222,11 +223,13 @@ packet::
 void packet::
 reset()
 {
+    // This method stops the data pump thread and restarts it, performing a pthread_join. Given this, it's unsafe to be
+    // called from the data pump itself. This is a belt and braces check to ensure we don't do that (spoiler: we were).
+    assert(pthread_self() != datapump);
     if (fd != -1) {
         pthread_cancel(datapump);
         pthread_join(datapump, NULL);
     }
-    outRead = outWrite = 0;
     internalReset();
     if (fd != -1) {
         pthread_create(&datapump, NULL, pump_run, this);
@@ -244,6 +247,7 @@ internalReset()
         fd = -1;
     }
     usleep(100000);
+    outRead = outWrite = 0;
     inRead = inWrite = 0;
     esc = false;
     lastFatal = false;
@@ -251,7 +255,6 @@ internalReset()
     lastSYN = startPkt = -1;
     crcIn = crcOut = 0;
     realBaud = baud;
-    justStarted = true;
     if (baud < 0) {
         realBaud = baud_table[baud_index++];
         if (baud_index >= BAUD_TABLE_SIZE)
@@ -372,7 +375,7 @@ findSync()
     int inw = inWrite;
     int p;
 
- outerLoop:
+outerLoop:
     p = (lastSYN >= 0) ? lastSYN : inRead;
     if (startPkt < 0) {
         while (p != inw) {
@@ -399,7 +402,6 @@ findSync()
         }
     }
     if (startPkt >= 0) {
-        justStarted = false;
         while (p != inw) {
             unsigned char c = inBuffer[p];
             switch (inCRCstate) {
@@ -463,19 +465,20 @@ findSync()
         lastSYN = p;
     } else {
         // If we get here, no sync was found.
-        // If we are just started and the amount of received data exceeds
-        // 15 bytes, the baudrate is obviously wrong.
-        // (or the connected device is not an EPOC device). Reset the
-        // serial connection and try next baudrate, if auto-baud is set.
-        if (justStarted) {
+        // If we've not seen any packets yet, and the amount of received data exceeds 15 bytes, the baudrate is
+        // obviously wrong (or the connected device is not an EPOC device). Reset the serial connection and try next
+        // baudrate (if auto-baud is set).
+        if (startPkt < 0) {
             int rx_amount = (inw > inRead) ?
                 inw - inRead : BUFLEN - inRead + inw;
-            if (rx_amount > 15)
-                reset();
+            if (rx_amount > 15) {
+                internalReset();
+            }
         }
     }
 }
 
+// TODO: WHAT THE FUCK IS CALLING HTIS?
 bool packet::
 linkFailed()
 {

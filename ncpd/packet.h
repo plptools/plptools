@@ -97,7 +97,6 @@ private:
     bool esc;
     bool lastFatal;
     bool isEPOC;
-    bool justStarted;
 
     char *devname;
     int baud;

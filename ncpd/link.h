@@ -159,6 +159,11 @@ private:
     friend class packet;
     friend void * expire_check(void *);
 
+    /**
+    * Effectively a delegate method that accepts data from our @ref packet instance.
+    *
+    * Called on the @ref packet's internal thread.
+    */
     void receive(bufferStore buf);
     void transmit(bufferStore buf);
     void sendAck(int seq);
