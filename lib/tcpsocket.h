@@ -92,14 +92,25 @@ public:
     virtual bool listen(const char * const Host, int Port);
 
     /**
-    * Accept a connection.
+    * Accept a connection; blocking, non-cancellable.
     *
     * @param Peer If non-Null, the peer's name is returned here.
     *
     * @returns A pointer to a new instance for the accepted connection or NULL
     *          if an error happened.
     */
-    TCPSocket *accept(std::string *Peer, IOWatch *);
+    TCPSocket *accept(std::string *Peer);
+
+    /**
+    * Accept a connection; blocking, cancellable.
+    *
+    * @param Peer If non-Null, the peer's name is returned here.
+    * @param cancellationFd File descriptor that can be used to signal cancellation.
+    *
+    * @returns A pointer to a new instance for the accepted connection or NULL
+    *          if an error happened.
+    */
+    TCPSocket *accept(std::string *Peer, int cancellationFd);
 
     /**
     * Check and optionally wait for incoming data.

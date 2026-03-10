@@ -118,17 +118,12 @@ void *socket_connection_polling_thread(void *arg) {
 
 void check_for_new_socket_connection(NCPSession *session) {
 
-    // This watch returns false in the case of a time out or cancellation due to a signal, and true in the case of
-    // cancellation or one of the file descriptors becoming readable. In the case a timeout or interrupt, we return and
-    // allow the calling code to re-call.
-    if (!session->connectionListenerWatch_.watch(5, 0) || session->isCancelled()) {
-        return;
-    }
-
     // Accept the incoming socket.
     string peer;
-    TCPSocket *next = session->skt_.accept(&peer, &session->socketChannelWatch_);
-    if (next == NULL) {
+    TCPSocket *next = session->skt_.accept(&peer, session->cancellationPipe_[0]);
+    if (!next) {
+        // NULL here can indicate an error, or cancellation, so we return control to our calling code to allow it to
+        // decide what to do.
         return;
     }
     if (session->nverbose_ & NCP_SESSION_LOG) {
@@ -172,7 +167,6 @@ void check_for_new_socket_connection(NCPSession *session) {
 void *ncp_session_main_thread(void *arg) {
     NCPSession *session = (NCPSession *)arg;
 
-    session->skt_.setWatch(&session->connectionListenerWatch_);
     if (!session->skt_.listen(session->host_.c_str(), session->portNumber_)) {
         lerr << "listen on " << session->host_ << ":" << session->portNumber_ << ": " << strerror(errno) << endl;
         return nullptr;
@@ -194,8 +188,9 @@ void *ncp_session_main_thread(void *arg) {
         lerr << "Could not create Socket thread" << endl;
         exit(-1);
     }
-    while (!session->isCancelled())
+    while (!session->isCancelled()) {
         check_for_new_socket_connection(session);
+    }
     linf << _("terminating") << endl;
     void *ret;
     pthread_join(thr_a, &ret);
@@ -224,7 +219,6 @@ int NCPSession::start() {
         return result;
     }
     socketChannelWatch_.addIO(cancellationPipe_[0]);
-    connectionListenerWatch_.addIO(cancellationPipe_[0]);
     return pthread_create(&sessionMainThreadId_, NULL, ncp_session_main_thread, this);
 }
 
