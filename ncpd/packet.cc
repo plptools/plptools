@@ -169,6 +169,7 @@ packet(const char *fname, int _baud, Link *_link, unsigned short _verbose, const
     baud = _baud;
     theLINK = _link;
     isEPOC = false;
+    justStarted = true;
 
     // Initialize CRC table
     crc_table[0] = 0;
@@ -255,6 +256,7 @@ internalReset()
     lastSYN = startPkt = -1;
     crcIn = crcOut = 0;
     realBaud = baud;
+    justStarted = true;
     if (baud < 0) {
         realBaud = baud_table[baud_index++];
         if (baud_index >= BAUD_TABLE_SIZE)
@@ -402,6 +404,7 @@ outerLoop:
         }
     }
     if (startPkt >= 0) {
+        justStarted = false;
         while (p != inw) {
             unsigned char c = inBuffer[p];
             switch (inCRCstate) {
@@ -465,10 +468,11 @@ outerLoop:
         lastSYN = p;
     } else {
         // If we get here, no sync was found.
-        // If we've not seen any packets yet, and the amount of received data exceeds 15 bytes, the baudrate is
-        // obviously wrong (or the connected device is not an EPOC device). Reset the serial connection and try next
-        // baudrate (if auto-baud is set).
-        if (startPkt < 0) {
+        // If we are just started and the amount of received data exceeds
+        // 15 bytes, the baudrate is obviously wrong.
+        // (or the connected device is not an EPOC device). Reset the
+        // serial connection and try next baudrate, if auto-baud is set.
+        if (justStarted) {
             int rx_amount = (inw > inRead) ?
                 inw - inRead : BUFLEN - inRead + inw;
             if (rx_amount > 15) {
@@ -478,7 +482,6 @@ outerLoop:
     }
 }
 
-// TODO: WHAT THE FUCK IS CALLING HTIS?
 bool packet::
 linkFailed()
 {
