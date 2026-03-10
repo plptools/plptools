@@ -205,7 +205,7 @@ listen(const char * const Host, int Port)
 }
 
 TCPSocket *TCPSocket::
-accept(string *Peer)
+accept(std::string *Peer)
 {
     socklen_t len;
 
@@ -248,7 +248,7 @@ accept(string *Peer)
     return accepted;
 }
 
-TCPSocket *TCPSocket::accept(string *Peer, int cancellationFd) {
+TCPSocket *TCPSocket::accept(std::string *Peer, int cancellationFd) {
     assert(m_Socket != INVALID_SOCKET);
     while (true) {
 
