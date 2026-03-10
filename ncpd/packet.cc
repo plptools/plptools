@@ -20,6 +20,7 @@
  */
 #include "config.h"
 
+#include <pthread.h>
 #include <string>
 #include <cstring>
 #include <fstream>
@@ -151,6 +152,7 @@ static const int baud_table[] = {
     57600,
     38400,
     19200,
+    9600,
     // Lower rates don't make sense ?!
 };
 #define BAUD_TABLE_SIZE (sizeof(baud_table) / sizeof(int))
@@ -222,11 +224,13 @@ packet::
 void packet::
 reset()
 {
+    // This method stops the data pump thread and restarts it, performing a pthread_join. Given this, it's unsafe to be
+    // called from the data pump itself. This is a belt and braces check to ensure we don't do that (spoiler: we were).
+    assert(pthread_self() != datapump);
     if (fd != -1) {
         pthread_cancel(datapump);
         pthread_join(datapump, NULL);
     }
-    outRead = outWrite = 0;
     internalReset();
     if (fd != -1) {
         pthread_create(&datapump, NULL, pump_run, this);
@@ -244,6 +248,7 @@ internalReset()
         fd = -1;
     }
     usleep(100000);
+    outRead = outWrite = 0;
     inRead = inWrite = 0;
     esc = false;
     lastFatal = false;
@@ -372,7 +377,7 @@ findSync()
     int inw = inWrite;
     int p;
 
- outerLoop:
+outerLoop:
     p = (lastSYN >= 0) ? lastSYN : inRead;
     if (startPkt < 0) {
         while (p != inw) {
@@ -470,8 +475,9 @@ findSync()
         if (justStarted) {
             int rx_amount = (inw > inRead) ?
                 inw - inRead : BUFLEN - inRead + inw;
-            if (rx_amount > 15)
-                reset();
+            if (rx_amount > 15) {
+                internalReset();
+            }
         }
     }
 }

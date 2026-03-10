@@ -43,6 +43,10 @@ using namespace std;
 * client is connected. It's possible this was introduced as a work-around to connectivity issues. It is also worth
 * noting that @ref IOWatch is _not_ thread-safe, so using it in @ref link_thread, and adding to it in
 * @ref ncp_session_main_thread (as we are doing) is definitely a bad thing.
+*
+* The @ref NCP::reset call here is currently required (even though it feels like it shouldn't be) as it's responsible
+* for preparing the stack after a successful connection has ended (@ref packet currently has responsibility for
+* performing internal resets when auto-detecting baud rate).
 */
 void *link_thread(void *arg) {
     NCPSession *session = (NCPSession *)arg;
