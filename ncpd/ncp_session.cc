@@ -22,6 +22,7 @@
 #include "config.h"
 #include "ncp_session.h"
 
+#include <algorithm>
 #include <cassert>
 #include <cstring>
 #include <iostream>
@@ -30,6 +31,7 @@
 #include <pthread.h>
 
 #include "ncp_log.h"
+#include "socketchannel.h"
 
 using namespace std;
 
@@ -68,59 +70,102 @@ void *link_thread(void *arg) {
 * Responsible for driving the @ref SocketChannel instances (incoming TCP connections) by means of
 * @ref SocketChannel::socketPoll. This isn't likely to scale particularly well as it polls _all_ connected sockets
 * whenever a single one wakes up, but it seems to work (as we never have that many connected clients).
-*
-* @todo This thread mutates both @ref NCPSession::socketChannelWatch_ and @ref NCPSession::socketChannels_, neither of
-* which are thread-safe and are both accessed and mutated by @ref ncp_session_main_thread.
 */
 void *socket_connection_polling_thread(void *arg) {
     NCPSession *session = (NCPSession *)arg;
-    while (!session->isCancelled()) {
+    while (true) {
+
+        // Wait for events on our sockets, or cancellation.
         session->socketChannelWatch_.watch(0, 10000);
-        for (int i = 0; i < session->socketChannelCount_; i++) {
-            session->socketChannels_[i]->socketPoll();
-            if (session->socketChannels_[i]->terminate()) {
-                // Requested channel termination
-                delete session->socketChannels_[i];
-                session->socketChannelCount_--;
-                for (int j = i; j < session->socketChannelCount_; j++)
-                    session->socketChannels_[j] = session->socketChannels_[j + 1];
-                i--;
+        if (session->isCancelled()) {
+            break;
+        }
+
+        // Poll all the socket channels to drive things forwards.
+        // We take a copy of the socket channels array while holding a lock as this can be mutated on other threads. We
+        // know that it's safe to operate on a copy and that nothing will get cleaned up under our feet as we're also
+        // responsible for clean up (see later).
+        {
+            std::vector<SocketChannel *> socketChannels;
+            {
+                std::lock_guard<std::mutex> lock(session->socketChannelLock_);
+                socketChannels = session->socketChannels_;
+            }
+            for (auto &socketChannel : socketChannels) {
+                socketChannel->socketPoll();
             }
         }
+
+        // Clean up the terminated sockets while holding a lock.
+        {
+            std::lock_guard<std::mutex> lock(session->socketChannelLock_);
+            session->socketChannels_.erase(std::remove_if(
+                session->socketChannels_.begin(),
+                session->socketChannels_.end(),
+                [](SocketChannel *socketChannel) {
+                    if (!socketChannel->shouldTerminate()) {
+                        return false;
+                    }
+                    delete socketChannel;
+                    return true;
+                }),
+                session->socketChannels_.end());
+        }
+
     }
-    return NULL;
+    return nullptr;
 }
 
 void check_for_new_socket_connection(NCPSession *session) {
-    string peer;
 
     // This watch returns false in the case of a time out or cancellation due to a signal, and true in the case of
-    // cancellation or one of the file descriptors becoming readable. In the cause a timeout or interrupt, we return
-    // flow of control to our calling code.
+    // cancellation or one of the file descriptors becoming readable. In the case a timeout or interrupt, we return and
+    // allow the calling code to re-call.
     if (!session->connectionListenerWatch_.watch(5, 0) || session->isCancelled()) {
         return;
     }
+
+    // Accept the incoming socket.
+    string peer;
     TCPSocket *next = session->skt_.accept(&peer, &session->socketChannelWatch_);
-    if (next != NULL) {
+    if (next == NULL) {
+        return;
+    }
+    if (session->nverbose_ & NCP_SESSION_LOG) {
+        lout << "New socket connection from " << peer << endl;
+    }
+
+    // Check to see if we can service the incoming socket.
+    // We don't perform socket rejection while holding the lock since it can take some time.
+    bool didAddSocket = false;
+    {
+        std::lock_guard<std::mutex> lock(session->socketChannelLock_);
+        if ((session->socketChannels_.size() < session->ncp_->maxLinks()) && (session->ncp_->gotLinkChannel())) {
+            session->socketChannels_.push_back(new SocketChannel(next, session->ncp_));
+            didAddSocket = true;
+        }
+    }
+
+    // If we accepted the socket, start watching it and return.
+    if (didAddSocket) {
         next->setWatch(&session->socketChannelWatch_);
-        // New connect
-        if (session->nverbose_ & NCP_SESSION_LOG)
-            lout << "New socket connection from " << peer << endl;
-        if ((session->socketChannelCount_ >= session->ncp_->maxLinks()) || (!session->ncp_->gotLinkChannel())) {
-            bufferStore a;
+        return;
+    }
 
-            // Give the client time to send its version request.
-            next->dataToGet(1, 0);
-            next->getBufferStore(a, false);
+    // If we weren't able to accept the socket, then we need to clean it up.
 
-            a.init();
-            a.addStringT("No Psion Connected\n");
-            next->sendBufferStore(a);
-            delete next;
-            if (session->nverbose_ & NCP_SESSION_LOG)
-                lout << "rejected" << endl;
-        } else
-            session->socketChannels_[session->socketChannelCount_++] = new SocketChannel(next, session->ncp_);
+    bufferStore a;
+
+    // Give the client time to send its version request.
+    next->dataToGet(1, 0);
+    next->getBufferStore(a, false);
+
+    a.init();
+    a.addStringT("No Psion Connected\n");
+    next->sendBufferStore(a);
+    delete next;
+    if (session->nverbose_ & NCP_SESSION_LOG) {
+        lout << "rejected" << endl;
     }
 }
 
