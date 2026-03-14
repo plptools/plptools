@@ -116,7 +116,7 @@ static void *pump_run(void *arg)
                             int hadSpace = hasSpace(p->out);
                             inca(p->outRead, res);
                             if (!hadSpace)
-                                    pthread_kill(p->thisThread, SIGUSR1);
+                                    pthread_kill(p->ownerThreadId_, SIGUSR1);
                         }
                     }
                     if (FD_ISSET(p->fd, &r_set)) {
@@ -167,9 +167,7 @@ packet(const char *fname, int _baud, Link *_link, unsigned short _verbose, const
     devname = strdup(fname);
     assert(devname);
     baud = _baud;
-    theLINK = _link;
-    isEPOC = false;
-    justStarted = true;
+    link_ = _link;
 
     // Initialize CRC table
     crc_table[0] = 0;
@@ -180,30 +178,21 @@ packet(const char *fname, int _baud, Link *_link, unsigned short _verbose, const
         crc_table[i * 2 + (carry ? 1 : 0)] = tmp;
     }
 
-    inRead = inWrite = outRead = outWrite = 0;
     inBuffer = new unsigned char[BUFLEN + 1];
     outBuffer = new unsigned char[BUFLEN + 1];
-    assert(inBuffer);
-    assert(outBuffer);
 
-    esc = false;
-    lastFatal = false;
-    serialStatus = -1;
-    lastSYN = startPkt = -1;
-    crcIn = crcOut = 0;
-
-    thisThread = pthread_self();
+    ownerThreadId_ = pthread_self();
     realBaud = baud;
     if (baud < 0) {
         baud_index = 1;
         realBaud = baud_table[0];
     }
     fd = init_serial(devname, realBaud, 0);
-    if (fd == -1)
+    if (fd == -1) {
         lastFatal = true;
-    else {
+    } else {
         signal(SIGUSR1, usr1handler);
-        pthread_create(&datapump, NULL, pump_run, this);
+        pthread_create(&dataPumpThreadId_, NULL, pump_run, this);
     }
 }
 
@@ -211,8 +200,8 @@ packet::
 ~packet()
 {
     if (fd != -1) {
-        pthread_cancel(datapump);
-        pthread_join(datapump, NULL);
+        pthread_cancel(dataPumpThreadId_);
+        pthread_join(dataPumpThreadId_, NULL);
         ser_exit(fd);
     }
     fd = -1;
@@ -226,14 +215,14 @@ reset()
 {
     // This method stops the data pump thread and restarts it, performing a pthread_join. Given this, it's unsafe to be
     // called from the data pump itself. This is a belt and braces check to ensure we don't do that (spoiler: we were).
-    assert(pthread_self() != datapump);
+    assert(pthread_self() != dataPumpThreadId_);
     if (fd != -1) {
-        pthread_cancel(datapump);
-        pthread_join(datapump, NULL);
+        pthread_cancel(dataPumpThreadId_);
+        pthread_join(dataPumpThreadId_, NULL);
     }
     internalReset();
     if (fd != -1) {
-        pthread_create(&datapump, NULL, pump_run, this);
+        pthread_create(&dataPumpThreadId_, NULL, pump_run, this);
         realWrite();
     }
 }
@@ -361,7 +350,7 @@ opCByte(unsigned char a, unsigned short *crc)
 void packet::
 realWrite()
 {
-    pthread_kill(datapump, SIGUSR1);
+    pthread_kill(dataPumpThreadId_, SIGUSR1);
     while (!hasSpace(out)) {
         sigset_t sigs;
         int dummy;
@@ -456,7 +445,7 @@ outerLoop:
                                 lout << "len=" << dec << rcv.getLen();
                             lout << endl;
                         }
-                        theLINK->receive(rcv);
+                        link_->receive(rcv);
                     }
                     rcv.init();
                     if (hasData(out))
