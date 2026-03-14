@@ -127,21 +127,6 @@ public:
     void purgeQueue(int channel);
 
     /**
-     * Set verbosity of Link and underlying packet instance.
-     *
-     * @param _verbose Verbosity (a bitmapped value, see LINK_DEBUG_.. constants)
-     */
-    void setVerbose(unsigned short _verbose);
-
-    /**
-     * Get current verbosity of Link.
-     *
-     * @returns The verbosity, specified at construction or last call to
-     *  setVerbosity();
-     */
-    unsigned short getVerbose();
-
-    /**
      * Get the current link type.
      *
      * @returns One of LINK_TYPE_... values.

@@ -95,19 +95,6 @@ reset() {
     l->reset();
 }
 
-unsigned short NCP::
-getVerbose()
-{
-    return verbose;
-}
-
-void NCP::
-setVerbose(unsigned short _verbose)
-{
-    verbose = _verbose;
-    l->setVerbose(verbose);
-}
-
 short int NCP::
 getProtocolVersion()
 {
