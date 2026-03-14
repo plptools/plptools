@@ -158,17 +158,17 @@ static const int baud_table[] = {
 using namespace std;
 
 DataLink::DataLink(const char *fname,
-                   int _baud,
+                   int baud,
                    Link *link,
                    unsigned short verbose,
                    const int cancellationFd)
-: link_(link)
+: requestedBaud_(baud)
+, link_(link)
 , verbose_(verbose)
 , cancellationFd_(cancellationFd) {
     verbose_ = verbose;
     devname = strdup(fname);
     assert(devname);
-    baud = _baud;
 
     // Initialize CRC table
     crc_table[0] = 0;
@@ -183,8 +183,8 @@ DataLink::DataLink(const char *fname,
     outBuffer = new unsigned char[BUFLEN + 1];
 
     ownerThreadId_ = pthread_self();
-    realBaud = baud;
-    if (baud < 0) {
+    realBaud = requestedBaud_;
+    if (requestedBaud_ < 0) {
         baud_index = 1;
         realBaud = baud_table[0];
     }
@@ -239,9 +239,9 @@ void DataLink::internalReset() {
     serialStatus = -1;
     lastSYN = startPkt = -1;
     crcIn = crcOut = 0;
-    realBaud = baud;
+    realBaud = requestedBaud_;
     justStarted = true;
-    if (baud < 0) {
+    if (requestedBaud_ < 0) {
         realBaud = baud_table[baud_index++];
         if (baud_index >= BAUD_TABLE_SIZE)
             baud_index = 0;
