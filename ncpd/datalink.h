@@ -97,7 +97,11 @@ private:
     bool justStarted = true;
 
     char *devname;
-    int baud;
+
+    /**
+    * Requested baud rate; -1 indicates automatic.
+    */
+    const int requestedBaud_;
 
     const int cancellationFd_;
 };
