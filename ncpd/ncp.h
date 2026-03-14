@@ -71,8 +71,6 @@ public:
     void registerPcServer(TCPSocket *skt, const char *name);
     void unregisterPcServer(PcServer *server);
 
-    void setVerbose(unsigned short);
-    unsigned short getVerbose();
     short int getProtocolVersion();
     int getSpeed();
 

@@ -46,8 +46,6 @@ public:
     void send(bufferStore &b);
 
     void setEpoc(bool);
-    void setVerbose(short int);
-    short int getVerbose();
     int getSpeed();
     bool linkFailed();
     void reset();
@@ -88,7 +86,6 @@ private:
 
     bufferArray inQueue;
     bufferStore rcv;
-    int foundSync;
     int fd;
     int serialStatus;
     int baud_index;

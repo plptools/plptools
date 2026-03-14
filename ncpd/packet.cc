@@ -271,18 +271,6 @@ internalReset()
         lastFatal = false;
 }
 
-short int packet::
-getVerbose()
-{
-    return verbose;
-}
-
-void packet::
-setVerbose(short int _verbose)
-{
-    verbose = pumpverbose = _verbose;
-}
-
 void packet::
 setEpoc(bool _epoc)
 {

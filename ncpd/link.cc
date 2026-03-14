@@ -113,19 +113,6 @@ reset() {
     sendReqReq();
 }
 
-unsigned short Link::
-getVerbose()
-{
-    return verbose;
-}
-
-void Link::
-setVerbose(unsigned short _verbose)
-{
-    verbose = _verbose;
-    p->setVerbose(verbose);
-}
-
 void Link::
 send(const bufferStore & buff)
 {
