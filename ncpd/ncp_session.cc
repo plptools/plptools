@@ -45,7 +45,7 @@ using namespace std;
 * @ref ncp_session_main_thread (as we are doing) is definitely a bad thing.
 *
 * The @ref NCP::reset call here is currently required (even though it feels like it shouldn't be) as it's responsible
-* for preparing the stack after a successful connection has ended (@ref packet currently has responsibility for
+* for preparing the stack after a successful connection has ended (@ref DataLink currently has responsibility for
 * performing internal resets when auto-detecting baud rate).
 */
 void *link_thread(void *arg) {

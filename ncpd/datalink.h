@@ -34,11 +34,11 @@ extern "C" {
 
 class Link;
 
-class packet
+class DataLink
 {
 public:
-    packet(const char *fname, int baud, Link *_link, unsigned short verbose, const int cancellationFd);
-    ~packet();
+    DataLink(const char *fname, int baud, Link *_link, unsigned short verbose, const int cancellationFd);
+    ~DataLink();
 
     /**
      * Send a buffer out to serial line

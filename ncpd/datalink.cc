@@ -40,7 +40,7 @@
 #include "link.h"
 #include "mp_serial.h"
 #include "ncp_log.h"
-#include "packet.h"
+#include "datalink.h"
 
 #define BUFLEN 4096 // Must be a power of 2
 #define BUFMASK (BUFLEN-1)
@@ -67,15 +67,15 @@ static void usr1handler(int sig)
 // TODO: `fd` isn't thread-safe.
 static void *data_pump_thread(void *arg)
 {
-    packet *p = (packet *)arg;
+    DataLink *dataLink = (DataLink *)arg;
     pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
     while (1) {
-        if (p->fd == -1) {
+        if (dataLink->fd == -1) {
             fd_set r_set;
             FD_ZERO(&r_set);
-            FD_SET(p->cancellationFd_, &r_set);
+            FD_SET(dataLink->cancellationFd_, &r_set);
             struct timeval tv = {1, 0};
-            select(p->cancellationFd_ + 1, &r_set, NULL, NULL, &tv);
+            select(dataLink->cancellationFd_ + 1, &r_set, NULL, NULL, &tv);
         } else {
             fd_set r_set;
             fd_set w_set;
@@ -84,58 +84,58 @@ static void *data_pump_thread(void *arg)
 
             FD_ZERO(&r_set);
             w_set = r_set;
-            FD_SET(p->cancellationFd_, &r_set);
-            if (hasSpace(p->in))
-                FD_SET(p->fd, &r_set);
-            if (hasData(p->out))
-                FD_SET(p->fd, &w_set);
+            FD_SET(dataLink->cancellationFd_, &r_set);
+            if (hasSpace(dataLink->in))
+                FD_SET(dataLink->fd, &r_set);
+            if (hasData(dataLink->out))
+                FD_SET(dataLink->fd, &w_set);
             struct timeval tv = {1, 0};
-            res = select(MAX(p->fd, p->cancellationFd_) + 1, &r_set, &w_set, NULL, &tv);
+            res = select(MAX(dataLink->fd, dataLink->cancellationFd_) + 1, &r_set, &w_set, NULL, &tv);
             switch (res) {
                 case 0:
                     break;
                 case -1:
                     break;
                 default:
-                    if (FD_ISSET(p->fd, &w_set)) {
-                        count = p->outWrite - p->outRead;
+                    if (FD_ISSET(dataLink->fd, &w_set)) {
+                        count = dataLink->outWrite - dataLink->outRead;
                         if (count < 0)
-                            count = (BUFLEN - p->outRead);
-                        res = write(p->fd, &p->outBuffer[p->outRead], count);
+                            count = (BUFLEN - dataLink->outRead);
+                        res = write(dataLink->fd, &dataLink->outBuffer[dataLink->outRead], count);
                         if (res > 0) {
-                            if (p->verbose_ & PKT_DEBUG_DUMP) {
+                            if (dataLink->verbose_ & PKT_DEBUG_DUMP) {
                                 int i;
                                 printf("pump: wrote %d bytes: (", res);
                                 for (i = 0; i<res; i++)
                                     printf("%02x ",
-                                           p->outBuffer[p->outRead + i]);
+                                           dataLink->outBuffer[dataLink->outRead + i]);
                                 printf(")\n");
                             }
-                            int hadSpace = hasSpace(p->out);
-                            inca(p->outRead, res);
+                            int hadSpace = hasSpace(dataLink->out);
+                            inca(dataLink->outRead, res);
                             if (!hadSpace)
-                                    pthread_kill(p->ownerThreadId_, SIGUSR1);
+                                    pthread_kill(dataLink->ownerThreadId_, SIGUSR1);
                         }
                     }
-                    if (FD_ISSET(p->fd, &r_set)) {
-                        count = p->inRead - p->inWrite;
+                    if (FD_ISSET(dataLink->fd, &r_set)) {
+                        count = dataLink->inRead - dataLink->inWrite;
                         if (count <= 0)
-                            count = (BUFLEN - p->inWrite);
-                        res = read(p->fd, &p->inBuffer[p->inWrite], count);
+                            count = (BUFLEN - dataLink->inWrite);
+                        res = read(dataLink->fd, &dataLink->inBuffer[dataLink->inWrite], count);
                         if (res > 0) {
-                            if (p->verbose_ & PKT_DEBUG_DUMP) {
+                            if (dataLink->verbose_ & PKT_DEBUG_DUMP) {
                                 int i;
                                 printf("pump: read %d bytes: (", res);
                                 for (i = 0; i<res; i++)
-                                    printf("%02x ", p->inBuffer[p->inWrite + i]);
+                                    printf("%02x ", dataLink->inBuffer[dataLink->inWrite + i]);
                                 printf(")\n");
                             }
-                            inca(p->inWrite, res);
-                            p->findSync();
+                            inca(dataLink->inWrite, res);
+                            dataLink->findSync();
                         }
                     } else {
-                        if (hasData(p->in))
-                            p->findSync();
+                        if (hasData(dataLink->in))
+                            dataLink->findSync();
                     }
                     break;
             }
@@ -157,15 +157,14 @@ static const int baud_table[] = {
 
 using namespace std;
 
-packet::packet(const char *fname,
-               int _baud,
-               Link *link,
-               unsigned short verbose,
-               const int cancellationFd)
+DataLink::DataLink(const char *fname,
+                   int _baud,
+                   Link *link,
+                   unsigned short verbose,
+                   const int cancellationFd)
 : link_(link)
 , verbose_(verbose)
-, cancellationFd_(cancellationFd)
-{
+, cancellationFd_(cancellationFd) {
     verbose_ = verbose;
     devname = strdup(fname);
     assert(devname);
@@ -198,9 +197,7 @@ packet::packet(const char *fname,
     }
 }
 
-packet::
-~packet()
-{
+DataLink::~DataLink() {
     if (fd != -1) {
         pthread_cancel(dataPumpThreadId_);
         pthread_join(dataPumpThreadId_, NULL);
@@ -212,9 +209,7 @@ packet::
     free(devname);
 }
 
-void packet::
-reset()
-{
+void DataLink::reset() {
     // This method stops the data pump thread and restarts it, performing a pthread_join. Given this, it's unsafe to be
     // called from the data pump itself. This is a belt and braces check to ensure we don't do that (spoiler: we were).
     assert(pthread_self() != dataPumpThreadId_);
@@ -229,9 +224,7 @@ reset()
     }
 }
 
-void packet::
-internalReset()
-{
+void DataLink::internalReset() {
     if (verbose_ & PKT_DEBUG_LOG)
         lout << "resetting serial connection" << endl;
     if (fd != -1) {
@@ -262,21 +255,15 @@ internalReset()
         lastFatal = false;
 }
 
-void packet::
-setEpoc(bool _epoc)
-{
+void DataLink::setEpoc(bool _epoc) {
     isEPOC = _epoc;
 }
 
-int packet::
-getSpeed()
-{
+int DataLink:: getSpeed() {
     return realBaud;
 }
 
-void packet::
-send(bufferStore &b)
-{
+void DataLink::send(bufferStore &b) {
     opByte(0x16);
     opByte(0x10);
     opByte(0x02);
@@ -318,28 +305,24 @@ send(bufferStore &b)
     realWrite();
 }
 
-void packet::
-opByte(unsigned char a)
-{
-    if (!hasSpace(out))
+void DataLink::opByte(unsigned char a) {
+    if (!hasSpace(out)) {
         realWrite();
+    }
     outBuffer[outWrite] = a;
     inc1(outWrite);
 }
 
-void packet::
-opCByte(unsigned char a, unsigned short *crc)
-{
+void DataLink::opCByte(unsigned char a, unsigned short *crc) {
     addToCrc(a, crc);
-    if (!hasSpace(out))
+    if (!hasSpace(out)) {
         realWrite();
+    }
     outBuffer[outWrite] = a;
     inc1(outWrite);
 }
 
-void packet::
-realWrite()
-{
+void DataLink::realWrite() {
     pthread_kill(dataPumpThreadId_, SIGUSR1);
     while (!hasSpace(out)) {
         sigset_t sigs;
@@ -350,9 +333,10 @@ realWrite()
     }
 }
 
-void packet::
-findSync()
-{
+/**
+* Reads the incoming data and processes data frames.
+*/
+void DataLink::findSync() {
     int inw = inWrite;
     int p;
 
@@ -461,9 +445,7 @@ outerLoop:
     }
 }
 
-bool packet::
-linkFailed()
-{
+bool DataLink::linkFailed() {
     int arg;
     int res;
     bool failed = false;
