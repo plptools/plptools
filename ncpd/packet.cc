@@ -167,9 +167,7 @@ packet(const char *fname, int _baud, Link *_link, unsigned short _verbose, const
     devname = strdup(fname);
     assert(devname);
     baud = _baud;
-    theLINK = _link;
-    isEPOC = false;
-    justStarted = true;
+    link_ = _link;
 
     // Initialize CRC table
     crc_table[0] = 0;
@@ -180,17 +178,8 @@ packet(const char *fname, int _baud, Link *_link, unsigned short _verbose, const
         crc_table[i * 2 + (carry ? 1 : 0)] = tmp;
     }
 
-    inRead = inWrite = outRead = outWrite = 0;
     inBuffer = new unsigned char[BUFLEN + 1];
     outBuffer = new unsigned char[BUFLEN + 1];
-    assert(inBuffer);
-    assert(outBuffer);
-
-    esc = false;
-    lastFatal = false;
-    serialStatus = -1;
-    lastSYN = startPkt = -1;
-    crcIn = crcOut = 0;
 
     thisThread = pthread_self();
     realBaud = baud;
@@ -199,9 +188,9 @@ packet(const char *fname, int _baud, Link *_link, unsigned short _verbose, const
         realBaud = baud_table[0];
     }
     fd = init_serial(devname, realBaud, 0);
-    if (fd == -1)
+    if (fd == -1) {
         lastFatal = true;
-    else {
+    } else {
         signal(SIGUSR1, usr1handler);
         pthread_create(&datapump, NULL, pump_run, this);
     }
@@ -456,7 +445,7 @@ outerLoop:
                                 lout << "len=" << dec << rcv.getLen();
                             lout << endl;
                         }
-                        theLINK->receive(rcv);
+                        link_->receive(rcv);
                     }
                     rcv.init();
                     if (hasData(out))

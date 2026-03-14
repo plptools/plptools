@@ -65,39 +65,39 @@ private:
     void realWrite();
     void internalReset();
 
-    Link *theLINK;
+    Link *link_;
     pthread_t datapump;
     pthread_t thisThread;
     unsigned int   crc_table[256];
 
-    unsigned short crcOut;
-    unsigned short crcIn;
+    unsigned short crcOut = 0;
+    unsigned short crcIn = 0;
     unsigned short receivedCRC;
     unsigned short inCRCstate;
 
     unsigned char *inBuffer;
-    int inWrite;
-    int inRead;
+    int inWrite = 0;
+    int inRead = 0;
 
     unsigned char *outBuffer;
-    int outWrite;
-    int outRead;
+    int outWrite = 0;
+    int outRead = 0;
 
-    int startPkt;
-    int lastSYN;
+    int startPkt = -1;
+    int lastSYN = -1;
 
     bufferArray inQueue;
     bufferStore rcv;
     int foundSync;
     int fd;
-    int serialStatus;
+    int serialStatus = -1;
     int baud_index;
     int realBaud;
     short int verbose;
-    bool esc;
-    bool lastFatal;
-    bool isEPOC;
-    bool justStarted;
+    bool esc = false;
+    bool lastFatal = false;
+    bool isEPOC = false;
+    bool justStarted = true;
 
     char *devname;
     int baud;
