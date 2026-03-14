@@ -29,7 +29,7 @@
 #include "bufferarray.h"
 
 extern "C" {
-    static void *pump_run(void *);
+    static void *data_pump_thread(void *);
 }
 
 class Link;
@@ -51,7 +51,7 @@ public:
     void reset();
 
 private:
-    friend void * pump_run(void *);
+    friend void * data_pump_thread(void *);
 
     inline void addToCrc(unsigned char a, unsigned short *crc) {
         *crc =  (*crc << 8) ^ crc_table[((*crc >> 8) ^ a) & 0xff];
@@ -90,7 +90,7 @@ private:
     int serialStatus = -1;
     int baud_index;
     int realBaud;
-    short int verbose;
+    short int verbose_;
     bool esc = false;
     bool lastFatal = false;
     bool isEPOC = false;
@@ -99,7 +99,7 @@ private:
     char *devname;
     int baud;
 
-    const int cancellationFd;
+    const int cancellationFd_;
 };
 
 #endif
