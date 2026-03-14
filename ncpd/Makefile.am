@@ -26,6 +26,8 @@ ncpd_LDADD = $(LIB_PLP) $(INTLLIBS) $(LIBPMULTITHREAD) $(LIBTHREAD) $(NANOSLEEP_
 ncpd_SOURCES = \
 	channel.cc \
 	channel.h \
+	datalink.cc \
+	datalink.h \
 	link.cc \
 	link.h  \
 	linkchan.cc \
@@ -39,7 +41,5 @@ ncpd_SOURCES = \
 	ncp_session.h \
 	ncp.cc \
 	ncp.h \
-	packet.cc \
-	packet.h \
 	socketchannel.cc \
 	socketchannel.h

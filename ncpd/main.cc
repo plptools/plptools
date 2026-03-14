@@ -46,7 +46,7 @@
 
 #include "ncp_log.h"
 #include "ncp_session.h"
-#include "packet.h"
+#include "datalink.h"
 
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE

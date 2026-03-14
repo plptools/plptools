@@ -30,8 +30,8 @@
 #include "Enum.h"
 #include <vector>
 
+class DataLink;
 class NCP;
-class packet;
 
 /**
  * Describes a transmitted packet which has not yet
@@ -141,13 +141,13 @@ public:
     int getSpeed();
 
 private:
-    friend class packet;
+    friend class DataLink;
     friend void * expire_check(void *);
 
     /**
-    * Effectively a delegate method that accepts data from our @ref packet instance.
+    * Effectively a delegate method that accepts data from our @ref DataLink instance.
     *
-    * Called on the @ref packet's internal thread.
+    * Called on the @ref DataLink's internal thread.
     */
     void receive(bufferStore buf);
     void transmit(bufferStore buf);
@@ -166,7 +166,7 @@ private:
     pthread_mutex_t queueMutex;
 
     NCP *theNCP;
-    packet *p;
+    DataLink *dataLink_ = nullptr;
     int txSequence;
     int rxSequence;
     int seqMask;
