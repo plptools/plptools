@@ -38,9 +38,11 @@
 #include <signal.h>
 
 #include "link.h"
-#include "mp_serial.h"
 #include "ncp_log.h"
 #include "packet.h"
+
+#include "serialtransport.h"
+#include "tcptransport.h"
 
 #define BUFLEN 4096 // Must be a power of 2
 #define BUFMASK (BUFLEN-1)
@@ -72,7 +74,9 @@ static void *pump_run(void *arg)
     packet *p = (packet *)arg;
     pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
     while (1) {
-        if (p->fd == -1) {
+        fd_set r_set;
+        int fd = p->transport->getFd();
+        if (fd == -1) {
             fd_set r_set;
             FD_ZERO(&r_set);
             FD_SET(p->cancellationFd, &r_set);
@@ -88,22 +92,22 @@ static void *pump_run(void *arg)
             w_set = r_set;
             FD_SET(p->cancellationFd, &r_set);
             if (hasSpace(p->in))
-                FD_SET(p->fd, &r_set);
+                FD_SET(fd, &r_set);
             if (hasData(p->out))
-                FD_SET(p->fd, &w_set);
+                FD_SET(fd, &w_set);
             struct timeval tv = {1, 0};
-            res = select(MAX(p->fd, p->cancellationFd) + 1, &r_set, &w_set, NULL, &tv);
+            res = select(MAX(fd, p->cancellationFd) + 1, &r_set, &w_set, NULL, &tv);
             switch (res) {
                 case 0:
                     break;
                 case -1:
                     break;
                 default:
-                    if (FD_ISSET(p->fd, &w_set)) {
+                    if (FD_ISSET(fd, &w_set)) {
                         count = p->outWrite - p->outRead;
                         if (count < 0)
                             count = (BUFLEN - p->outRead);
-                        res = write(p->fd, &p->outBuffer[p->outRead], count);
+                        res = write(fd, &p->outBuffer[p->outRead], count);
                         if (res > 0) {
                             if (pumpverbose & PKT_DEBUG_DUMP) {
                                 int i;
@@ -119,11 +123,11 @@ static void *pump_run(void *arg)
                                     pthread_kill(p->thisThread, SIGUSR1);
                         }
                     }
-                    if (FD_ISSET(p->fd, &r_set)) {
+                    if (FD_ISSET(fd, &r_set)) {
                         count = p->inRead - p->inWrite;
                         if (count <= 0)
                             count = (BUFLEN - p->inWrite);
-                        res = read(p->fd, &p->inBuffer[p->inWrite], count);
+                        res = read(fd, &p->inBuffer[p->inWrite], count);
                         if (res > 0) {
                             if (pumpverbose & PKT_DEBUG_DUMP) {
                                 int i;
@@ -198,7 +202,24 @@ packet(const char *fname, int _baud, Link *_link, unsigned short _verbose, const
         baud_index = 1;
         realBaud = baud_table[0];
     }
-    fd = init_serial(devname, realBaud, 0);
+
+    // Check the serial device to see if it contains the special `tcp:` prefix indicating that we should
+    // create a TCP transport instead of the usual serial.
+    string device(fname);
+    if (device.rfind("tcp:", 0) == 0) {
+        size_t pos;
+        string portString = device.substr(4);
+        int port = std::stoi(portString, &pos);
+        if (pos < portString.length()) {
+            printf("Invalid TCP port specification.\n");
+            abort();
+        }
+        transport = new TCPTransport(port);
+    } else {
+        transport = new SerialTransport(devname, realBaud, 0);
+    }
+
+    int fd = transport->open();
     if (fd == -1)
         lastFatal = true;
     else {
@@ -210,12 +231,11 @@ packet(const char *fname, int _baud, Link *_link, unsigned short _verbose, const
 packet::
 ~packet()
 {
-    if (fd != -1) {
+    if (transport->isConnected()) {
         pthread_cancel(datapump);
         pthread_join(datapump, NULL);
-        ser_exit(fd);
+        transport->close();
     }
-    fd = -1;
     delete []inBuffer;
     delete []outBuffer;
     free(devname);
@@ -227,12 +247,12 @@ reset()
     // This method stops the data pump thread and restarts it, performing a pthread_join. Given this, it's unsafe to be
     // called from the data pump itself. This is a belt and braces check to ensure we don't do that (spoiler: we were).
     assert(pthread_self() != datapump);
-    if (fd != -1) {
+    if (transport->isConnected()) {
         pthread_cancel(datapump);
         pthread_join(datapump, NULL);
     }
     internalReset();
-    if (fd != -1) {
+    if (transport->isConnected()) {
         pthread_create(&datapump, NULL, pump_run, this);
         realWrite();
     }
@@ -243,9 +263,8 @@ internalReset()
 {
     if (verbose & PKT_DEBUG_LOG)
         lout << "resetting serial connection" << endl;
-    if (fd != -1) {
-        ser_exit(fd);
-        fd = -1;
+    if (transport->isConnected()) {
+        transport->close();
     }
     usleep(100000);
     outRead = outWrite = 0;
@@ -263,7 +282,7 @@ internalReset()
             baud_index = 0;
     }
 
-    fd = init_serial(devname, realBaud, 0);
+    int fd = transport->open();
     if (verbose & PKT_DEBUG_LOG)
         lout << "serial connection set to " << dec << realBaud
              << " baud, fd=" << fd << endl;
@@ -485,43 +504,16 @@ outerLoop:
 bool packet::
 linkFailed()
 {
-    int arg;
-    int res;
-    bool failed = false;
-
-    if (fd == -1)
+    switch (transport->refreshLink()) {
+    case LinkStatus::OK:
         return false;
-    res = ioctl(fd, TIOCMGET, &arg);
-    if (res < 0)
+    case LinkStatus::FAILED:
+        return true;
+    case LinkStatus::FATAL:
         lastFatal = true;
-    if ((serialStatus == -1) || (arg != serialStatus)) {
-        if (verbose & PKT_DEBUG_HANDSHAKE)
-            lout << "packet: < DTR:" << ((arg & TIOCM_DTR)?1:0)
-                 << " RTS:" << ((arg & TIOCM_RTS)?1:0)
-                 << " DCD:" << ((arg & TIOCM_CAR)?1:0)
-                 << " DSR:" << ((arg & TIOCM_DSR)?1:0)
-                 << " CTS:" << ((arg & TIOCM_CTS)?1:0) << endl;
-        if (!((arg & TIOCM_RTS) && (arg & TIOCM_DTR))) {
-            arg |= (TIOCM_DTR | TIOCM_RTS);
-            res = ioctl(fd, TIOCMSET, &arg);
-            if (res < 0)
-                lastFatal = true;
-            if (verbose & PKT_DEBUG_HANDSHAKE)
-                lout << "packet: > DTR:" << ((arg & TIOCM_DTR)?1:0)
-                     << " RTS:" << ((arg & TIOCM_RTS)?1:0)
-                     << " DCD:" << ((arg & TIOCM_CAR)?1:0)
-                     << " DSR:" << ((arg & TIOCM_DSR)?1:0)
-                     << " CTS:" << ((arg & TIOCM_CTS)?1:0) << endl;
-        }
-        serialStatus = arg;
+        return true;
+    default:
+        fprintf(stderr, "Invalid LinkStatus value\n");
+        abort();
     }
-    // TODO: Check for a solution on Solaris.
-    if ((arg & TIOCM_DSR) == 0) {
-        failed = true;
-    }
-    if ((verbose & PKT_DEBUG_LOG) && lastFatal)
-        lout << "packet: linkFATAL\n";
-    if ((verbose & PKT_DEBUG_LOG) && failed)
-        lout << "packet: linkFAILED\n";
-    return (lastFatal || failed);
 }
