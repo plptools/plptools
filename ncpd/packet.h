@@ -66,9 +66,9 @@ private:
     void internalReset();
 
     Link *link_;
-    pthread_t datapump;
-    pthread_t thisThread;
-    unsigned int   crc_table[256];
+    pthread_t dataPumpThreadId_;
+    pthread_t ownerThreadId_;
+    unsigned int crc_table[256];
 
     unsigned short crcOut = 0;
     unsigned short crcIn = 0;
