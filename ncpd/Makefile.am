@@ -41,5 +41,10 @@ ncpd_SOURCES = \
 	ncp.h \
 	packet.cc \
 	packet.h \
+	serialtransport.cc \
+	serialtransport.h \
 	socketchannel.cc \
-	socketchannel.h
+	socketchannel.h \
+	tcptransport.cc \
+	tcptransport.h \
+	transport.h

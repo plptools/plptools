@@ -27,6 +27,7 @@
 
 #include "bufferstore.h"
 #include "bufferarray.h"
+#include "transport.h"
 
 extern "C" {
     static void *pump_run(void *);
@@ -89,7 +90,6 @@ private:
     bufferArray inQueue;
     bufferStore rcv;
     int foundSync;
-    int fd;
     int serialStatus;
     int baud_index;
     int realBaud;
@@ -98,6 +98,7 @@ private:
     bool lastFatal;
     bool isEPOC;
     bool justStarted;
+    Transport *transport = nullptr;
 
     char *devname;
     int baud;
