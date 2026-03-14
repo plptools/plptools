@@ -52,8 +52,6 @@
 #define inc1(idx) inca(idx, 1)
 #define normalize(idx) do { idx &= BUFMASK; } while (0)
 
-static unsigned short pumpverbose = 0;
-
 extern "C" {
 /**
  * Signal handler does nothing. It just exists
@@ -67,7 +65,7 @@ static void usr1handler(int sig)
 
 
 // TODO: `fd` isn't thread-safe.
-static void *pump_run(void *arg)
+static void *data_pump_thread(void *arg)
 {
     packet *p = (packet *)arg;
     pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
@@ -75,9 +73,9 @@ static void *pump_run(void *arg)
         if (p->fd == -1) {
             fd_set r_set;
             FD_ZERO(&r_set);
-            FD_SET(p->cancellationFd, &r_set);
+            FD_SET(p->cancellationFd_, &r_set);
             struct timeval tv = {1, 0};
-            select(p->cancellationFd + 1, &r_set, NULL, NULL, &tv);
+            select(p->cancellationFd_ + 1, &r_set, NULL, NULL, &tv);
         } else {
             fd_set r_set;
             fd_set w_set;
@@ -86,13 +84,13 @@ static void *pump_run(void *arg)
 
             FD_ZERO(&r_set);
             w_set = r_set;
-            FD_SET(p->cancellationFd, &r_set);
+            FD_SET(p->cancellationFd_, &r_set);
             if (hasSpace(p->in))
                 FD_SET(p->fd, &r_set);
             if (hasData(p->out))
                 FD_SET(p->fd, &w_set);
             struct timeval tv = {1, 0};
-            res = select(MAX(p->fd, p->cancellationFd) + 1, &r_set, &w_set, NULL, &tv);
+            res = select(MAX(p->fd, p->cancellationFd_) + 1, &r_set, &w_set, NULL, &tv);
             switch (res) {
                 case 0:
                     break;
@@ -105,7 +103,7 @@ static void *pump_run(void *arg)
                             count = (BUFLEN - p->outRead);
                         res = write(p->fd, &p->outBuffer[p->outRead], count);
                         if (res > 0) {
-                            if (pumpverbose & PKT_DEBUG_DUMP) {
+                            if (p->verbose_ & PKT_DEBUG_DUMP) {
                                 int i;
                                 printf("pump: wrote %d bytes: (", res);
                                 for (i = 0; i<res; i++)
@@ -125,7 +123,7 @@ static void *pump_run(void *arg)
                             count = (BUFLEN - p->inWrite);
                         res = read(p->fd, &p->inBuffer[p->inWrite], count);
                         if (res > 0) {
-                            if (pumpverbose & PKT_DEBUG_DUMP) {
+                            if (p->verbose_ & PKT_DEBUG_DUMP) {
                                 int i;
                                 printf("pump: read %d bytes: (", res);
                                 for (i = 0; i<res; i++)
@@ -159,15 +157,19 @@ static const int baud_table[] = {
 
 using namespace std;
 
-packet::
-packet(const char *fname, int _baud, Link *_link, unsigned short _verbose, const int _cancellationFd)
-: cancellationFd(_cancellationFd)
+packet::packet(const char *fname,
+               int _baud,
+               Link *link,
+               unsigned short verbose,
+               const int cancellationFd)
+: link_(link)
+, verbose_(verbose)
+, cancellationFd_(cancellationFd)
 {
-    verbose = pumpverbose = _verbose;
+    verbose_ = verbose;
     devname = strdup(fname);
     assert(devname);
     baud = _baud;
-    link_ = _link;
 
     // Initialize CRC table
     crc_table[0] = 0;
@@ -192,7 +194,7 @@ packet(const char *fname, int _baud, Link *_link, unsigned short _verbose, const
         lastFatal = true;
     } else {
         signal(SIGUSR1, usr1handler);
-        pthread_create(&dataPumpThreadId_, NULL, pump_run, this);
+        pthread_create(&dataPumpThreadId_, NULL, data_pump_thread, this);
     }
 }
 
@@ -222,7 +224,7 @@ reset()
     }
     internalReset();
     if (fd != -1) {
-        pthread_create(&dataPumpThreadId_, NULL, pump_run, this);
+        pthread_create(&dataPumpThreadId_, NULL, data_pump_thread, this);
         realWrite();
     }
 }
@@ -230,7 +232,7 @@ reset()
 void packet::
 internalReset()
 {
-    if (verbose & PKT_DEBUG_LOG)
+    if (verbose_ & PKT_DEBUG_LOG)
         lout << "resetting serial connection" << endl;
     if (fd != -1) {
         ser_exit(fd);
@@ -253,7 +255,7 @@ internalReset()
     }
 
     fd = init_serial(devname, realBaud, 0);
-    if (verbose & PKT_DEBUG_LOG)
+    if (verbose_ & PKT_DEBUG_LOG)
         lout << "serial connection set to " << dec << realBaud
              << " baud, fd=" << fd << endl;
     if (fd != -1)
@@ -282,9 +284,9 @@ send(bufferStore &b)
     crcOut = 0;
     long len = b.getLen();
 
-    if (verbose & PKT_DEBUG_LOG) {
+    if (verbose_ & PKT_DEBUG_LOG) {
         lout << "packet: >> ";
-        if (verbose & PKT_DEBUG_DUMP)
+        if (verbose_ & PKT_DEBUG_DUMP)
             lout << b;
         else
             lout << " len=" << dec << len;
@@ -422,12 +424,12 @@ outerLoop:
                     startPkt = lastSYN = -1;
                     inCRCstate = 0;
                     if (receivedCRC != crcIn) {
-                        if (verbose & PKT_DEBUG_LOG)
+                        if (verbose_ & PKT_DEBUG_LOG)
                             lout << "packet: BAD CRC" << endl;
                     } else {
-                        if (verbose & PKT_DEBUG_LOG) {
+                        if (verbose_ & PKT_DEBUG_LOG) {
                             lout << "packet: << ";
-                            if (verbose & PKT_DEBUG_DUMP)
+                            if (verbose_ & PKT_DEBUG_DUMP)
                                 lout << rcv;
                             else
                                 lout << "len=" << dec << rcv.getLen();
@@ -472,7 +474,7 @@ linkFailed()
     if (res < 0)
         lastFatal = true;
     if ((serialStatus == -1) || (arg != serialStatus)) {
-        if (verbose & PKT_DEBUG_HANDSHAKE)
+        if (verbose_ & PKT_DEBUG_HANDSHAKE)
             lout << "packet: < DTR:" << ((arg & TIOCM_DTR)?1:0)
                  << " RTS:" << ((arg & TIOCM_RTS)?1:0)
                  << " DCD:" << ((arg & TIOCM_CAR)?1:0)
@@ -483,7 +485,7 @@ linkFailed()
             res = ioctl(fd, TIOCMSET, &arg);
             if (res < 0)
                 lastFatal = true;
-            if (verbose & PKT_DEBUG_HANDSHAKE)
+            if (verbose_ & PKT_DEBUG_HANDSHAKE)
                 lout << "packet: > DTR:" << ((arg & TIOCM_DTR)?1:0)
                      << " RTS:" << ((arg & TIOCM_RTS)?1:0)
                      << " DCD:" << ((arg & TIOCM_CAR)?1:0)
@@ -496,9 +498,9 @@ linkFailed()
     if ((arg & TIOCM_DSR) == 0) {
         failed = true;
     }
-    if ((verbose & PKT_DEBUG_LOG) && lastFatal)
+    if ((verbose_ & PKT_DEBUG_LOG) && lastFatal)
         lout << "packet: linkFATAL\n";
-    if ((verbose & PKT_DEBUG_LOG) && failed)
+    if ((verbose_ & PKT_DEBUG_LOG) && failed)
         lout << "packet: linkFAILED\n";
     return (lastFatal || failed);
 }
