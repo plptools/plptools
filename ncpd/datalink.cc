@@ -97,7 +97,11 @@ static void *data_pump_thread(void *arg)
                 case -1:
                     break;
                 default:
+
+                    // We can write to the transport.
                     if (FD_ISSET(dataLink->fd, &w_set)) {
+
+                        // Work out how much contiguous data there is to write in the out buffer.
                         count = dataLink->outWrite - dataLink->outRead;
                         if (count < 0)
                             count = (BUFLEN - dataLink->outRead);
@@ -117,6 +121,8 @@ static void *data_pump_thread(void *arg)
                                     pthread_kill(dataLink->ownerThreadId_, SIGUSR1);
                         }
                     }
+
+                    // We can read from the transport.
                     if (FD_ISSET(dataLink->fd, &r_set)) {
                         count = dataLink->inRead - dataLink->inWrite;
                         if (count <= 0)
@@ -137,6 +143,7 @@ static void *data_pump_thread(void *arg)
                         if (hasData(dataLink->in))
                             dataLink->findSync();
                     }
+
                     break;
             }
         }
