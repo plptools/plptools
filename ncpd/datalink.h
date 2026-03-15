@@ -18,12 +18,13 @@
  *  along with this program; if not, see <https://www.gnu.org/licenses/>.
  *
  */
-#ifndef _packet_h
-#define _packet_h
+#pragma once
 
 #include "config.h"
+
 #include <stdio.h>
 #include <pthread.h>
+#include <mutex>
 
 #include "bufferstore.h"
 #include "bufferarray.h"
@@ -57,7 +58,7 @@ private:
         *crc =  (*crc << 8) ^ crc_table[((*crc >> 8) ^ a) & 0xff];
     }
 
-    void findSync();
+    bool findSync();
     void opByte(unsigned char a);
     void opCByte(unsigned char a, unsigned short *crc);
     void realWrite();
@@ -72,11 +73,15 @@ private:
     // with maintaining the underlying serial device, reading data from the serial device, and
     // writing data to the serial device. These should be treated as three distinct domains
     // wrt. concurrency and data within each group should be updated atomically.
-    //
-    // N.B. This thread-safety is not currently implemented.
+
+    // When acquiring locks, the order _must_ be:
+    // 1) serial
+    // 2) input
+    // 3) output
 
     // Serial.
 
+    std::mutex serialMutex_;
     int fd;
     int serialStatus = -1;
     int baudRateIndex_;
@@ -85,6 +90,7 @@ private:
 
     // Reading from serial.
 
+    std::mutex inputMutex_;
     bool esc = false;
     bool justStarted = true;
     bufferStore rcv;
@@ -97,8 +103,9 @@ private:
 
     // Writing to serial.
 
-    bool isEPOC = false;
-    unsigned short crcOut = 0;
+    std::mutex outputMutex_;
+    bool isEPOC_ = false;
+    // unsigned short crcOut = 0;
     unsigned char *outBuffer; int outWrite = 0; int outRead = 0;
 
     // Initial configuration (const).
@@ -115,5 +122,3 @@ private:
     const int cancellationFd_;
     const short int verbose_;
 };
-
-#endif
