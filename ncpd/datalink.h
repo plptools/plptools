@@ -87,9 +87,9 @@ private:
     bufferStore rcv;
     int fd;
     int serialStatus = -1;
-    int baud_index;
-    int realBaud;
-    const short int verbose_;
+    int baudRateIndex_;
+    int baudRate_;
+
     bool esc = false;
     bool lastFatal = false;
     bool isEPOC = false;
@@ -100,9 +100,10 @@ private:
     /**
     * Requested baud rate; -1 indicates automatic.
     */
-    const int requestedBaud_;
+    const int requestedBaudRate_;
 
     const int cancellationFd_;
+    const short int verbose_;
 };
 
 #endif
