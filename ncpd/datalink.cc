@@ -142,11 +142,12 @@ static void *data_pump_thread(void *arg) {
                         if (res > 0) {
                             log_data(dataLink->verbose_, PKT_DEBUG_DUMP, "read", dataLink->inBuffer + dataLink->inWrite, res);
                             inca(dataLink->inWrite, res);
-                            dataLink->findSync();
                         }
-                    } else {
-                        if (hasData(dataLink->in))
-                            dataLink->findSync();
+                    }
+
+                    // Process any available data.
+                    if (hasData(dataLink->in)) {
+                        dataLink->findSync();
                     }
 
                     break;
