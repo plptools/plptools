@@ -122,7 +122,7 @@ static void *data_pump_thread(void *arg)
                         }
                     }
 
-                    // Read from the transport.
+                    // We can read from the transport.
                     if (FD_ISSET(dataLink->fd, &r_set)) {
                         count = dataLink->inRead - dataLink->inWrite;
                         if (count <= 0)
