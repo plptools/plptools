@@ -18,10 +18,10 @@
  *  along with this program; if not, see <https://www.gnu.org/licenses/>.
  *
  */
-#ifndef _packet_h
-#define _packet_h
+#pragma once
 
 #include "config.h"
+
 #include <stdio.h>
 #include <pthread.h>
 
@@ -98,7 +98,6 @@ private:
     // Writing to serial.
 
     bool isEPOC = false;
-    unsigned short crcOut = 0;
     unsigned char *outBuffer; int outWrite = 0; int outRead = 0;
 
     // Initial configuration (const).
@@ -115,5 +114,3 @@ private:
     const int cancellationFd_;
     const short int verbose_;
 };
-
-#endif
