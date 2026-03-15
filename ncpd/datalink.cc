@@ -243,7 +243,7 @@ void DataLink::internalReset() {
     lastFatal = false;
     serialStatus = -1;
     lastSYN = startPkt = -1;
-    crcIn = crcOut = 0;
+    crcIn = 0;
     baudRate_ = requestedBaudRate_;
     justStarted = true;
     if (requestedBaudRate_ < 0) {
@@ -252,7 +252,6 @@ void DataLink::internalReset() {
             baudRateIndex_ = 0;
         }
     }
-
     fd = init_serial(devname.c_str(), baudRate_, 0);
     if (verbose_ & PKT_DEBUG_LOG)
         lout << "serial connection set to " << dec << baudRate_
@@ -275,7 +274,7 @@ void DataLink::send(bufferStore &b) {
     opByte(0x10);
     opByte(0x02);
 
-    crcOut = 0;
+    unsigned short crcOut = 0;
     long len = b.getLen();
 
     if (verbose_ & PKT_DEBUG_LOG) {
