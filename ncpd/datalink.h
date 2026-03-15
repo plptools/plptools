@@ -123,7 +123,7 @@ private:
     const int requestedBaudRate_;
 
     /**
-    * Used to signal cancellation/
+    * Used to signal cancellation.
     *
     * Should never be read.
     */
