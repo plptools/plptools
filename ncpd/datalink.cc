@@ -121,6 +121,8 @@ static void *data_pump_thread(void *arg)
                                     pthread_kill(dataLink->ownerThreadId_, SIGUSR1);
                         }
                     }
+
+                    // Read from the transport.
                     if (FD_ISSET(dataLink->fd, &r_set)) {
                         count = dataLink->inRead - dataLink->inWrite;
                         if (count <= 0)
@@ -141,6 +143,7 @@ static void *data_pump_thread(void *arg)
                         if (hasData(dataLink->in))
                             dataLink->findSync();
                     }
+
                     break;
             }
         }
