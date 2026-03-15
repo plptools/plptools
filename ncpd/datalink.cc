@@ -89,8 +89,9 @@ static void *data_pump_thread(void *arg) {
         } else {
             fd_set r_set;
             fd_set w_set;
-            int res;
 
+            // Conditionally watch to to see if we can read and write from the serial port, depending on whether we have
+            // space in the input buffer, and data in the output buffer.
             FD_ZERO(&r_set);
             w_set = r_set;
             FD_SET(dataLink->cancellationFd_, &r_set);
@@ -99,58 +100,53 @@ static void *data_pump_thread(void *arg) {
             if (hasData(dataLink->out))
                 FD_SET(dataLink->fd, &w_set);
             struct timeval tv = {1, 0};
-            res = select(MAX(dataLink->fd, dataLink->cancellationFd_) + 1, &r_set, &w_set, NULL, &tv);
-            switch (res) {
-                case 0:
-                    break;
-                case -1:
-                    break;
-                default:
+            int res = select(MAX(dataLink->fd, dataLink->cancellationFd_) + 1, &r_set, &w_set, NULL, &tv);
+            if (res <= 0) {
+                // Ignore interrupts and timeouts.
+                continue;
+            }
 
-                    // We can write to the transport.
-                    if (FD_ISSET(dataLink->fd, &w_set)) {
+            // We can write to the transport; write as much as we can.
+            if (FD_ISSET(dataLink->fd, &w_set)) {
 
-                        // Work out how much contiguous data there is to write in the out buffer.
-                        int count = dataLink->outWrite - dataLink->outRead;
-                        if (count < 0) {
-                            count = (BUFLEN - dataLink->outRead);
-                        }
+                // Work out how much contiguous data there is to write in the out buffer.
+                int count = dataLink->outWrite - dataLink->outRead;
+                if (count < 0) {
+                    count = (BUFLEN - dataLink->outRead);
+                }
 
-                        // Write as much data as possible.
-                        res = write(dataLink->fd, &dataLink->outBuffer[dataLink->outRead], count);
-                        if (res > 0) {
-                            log_data(dataLink->verbose_, PKT_DEBUG_DUMP, "wrote", dataLink->outBuffer + dataLink->outRead, res);
-                            int hadSpace = hasSpace(dataLink->out);
-                            inca(dataLink->outRead, res);
-                            if (!hadSpace) {
-                                pthread_kill(dataLink->ownerThreadId_, SIGUSR1);
-                            }
-                        }
+                // Write as much data as possible.
+                res = write(dataLink->fd, &dataLink->outBuffer[dataLink->outRead], count);
+                if (res > 0) {
+                    log_data(dataLink->verbose_, PKT_DEBUG_DUMP, "wrote", dataLink->outBuffer + dataLink->outRead, res);
+                    int hadSpace = hasSpace(dataLink->out);
+                    inca(dataLink->outRead, res);
+                    if (!hadSpace) {
+                        pthread_kill(dataLink->ownerThreadId_, SIGUSR1);
                     }
+                }
+            }
 
-                    // We can read from the transport.
-                    if (FD_ISSET(dataLink->fd, &r_set)) {
+            // We can read from the transport; read as much as we can.
+            if (FD_ISSET(dataLink->fd, &r_set)) {
 
-                        // Work out how much contiguous space there is in the buffer.
-                        int count = dataLink->inRead - dataLink->inWrite;
-                        if (count <= 0) {
-                            count = (BUFLEN - dataLink->inWrite);
-                        }
+                // Work out how much contiguous space there is in the buffer.
+                int count = dataLink->inRead - dataLink->inWrite;
+                if (count <= 0) {
+                    count = (BUFLEN - dataLink->inWrite);
+                }
 
-                        // Read as much data as possible.
-                        res = read(dataLink->fd, &dataLink->inBuffer[dataLink->inWrite], count);
-                        if (res > 0) {
-                            log_data(dataLink->verbose_, PKT_DEBUG_DUMP, "read", dataLink->inBuffer + dataLink->inWrite, res);
-                            inca(dataLink->inWrite, res);
-                        }
-                    }
+                // Read as much data as possible.
+                res = read(dataLink->fd, &dataLink->inBuffer[dataLink->inWrite], count);
+                if (res > 0) {
+                    log_data(dataLink->verbose_, PKT_DEBUG_DUMP, "read", dataLink->inBuffer + dataLink->inWrite, res);
+                    inca(dataLink->inWrite, res);
+                }
+            }
 
-                    // Process any available data.
-                    if (hasData(dataLink->in)) {
-                        dataLink->findSync();
-                    }
-
-                    break;
+            // Process any available data.
+            if (hasData(dataLink->in)) {
+                dataLink->findSync();
             }
         }
     }
@@ -164,7 +160,6 @@ static const int baud_table[] = {
     38400,
     19200,
     9600,
-    // Lower rates don't make sense ?!
 };
 #define BAUD_TABLE_SIZE (sizeof(baud_table) / sizeof(int))
 
@@ -255,16 +250,18 @@ void DataLink::internalReset() {
     justStarted = true;
     if (requestedBaud_ < 0) {
         realBaud = baud_table[baud_index++];
-        if (baud_index >= BAUD_TABLE_SIZE)
+        if (baud_index >= BAUD_TABLE_SIZE) {
             baud_index = 0;
+        }
     }
 
     fd = init_serial(devname, realBaud, 0);
     if (verbose_ & PKT_DEBUG_LOG)
         lout << "serial connection set to " << dec << realBaud
              << " baud, fd=" << fd << endl;
-    if (fd != -1)
+    if (fd != -1) {
         lastFatal = false;
+    }
 }
 
 void DataLink::setEpoc(bool _epoc) {
