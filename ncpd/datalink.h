@@ -61,6 +61,10 @@ private:
     bool findSync();
     void opByte(unsigned char a);
     void opCByte(unsigned char a, unsigned short *crc);
+
+    /**
+    */
+    // TODO: Rename to flushOutputBuffer();
     void realWrite();
     void internalReset();
 
@@ -119,6 +123,11 @@ private:
     */
     const int requestedBaudRate_;
 
+    /**
+    * Used to signal cancellation/
+    *
+    * Should never be read.
+    */
     const int cancellationFd_;
     const short int verbose_;
 };
