@@ -264,7 +264,7 @@ void DataLink::reset() {
     internalReset();
     if (fd != -1) {
         pthread_create(&dataPumpThreadId_, NULL, data_pump_thread, this);
-        realWrite();
+        flushOutputBuffer();
     }
 }
 
@@ -304,24 +304,13 @@ void DataLink::internalReset() {
     }
 }
 
-void DataLink::setEpoc(bool _epoc) {
-    std::lock_guard<std::mutex> outputLock(outputMutex_);
-    isEPOC_ = _epoc;
-}
-
 int DataLink:: getSpeed() {
     std::lock_guard<std::mutex> serialLock(serialMutex_);
     return baudRate_;
 }
 
 // TODO: Can we inject isEPOC?
-void DataLink::send(bufferStore &b) {
-    bool isEPOC = false;
-    {
-        std::lock_guard<std::mutex> outputLock(outputMutex_);
-        isEPOC = isEPOC_;
-    }
-
+void DataLink::send(bufferStore &b, bool isEPOC) {
     opByte(0x16);
     opByte(0x10);
     opByte(0x02);
@@ -369,7 +358,7 @@ void DataLink::opByte(unsigned char a) {
         canWrite = hasSpace(out);
     }
     if (!canWrite) {
-        realWrite();
+        flushOutputBuffer();
     }
     {
         std::lock_guard<std::mutex> outputLock(outputMutex_);
@@ -386,7 +375,7 @@ void DataLink::opCByte(unsigned char a, unsigned short *crc) {
         canWrite = hasSpace(out);
     }
     if (!canWrite) {
-        realWrite();
+        flushOutputBuffer();
     }
     {
         std::lock_guard<std::mutex> outputLock(outputMutex_);
@@ -395,7 +384,7 @@ void DataLink::opCByte(unsigned char a, unsigned short *crc) {
     }
 }
 
-void DataLink::realWrite() {
+void DataLink::flushOutputBuffer() {
     pthread_kill(dataPumpThreadId_, SIGUSR1);
     while (!hasSpace(out)) {
         sigset_t sigs;

@@ -44,9 +44,8 @@ public:
     /**
      * Send a buffer out to serial line
      */
-    void send(bufferStore &b);
+    void send(bufferStore &b, bool isEPOC);
 
-    void setEpoc(bool);
     int getSpeed();
     bool linkFailed();
     void reset();
@@ -63,9 +62,11 @@ private:
     void opCByte(unsigned char a, unsigned short *crc);
 
     /**
+    * Signal the data pump thread that there is data to write and block until
+    * there's space available.
     */
-    // TODO: Rename to flushOutputBuffer();
-    void realWrite();
+    void flushOutputBuffer();
+
     void internalReset();
 
     pthread_t dataPumpThreadId_;
@@ -108,7 +109,6 @@ private:
     // Writing to serial.
 
     std::mutex outputMutex_;
-    bool isEPOC_ = false;
     unsigned char *outBuffer; int outWrite = 0; int outRead = 0;
 
     // Initial configuration (const).
