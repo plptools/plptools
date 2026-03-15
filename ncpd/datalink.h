@@ -60,7 +60,13 @@ private:
     void findSync();
     void opByte(unsigned char a);
     void opCByte(unsigned char a, unsigned short *crc);
-    void realWrite();
+
+    /**
+    * Signal the data pump thread that there is data to write and block until
+    * there's space available.
+    */
+    void flushOutputBuffer();
+
     void internalReset();
 
     pthread_t dataPumpThreadId_;
@@ -111,6 +117,11 @@ private:
     */
     const int requestedBaudRate_;
 
+    /**
+    * Used to signal cancellation.
+    *
+    * Should never be read.
+    */
     const int cancellationFd_;
     const short int verbose_;
 };

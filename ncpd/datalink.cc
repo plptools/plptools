@@ -225,7 +225,7 @@ void DataLink::reset() {
     internalReset();
     if (fd != -1) {
         pthread_create(&dataPumpThreadId_, NULL, data_pump_thread, this);
-        realWrite();
+        flushOutputBuffer();
     }
 }
 
@@ -308,12 +308,12 @@ void DataLink::send(bufferStore &b) {
     opByte(0x03);
     opByte(crcOut >> 8);
     opByte(crcOut & 0xff);
-    realWrite();
+    flushOutputBuffer();
 }
 
 void DataLink::opByte(unsigned char a) {
     if (!hasSpace(out)) {
-        realWrite();
+        flushOutputBuffer();
     }
     outBuffer[outWrite] = a;
     inc1(outWrite);
@@ -322,13 +322,13 @@ void DataLink::opByte(unsigned char a) {
 void DataLink::opCByte(unsigned char a, unsigned short *crc) {
     addToCrc(a, crc);
     if (!hasSpace(out)) {
-        realWrite();
+        flushOutputBuffer();
     }
     outBuffer[outWrite] = a;
     inc1(outWrite);
 }
 
-void DataLink::realWrite() {
+void DataLink::flushOutputBuffer() {
     pthread_kill(dataPumpThreadId_, SIGUSR1);
     while (!hasSpace(out)) {
         sigset_t sigs;
