@@ -89,7 +89,7 @@ private:
     int serialStatus = -1;
     int baud_index;
     int realBaud;
-    short int verbose_;
+    const short int verbose_;
     bool esc = false;
     bool lastFatal = false;
     bool isEPOC = false;

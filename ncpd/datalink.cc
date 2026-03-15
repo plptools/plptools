@@ -173,7 +173,6 @@ DataLink::DataLink(const char *fname,
 , link_(link)
 , verbose_(verbose)
 , cancellationFd_(cancellationFd) {
-    verbose_ = verbose;
     devname = strdup(fname);
     assert(devname);
 
