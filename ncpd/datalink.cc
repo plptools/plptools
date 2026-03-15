@@ -154,14 +154,14 @@ static void *data_pump_thread(void *arg) {
 
 };
 
-static const int baud_table[] = {
+static const int kBaudRatesTable[] = {
     115200,
     57600,
     38400,
     19200,
     9600,
 };
-#define BAUD_TABLE_SIZE (sizeof(baud_table) / sizeof(int))
+#define BAUD_RATES_TABLE_SIZE (sizeof(kBaudRatesTable) / sizeof(int))
 
 using namespace std;
 
@@ -170,7 +170,7 @@ DataLink::DataLink(const char *fname,
                    Link *link,
                    unsigned short verbose,
                    const int cancellationFd)
-: requestedBaud_(baud)
+: requestedBaudRate_(baud)
 , link_(link)
 , verbose_(verbose)
 , cancellationFd_(cancellationFd) {
@@ -190,12 +190,12 @@ DataLink::DataLink(const char *fname,
     outBuffer = new unsigned char[BUFLEN + 1];
 
     ownerThreadId_ = pthread_self();
-    realBaud = requestedBaud_;
-    if (requestedBaud_ < 0) {
-        baud_index = 1;
-        realBaud = baud_table[0];
+    baudRate_ = requestedBaudRate_;
+    if (requestedBaudRate_ < 0) {
+        baudRateIndex_ = 1;
+        baudRate_ = kBaudRatesTable[0];
     }
-    fd = init_serial(devname, realBaud, 0);
+    fd = init_serial(devname, baudRate_, 0);
     if (fd == -1) {
         lastFatal = true;
     } else {
@@ -246,18 +246,18 @@ void DataLink::internalReset() {
     serialStatus = -1;
     lastSYN = startPkt = -1;
     crcIn = crcOut = 0;
-    realBaud = requestedBaud_;
+    baudRate_ = requestedBaudRate_;
     justStarted = true;
-    if (requestedBaud_ < 0) {
-        realBaud = baud_table[baud_index++];
-        if (baud_index >= BAUD_TABLE_SIZE) {
-            baud_index = 0;
+    if (requestedBaudRate_ < 0) {
+        baudRate_ = kBaudRatesTable[baudRateIndex_++];
+        if (baudRateIndex_ >= BAUD_RATES_TABLE_SIZE) {
+            baudRateIndex_ = 0;
         }
     }
 
-    fd = init_serial(devname, realBaud, 0);
+    fd = init_serial(devname, baudRate_, 0);
     if (verbose_ & PKT_DEBUG_LOG)
-        lout << "serial connection set to " << dec << realBaud
+        lout << "serial connection set to " << dec << baudRate_
              << " baud, fd=" << fd << endl;
     if (fd != -1) {
         lastFatal = false;
@@ -269,7 +269,7 @@ void DataLink::setEpoc(bool _epoc) {
 }
 
 int DataLink:: getSpeed() {
-    return realBaud;
+    return baudRate_;
 }
 
 void DataLink::send(bufferStore &b) {
