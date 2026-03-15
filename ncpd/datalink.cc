@@ -103,7 +103,7 @@ static void *data_pump_thread(void *arg) {
             int res = select(MAX(dataLink->fd, dataLink->cancellationFd_) + 1, &r_set, &w_set, NULL, &tv);
             if (res <= 0) {
                 // Ignore interrupts and timeouts.
-                return;
+                continue;
             }
 
             // We can write to the transport; write as much as we can.
