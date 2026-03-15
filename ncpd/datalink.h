@@ -84,7 +84,6 @@ private:
     int startPkt = -1;
     int lastSYN = -1;
 
-    bufferArray inQueue;
     bufferStore rcv;
     int fd;
     int serialStatus = -1;
