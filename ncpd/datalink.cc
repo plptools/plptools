@@ -349,6 +349,7 @@ void DataLink::send(bufferStore &b, bool isEPOC) {
     opByte(0x03);
     opByte(crcOut >> 8);
     opByte(crcOut & 0xff);
+    flushOutputBuffer();
 }
 
 void DataLink::opByte(unsigned char a) {
