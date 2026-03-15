@@ -97,7 +97,11 @@ static void *data_pump_thread(void *arg)
                 case -1:
                     break;
                 default:
+
+                    // We can write to the transport.
                     if (FD_ISSET(dataLink->fd, &w_set)) {
+
+                        // Work out how much contiguous data there is to write in the out buffer.
                         count = dataLink->outWrite - dataLink->outRead;
                         if (count < 0)
                             count = (BUFLEN - dataLink->outRead);
