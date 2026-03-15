@@ -91,7 +91,6 @@ static void *data_pump_thread(void *arg) {
             fd_set r_set;
             fd_set w_set;
             int res;
-            int count;
 
             FD_ZERO(&r_set);
             w_set = r_set;
@@ -113,24 +112,31 @@ static void *data_pump_thread(void *arg) {
                     if (FD_ISSET(dataLink->fd, &w_set)) {
 
                         // Work out how much contiguous data there is to write in the out buffer.
-                        count = dataLink->outWrite - dataLink->outRead;
-                        if (count < 0)
+                        int count = dataLink->outWrite - dataLink->outRead;
+                        if (count < 0) {
                             count = (BUFLEN - dataLink->outRead);
+                        }
+
+                        // Write as much data as possible.
                         res = write(dataLink->fd, &dataLink->outBuffer[dataLink->outRead], count);
                         if (res > 0) {
                             log_data(dataLink->verbose_, PKT_DEBUG_DUMP, "wrote", dataLink->outBuffer + dataLink->outRead, res);
                             int hadSpace = hasSpace(dataLink->out);
                             inca(dataLink->outRead, res);
-                            if (!hadSpace)
-                                    pthread_kill(dataLink->ownerThreadId_, SIGUSR1);
+                            if (!hadSpace) {
+                                pthread_kill(dataLink->ownerThreadId_, SIGUSR1);
+                            }
                         }
                     }
 
                     // We can read from the transport.
                     if (FD_ISSET(dataLink->fd, &r_set)) {
-                        count = dataLink->inRead - dataLink->inWrite;
-                        if (count <= 0)
+
+                        // Work out how much contiguous space there is in the buffer.
+                        int count = dataLink->inRead - dataLink->inWrite;
+                        if (count <= 0) {
                             count = (BUFLEN - dataLink->inWrite);
+                        }
 
                         // Read as much data as possible.
                         res = read(dataLink->fd, &dataLink->inBuffer[dataLink->inWrite], count);
