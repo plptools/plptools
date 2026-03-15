@@ -58,15 +58,26 @@ extern "C" {
  * for having the select() below return an
  * interrupted system call.
  */
-static void usr1handler(int sig)
-{
+static void usr1handler(int sig) {
     signal(SIGUSR1, usr1handler);
 }
 
+void log_data(unsigned short options,
+              unsigned short category,
+              std::string description,
+              unsigned char *buffer, int length) {
+    if (!(options & category)) {
+        return;
+    }
+    printf("pump: %s %d bytes: (", description.c_str(), length);
+    for (int i = 0; i<length; i++) {
+        printf("%02x ", buffer[i]);
+    }
+    printf(")\n");
+}
 
 // TODO: `fd` isn't thread-safe.
-static void *data_pump_thread(void *arg)
-{
+static void *data_pump_thread(void *arg) {
     DataLink *dataLink = (DataLink *)arg;
     pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
     while (1) {
@@ -107,14 +118,7 @@ static void *data_pump_thread(void *arg)
                             count = (BUFLEN - dataLink->outRead);
                         res = write(dataLink->fd, &dataLink->outBuffer[dataLink->outRead], count);
                         if (res > 0) {
-                            if (dataLink->verbose_ & PKT_DEBUG_DUMP) {
-                                int i;
-                                printf("pump: wrote %d bytes: (", res);
-                                for (i = 0; i<res; i++)
-                                    printf("%02x ",
-                                           dataLink->outBuffer[dataLink->outRead + i]);
-                                printf(")\n");
-                            }
+                            log_data(dataLink->verbose_, PKT_DEBUG_DUMP, "wrote", dataLink->outBuffer + dataLink->outRead, res);
                             int hadSpace = hasSpace(dataLink->out);
                             inca(dataLink->outRead, res);
                             if (!hadSpace)
@@ -127,15 +131,11 @@ static void *data_pump_thread(void *arg)
                         count = dataLink->inRead - dataLink->inWrite;
                         if (count <= 0)
                             count = (BUFLEN - dataLink->inWrite);
+
+                        // Read as much data as possible.
                         res = read(dataLink->fd, &dataLink->inBuffer[dataLink->inWrite], count);
                         if (res > 0) {
-                            if (dataLink->verbose_ & PKT_DEBUG_DUMP) {
-                                int i;
-                                printf("pump: read %d bytes: (", res);
-                                for (i = 0; i<res; i++)
-                                    printf("%02x ", dataLink->inBuffer[dataLink->inWrite + i]);
-                                printf(")\n");
-                            }
+                            log_data(dataLink->verbose_, PKT_DEBUG_DUMP, "read", dataLink->inBuffer + dataLink->inWrite, res);
                             inca(dataLink->inWrite, res);
                             dataLink->findSync();
                         }
