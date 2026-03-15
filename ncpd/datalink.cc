@@ -25,6 +25,7 @@
 #include <cstring>
 #include <fstream>
 #include <iomanip>
+#include <iowatch.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -82,11 +83,9 @@ static void *data_pump_thread(void *arg) {
     pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
     while (1) {
         if (dataLink->fd == -1) {
-            fd_set r_set;
-            FD_ZERO(&r_set);
-            FD_SET(dataLink->cancellationFd_, &r_set);
-            struct timeval tv = {1, 0};
-            select(dataLink->cancellationFd_ + 1, &r_set, NULL, NULL, &tv);
+            IOWatch cancellationWatch;
+            cancellationWatch.addIO(dataLink->cancellationFd_);
+            cancellationWatch.watch(1, 0);
         } else {
             fd_set r_set;
             fd_set w_set;
