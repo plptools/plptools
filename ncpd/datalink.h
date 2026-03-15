@@ -109,7 +109,6 @@ private:
 
     std::mutex outputMutex_;
     bool isEPOC_ = false;
-    // unsigned short crcOut = 0;
     unsigned char *outBuffer; int outWrite = 0; int outRead = 0;
 
     // Initial configuration (const).
