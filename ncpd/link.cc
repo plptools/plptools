@@ -162,9 +162,10 @@ sendAck(int seq)
         int lseq = (seq & 7) | 8;
         seq = (hseq << 8) + lseq;
         tmp.prependWord(seq);
-    } else
+    } else {
         tmp.prependByte(seq);
-    dataLink_->send(tmp);
+    }
+    dataLink_->send(tmp, isEPOC_);
 }
 
 void Link::
@@ -185,7 +186,7 @@ sendReqCon()
     pthread_mutex_lock(&queueMutex);
     ackWaitQueue.push_back(e);
     pthread_mutex_unlock(&queueMutex);
-    dataLink_->send(tmp);
+    dataLink_->send(tmp, isEPOC_);
 }
 
 void Link::
@@ -205,7 +206,7 @@ sendReqReq()
     pthread_mutex_lock(&queueMutex);
     ackWaitQueue.push_back(e);
     pthread_mutex_unlock(&queueMutex);
-    dataLink_->send(tmp);
+    dataLink_->send(tmp, isEPOC_);
 }
 
 void Link::
@@ -218,7 +219,9 @@ sendReq()
         lout << "Link: >> con seq=1" << endl;
     tmp.addByte(0x20);
     // No Ack expected for this, so no new entry in ackWaitQueue
-    dataLink_->send(tmp);
+    pthread_mutex_lock(&queueMutex);
+    pthread_mutex_unlock(&queueMutex);
+    dataLink_->send(tmp, isEPOC_);
 }
 
 void Link::
@@ -281,11 +284,11 @@ receive(bufferStore buff)
                         default:
                             theNCP->receive(buff);
                     }
-                } else
+                } else {
                     theNCP->receive(buff);
-
+                }
             } else {
-                    sendAck(rxSequence);
+                sendAck(rxSequence);
                 if (verbose & LNK_DEBUG_LOG)
                     lout << "Link: DUP\n";
             }
@@ -323,7 +326,7 @@ receive(bufferStore buff)
                     rxSequence = 0;
                     txSequence = 1;
                     purgeAllQueues();
-                    dataLink_->setEpoc(false);
+                    isEPOC_ = false;
                     if (verbose & LNK_DEBUG_LOG)
                         lout << "Link: 1-linkType set to " << linkType << endl;
                 }
@@ -356,7 +359,7 @@ receive(bufferStore buff)
                             if (verbose & LNK_DEBUG_LOG)
                                 lout << "Link: >> RETRANSMIT seq=" << i->seq
                                      << endl;
-                            dataLink_->send(i->data);
+                            dataLink_->send(i->data, isEPOC_);
                         }
                         break;
                     }
@@ -388,7 +391,7 @@ receive(bufferStore buff)
                         seqMask = 0x7ff;
                         // EPOC can handle up to 8 unacknowledged packets
                         maxOutstanding = 8;
-                        dataLink_->setEpoc(true);
+                        isEPOC_ = true;
                         if (verbose & LNK_DEBUG_LOG) {
                             lout << "Link: << con seq=" << seq ;
                             if (verbose & LNK_DEBUG_DUMP)
@@ -419,7 +422,7 @@ receive(bufferStore buff)
                     seqMask = 0x7ff;
                     // EPOC can handle up to 8 unacknowledged packets
                     maxOutstanding = 8;
-                    dataLink_->setEpoc(true);
+                    isEPOC_ = true;
                     failed = false;
                     sendReqCon();
                 } else {
@@ -433,7 +436,7 @@ receive(bufferStore buff)
                     rxSequence = 0;
                     txSequence = 1; // Our ReqReq was seq 0
                     purgeAllQueues();
-                    dataLink_->setEpoc(false);
+                    isEPOC_ = false;
                     sendAck(rxSequence);
                 }
             }
@@ -542,7 +545,7 @@ transmit(bufferStore buf)
         pthread_mutex_lock(&queueMutex);
         ackWaitQueue.push_back(e);
         pthread_mutex_unlock(&queueMutex);
-        dataLink_->send(buf);
+        dataLink_->send(buf, isEPOC_);
     }
 }
 
@@ -613,7 +616,7 @@ retransmit()
                 i->stamp = now;
                 if (verbose & LNK_DEBUG_LOG)
                     lout << "Link: >> RETRANSMIT seq=" << i->seq << endl;
-                dataLink_->send(i->data);
+                dataLink_->send(i->data, isEPOC_);
             }
         }
     pthread_mutex_unlock(&queueMutex);
