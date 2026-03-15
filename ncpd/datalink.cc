@@ -170,12 +170,11 @@ DataLink::DataLink(const char *fname,
                    Link *link,
                    unsigned short verbose,
                    const int cancellationFd)
-: requestedBaudRate_(baud)
+: devname(fname)
+, requestedBaudRate_(baud)
 , link_(link)
 , verbose_(verbose)
 , cancellationFd_(cancellationFd) {
-    devname = strdup(fname);
-    assert(devname);
 
     // Initialize CRC table
     crc_table[0] = 0;
@@ -195,7 +194,7 @@ DataLink::DataLink(const char *fname,
         baudRateIndex_ = 1;
         baudRate_ = kBaudRatesTable[0];
     }
-    fd = init_serial(devname, baudRate_, 0);
+    fd = init_serial(devname.c_str(), baudRate_, 0);
     if (fd == -1) {
         lastFatal = true;
     } else {
@@ -213,7 +212,6 @@ DataLink::~DataLink() {
     fd = -1;
     delete []inBuffer;
     delete []outBuffer;
-    free(devname);
 }
 
 void DataLink::reset() {
@@ -255,7 +253,7 @@ void DataLink::internalReset() {
         }
     }
 
-    fd = init_serial(devname, baudRate_, 0);
+    fd = init_serial(devname.c_str(), baudRate_, 0);
     if (verbose_ & PKT_DEBUG_LOG)
         lout << "serial connection set to " << dec << baudRate_
              << " baud, fd=" << fd << endl;

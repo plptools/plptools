@@ -63,39 +63,49 @@ private:
     void realWrite();
     void internalReset();
 
-    Link *link_;
     pthread_t dataPumpThreadId_;
     pthread_t ownerThreadId_;
+
     unsigned int crc_table[256];
 
-    unsigned short crcOut = 0;
-    unsigned short crcIn = 0;
-    unsigned short receivedCRC;
-    unsigned short inCRCstate;
+    // The following sections represent groups of variables that comprise the state associated
+    // with maintaining the underlying serial device, reading data from the serial device, and
+    // writing data to the serial device. These should be treated as three distinct domains
+    // wrt. concurrency and data within each group should be updated atomically.
+    //
+    // N.B. This thread-safety is not currently implemented.
 
-    unsigned char *inBuffer;
-    int inWrite = 0;
-    int inRead = 0;
+    // Serial.
 
-    unsigned char *outBuffer;
-    int outWrite = 0;
-    int outRead = 0;
-
-    int startPkt = -1;
-    int lastSYN = -1;
-
-    bufferStore rcv;
     int fd;
     int serialStatus = -1;
     int baudRateIndex_;
     int baudRate_;
+    bool lastFatal = false;
+
+    // Reading from serial.
 
     bool esc = false;
-    bool lastFatal = false;
-    bool isEPOC = false;
     bool justStarted = true;
+    bufferStore rcv;
+    int startPkt = -1;
+    int lastSYN = -1;
+    unsigned short crcIn = 0;
+    unsigned short inCRCstate;
+    unsigned short receivedCRC;
+    unsigned char *inBuffer; int inWrite = 0; int inRead = 0;
 
-    char *devname;
+    // Writing to serial.
+
+    bool isEPOC = false;
+    unsigned short crcOut = 0;
+    unsigned char *outBuffer; int outWrite = 0; int outRead = 0;
+
+    // Initial configuration (const).
+
+    Link * const link_;
+
+    const std::string devname;
 
     /**
     * Requested baud rate; -1 indicates automatic.
