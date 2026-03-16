@@ -32,18 +32,24 @@
 #include "linkchan.h"
 #include "ncp_log.h"
 #include "ncp.h"
+#include "ncpstatuscallback.h"
 #include "rfsv.h"
 
 using namespace std;
 
-NCP::NCP(const char *fname, int baud, unsigned short _verbose, const int cancellationFd)
-{
+NCP::NCP(const char *fname,
+         int baud,
+         unsigned short _verbose,
+         const int cancellationFd,
+         NCPStatusCallback statusCallback,
+         void *callbackContext)
+: verbose(_verbose)
+, statusCallback_(statusCallback)
+, callbackContext_(callbackContext) {
+
     channelPtr = new channel*[MAX_CHANNELS_PSION + 1];
     messageList = new bufferStore[MAX_CHANNELS_PSION + 1];
     remoteChanList = new int[MAX_CHANNELS_PSION + 1];
-
-    failed = false;
-    verbose = _verbose;
 
     // until detected on receipt of INFO we use these.
     maxChannels = MAX_CHANNELS_SIBO;
@@ -57,8 +63,7 @@ NCP::NCP(const char *fname, int baud, unsigned short _verbose, const int cancell
     l = new Link(fname, baud, this, verbose, cancellationFd);
 }
 
-NCP::~NCP()
-{
+NCP::~NCP() {
     bufferStore b;
     for (int i = 0; i < maxLinks(); i++) {
         if (isValidChannel(i)) {
@@ -75,13 +80,11 @@ NCP::~NCP()
     delete [] messageList;
 }
 
-int NCP::
-maxLinks() {
+int NCP::maxLinks() {
     return maxChannels;
 }
 
-void NCP::
-reset() {
+void NCP::reset() {
     for (int i = 0; i < maxLinks(); i++) {
         if (isValidChannel(i))
             channelPtr[i]->terminateWhenAsked();
@@ -95,14 +98,12 @@ reset() {
     l->reset();
 }
 
-short int NCP::
-getProtocolVersion()
+short int NCP::getProtocolVersion()
 {
     return protocolVersion;
 }
 
-void NCP::
-receive(bufferStore s) {
+void NCP::receive(bufferStore s) {
     if (s.getLen() > 1) {
         int channel = s.getByte(0);
         s.discardFirstBytes(1);
@@ -132,9 +133,7 @@ receive(bufferStore s) {
         lerr << "Got null message\n";
 }
 
-void NCP::
-controlChannel(int chan, enum interControllerMessageType t, bufferStore & command)
-{
+void NCP::controlChannel(int chan, enum interControllerMessageType t, bufferStore & command) {
     bufferStore open;
     open.addByte(0);  // control
 
@@ -146,9 +145,7 @@ controlChannel(int chan, enum interControllerMessageType t, bufferStore & comman
     l->send(open);
 }
 
-PcServer *NCP::
-findPcServer(const char *name)
-{
+PcServer *NCP::findPcServer(const char *name) {
     if (name) {
         vector<PcServer>::iterator i;
         for (i = pcServers.begin(); i != pcServers.end(); i++)
@@ -158,13 +155,11 @@ findPcServer(const char *name)
     return NULL;
 }
 
-void NCP::
-registerPcServer(TCPSocket *skt, const char *name) {
+void NCP::registerPcServer(TCPSocket *skt, const char *name) {
     pcServers.push_back(PcServer(skt, name));
 }
 
-void NCP::
-unregisterPcServer(PcServer *server) {
+void NCP::unregisterPcServer(PcServer *server) {
     if (server) {
         vector<PcServer>::iterator i;
         for (i = pcServers.begin(); i != pcServers.end(); i++)
@@ -175,9 +170,7 @@ unregisterPcServer(PcServer *server) {
     }
 }
 
-void NCP::
-decodeControlMessage(bufferStore & buff)
-{
+void NCP::decodeControlMessage(bufferStore & buff) {
     int remoteChan = buff.getByte(0);
 
     interControllerMessageType imt = (interControllerMessageType)buff.getByte(1);
@@ -209,6 +202,9 @@ decodeControlMessage(bufferStore & buff)
                 controlChannel(localChan, NCON_MSG_CONNECT_RESPONSE, b);
                 if (verbose & NCP_DEBUG_LOG)
                     lout << "ncp: Link UP" << endl;
+                if (statusCallback_) {
+                    statusCallback_(callbackContext_, true, protocolVersion);
+                }
                 linf << _("Connected with a S")
                      << ((protocolVersion == PV_SERIES_5) ? 5 : 3) << _(" at ")
                      << getSpeed() << _(" baud") << endl;
@@ -327,6 +323,9 @@ decodeControlMessage(bufferStore & buff)
                 lout << " ch=" << (int) buff.getByte(0) << endl;
             disconnect(buff.getByte(0));
             l->purgeQueue(remoteChan);
+            if (statusCallback_) {
+                statusCallback_(callbackContext_, false, 0);
+            }
             break;
 
         case NCON_MSG_DATA_XOFF:
@@ -343,9 +342,7 @@ decodeControlMessage(bufferStore & buff)
     }
 }
 
-int NCP::
-getFirstUnusedChan()
-{
+int NCP::getFirstUnusedChan() {
     for (int cNum = 1; cNum < maxLinks(); cNum++) {
         if (channelPtr[cNum] == NULL) {
             if (verbose & NCP_DEBUG_LOG)
@@ -357,15 +354,11 @@ getFirstUnusedChan()
     return 0;
 }
 
-bool NCP::
-isValidChannel(int channel)
-{
+bool NCP::isValidChannel(int channel) {
     return (channelPtr[channel] && ((long)channelPtr[channel] != 0xdeadbeef));
 }
 
-void NCP::
-RegisterAck(int chan, const char *name)
-{
+void NCP::RegisterAck(int chan, const char *name) {
     if (verbose & NCP_DEBUG_LOG)
         lout << "ncp: RegisterAck: chan=" << chan << endl;
     for (int cNum = 1; cNum < maxLinks(); cNum++) {
@@ -379,9 +372,7 @@ RegisterAck(int chan, const char *name)
     lerr << "ncp: RegisterAck: no channel to deliver" << endl;
 }
 
-void NCP::
-Register(channel * ch)
-{
+void NCP::Register(channel * ch) {
     if (lChan) {
         int cNum = ch->getNcpChannel();
         if (cNum == 0)
@@ -396,9 +387,7 @@ Register(channel * ch)
         lerr << "ncp: Register without established lChan" << endl;
 }
 
-int NCP::
-connect(channel * ch)
-{
+int NCP::connect(channel * ch) {
     // look for first unused chan
 
     int cNum = ch->getNcpChannel();
@@ -421,9 +410,7 @@ connect(channel * ch)
     return -1;
 }
 
-void NCP::
-send(int channel, bufferStore & a)
-{
+void NCP::send(int channel, bufferStore & a) {
     bool last;
     do {
         last = true;
@@ -448,9 +435,7 @@ send(int channel, bufferStore & a)
     lastSentChannel = channel;
 }
 
-void NCP::
-disconnect(int channel)
-{
+void NCP::disconnect(int channel) {
     if (!isValidChannel(channel)) {
         lerr << "ncp: Ignored disconnect for unknown channel #" << channel << endl;
         return;
@@ -464,15 +449,11 @@ disconnect(int channel)
     controlChannel(channel, NCON_MSG_CHANNEL_DISCONNECT, b);
 }
 
-bool NCP::
-stuffToSend()
-{
+bool NCP::stuffToSend() {
     return l->stuffToSend();
 }
 
-bool NCP::
-hasFailed()
-{
+bool NCP::hasFailed() {
     bool lfailed = l->hasFailed();
     if (failed || lfailed) {
         if (verbose & NCP_DEBUG_LOG)
@@ -480,6 +461,9 @@ hasFailed()
     }
     failed |= lfailed;
     if (failed) {
+        if (statusCallback_) {
+            statusCallback_(callbackContext_, false, 0);
+        }
         if (lChan) {
             channelPtr[lChan->getNcpChannel()] = NULL;
             delete lChan;
@@ -489,21 +473,15 @@ hasFailed()
     return failed;
 }
 
-bool NCP::
-gotLinkChannel()
-{
+bool NCP::gotLinkChannel() {
     return (lChan != NULL);
 }
 
-int NCP::
-getSpeed()
-{
+int NCP::getSpeed() {
     return l->getSpeed();
 }
 
-const char *NCP::
-ctrlMsgName(unsigned char msgType)
-{
+const char *NCP::ctrlMsgName(unsigned char msgType) {
     switch (msgType) {
         case NCON_MSG_DATA_XOFF:
             return "NCON_MSG_DATA_XOFF";

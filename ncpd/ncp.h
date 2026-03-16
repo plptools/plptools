@@ -18,8 +18,7 @@
  *  along with this program; if not, see <https://www.gnu.org/licenses/>.
  *
  */
-#ifndef _ncp_h_
-#define _ncp_h_
+#pragma once
 
 #include "config.h"
 
@@ -27,6 +26,7 @@
 
 #include "bufferstore.h"
 #include "linkchan.h"
+#include "ncpstatuscallback.h"
 #include "tcpsocket.h"
 
 #define MAX_CHANNELS_PSION 256
@@ -53,7 +53,12 @@ private:
 
 class NCP {
 public:
-    NCP(const char *fname, int baud, unsigned short verbose, const int cancellationFd);
+    NCP(const char *fname,
+        int baud,
+        unsigned short verbose,
+        const int cancellationFd,
+        NCPStatusCallback statusCallback,
+        void *context);
     ~NCP();
 
     int connect(channel *c); // returns channel, or -1 if failure
@@ -102,12 +107,12 @@ private:
     channel **channelPtr;
     bufferStore *messageList;
     int *remoteChanList;
-    bool failed;
+    bool failed = false;
     short int protocolVersion;
     linkChan *lChan;
     int maxChannels;
     std::vector<PcServer> pcServers;
     int lastSentChannel;
+    NCPStatusCallback statusCallback_;
+    void *callbackContext_;
 };
-
-#endif

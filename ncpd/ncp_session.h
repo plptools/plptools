@@ -30,6 +30,7 @@
 #include <iowatch.h>
 
 #include "ncp.h"
+#include "ncpstatuscallback.h"
 #include "socketchannel.h"
 
 /**
@@ -46,13 +47,20 @@ public:
                std::string host,
                std::string serialDevice,
                bool autoexit,
-               unsigned short nverbose)
+               unsigned short nverbose,
+               NCPStatusCallback statusCallback = nullptr,
+               void *callbackContext = nullptr)
     : portNumber_(portNumber)
     , baudRate_(baudRate)
     , host_(host)
     , serialDevice_(serialDevice)
     , autoexit_(autoexit)
-    , nverbose_(nverbose) {}
+    , nverbose_(nverbose)
+    , statusCallback_(statusCallback)
+    , callbackContext_(callbackContext) {}
+
+    NCPSession(const NCPSession&) = delete;
+    NCPSession& operator=(const NCPSession&) = delete;
 
     ~NCPSession();
 
@@ -100,6 +108,8 @@ private:
     std::string serialDevice_;
     bool autoexit_;
     unsigned short nverbose_;
+    NCPStatusCallback statusCallback_;
+    void *callbackContext_;
 
     // State.
 
