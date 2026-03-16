@@ -63,7 +63,7 @@ private:
     *
     * Must be called with inputMutex_ held.
     *
-    * @return true if the link is reliable and more data can be consumed; false otherwise.
+    * @return true if the link is stable and more data can be consumed; false otherwise.
     */
     bool processInputData();
 

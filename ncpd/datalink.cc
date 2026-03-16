@@ -175,16 +175,16 @@ static void *data_pump_thread(void *arg) {
             }
 
             // Process any available data.
-            bool canProcessData = true;
+            bool isLinkStable = true;
             {
                 std::lock_guard<std::mutex> inputLock(dataLink->inputMutex_);
                 if (hasData(dataLink->in)) {
-                    canProcessData = dataLink->processInputData();
+                    isLinkStable = dataLink->processInputData();
                 }
             }
 
             // Reset if we're unable to process data.
-            if (!canProcessData) {
+            if (!isLinkStable) {
                 dataLink->internalReset();
             }
         }
