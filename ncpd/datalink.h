@@ -58,7 +58,15 @@ private:
         *crc =  (*crc << 8) ^ crc_table[((*crc >> 8) ^ a) & 0xff];
     }
 
-    bool findSync();
+    /**
+    * Reads the incoming data and processes data frames.
+    *
+    * Must be called with inputMutex_ held.
+    *
+    * @return true if the link is reliable and more data can be consumed; false otherwise.
+    */
+    bool processInputData();
+
     void opByte(unsigned char a);
 
     /**

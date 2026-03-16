@@ -175,16 +175,16 @@ static void *data_pump_thread(void *arg) {
             }
 
             // Process any available data.
-            bool isHappy = true;
+            bool canProcessData = true;
             {
                 std::lock_guard<std::mutex> inputLock(dataLink->inputMutex_);
                 if (hasData(dataLink->in)) {
-                    isHappy = dataLink->findSync();
+                    canProcessData = dataLink->processInputData();
                 }
             }
 
-            // If we're not happy, we need to reset; this doesn't require us to hold a lock.
-            if (!isHappy) {
+            // Reset if we're unable to process data.
+            if (!canProcessData) {
                 dataLink->internalReset();
             }
         }
@@ -383,12 +383,7 @@ void DataLink::flushOutputBuffer() {
     }
 }
 
-/**
-* Reads the incoming data and processes data frames.
-*
-* Must be called with inputMutex_ held.
-*/
-bool DataLink::findSync() {
+bool DataLink::processInputData() {
     int inw = inWrite;
     int p;
 
@@ -492,7 +487,6 @@ outerLoop:
                 inw - inRead : BUFLEN - inRead + inw;
             if (rx_amount > 15) {
                 return false;
-                // internalReset();
             }
         }
     }
