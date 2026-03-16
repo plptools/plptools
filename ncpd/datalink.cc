@@ -3,6 +3,7 @@
  *
  *  Copyright (C) 1999 Philip Proudman <philip.proudman@btinternet.com>
  *  Copyright (C) 1999-2001 Fritz Elfert <felfert@to.com>
+ *  Copyright (C) 2026 Jason Morley <hello@jbmorley.co.uk>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -332,18 +333,22 @@ void DataLink::send(bufferStore &b, bool isEPOC) {
         switch (c) {
             case 0x03:
                 if (isEPOC) {
+                    // Stuff ETX as DLE EOT
                     opByte(0x10);
                     opByte(0x04);
-                    addToCrc(0x03, &crcOut);
-                } else
-                    opCByte(c, &crcOut);
+                } else {
+                    opByte(c);
+                }
                 break;
             case 0x10:
+                // Stuff DLE as DLE DLE
                 opByte(0x10);
-                // fall thru
+                opByte(0x10);
+                break;
             default:
-                opCByte(c, &crcOut);
+                opByte(c);
         }
+        addToCrc(c, &crcOut);
     }
     opByte(0x10);
     opByte(0x03);
@@ -353,23 +358,6 @@ void DataLink::send(bufferStore &b, bool isEPOC) {
 }
 
 void DataLink::opByte(unsigned char a) {
-    bool canWrite = false;
-    {
-        std::lock_guard<std::mutex> outputLock(outputMutex_);
-        canWrite = hasSpace(out);
-    }
-    if (!canWrite) {
-        flushOutputBuffer();
-    }
-    {
-        std::lock_guard<std::mutex> outputLock(outputMutex_);
-        outBuffer[outWrite] = a;
-        inc1(outWrite);
-    }
-}
-
-void DataLink::opCByte(unsigned char a, unsigned short *crc) {
-    addToCrc(a, crc);
     bool canWrite = false;
     {
         std::lock_guard<std::mutex> outputLock(outputMutex_);
