@@ -308,7 +308,6 @@ int DataLink:: getSpeed() {
     return baudRate_;
 }
 
-// TODO: Can we inject isEPOC?
 void DataLink::send(bufferStore &b, bool isEPOC) {
     opByte(0x16);
     opByte(0x10);
