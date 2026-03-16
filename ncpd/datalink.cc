@@ -151,7 +151,7 @@ static void *data_pump_thread(void *arg) {
                 isLinkStable = dataLink->processInputData();
             }
 
-            // Reset if we're unable to process data.
+            // Reset if we were unable to establish a stable link.
             if (!isLinkStable) {
                 dataLink->internalReset();
             }
