@@ -3,6 +3,7 @@
  *
  *  Copyright (C) 1999 Philip Proudman <philip.proudman@btinternet.com>
  *  Copyright (C) 1999-2001 Fritz Elfert <felfert@to.com>
+ *  Copyright (C) 2026 Jason Morley <hello@jbmorley.co.uk>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -59,7 +60,6 @@ private:
 
     void findSync();
     void opByte(unsigned char a);
-    void opCByte(unsigned char a, unsigned short *crc);
 
     /**
     * Signal the data pump thread that there is data to write and block until
