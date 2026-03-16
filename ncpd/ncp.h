@@ -66,7 +66,7 @@ public:
     void Register(channel *c);
     void RegisterAck(int, const char *);
     void disconnect(int channel);
-    void send(int channel, bufferStore &a);
+    void send(int channel, BufferStore &a);
     void reset();
     int  maxLinks();
     bool stuffToSend();
@@ -96,17 +96,17 @@ private:
         NCON_MSG_NCP_END=8
     };
     enum protocolVersionType { PV_SERIES_5 = 6, PV_SERIES_3 = 3 };
-    void receive(bufferStore s);
+    void receive(BufferStore s);
     int getFirstUnusedChan();
     bool isValidChannel(int);
-    void decodeControlMessage(bufferStore &buff);
-    void controlChannel(int chan, enum interControllerMessageType t, bufferStore &command);
+    void decodeControlMessage(BufferStore &buff);
+    void controlChannel(int chan, enum interControllerMessageType t, BufferStore &command);
     const char * ctrlMsgName(unsigned char);
 
     Link *l;
     unsigned short verbose;
     channel **channelPtr;
-    bufferStore *messageList;
+    BufferStore *messageList;
     int *remoteChanList;
     bool failed = false;
     short int protocolVersion;

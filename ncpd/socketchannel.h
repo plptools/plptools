@@ -30,7 +30,7 @@ public:
   SocketChannel(TCPSocket* socket, NCP* ncp);
   virtual ~SocketChannel();
 
-  void ncpDataCallback(bufferStore& a);
+  void ncpDataCallback(BufferStore& a);
   const char* getNcpRegisterName();
   void ncpConnectAck();
   void ncpRegisterAck();
@@ -42,7 +42,7 @@ public:
   void socketPoll();
 private:
   enum protocolVersionType { PV_SERIES_5 = 6, PV_SERIES_3 = 3 };
-  bool ncpCommand(bufferStore &a);
+  bool ncpCommand(BufferStore &a);
 
   TCPSocket* socket_;
   char* registerName_;

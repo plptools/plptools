@@ -30,7 +30,7 @@
 #include "Enum.h"
 
 class rpcs;
-class bufferStore;
+class BufferStore;
 class bufferArray;
 
 class ftp {

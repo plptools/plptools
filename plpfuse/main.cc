@@ -55,7 +55,7 @@ static rfsvfactory *rf;
 
 static rpcs *r;
 static rpcsfactory *rp;
-static bufferStore owner;
+static BufferStore owner;
 
 /* Translate EPOC/SIBO error to UNIX error code, leaving positive
    numbers alone */

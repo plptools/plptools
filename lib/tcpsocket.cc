@@ -286,7 +286,7 @@ dataToGet(int sec, int usec) const
 }
 
 int TCPSocket::
-getBufferStore(bufferStore & a, bool wait)
+getBufferStore(BufferStore & a, bool wait)
 {
     /* Returns a 0 for for no message,
     * 1 for message OK, and -1 for socket problem
@@ -322,7 +322,7 @@ getBufferStore(bufferStore & a, bool wait)
 }
 
 bool TCPSocket::
-sendBufferStore(const bufferStore & a)
+sendBufferStore(const BufferStore & a)
 {
     long l = a.getLen();
     uint32_t hl = htonl(l);
@@ -330,7 +330,7 @@ sendBufferStore(const bufferStore & a)
     int retries = 0;
     int i;
 
-    bufferStore b;
+    BufferStore b;
     b.addBytes(reinterpret_cast<const unsigned char *>(&hl), sizeof(hl));
     b.addBuff(a);
     l += 4;

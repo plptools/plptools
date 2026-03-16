@@ -47,7 +47,7 @@ SocketChannel::~SocketChannel() {
         free(registerName_);
 }
 
-void SocketChannel::ncpDataCallback(bufferStore & a) {
+void SocketChannel::ncpDataCallback(BufferStore & a) {
     if (registerName_ != 0) {
         socket_->sendBufferStore(a);
     } else
@@ -59,7 +59,7 @@ const char *SocketChannel::getNcpRegisterName() {
 }
 
 // NCP Command processing
-bool SocketChannel::ncpCommand(bufferStore & a) {
+bool SocketChannel::ncpCommand(BufferStore & a) {
     // str is guaranteed to begin with NCP$, and all NCP commands are
     // greater than or equal to 8 characters in length.
     const char *str = a.getString(4);
@@ -131,7 +131,7 @@ bool SocketChannel::ncpCommand(bufferStore & a) {
 }
 
 void SocketChannel::ncpConnectAck() {
-    bufferStore a;
+    BufferStore a;
     a.addStringT("Ok");
     socket_->sendBufferStore(a);
     isConnected_ = true;
@@ -139,7 +139,7 @@ void SocketChannel::ncpConnectAck() {
 }
 
 void SocketChannel::ncpConnectTerminate() {
-    bufferStore a;
+    BufferStore a;
     a.addStringT("NAK");
     socket_->sendBufferStore(a);
     ncpDisconnect();
@@ -164,7 +164,7 @@ void SocketChannel::socketPoll() {
     int res;
 
     if (registerName_ == 0) {
-        bufferStore a;
+        BufferStore a;
         res = socket_->getBufferStore(a, false);
         switch (res) {
             case 1:
@@ -226,7 +226,7 @@ void SocketChannel::socketPoll() {
                 break;
         }
     } else if (isConnected_) {
-        bufferStore a;
+        BufferStore a;
         res = socket_->getBufferStore(a, false);
         if (res == -1) {
             ncpDisconnect();

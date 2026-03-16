@@ -272,7 +272,7 @@ int DataLink:: getSpeed() {
     return baudRate_;
 }
 
-void DataLink::send(bufferStore &b, bool isEPOC) {
+void DataLink::send(BufferStore &b, bool isEPOC) {
     opByte(0x16);
     opByte(0x10);
     opByte(0x02);

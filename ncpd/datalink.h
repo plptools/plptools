@@ -44,7 +44,7 @@ public:
     /**
      * Send a buffer out to serial line
      */
-    void send(bufferStore &b, bool isEPOC);
+    void send(BufferStore &b, bool isEPOC);
 
     int getSpeed();
     bool linkFailed();
@@ -98,7 +98,7 @@ private:
 
     bool esc = false;
     bool justStarted = true;
-    bufferStore rcv;
+    BufferStore rcv;
     int startPkt = -1;
     int lastSYN = -1;
     unsigned short crcIn = 0;

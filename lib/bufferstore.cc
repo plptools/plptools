@@ -36,17 +36,15 @@
 
 using namespace std;
 
-bufferStore::bufferStore()
-    : len(0)
-    , lenAllocd(0)
-    , start(0)
-    , buff(0)
-{
+BufferStore::BufferStore()
+: len(0)
+, lenAllocd(0)
+, start(0)
+, buff(0) {
 }
 
-bufferStore::bufferStore(const bufferStore &a)
-    : start(0)
-{
+BufferStore::BufferStore(const BufferStore &a)
+: start(0) {
     lenAllocd = (a.getLen() > MIN_LEN) ? a.getLen() : MIN_LEN;
     buff = (unsigned char *)malloc(lenAllocd);
     assert(buff);
@@ -54,9 +52,8 @@ bufferStore::bufferStore(const bufferStore &a)
     memcpy(buff, a.getString(0), len);
 }
 
-bufferStore::bufferStore(const unsigned char *_buff, long _len)
-    : start(0)
-{
+BufferStore::BufferStore(const unsigned char *_buff, long _len)
+: start(0) {
     lenAllocd = (_len > MIN_LEN) ? _len : MIN_LEN;
     buff = (unsigned char *)malloc(lenAllocd);
     assert(buff);
@@ -64,7 +61,7 @@ bufferStore::bufferStore(const unsigned char *_buff, long _len)
     memcpy(buff, _buff, len);
 }
 
-bufferStore &bufferStore::operator =(const bufferStore &a) {
+BufferStore &BufferStore::operator =(const BufferStore &a) {
     if (this != &a) {
         checkAllocd(a.getLen());
         len = a.getLen();
@@ -74,54 +71,55 @@ bufferStore &bufferStore::operator =(const bufferStore &a) {
     return *this;
 }
 
-void bufferStore::init() {
+void BufferStore::init() {
     start = 0;
     len = 0;
 }
 
-void bufferStore::init(const unsigned char *_buff, long _len) {
+void BufferStore::init(const unsigned char *_buff, long _len) {
     checkAllocd(_len);
     start = 0;
     len = _len;
     memcpy(buff, _buff, len);
 }
 
-bufferStore::~bufferStore() {
-    if (buff)
+BufferStore::~BufferStore() {
+    if (buff) {
         ::free(buff);
+    }
 }
 
-unsigned long bufferStore::getLen() const {
+unsigned long BufferStore::getLen() const {
     return (start > len) ? 0 : len - start;
 }
 
-unsigned char bufferStore::getByte(long pos) const {
+unsigned char BufferStore::getByte(long pos) const {
     return buff[pos+start];
 }
 
-uint16_t bufferStore::getWord(long pos) const {
+uint16_t BufferStore::getWord(long pos) const {
     return buff[pos+start] + (buff[pos+start+1] << 8);
 }
 
-uint32_t bufferStore::getDWord(long pos) const {
+uint32_t BufferStore::getDWord(long pos) const {
     return buff[pos+start] +
         (buff[pos+start+1] << 8) +
         (buff[pos+start+2] << 16) +
         (buff[pos+start+3] << 24);
 }
 
-int32_t bufferStore::getSDWord(long pos) const {
+int32_t BufferStore::getSDWord(long pos) const {
     return buff[pos+start] +
         (buff[pos+start+1] << 8) +
         (buff[pos+start+2] << 16) +
         (buff[pos+start+3] << 24);
 }
 
-const char * bufferStore::getString(long pos) const {
+const char * BufferStore::getString(long pos) const {
     return (const char *)buff + pos + start;
 }
 
-ostream &operator<<(std::ostream &s, const bufferStore &m) {
+ostream &operator<<(std::ostream &s, const BufferStore &m) {
     // save stream flags
     ostream::fmtflags old = s.flags();
 
@@ -140,12 +138,12 @@ ostream &operator<<(std::ostream &s, const bufferStore &m) {
     return s << ")";
 }
 
-void bufferStore::discardFirstBytes(int n) {
+void BufferStore::discardFirstBytes(int n) {
     start += n;
     if (start > len) start = len;
 }
 
-void bufferStore::checkAllocd(long newLen) {
+void BufferStore::checkAllocd(long newLen) {
     if (newLen >= lenAllocd) {
         do {
             lenAllocd = (lenAllocd < MIN_LEN) ? MIN_LEN : (lenAllocd * 2);
@@ -156,30 +154,30 @@ void bufferStore::checkAllocd(long newLen) {
     }
 }
 
-void bufferStore::addByte(unsigned char cc) {
+void BufferStore::addByte(unsigned char cc) {
     checkAllocd(len + 1);
     buff[len++] = cc;
 }
 
-void bufferStore::addString(const char *s) {
+void BufferStore::addString(const char *s) {
     int l = strlen(s);
     checkAllocd(len + l);
     memcpy(&buff[len], s, l);
     len += l;
 }
 
-void bufferStore::addStringT(const char *s) {
+void BufferStore::addStringT(const char *s) {
     addString(s);
     addByte(0);
 }
 
-void bufferStore::addBytes(const unsigned char *s, int l) {
+void BufferStore::addBytes(const unsigned char *s, int l) {
     checkAllocd(len + l);
     memcpy(&buff[len], s, l);
     len += l;
 }
 
-void bufferStore::addBuff(const bufferStore &s, long maxLen) {
+void BufferStore::addBuff(const BufferStore &s, long maxLen) {
     long l = s.getLen();
     checkAllocd(len + l);
     if ((maxLen >= 0) && (maxLen < l))
@@ -190,13 +188,13 @@ void bufferStore::addBuff(const bufferStore &s, long maxLen) {
     }
 }
 
-void bufferStore::addWord(int a) {
+void BufferStore::addWord(int a) {
     checkAllocd(len + 2);
     buff[len++] = a & 0xff;
     buff[len++] = (a>>8) & 0xff;
 }
 
-void bufferStore::addDWord(long a) {
+void BufferStore::addDWord(long a) {
     checkAllocd(len + 4);
     buff[len++] = a & 0xff;
     buff[len++] = (a>>8) & 0xff;
@@ -204,18 +202,19 @@ void bufferStore::addDWord(long a) {
     buff[len++] = (a>>24) & 0xff;
 }
 
-void bufferStore::truncate(long newLen) {
-    if (newLen < len)
+void BufferStore::truncate(long newLen) {
+    if (newLen < len) {
         len = newLen;
+    }
 }
 
-void bufferStore::prependByte(unsigned char cc) {
+void BufferStore::prependByte(unsigned char cc) {
     checkAllocd(len + 1);
     memmove(&buff[1], buff, len++);
     buff[0] = cc;
 }
 
-void bufferStore::prependWord(int a) {
+void BufferStore::prependWord(int a) {
     checkAllocd(len + 2);
     memmove(&buff[2], buff, len);
     len += 2;

@@ -24,7 +24,7 @@
 #include "rpcs.h"
 
 class TCPSocket;
-class bufferStore;
+class BufferStore;
 class rpcsfactory;
 
 /**

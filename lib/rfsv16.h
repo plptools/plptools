@@ -145,8 +145,8 @@ private:
     uint32_t std2attr(const uint32_t);
 
     // Communication
-    bool sendCommand(enum commands, bufferStore &);
-    Enum<rfsv::errs> getResponse(bufferStore &);
+    bool sendCommand(enum commands, BufferStore &);
+    Enum<rfsv::errs> getResponse(BufferStore &);
 };
 
 #endif

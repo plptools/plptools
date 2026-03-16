@@ -24,8 +24,8 @@
 
 void
 encodeBitmap(int width, int height, getPixelFunction_t getPixel, bool /*rle*/,
-             bufferStore &out) {
-    bufferStore ib;
+             BufferStore &out) {
+    BufferStore ib;
 
     ib.addDWord(0x00000028);   // hdrlen
     ib.addDWord(width);        // xPixels
@@ -37,7 +37,7 @@ encodeBitmap(int width, int height, getPixelFunction_t getPixel, bool /*rle*/,
     ib.addDWord(0);            // unknown2
     ib.addDWord(0);            // RLEflag
 
-    bufferStore rawBuf;
+    BufferStore rawBuf;
     for (int y = 0; y < height; y++) {
         int ov = 0;
         int shift = 0;
@@ -74,7 +74,7 @@ encodeBitmap(int width, int height, getPixelFunction_t getPixel, bool /*rle*/,
     int rawLen = rawBuf.getLen();
     int eqCount = 1;
     int lastByte = rawBuf.getByte(0);
-    bufferStore diBuf;
+    BufferStore diBuf;
 
     for (int i = 1; i <= rawLen; i++) {
         int v;
@@ -138,7 +138,7 @@ do {                                                \
 } while (0)
 
 bool
-decodeBitmap(const unsigned char *p, int &width, int &height, bufferStore &out)
+decodeBitmap(const unsigned char *p, int &width, int &height, BufferStore &out)
 {
     uint32_t totlen = *((const uint32_t*)p); p += 4;
     uint32_t hdrlen = *((const uint32_t*)p); p += 4;
