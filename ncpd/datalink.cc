@@ -152,7 +152,6 @@ static void *data_pump_thread(void *arg) {
                         pthread_kill(dataLink->ownerThreadId_, SIGUSR1);
                     }
                 }
-
             }
 
             // We can read from the transport; read as much as we can.
