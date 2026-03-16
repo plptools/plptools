@@ -131,7 +131,6 @@ static void *data_pump_thread(void *arg) {
                 continue;
             }
 
-
             // We can write to the transport; write as much as we can.
             if (FD_ISSET(serialFd, &w_set)) {
                 std::lock_guard<std::mutex> serialLock(dataLink->serialMutex_);
