@@ -37,16 +37,14 @@
 using namespace std;
 
 BufferStore::BufferStore()
-    : len(0)
-    , lenAllocd(0)
-    , start(0)
-    , buff(0)
-{
+: len(0)
+, lenAllocd(0)
+, start(0)
+, buff(0) {
 }
 
 BufferStore::BufferStore(const BufferStore &a)
-    : start(0)
-{
+: start(0) {
     lenAllocd = (a.getLen() > MIN_LEN) ? a.getLen() : MIN_LEN;
     buff = (unsigned char *)malloc(lenAllocd);
     assert(buff);
@@ -55,8 +53,7 @@ BufferStore::BufferStore(const BufferStore &a)
 }
 
 BufferStore::BufferStore(const unsigned char *_buff, long _len)
-    : start(0)
-{
+: start(0) {
     lenAllocd = (_len > MIN_LEN) ? _len : MIN_LEN;
     buff = (unsigned char *)malloc(lenAllocd);
     assert(buff);
@@ -87,8 +84,9 @@ void BufferStore::init(const unsigned char *_buff, long _len) {
 }
 
 BufferStore::~BufferStore() {
-    if (buff)
+    if (buff) {
         ::free(buff);
+    }
 }
 
 unsigned long BufferStore::getLen() const {
@@ -205,8 +203,9 @@ void BufferStore::addDWord(long a) {
 }
 
 void BufferStore::truncate(long newLen) {
-    if (newLen < len)
+    if (newLen < len) {
         len = newLen;
+    }
 }
 
 void BufferStore::prependByte(unsigned char cc) {
