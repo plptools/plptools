@@ -53,7 +53,7 @@ reconnect(void)
 void rclip::
 reset(void)
 {
-    bufferStore a;
+    BufferStore a;
     status = rfsv::E_PSI_FILE_DISC;
     a.addStringT(getConnectName());
     if (skt->sendBufferStore(a)) {
@@ -93,7 +93,7 @@ sendCommand(enum commands cc)
         return false;
 
     bool result;
-    bufferStore a;
+    BufferStore a;
     a.addByte(cc);
     switch (cc) {
         case RCLIP_INIT:
@@ -123,7 +123,7 @@ sendListen() {
 Enum<rfsv::errs> rclip::
 checkNotify() {
     Enum<rfsv::errs> ret;
-    bufferStore a;
+    BufferStore a;
 
     int r = skt->getBufferStore(a, false);
     if (r < 0) {
@@ -143,7 +143,7 @@ Enum<rfsv::errs> rclip::
 waitNotify() {
     Enum<rfsv::errs> ret;
 
-    bufferStore a;
+    BufferStore a;
     sendCommand(RCLIP_LISTEN);
     if ((ret = getResponse(a)) == rfsv::E_PSI_GEN_NONE) {
         if ((a.getLen() != 1) || (a.getByte(0) != 0))
@@ -155,7 +155,7 @@ waitNotify() {
 Enum<rfsv::errs> rclip::
 notify() {
     Enum<rfsv::errs> ret;
-    bufferStore a;
+    BufferStore a;
 
     sendCommand(RCLIP_NOTIFY);
     if ((ret = getResponse(a)) == rfsv::E_PSI_GEN_NONE) {
@@ -168,7 +168,7 @@ notify() {
 Enum<rfsv::errs> rclip::
 initClipbd() {
     Enum<rfsv::errs> ret;
-    bufferStore a;
+    BufferStore a;
 
     if (status != rfsv::E_PSI_GEN_NONE)
         return status;
@@ -183,7 +183,7 @@ initClipbd() {
 }
 
 Enum<rfsv::errs> rclip::
-getResponse(bufferStore & data)
+getResponse(BufferStore & data)
 {
     Enum<rfsv::errs> ret = rfsv::E_PSI_GEN_NONE;
 

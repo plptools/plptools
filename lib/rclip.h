@@ -24,7 +24,7 @@
 #include "Enum.h"
 
 class TCPSocket;
-class bufferStore;
+class BufferStore;
 class bufferArray;
 
 /**
@@ -168,7 +168,7 @@ protected:
     * @returns true on success, false on failure.
     */
     bool sendCommand(enum commands cc);
-    Enum<rfsv::errs> getResponse(bufferStore &data);
+    Enum<rfsv::errs> getResponse(BufferStore &data);
     const char *getConnectName();
 
 };

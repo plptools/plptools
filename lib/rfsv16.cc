@@ -50,7 +50,7 @@ rfsv16::rfsv16(TCPSocket *_skt)
 Enum<rfsv::errs> rfsv16::
 fopen(uint32_t attr, const char *name, uint32_t &handle)
 {
-    bufferStore a;
+    BufferStore a;
     string realName = convertSlash(name);
 
     // Allow random access, rather than forcing the caller to ask for it
@@ -70,7 +70,7 @@ fopen(uint32_t attr, const char *name, uint32_t &handle)
 Enum<rfsv::errs> rfsv16::
 mktemp(uint32_t &handle, string &tmpname)
 {
-    bufferStore a;
+    BufferStore a;
 
     a.addWord(P_FUNIQUE);
     a.addStringT("TMP");
@@ -107,7 +107,7 @@ fopendir(const char * const name, uint32_t &handle)
 Enum<rfsv::errs> rfsv16::
 fclose(uint32_t fileHandle)
 {
-    bufferStore a;
+    BufferStore a;
     a.addWord(fileHandle & 0xFFFF);
     if (!sendCommand(SIBO_FCLOSE, a))
         return E_PSI_FILE_DISC;
@@ -197,7 +197,7 @@ opMode(uint32_t mode)
 Enum<rfsv::errs> rfsv16::
 fgetmtime(const char * const name, PsiTime &mtime)
 {
-    bufferStore a;
+    BufferStore a;
     string realName = convertSlash(name);
     a.addStringT(realName.c_str());
     if (!sendCommand(SIBO_FINFO, a))
@@ -221,7 +221,7 @@ fsetmtime(const char *name, PsiTime mtime)
     // According to Alexander's protocol doc, SIBO_SFDATE sets the modification
     // time - and as far as I can see SIBO only keeps a modification
     // time. So call SIBO_SFDATE here.
-    bufferStore a;
+    BufferStore a;
     string realName = convertSlash(name);
     // According to Alex's docs, Psion's file times are in
     // seconds since 13:00!!, 1.1.1970
@@ -235,7 +235,7 @@ fsetmtime(const char *name, PsiTime mtime)
 Enum<rfsv::errs> rfsv16::
 fgetattr(const char * const name, uint32_t &attr)
 {
-    bufferStore a;
+    BufferStore a;
     string realName = convertSlash(name);
     a.addStringT(realName.c_str());
     if (!sendCommand(SIBO_FINFO, a))
@@ -254,7 +254,7 @@ fgetattr(const char * const name, uint32_t &attr)
 Enum<rfsv::errs> rfsv16::
 fgeteattr(const char * const name, PlpDirent &e)
 {
-    bufferStore a;
+    BufferStore a;
     string realName = convertSlash(name);
     a.addStringT(realName.c_str());
     if (!sendCommand(SIBO_FINFO, a))
@@ -293,7 +293,7 @@ fsetattr(const char *name, uint32_t seta, uint32_t unseta)
     uint32_t statusword = std2attr(seta) & (~ std2attr(unseta));
     statusword ^= 0x0000001; // r bit is inverted
     uint32_t bitmask = std2attr(seta) | std2attr(unseta);
-    bufferStore a;
+    BufferStore a;
     a.addWord(statusword & 0xFFFF);
     a.addWord(bitmask & 0xFFFF);
     a.addStringT(name);
@@ -331,7 +331,7 @@ devlist(uint32_t &devbits)
     // (P_FDEVICE) this, SIBO_FDEVICEREAD each entry, setting the appropriate
     // drive-letter-bit in devbits, then FCLOSE.
 
-    bufferStore a;
+    BufferStore a;
     a.init();
     a.addByte(0x00); // no Name 1
     a.addByte(0x00); // no Name 2
@@ -394,7 +394,7 @@ static int sibo_dattr[] = {
 Enum<rfsv::errs> rfsv16::
 devinfo(const char drive, PlpDrive &dinfo)
 {
-    bufferStore a;
+    BufferStore a;
     Enum<rfsv::errs> res;
 
     // Again, this is taken from an exchange between PsiWin and a 3c.
@@ -451,7 +451,7 @@ devinfo(const char drive, PlpDrive &dinfo)
 }
 
 bool rfsv16::
-sendCommand(enum commands cc, bufferStore & data)
+sendCommand(enum commands cc, BufferStore & data)
 {
     if (status == E_PSI_FILE_DISC) {
         reconnect();
@@ -460,7 +460,7 @@ sendCommand(enum commands cc, bufferStore & data)
     }
 
     bool result;
-    bufferStore a;
+    BufferStore a;
     a.addWord(cc);
     a.addWord(data.getLen());
     a.addBuff(data);
@@ -476,7 +476,7 @@ sendCommand(enum commands cc, bufferStore & data)
 
 
 Enum<rfsv::errs> rfsv16::
-getResponse(bufferStore & data)
+getResponse(BufferStore & data)
 {
     // getWord(2) is the size field
     // which is the body of the response not counting the command (002a) and
@@ -508,7 +508,7 @@ fread(const uint32_t handle, unsigned char * const buf, const uint32_t len, uint
 
     count = 0;
     do {
-        bufferStore a;
+        BufferStore a;
 
         // Read in blocks of 291 bytes; the maximum payload for
         // an RFSV frame. ( As seen in traces ) - this isn't optimal:
@@ -545,7 +545,7 @@ fwrite(const uint32_t handle, const unsigned char * const buf, const uint32_t le
 
     count = 0;
     while (count < len) {
-        bufferStore a;
+        BufferStore a;
         int nbytes;
 
         // Write in blocks of 291 bytes; the maximum payload for
@@ -704,7 +704,7 @@ Enum<rfsv::errs> rfsv16::
 pathtest(const char * const path)
 {
     string realName = convertSlash(path);
-    bufferStore a;
+    BufferStore a;
     a.addStringT(realName.c_str());
     sendCommand(SIBO_PATHTEST, a);
     return getResponse(a);
@@ -713,7 +713,7 @@ pathtest(const char * const path)
 Enum<rfsv::errs> rfsv16::
 fsetsize(uint32_t handle, uint32_t size)
 {
-    bufferStore a;
+    BufferStore a;
     a.addWord(handle & 0xffff);
     a.addDWord(size);
     if (!sendCommand(SIBO_FSETEOF, a))
@@ -729,7 +729,7 @@ fsetsize(uint32_t handle, uint32_t size)
 Enum<rfsv::errs> rfsv16::
 fseek(const uint32_t handle, const int32_t pos, const uint32_t mode, uint32_t &resultpos)
 {
-    bufferStore a;
+    BufferStore a;
     Enum<rfsv::errs> res;
     uint32_t savpos = 0;
     uint32_t realpos;
@@ -827,7 +827,7 @@ Enum<rfsv::errs> rfsv16::
 mkdir(const char* dirName)
 {
     string realName = convertSlash(dirName);
-    bufferStore a;
+    BufferStore a;
     a.addStringT(realName.c_str());
     sendCommand(SIBO_MKDIR, a);
     return getResponse(a);
@@ -869,7 +869,7 @@ rename(const char *oldName, const char *newName)
 {
     string realOldName = convertSlash(oldName);
     string realNewName = convertSlash(newName);
-    bufferStore a;
+    BufferStore a;
     a.addStringT(realOldName.c_str());
     a.addStringT(realNewName.c_str());
     sendCommand(SIBO_RENAME, a);
@@ -880,7 +880,7 @@ Enum<rfsv::errs> rfsv16::
 remove(const char* psionName)
 {
     string realName = convertSlash(psionName);
-    bufferStore a;
+    BufferStore a;
     a.addStringT(realName.c_str());
     // and this needs sending in the length word.
     sendCommand(SIBO_DELETE, a);

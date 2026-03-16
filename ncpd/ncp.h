@@ -3,6 +3,7 @@
  *
  *  Copyright (C) 1999 Philip Proudman <philip.proudman@btinternet.com>
  *  Copyright (C) 1999-2001 Fritz Elfert <felfert@to.com>
+ *  Copyright (C) 2026 Jason Morley <hello@jbmorley.co.uk>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -18,8 +19,7 @@
  *  along with this program; if not, see <https://www.gnu.org/licenses/>.
  *
  */
-#ifndef _ncp_h_
-#define _ncp_h_
+#pragma once
 
 #include "config.h"
 
@@ -27,6 +27,7 @@
 
 #include "bufferstore.h"
 #include "linkchan.h"
+#include "ncpstatuscallback.h"
 #include "tcpsocket.h"
 
 #define MAX_CHANNELS_PSION 256
@@ -53,14 +54,19 @@ private:
 
 class NCP {
 public:
-    NCP(const char *fname, int baud, unsigned short verbose, const int cancellationFd);
+    NCP(const char *fname,
+        int baud,
+        unsigned short verbose,
+        const int cancellationFd,
+        NCPStatusCallback statusCallback,
+        void *context);
     ~NCP();
 
     int connect(channel *c); // returns channel, or -1 if failure
     void Register(channel *c);
     void RegisterAck(int, const char *);
     void disconnect(int channel);
-    void send(int channel, bufferStore &a);
+    void send(int channel, BufferStore &a);
     void reset();
     int  maxLinks();
     bool stuffToSend();
@@ -90,24 +96,24 @@ private:
         NCON_MSG_NCP_END=8
     };
     enum protocolVersionType { PV_SERIES_5 = 6, PV_SERIES_3 = 3 };
-    void receive(bufferStore s);
+    void receive(BufferStore s);
     int getFirstUnusedChan();
     bool isValidChannel(int);
-    void decodeControlMessage(bufferStore &buff);
-    void controlChannel(int chan, enum interControllerMessageType t, bufferStore &command);
+    void decodeControlMessage(BufferStore &buff);
+    void controlChannel(int chan, enum interControllerMessageType t, BufferStore &command);
     const char * ctrlMsgName(unsigned char);
 
     Link *l;
     unsigned short verbose;
     channel **channelPtr;
-    bufferStore *messageList;
+    BufferStore *messageList;
     int *remoteChanList;
-    bool failed;
+    bool failed = false;
     short int protocolVersion;
     linkChan *lChan;
     int maxChannels;
     std::vector<PcServer> pcServers;
     int lastSentChannel;
+    NCPStatusCallback statusCallback_;
+    void *callbackContext_;
 };
-
-#endif

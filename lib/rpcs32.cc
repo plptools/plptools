@@ -42,7 +42,7 @@ rpcs32::rpcs32(TCPSocket * _skt)
 Enum<rfsv::errs> rpcs32::
 getCmdLine(const char *process, string &ret)
 {
-    bufferStore a;
+    BufferStore a;
     Enum<rfsv::errs> res;
 
     a.addStringT(process);
@@ -56,7 +56,7 @@ getCmdLine(const char *process, string &ret)
 Enum<rfsv::errs> rpcs32::
 getMachineInfo(machineInfo &mi)
 {
-    bufferStore a;
+    BufferStore a;
     Enum<rfsv::errs> res;
 
     if (!sendCommand(rpcs::GET_MACHINE_INFO, a))
@@ -129,7 +129,7 @@ Enum<rfsv::errs> rpcs32::
 getOwnerInfo(bufferArray &owner)
 {
     Enum<rfsv::errs> res;
-    bufferStore a;
+    BufferStore a;
 
     if (!sendCommand(GET_OWNERINFO, a))
         return rfsv::E_PSI_FILE_DISC;
@@ -141,13 +141,13 @@ getOwnerInfo(bufferArray &owner)
     int p = 0;
     int l;
     while ((l = s.find('\006', p)) != s.npos) {
-        bufferStore b;
+        BufferStore b;
         b.addStringT(s.substr(p, l - p).c_str());
         owner += b;
         p = l + 1;
     }
     if (s.substr(p).length()) {
-        bufferStore b;
+        BufferStore b;
         b.addStringT(s.substr(p).c_str());
         owner += b;
     }
@@ -157,7 +157,7 @@ getOwnerInfo(bufferArray &owner)
 Enum<rfsv::errs> rpcs32::
 regOpenIter(uint32_t uid, char *match, uint16_t &handle)
 {
-    bufferStore a;
+    BufferStore a;
     Enum<rfsv::errs> res;
 
     cout << "Oiter" << endl;
@@ -176,7 +176,7 @@ regOpenIter(uint32_t uid, char *match, uint16_t &handle)
 Enum<rfsv::errs> rpcs32::
 regReadIter(uint16_t handle)
 {
-    bufferStore a;
+    BufferStore a;
     Enum<rfsv::errs> res;
 
     cout << "Riter" << endl;
@@ -193,7 +193,7 @@ regReadIter(uint16_t handle)
 Enum<rfsv::errs> rpcs32::
 setTime(time_t time)
 {
-    bufferStore a;
+    BufferStore a;
     Enum<rfsv::errs> res;
     PsiTime pt;
     psi_timezone ptz;
@@ -222,7 +222,7 @@ setTime(time_t time)
 Enum<rfsv::errs> rpcs32::
 configOpen(uint16_t &handle, uint32_t size)
 {
-    bufferStore a;
+    BufferStore a;
     Enum<rfsv::errs> res;
 
     a.addDWord(size);
@@ -235,9 +235,9 @@ configOpen(uint16_t &handle, uint32_t size)
 }
 
 Enum<rfsv::errs> rpcs32::
-configRead(uint32_t size, bufferStore &ret)
+configRead(uint32_t size, BufferStore &ret)
 {
-    bufferStore a;
+    BufferStore a;
     uint16_t handle;
     Enum<rfsv::errs> res;
 
@@ -261,9 +261,9 @@ configRead(uint32_t size, bufferStore &ret)
 }
 
 Enum<rfsv::errs> rpcs32::
-configWrite(bufferStore data)
+configWrite(BufferStore data)
 {
-    bufferStore a;
+    BufferStore a;
     uint16_t handle;
     Enum<rfsv::errs> res;
 
@@ -289,7 +289,7 @@ configWrite(bufferStore data)
 Enum<rfsv::errs> rpcs32::
 closeHandle(uint16_t handle)
 {
-    bufferStore a;
+    BufferStore a;
 
     a.addWord(handle);
     if (!sendCommand(rpcs::CLOSE_HANDLE, a))

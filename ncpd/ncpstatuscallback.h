@@ -1,8 +1,7 @@
 /*
  * This file is part of plptools.
  *
- *  Copyright (C) 1999 Philip Proudman <philip.proudman@btinternet.com>
- *  Copyright (C) 1999-2001 Fritz Elfert <felfert@to.com>
+ *  Copyright (C) 2026 Jason Morley <hello@jbmorley.co.uk>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -18,28 +17,8 @@
  *  along with this program; if not, see <https://www.gnu.org/licenses/>.
  *
  */
-#ifndef _linkchan_h_
-#define _linkchan_h_
+#pragma once
 
-#include "channel.h"
-#include "bufferarray.h"
+#include "config.h"
 
-#define LINKCHAN_DEBUG_LOG  1
-#define LINKCHAN_DEBUG_DUMP 2
-
-class linkChan : public channel {
-public:
-    linkChan(NCP *ncpController, int ncpChannel = -1);
-
-    void ncpDataCallback(BufferStore &a);
-    const char *getNcpRegisterName();
-    void ncpConnectAck();
-    void ncpConnectTerminate();
-    void ncpConnectNak();
-    void ncpRegisterAck() {}
-    void Register(channel *);
-private:
-    int registerSer;
-    bufferArray registerStack;
-};
-#endif
+typedef void (*NCPStatusCallback)(void *context, bool isConnected, int protocolVersion);

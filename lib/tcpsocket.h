@@ -28,7 +28,7 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 
-class bufferStore;
+class BufferStore;
 class IOWatch;
 
 /**
@@ -123,23 +123,23 @@ public:
     bool dataToGet(int sec, int usec) const;
 
     /**
-    * Receive data into a @ref bufferStore .
+    * Receive data into a @ref BufferStore .
     *
-    * @param a The bufferStore to fill with received data.
+    * @param a The BufferStore to fill with received data.
     * @param wait If true, wait until something is received, else return
     *              if no data is available.
-    * @returns 1 if a bufferStore received, 0, if no bufferStore received, -1
+    * @returns 1 if a BufferStore received, 0, if no BufferStore received, -1
     *          on error.
     */
-    int getBufferStore(bufferStore &a, bool wait = true);
+    int getBufferStore(BufferStore &a, bool wait = true);
 
     /**
-    * Sends data from a @ref bufferStore .
+    * Sends data from a @ref BufferStore .
     *
-    * @param a The bufferStore to send.
+    * @param a The BufferStore to send.
     * @returns true on success, false otherwise.
     */
-    bool sendBufferStore(const bufferStore &a);
+    bool sendBufferStore(const BufferStore &a);
 
     /**
     * Closes the connection.

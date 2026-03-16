@@ -45,7 +45,7 @@ typedef int (*getPixelFunction_t)(int x, int y);
  */
 extern void
 encodeBitmap(int width, int height, getPixelFunction_t getPixel,
-             bool rle, bufferStore &out);
+             bool rle, BufferStore &out);
 
 /**
  * Convert a Psion bitmap to a 8bit/pixel grayscale image.
@@ -62,6 +62,6 @@ encodeBitmap(int width, int height, getPixelFunction_t getPixel,
  * @returns      true on success, false if input data is inconsistent.
  */
 extern bool
-decodeBitmap(const unsigned char *p, int &width, int &height, bufferStore &out);
+decodeBitmap(const unsigned char *p, int &width, int &height, BufferStore &out);
 
 #endif // !_PSIBITMAP_H_

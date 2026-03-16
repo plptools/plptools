@@ -40,8 +40,8 @@ class rpcs32 : public rpcs {
     Enum<rfsv::errs> getCmdLine(const char *, std::string &);
     Enum<rfsv::errs> getMachineInfo(machineInfo &);
     Enum<rfsv::errs> getOwnerInfo(bufferArray &owner);
-    Enum<rfsv::errs> configRead(uint32_t, bufferStore &);
-    Enum<rfsv::errs> configWrite(bufferStore);
+    Enum<rfsv::errs> configRead(uint32_t, BufferStore &);
+    Enum<rfsv::errs> configWrite(BufferStore);
     Enum<rfsv::errs> closeHandle(uint16_t);
     Enum<rfsv::errs> regOpenIter(uint32_t uid, char *match, uint16_t &handle);
     Enum<rfsv::errs> regReadIter(uint16_t handle);

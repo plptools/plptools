@@ -267,7 +267,7 @@ static void
 ps_bitmap(FILE *f, unsigned long llx, unsigned long lly, unsigned long urx,
           unsigned long ury, const char *buf)
 {
-    bufferStore out;
+    BufferStore out;
     int width, height;
     if (decodeBitmap((const unsigned char *)buf, width, height, out)) {
         fprintf(f, "%lu %lu %lu %lu %d %d I\n", llx, lly, urx, ury, width, height);
@@ -282,7 +282,7 @@ ps_bitmap(FILE *f, unsigned long llx, unsigned long lly, unsigned long urx,
 }
 
 static void
-convertPage(FILE *f, int page, bool last, bufferStore buf)
+convertPage(FILE *f, int page, bool last, BufferStore buf)
 {
     int len = buf.getLen();
     int i = 0;
@@ -774,8 +774,8 @@ service_loop()
         bool jobEnd;
         unsigned long plen;
         int pageCount = 0;
-        bufferStore buf;
-        bufferStore pageBuf;
+        BufferStore buf;
+        BufferStore pageBuf;
         int fd;
         FILE *f = nullptr;
         unsigned char b;

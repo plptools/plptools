@@ -42,7 +42,7 @@ linkChan::linkChan(NCP* _ncpController, int _ncpChannel):channel(_ncpController)
 }
 
 void linkChan::
-ncpDataCallback(bufferStore & a)
+ncpDataCallback(BufferStore & a)
 {
     int len = a.getLen();
     if (verbose & LINKCHAN_DEBUG_LOG) {
@@ -59,7 +59,7 @@ ncpDataCallback(bufferStore & a)
         int res = a.getWord(3);
         // int dontknow = a.getWord(5);
         bufferArray newStack;
-        bufferStore se;
+        BufferStore se;
 
 
         strncpy(srvName, a.getString(7), 17);
@@ -117,8 +117,8 @@ ncpConnectNak()
 void linkChan::
 Register(channel *ch)
 {
-    bufferStore a;
-    bufferStore stack;
+    BufferStore a;
+    BufferStore stack;
 
     stack.addWord(registerSer);
     stack.addWord(ch->getNcpChannel());

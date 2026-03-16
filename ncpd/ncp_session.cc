@@ -153,7 +153,7 @@ void check_for_new_socket_connection(NCPSession *session) {
 
     // If we weren't able to accept the socket, then we need to clean it up.
 
-    bufferStore a;
+    BufferStore a;
 
     // Give the client time to send its version request.
     next->dataToGet(1, 0);
@@ -182,7 +182,9 @@ void *ncp_session_main_thread(void *arg) {
     session->ncp_ = new NCP(session->serialDevice_.c_str(),
                            session->baudRate_,
                            session->nverbose_,
-                           session->cancellationPipe_[0]);
+                           session->cancellationPipe_[0],
+                           session->statusCallback_,
+                           session->callbackContext_);
     pthread_t thr_a, thr_b;
     if (pthread_create(&thr_a, NULL, link_thread, session) != 0) {
         lerr << "Could not create Link thread" << endl;
@@ -194,6 +196,9 @@ void *ncp_session_main_thread(void *arg) {
     }
     while (!session->isCancelled()) {
         check_for_new_socket_connection(session);
+    }
+    if (session->statusCallback_) {
+        session->statusCallback_(session->callbackContext_, false, 0);
     }
     linf << _("terminating") << endl;
     void *ret;

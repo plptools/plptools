@@ -53,7 +53,7 @@ rpcs * rpcsfactory::create(bool reconnect)
     // caller. We announce ourselves to the NCP daemon, and the relevant
     // rpcs module will also announce itself.
 
-    bufferStore a;
+    BufferStore a;
 
     err = FACERR_NONE;
     a.addStringT("NCP$INFO");

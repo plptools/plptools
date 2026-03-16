@@ -56,7 +56,7 @@ class rfsvDirhandle {
 
 private:
     uint32_t h;
-    bufferStore b;
+    BufferStore b;
 };
 
 /**
