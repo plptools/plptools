@@ -44,9 +44,8 @@ public:
     /**
      * Send a buffer out to serial line
      */
-    void send(bufferStore &b);
+    void send(bufferStore &b, bool isEPOC);
 
-    void setEpoc(bool);
     int getSpeed();
     bool linkFailed();
     void reset();
@@ -109,7 +108,6 @@ private:
 
     // Writing to serial.
 
-    bool isEPOC = false;
     unsigned char *outBuffer; int outWrite = 0; int outRead = 0;
 
     // Initial configuration (const).
