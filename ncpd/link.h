@@ -167,6 +167,7 @@ private:
 
     NCP *theNCP;
     DataLink *dataLink_ = nullptr;
+    bool isEPOC_ = false;
     int txSequence;
     int rxSequence;
     int seqMask;

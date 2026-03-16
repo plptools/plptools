@@ -268,15 +268,11 @@ void DataLink::internalReset() {
     }
 }
 
-void DataLink::setEpoc(bool _epoc) {
-    isEPOC = _epoc;
-}
-
 int DataLink:: getSpeed() {
     return baudRate_;
 }
 
-void DataLink::send(bufferStore &b) {
+void DataLink::send(bufferStore &b, bool isEPOC) {
     opByte(0x16);
     opByte(0x10);
     opByte(0x02);
