@@ -23,10 +23,10 @@
 
 #include "config.h"
 
-class bufferStore;
+class BufferStore;
 
 /**
- * An array of bufferStores
+ * An array of BufferStores
  */
 class bufferArray {
 public:
@@ -62,20 +62,20 @@ public:
     bool empty() const;
 
     /**
-    * Retrieves the bufferStore at given index.
+    * Retrieves the BufferStore at given index.
     *
-    * @return The bufferStore at index.
+    * @return The BufferStore at index.
     */
-    bufferStore &operator [](const unsigned long index);
+    BufferStore &operator [](const unsigned long index);
 
     /**
-    * Appends a bufferStore to a bufferArray.
+    * Appends a BufferStore to a bufferArray.
     *
-    * @param s The bufferStore to be appended.
+    * @param s The BufferStore to be appended.
     *
-    * @returns A new bufferArray with bufferStore appended to.
+    * @returns A new bufferArray with BufferStore appended to.
     */
-    bufferArray operator +(const bufferStore &s);
+    bufferArray operator +(const BufferStore &s);
 
     /**
     * Concatenates two bufferArrays.
@@ -87,13 +87,13 @@ public:
     bufferArray operator +(const bufferArray &a);
 
     /**
-    * Appends a bufferStore to current instance.
+    * Appends a BufferStore to current instance.
     *
-    * @param s The bufferStore to append.
+    * @param s The BufferStore to append.
     *
     * @returns A reference to the current instance with s appended.
     */
-    bufferArray &operator +=(const bufferStore &s);
+    bufferArray &operator +=(const BufferStore &s);
 
     /**
     * Appends a bufferArray to current instance.
@@ -105,30 +105,30 @@ public:
     bufferArray &operator +=(const bufferArray &a);
 
     /**
-    * Removes the first bufferStore.
+    * Removes the first BufferStore.
     *
-    * @return The removed bufferStore.
+    * @return The removed BufferStore.
     */
-    bufferStore pop(void);
+    BufferStore pop(void);
 
     /**
-    * Inserts a bufferStore at index 0.
+    * Inserts a BufferStore at index 0.
     *
-    * @param b The bufferStore to be inserted.
+    * @param b The BufferStore to be inserted.
     */
-    void push(const bufferStore& b);
+    void push(const BufferStore& b);
 
     /**
-    * Appends a bufferStore.
+    * Appends a BufferStore.
     *
-    * @param b The bufferStore to be appended.
+    * @param b The BufferStore to be appended.
     */
-    void append(const bufferStore& b);
+    void append(const BufferStore& b);
 
     /**
     * Evaluates the current length.
     *
-    * @return The current number of bufferStores
+    * @return The current number of BufferStores
     */
     long length(void);
 
@@ -139,19 +139,19 @@ public:
 
 private:
     /**
-    * Minimum number of bufferStores to
+    * Minimum number of BufferStores to
     * allocate.
     */
     static const long ALLOC_MIN = 5;
 
     /**
-    * The current number of bufferStores in
+    * The current number of BufferStores in
     * this bufferArray.
     */
     long len;
 
     /**
-    * The current number of bufferStores
+    * The current number of BufferStores
     * allocated.
     */
     long lenAllocd;
@@ -159,7 +159,7 @@ private:
     /**
     * The content.
     */
-    bufferStore* buff;
+    BufferStore* buff;
 };
 
 inline bool bufferArray::empty() const { return len == 0; }

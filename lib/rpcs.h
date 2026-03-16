@@ -28,7 +28,7 @@
 #include <vector>
 
 class TCPSocket;
-class bufferStore;
+class BufferStore;
 class bufferArray;
 
 typedef std::vector<PsiProcess> processList;
@@ -390,7 +390,7 @@ public:
      *
      * @returns A psion error code. 0 = Ok.
      */
-    virtual Enum<rfsv::errs> configRead(uint32_t size, bufferStore &data)
+    virtual Enum<rfsv::errs> configRead(uint32_t size, BufferStore &data)
         { return rfsv::E_PSI_NOT_SIBO; }
 
     /**
@@ -404,7 +404,7 @@ public:
      *
      * @returns A psion error code. 0 = Ok.
      */
-    virtual Enum<rfsv::errs> configWrite(bufferStore data)
+    virtual Enum<rfsv::errs> configWrite(BufferStore data)
         { return rfsv::E_PSI_NOT_SIBO;}
 
     virtual Enum<rfsv::errs> queryOpen(void)
@@ -497,8 +497,8 @@ protected:
     *
     * @returns true on success, false on failure.
     */
-    bool sendCommand(enum commands cc, bufferStore &data);
-    Enum<rfsv::errs> getResponse(bufferStore &data, bool statusIsFirstByte);
+    bool sendCommand(enum commands cc, BufferStore &data);
+    Enum<rfsv::errs> getResponse(BufferStore &data, bool statusIsFirstByte);
     const char *getConnectName();
 };
 

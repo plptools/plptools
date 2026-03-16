@@ -60,7 +60,7 @@ rfsv * rfsvfactory::create(bool reconnect)
     // caller. We announce ourselves to the NCP daemon, and the relevant
     // RFSV module will also announce itself.
 
-    bufferStore a;
+    BufferStore a;
 
     err = FACERR_NONE;
     a.addStringT("NCP$INFO");

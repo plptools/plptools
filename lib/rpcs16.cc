@@ -41,7 +41,7 @@ rpcs16::rpcs16(TCPSocket *_skt)
 Enum<rfsv::errs> rpcs16::
 getCmdLine(const char *process, string &ret)
 {
-    bufferStore a;
+    BufferStore a;
     Enum<rfsv::errs> res;
 
     a.addStringT(process);
@@ -56,7 +56,7 @@ Enum<rfsv::errs> rpcs16::
 getOwnerInfo(bufferArray &owner)
 {
     Enum<rfsv::errs> res;
-    bufferStore a;
+    BufferStore a;
 
     if (!sendCommand(GET_OWNERINFO, a)) {
         return rfsv::E_PSI_FILE_DISC;
@@ -72,7 +72,7 @@ getOwnerInfo(bufferArray &owner)
     // offsets, so we read these into four separate strings and append them to our resulting array.
     owner.clear();
     for (int i = 0; i < 4; i++) {
-        bufferStore b;
+        BufferStore b;
         b.addString(a.getString(52 * i));
         owner += b;
     }

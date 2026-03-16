@@ -122,7 +122,7 @@ void rfsv::reconnect(void)
 }
 
 void rfsv::reset(void) {
-    bufferStore a;
+    BufferStore a;
     status = E_PSI_FILE_DISC;
     a.addStringT(getConnectName());
     if (skt->sendBufferStore(a)) {
@@ -172,7 +172,7 @@ attr2String(const uint32_t attr)
 int rfsv::
 getSpeed()
 {
-    bufferStore a;
+    BufferStore a;
     a.addStringT("NCP$GSPD");
     if (!skt->sendBufferStore(a))
         return -1;

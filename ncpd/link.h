@@ -53,7 +53,7 @@ typedef struct {
     /**
      * Packet content.
      */
-    bufferStore data;
+    BufferStore data;
 } ackWaitQueueElement;
 
 extern "C" {
@@ -90,7 +90,7 @@ public:
      *
      * @param buff The contents of the PLP packet.
      */
-    void send(const bufferStore &buff);
+    void send(const BufferStore &buff);
 
     /**
      * Query outstanding packets.
@@ -149,8 +149,8 @@ private:
     *
     * Called on the @ref DataLink's internal thread.
     */
-    void receive(bufferStore buf);
-    void transmit(bufferStore buf);
+    void receive(BufferStore buf);
+    void transmit(BufferStore buf);
     void sendAck(int seq);
     void sendReqReq();
     void sendReqCon();
@@ -178,8 +178,8 @@ private:
     Enum<link_type> linkType;
 
     std::vector<ackWaitQueueElement> ackWaitQueue;
-    std::vector<bufferStore> holdQueue;
-    std::vector<bufferStore> waitQueue;
+    std::vector<BufferStore> holdQueue;
+    std::vector<BufferStore> waitQueue;
     bool xoff[256];
 };
 

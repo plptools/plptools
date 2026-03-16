@@ -409,7 +409,7 @@ ftp::putClipText(rpcs &, rfsv & a, rclip & rc, TCPSocket & rclipSocket, const ch
     uint32_t fh;
     uint32_t l;
     const unsigned char *p;
-    bufferStore b;
+    BufferStore b;
     char *data;
     FILE *fp;
 
@@ -468,7 +468,7 @@ ftp::putClipText(rpcs &, rfsv & a, rclip & rc, TCPSocket & rclipSocket, const ch
 //     uint32_t fh;
 //     uint32_t l;
 //     const unsigned char *p;
-//     bufferStore b;
+//     BufferStore b;
 
 //     res = rf->freplacefile(0x200, CLIPFILE, fh);
 //     if (res == rfsv::E_PSI_GEN_NONE) {
@@ -493,7 +493,7 @@ ftp::putClipText(rpcs &, rfsv & a, rclip & rc, TCPSocket & rclipSocket, const ch
 //         b.addDWord(0x0000001d);   // @19 Section Offset
 
 //         // Data
-//         bufferStore ib;
+//         BufferStore ib;
 //         putImage = &img;
 //         encodeBitmap(img.width(), img.height(), getGrayPixel, false, ib);
 //         b.addBuff(ib);
@@ -509,8 +509,8 @@ ftp::putClipText(rpcs &, rfsv & a, rclip & rc, TCPSocket & rclipSocket, const ch
 // QImage *TopLevel::
 // decode_image(const unsigned char *p)
 // {
-//     bufferStore out;
-//     bufferStore hout;
+//     BufferStore out;
+//     BufferStore hout;
 //     QImage *img = 0L;
 //     int xPixels;
 //     int yPixels;
@@ -1129,7 +1129,7 @@ session(rfsv & a, rpcs & r, rclip & rc, TCPSocket & rclipSocket, vector<char *> 
         }
         if (!strcmp(argv[0], "setupinfo")) {
             Enum<rfsv::errs> res;
-            bufferStore db;
+            BufferStore db;
 
             if ((res = r.configRead(0, db)) != rfsv::E_PSI_GEN_NONE) {
                 cerr << _("Error: ") << res << endl;

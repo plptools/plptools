@@ -113,7 +113,7 @@ reset() {
 }
 
 void Link::
-send(const bufferStore & buff)
+send(const BufferStore & buff)
 {
     if (buff.getLen() > 300) {
         failed = true;
@@ -140,7 +140,7 @@ purgeQueue(int channel)
             ackWaitQueue.erase(i);
             i--;
         }
-    vector<bufferStore>::iterator j;
+    vector<BufferStore>::iterator j;
     for (j = holdQueue.begin(); j != holdQueue.end(); j++)
         if (j->getByte(0) == channel) {
             holdQueue.erase(j);
@@ -154,7 +154,7 @@ sendAck(int seq)
 {
     if (hasFailed())
         return;
-    bufferStore tmp;
+    BufferStore tmp;
     if (verbose & LNK_DEBUG_LOG)
         lout << "Link: >> ack seq=" << seq << endl;
     if (seq > 7) {
@@ -173,7 +173,7 @@ sendReqCon()
 {
     if (hasFailed())
         return;
-    bufferStore tmp;
+    BufferStore tmp;
     if (verbose & LNK_DEBUG_LOG)
         lout << "Link: >> con seq=4" << endl;
     tmp.addByte(0x24);
@@ -194,7 +194,7 @@ sendReqReq()
 {
     if (hasFailed())
         return;
-    bufferStore tmp;
+    BufferStore tmp;
     if (verbose & LNK_DEBUG_LOG)
         lout << "Link: >> con seq=1" << endl;
     tmp.addByte(0x21);
@@ -214,7 +214,7 @@ sendReq()
 {
     if (hasFailed())
         return;
-    bufferStore tmp;
+    BufferStore tmp;
     if (verbose & LNK_DEBUG_LOG)
         lout << "Link: >> con seq=1" << endl;
     tmp.addByte(0x20);
@@ -223,7 +223,7 @@ sendReq()
 }
 
 void Link::
-receive(bufferStore buff)
+receive(BufferStore buff)
 {
     if (!dataLink_) {
         return;
@@ -455,8 +455,8 @@ receive(bufferStore buff)
 void Link::
 transmitHoldQueue(int channel)
 {
-    vector<bufferStore> tmpQueue;
-    vector<bufferStore>::iterator i;
+    vector<BufferStore> tmpQueue;
+    vector<BufferStore>::iterator i;
 
     // First, move desired packets to a temporary queue
     pthread_mutex_lock(&queueMutex);
@@ -476,8 +476,8 @@ transmitHoldQueue(int channel)
 void Link::
 transmitWaitQueue()
 {
-    vector<bufferStore> tmpQueue;
-    vector<bufferStore>::iterator i;
+    vector<BufferStore> tmpQueue;
+    vector<BufferStore>::iterator i;
 
     // First, move desired packets to a temporary queue
     for (i = waitQueue.begin(); i != waitQueue.end(); i++)
@@ -490,7 +490,7 @@ transmitWaitQueue()
 }
 
 void Link::
-transmit(bufferStore buf)
+transmit(BufferStore buf)
 {
     if (hasFailed())
         return;

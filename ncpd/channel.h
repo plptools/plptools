@@ -25,7 +25,7 @@
 #include <stdio.h>
 
 class NCP;
-class bufferStore;
+class BufferStore;
 class PcServer;
 class TCPSocket;
 
@@ -37,10 +37,10 @@ public:
 
     void setNcpChannel(int chan);
     int getNcpChannel(void);
-    void ncpSend(bufferStore &a);
+    void ncpSend(BufferStore &a);
     void setVerbose(short int _verbose);
     short int getVerbose();
-    virtual void ncpDataCallback(bufferStore &a) = 0;
+    virtual void ncpDataCallback(BufferStore &a) = 0;
     virtual const char *getNcpRegisterName() = 0;
     void ncpConnect();
     void ncpRegister();

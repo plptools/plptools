@@ -43,7 +43,7 @@ channel::~channel()
 }
 
 void channel::
-ncpSend(bufferStore & a)
+ncpSend(BufferStore & a)
 {
     ncpController->send(ncpChannel, a);
 }

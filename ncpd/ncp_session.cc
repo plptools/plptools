@@ -153,7 +153,7 @@ void check_for_new_socket_connection(NCPSession *session) {
 
     // If we weren't able to accept the socket, then we need to clean it up.
 
-    bufferStore a;
+    BufferStore a;
 
     // Give the client time to send its version request.
     next->dataToGet(1, 0);

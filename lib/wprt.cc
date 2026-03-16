@@ -57,7 +57,7 @@ reconnect(void)
 void wprt::
 reset(void)
 {
-    bufferStore a;
+    BufferStore a;
     status = rfsv::E_PSI_FILE_DISC;
     a.addStringT(getConnectName());
     if (skt->sendBufferStore(a)) {
@@ -84,7 +84,7 @@ getConnectName(void)
 // protected internals
 //
 bool wprt::
-sendCommand(enum commands cc, bufferStore & data)
+sendCommand(enum commands cc, BufferStore & data)
 {
     if (status == rfsv::E_PSI_FILE_DISC) {
         reconnect();
@@ -92,7 +92,7 @@ sendCommand(enum commands cc, bufferStore & data)
             return false;
     }
     bool result;
-    bufferStore a;
+    BufferStore a;
     a.addByte(cc);
     a.addBuff(data);
     result = skt->sendBufferStore(a);
@@ -109,7 +109,7 @@ Enum<rfsv::errs> wprt::
 initPrinter() {
     Enum<rfsv::errs> ret;
 
-    bufferStore a;
+    BufferStore a;
     a.addByte(2); // Major printer version
     a.addByte(0); // Minor printer version
     sendCommand(WPRT_INIT, a);
@@ -125,7 +125,7 @@ initPrinter() {
 }
 
 Enum<rfsv::errs> wprt::
-getData(bufferStore &buf) {
+getData(BufferStore &buf) {
     Enum<rfsv::errs> ret;
 
     sendCommand(WPRT_GET, buf);
@@ -137,7 +137,7 @@ getData(bufferStore &buf) {
 Enum<rfsv::errs> wprt::
 cancelJob() {
     Enum<rfsv::errs> ret;
-    bufferStore a;
+    BufferStore a;
 
     sendCommand(WPRT_CANCEL, a);
     if ((ret = getResponse(a)) != rfsv::E_PSI_GEN_NONE)
@@ -147,12 +147,12 @@ cancelJob() {
 
 bool wprt::
 stop() {
-    bufferStore a;
+    BufferStore a;
     return sendCommand(WPRT_STOP, a);
 }
 
 Enum<rfsv::errs> wprt::
-getResponse(bufferStore & data)
+getResponse(BufferStore & data)
 {
     Enum<rfsv::errs> ret = rfsv::E_PSI_GEN_NONE;
     if (skt->getBufferStore(data) == 1)

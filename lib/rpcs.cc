@@ -104,7 +104,7 @@ reconnect(void)
 void rpcs::
 reset(void)
 {
-    bufferStore a;
+    BufferStore a;
     mtCacheS5mx = 0;
     status = rfsv::E_PSI_FILE_DISC;
     a.addStringT(getConnectName());
@@ -132,7 +132,7 @@ getConnectName(void)
 // protected internals
 //
 bool rpcs::
-sendCommand(enum commands cc, bufferStore & data)
+sendCommand(enum commands cc, BufferStore & data)
 {
     if (status == rfsv::E_PSI_FILE_DISC) {
         reconnect();
@@ -140,7 +140,7 @@ sendCommand(enum commands cc, bufferStore & data)
             return false;
     }
     bool result;
-    bufferStore a;
+    BufferStore a;
     a.addByte(cc);
     a.addBuff(data);
     result = skt->sendBufferStore(a);
@@ -154,7 +154,7 @@ sendCommand(enum commands cc, bufferStore & data)
 }
 
 Enum<rfsv::errs> rpcs::
-getResponse(bufferStore & data, bool statusIsFirstByte)
+getResponse(BufferStore & data, bool statusIsFirstByte)
 {
     Enum<rfsv::errs> ret;
     if (skt->getBufferStore(data) == 1) {
@@ -182,7 +182,7 @@ Enum<rfsv::errs> rpcs::
 getNCPversion(int &major, int &minor)
 {
     Enum<rfsv::errs> res;
-    bufferStore a;
+    BufferStore a;
 
     if (!sendCommand(QUERY_NCP, a))
         return rfsv::E_PSI_FILE_DISC;
@@ -198,7 +198,7 @@ getNCPversion(int &major, int &minor)
 Enum<rfsv::errs> rpcs::
 execProgram(const char *program, const char *args)
 {
-    bufferStore a;
+    BufferStore a;
 
     a.addStringT(program);
     int l = strlen(program);
@@ -224,7 +224,7 @@ execProgram(const char *program, const char *args)
 Enum<rfsv::errs> rpcs::
 stopProgram(const char *program)
 {
-    bufferStore a;
+    BufferStore a;
 
     a.addStringT(program);
     if (!sendCommand(STOP_PROG, a))
@@ -235,7 +235,7 @@ stopProgram(const char *program)
 Enum<rfsv::errs> rpcs::
 queryProgram(const char *program)
 {
-    bufferStore a;
+    BufferStore a;
 
     a.addStringT(program);
     if (!sendCommand(QUERY_PROG, a))
@@ -246,7 +246,7 @@ queryProgram(const char *program)
 Enum<rfsv::errs> rpcs::
 queryPrograms(processList &ret)
 {
-    bufferStore a;
+    BufferStore a;
     const char *drives;
     const char *dptr;
     bool anySuccess = false;
@@ -323,7 +323,7 @@ Enum<rfsv::errs> rpcs::
 formatOpen(const char drive, int &handle, int &count)
 {
     Enum<rfsv::errs> res;
-    bufferStore a;
+    BufferStore a;
 
     a.addByte(toupper(drive));
     a.addByte(':');
@@ -342,7 +342,7 @@ formatOpen(const char drive, int &handle, int &count)
 Enum<rfsv::errs> rpcs::
 formatRead(int handle)
 {
-    bufferStore a;
+    BufferStore a;
 
     a.addWord(handle);
     if (!sendCommand(FORMAT_READ, a))
@@ -354,7 +354,7 @@ Enum<rfsv::errs> rpcs::
 getUniqueID(const char *device, long &id)
 {
     Enum<rfsv::errs> res;
-    bufferStore a;
+    BufferStore a;
 
     a.addStringT(device);
     if (!sendCommand(GET_UNIQUEID, a))
@@ -371,7 +371,7 @@ Enum<rfsv::errs> rpcs::
 getMachineType(Enum<machs> &type)
 {
     Enum<rfsv::errs> res;
-    bufferStore a;
+    BufferStore a;
 
     if (!sendCommand(GET_MACHINETYPE, a))
         return rfsv::E_PSI_FILE_DISC;
@@ -392,7 +392,7 @@ Enum<rfsv::errs> rpcs::
 fuser(const char *name, char *buf, int maxlen)
 {
     Enum<rfsv::errs> res;
-    bufferStore a;
+    BufferStore a;
     char *p;
 
     a.addStringT(name);
@@ -409,7 +409,7 @@ fuser(const char *name, char *buf, int maxlen)
 Enum<rfsv::errs> rpcs::
 quitServer(void)
 {
-    bufferStore a;
+    BufferStore a;
     if (!sendCommand(QUIT_SERVER, a))
         return rfsv::E_PSI_FILE_DISC;
     return getResponse(a, true);

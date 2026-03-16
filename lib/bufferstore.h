@@ -31,46 +31,46 @@
 /**
  * A generic container for an array of bytes.
  *
- * bufferStore provides an array of bytes which
+ * BufferStore provides an array of bytes which
  * can be accessed using various types.
  */
-class bufferStore {
+class BufferStore {
 public:
     /**
-    * Constructs a new bufferStore.
+    * Constructs a new BufferStore.
     */
-    bufferStore();
+    BufferStore();
 
     /**
-    * Constructs a new bufferStore and
+    * Constructs a new BufferStore and
     * initializes its content.
     *
     * @param buf Pointer to data for initialization.
     * @param len Length of data for initialization.
     */
-    bufferStore(const unsigned char *buf, long len);
+    BufferStore(const unsigned char *buf, long len);
 
     /**
-    * Destroys a bufferStore instance.
+    * Destroys a BufferStore instance.
     */
-    ~bufferStore();
+    ~BufferStore();
 
     /**
-    * Constructs a new bufferStore and
+    * Constructs a new BufferStore and
     * initializes its content.
     *
-    * @param b A bufferStore, whose content is
+    * @param b A BufferStore, whose content is
     * used for initialization.
     */
-    bufferStore(const bufferStore &b);
+    BufferStore(const BufferStore &b);
 
     /**
-    * Copies a bufferStore.
+    * Copies a BufferStore.
     */
-    bufferStore &operator =(const bufferStore &);
+    BufferStore &operator =(const BufferStore &);
 
     /**
-    * Retrieves the length of a bufferStore.
+    * Retrieves the length of a BufferStore.
     *
     * @returns The current length of the contents in bytes.
     */
@@ -132,21 +132,21 @@ public:
     * Prints a dump of the content.
     *
     * @param s The stream to write to.
-    * @param m The bufferStore do be dumped.
+    * @param m The BufferStore do be dumped.
     *
     * @returns The stream.
     */
-    friend std::ostream &operator<<(std::ostream &s, const bufferStore &m);
+    friend std::ostream &operator<<(std::ostream &s, const BufferStore &m);
 
     /**
-    * Tests if the bufferStore is empty.
+    * Tests if the BufferStore is empty.
     *
-    * @returns true, if the bufferStore is empty; false, if it contains data.
+    * @returns true, if the BufferStore is empty; false, if it contains data.
     */
     bool empty() const;
 
     /**
-    * Initializes the bufferStore.
+    * Initializes the BufferStore.
     *
     * All data is removed, the length is
     * reset to 0.
@@ -154,7 +154,7 @@ public:
     void init();
 
     /**
-    * Initializes the bufferStore with
+    * Initializes the BufferStore with
     * a given data.
     *
     * @param buf Pointer to data to initialize from.
@@ -214,13 +214,13 @@ public:
     /**
     * Appends data to the content of this instance.
     *
-    * @param b The bufferStore whose content to append.
+    * @param b The BufferStore whose content to append.
     * @param maxLen Length of content to append. If
     *               @p maxLen is less than 0 or greater than
     *               the current length of @p b , then the
     *               whole content of @p b is appended.
     */
-    void addBuff(const bufferStore &b, long maxLen = -1);
+    void addBuff(const BufferStore &b, long maxLen = -1);
 
     /**
     * Truncates the buffer.
@@ -255,7 +255,7 @@ private:
     enum c { MIN_LEN = 300 };
 };
 
-inline bool bufferStore::empty() const {
+inline bool BufferStore::empty() const {
     return (len - start) == 0;
 }
 

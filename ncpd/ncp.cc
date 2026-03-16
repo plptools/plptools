@@ -49,7 +49,7 @@ NCP::NCP(const char *fname,
 , callbackContext_(callbackContext) {
 
     channelPtr = new channel*[MAX_CHANNELS_PSION + 1];
-    messageList = new bufferStore[MAX_CHANNELS_PSION + 1];
+    messageList = new BufferStore[MAX_CHANNELS_PSION + 1];
     remoteChanList = new int[MAX_CHANNELS_PSION + 1];
 
     // until detected on receipt of INFO we use these.
@@ -65,10 +65,10 @@ NCP::NCP(const char *fname,
 }
 
 NCP::~NCP() {
-    bufferStore b;
+    BufferStore b;
     for (int i = 0; i < maxLinks(); i++) {
         if (isValidChannel(i)) {
-            bufferStore b2;
+            BufferStore b2;
             b2.addByte(remoteChanList[i]);
             controlChannel(i, NCON_MSG_CHANNEL_DISCONNECT, b2);
         }
@@ -104,7 +104,7 @@ short int NCP::getProtocolVersion()
     return protocolVersion;
 }
 
-void NCP::receive(bufferStore s) {
+void NCP::receive(BufferStore s) {
     if (s.getLen() > 1) {
         int channel = s.getByte(0);
         s.discardFirstBytes(1);
@@ -134,8 +134,8 @@ void NCP::receive(bufferStore s) {
         lerr << "Got null message\n";
 }
 
-void NCP::controlChannel(int chan, enum interControllerMessageType t, bufferStore & command) {
-    bufferStore open;
+void NCP::controlChannel(int chan, enum interControllerMessageType t, BufferStore & command) {
+    BufferStore open;
     open.addByte(0);  // control
 
     open.addByte(chan);
@@ -171,7 +171,7 @@ void NCP::unregisterPcServer(PcServer *server) {
     }
 }
 
-void NCP::decodeControlMessage(bufferStore & buff) {
+void NCP::decodeControlMessage(BufferStore & buff) {
     int remoteChan = buff.getByte(0);
 
     interControllerMessageType imt = (interControllerMessageType)buff.getByte(1);
@@ -179,7 +179,7 @@ void NCP::decodeControlMessage(bufferStore & buff) {
     if (verbose & NCP_DEBUG_LOG)
         lout << "ncp: << " << ctrlMsgName(imt) << " " << remoteChan;
 
-    bufferStore b;
+    BufferStore b;
     int localChan;
 
     switch (imt) {
@@ -293,7 +293,7 @@ void NCP::decodeControlMessage(bufferStore & buff) {
             // for the Series 5mx/7, this may need to change.
             //
             if (ver == PV_SERIES_5 || ver == PV_SERIES_3) {
-                bufferStore b;
+                BufferStore b;
                 protocolVersion = ver;
                 if (verbose & NCP_DEBUG_LOG) {
                     if (verbose & NCP_DEBUG_DUMP)
@@ -397,7 +397,7 @@ int NCP::connect(channel * ch) {
     if (cNum > 0) {
         channelPtr[cNum] = ch;
         ch->setNcpChannel(cNum);
-        bufferStore b;
+        BufferStore b;
         if (ch->getNcpConnectName())
             b.addString(ch->getNcpConnectName());
         else {
@@ -411,7 +411,7 @@ int NCP::connect(channel * ch) {
     return -1;
 }
 
-void NCP::send(int channel, bufferStore & a) {
+void NCP::send(int channel, BufferStore & a) {
     bool last;
     do {
         last = true;
@@ -419,7 +419,7 @@ void NCP::send(int channel, bufferStore & a) {
         if (a.getLen() > NCP_SENDLEN)
             last = false;
 
-        bufferStore out;
+        BufferStore out;
         out.addByte(remoteChanList[channel]);
         out.addByte(channel);
 
@@ -445,7 +445,7 @@ void NCP::disconnect(int channel) {
     if (verbose & NCP_DEBUG_LOG)
         lout << "ncp: disconnect: channel=" << channel << endl;
     channelPtr[channel] = NULL;
-    bufferStore b;
+    BufferStore b;
     b.addByte(remoteChanList[channel]);
     controlChannel(channel, NCON_MSG_CHANNEL_DISCONNECT, b);
 }
