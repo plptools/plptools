@@ -41,5 +41,6 @@ ncpd_SOURCES = \
 	ncp_session.h \
 	ncp.cc \
 	ncp.h \
+	ncpstatuscallback.h \
 	socketchannel.cc \
 	socketchannel.h
