@@ -58,7 +58,13 @@ private:
         *crc =  (*crc << 8) ^ crc_table[((*crc >> 8) ^ a) & 0xff];
     }
 
-    void findSync();
+    /**
+    * Reads the incoming data and processes data frames.
+    *
+    * @return true if the link is stable and more data can be consumed; false otherwise.
+    */
+    bool processInputData();
+
     void opByte(unsigned char a);
 
     /**

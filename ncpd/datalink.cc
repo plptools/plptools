@@ -146,8 +146,14 @@ static void *data_pump_thread(void *arg) {
             }
 
             // Process any available data.
+            bool isLinkStable = true;
             if (hasData(dataLink->in)) {
-                dataLink->findSync();
+                isLinkStable = dataLink->processInputData();
+            }
+
+            // Reset if we were unable to establish a stable link.
+            if (!isLinkStable) {
+                dataLink->internalReset();
             }
         }
     }
@@ -335,10 +341,7 @@ void DataLink::flushOutputBuffer() {
     }
 }
 
-/**
-* Reads the incoming data and processes data frames.
-*/
-void DataLink::findSync() {
+bool DataLink::processInputData() {
     int inw = inWrite;
     int p;
 
@@ -425,7 +428,7 @@ outerLoop:
                     }
                     rcv.init();
                     if (hasData(out))
-                        return;
+                        return true;
                     goto outerLoop;
             }
             inc1(p);
@@ -441,10 +444,11 @@ outerLoop:
             int rx_amount = (inw > inRead) ?
                 inw - inRead : BUFLEN - inRead + inw;
             if (rx_amount > 15) {
-                internalReset();
+                return false;
             }
         }
     }
+    return true;
 }
 
 bool DataLink::linkFailed() {
