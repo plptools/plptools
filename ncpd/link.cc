@@ -219,8 +219,6 @@ sendReq()
         lout << "Link: >> con seq=1" << endl;
     tmp.addByte(0x20);
     // No Ack expected for this, so no new entry in ackWaitQueue
-    pthread_mutex_lock(&queueMutex);
-    pthread_mutex_unlock(&queueMutex);
     dataLink_->send(tmp, isEPOC_);
 }
 
