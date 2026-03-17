@@ -40,6 +40,6 @@ public:
     void Register(channel *);
 private:
     int registerSer;
-    bufferArray registerStack;
+    BufferArray registerStack;
 };
 #endif

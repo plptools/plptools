@@ -29,7 +29,7 @@
 
 class TCPSocket;
 class BufferStore;
-class bufferArray;
+class BufferArray;
 
 typedef std::vector<PsiProcess> processList;
 
@@ -264,12 +264,12 @@ public:
     * This function is working with both SIBO and EPOC
     * devices.
     *
-    * @param owner A bufferArray, containing the lines of the owner info upon
+    * @param owner A BufferArray, containing the lines of the owner info upon
     *              return.
     *
     * @returns A psion error code. 0 = Ok.
     */
-    virtual Enum<rfsv::errs> getOwnerInfo(bufferArray &owner) = 0;
+    virtual Enum<rfsv::errs> getOwnerInfo(BufferArray &owner) = 0;
 
     /**
     * Retrieves the type of machine on the remote side

@@ -31,7 +31,7 @@
 
 class rpcs;
 class BufferStore;
-class bufferArray;
+class BufferArray;
 
 class ftp {
     public:

@@ -651,7 +651,7 @@ session(rfsv & a, rpcs & r, rclip & rc, TCPSocket & rclipSocket, vector<char *> 
 
     {
         Enum<rpcs::machs> machType;
-        bufferArray b;
+        BufferArray b;
         if ((res = r.getOwnerInfo(b)) == rfsv::E_PSI_GEN_NONE) {
             r.getMachineType(machType);
             if (!once) {
@@ -1206,7 +1206,7 @@ session(rfsv & a, rpcs & r, rclip & rc, TCPSocket & rclipSocket, vector<char *> 
             continue;
         }
         if (!strcmp(argv[0], "ownerinfo")) {
-            bufferArray b;
+            BufferArray b;
             if ((res = r.getOwnerInfo(b)) != rfsv::E_PSI_GEN_NONE) {
                 cerr << _("Error: ") << res << endl;
                 continue;

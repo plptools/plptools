@@ -25,7 +25,7 @@
 
 class TCPSocket;
 class BufferStore;
-class bufferArray;
+class BufferArray;
 
 /**
  * Remote ClipBoard services via PLP.

@@ -126,7 +126,7 @@ getMachineInfo(machineInfo &mi)
 }
 
 Enum<rfsv::errs> rpcs32::
-getOwnerInfo(bufferArray &owner)
+getOwnerInfo(BufferArray &owner)
 {
     Enum<rfsv::errs> res;
     BufferStore a;
