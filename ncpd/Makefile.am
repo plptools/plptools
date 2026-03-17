@@ -30,8 +30,8 @@ ncpd_SOURCES = \
 	datalink.h \
 	link.cc \
 	link.h  \
-	linkchan.cc \
-	linkchan.h \
+	linkchannel.cc \
+	linkchannel.h \
 	main.cc \
 	mp_serial.c \
 	mp_serial.h \
