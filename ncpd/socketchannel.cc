@@ -32,7 +32,7 @@
 using namespace std;
 
 SocketChannel::SocketChannel(TCPSocket* socket, NCP* ncp)
-: channel(ncp)
+: Channel(ncp)
 , socket_(socket) {
     registerName_ = nullptr;
     connectTry_ = 0;
