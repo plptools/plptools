@@ -4,6 +4,7 @@
 #
 # Copyright (C) 1999-2002 Fritz Elfert <felfert@to.com>
 # Copyright (C) 2007-2024 Reuben Thomas <rrt@sc3d.org>
+# Copyright (C) 2026 Jason Morley <hello@jbmorley.co.uk>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -24,15 +25,65 @@ LDADD = $(HOSTENT_LIB) $(LIBSOCKET)
 
 pkglib_LTLIBRARIES = libplp.la
 
-libplp_la_SOURCES = bufferarray.cc  bufferstore.cc iowatch.cc tcpsocket.cc \
-	rfsv16.cc rfsv32.cc rfsvfactory.cc log.cc rfsv.cc rpcs32.cc rpcs16.cc \
-	rpcs.cc rpcsfactory.cc psitime.cc Enum.cc plpdirent.cc wprt.cc \
-	rclip.cc siscomponentrecord.cpp  sisfile.cpp sisfileheader.cpp \
-	sisfilerecord.cpp sislangrecord.cpp sisreqrecord.cpp sistypes.cpp \
-	psibitmap.cpp psiprocess.cc path.cc cli_utils.cc
-noinst_HEADERS = bufferarray.h bufferstore.h iowatch.h tcpsocket.h \
-	rfsv.h rfsv16.h rfsv32.h rfsvfactory.h log.h rpcs32.h rpcs16.h rpcs.h \
-	rpcsfactory.h psitime.h Enum.h plpdirent.h wprt.h plpintl.h rclip.h \
-	siscomponentrecord.h sisfile.h sisfileheader.h sisfilerecord.h \
-	sislangrecord.h sisreqrecord.h sistypes.h psibitmap.h psiprocess.h \
-	path.h cli_utils.h
+libplp_la_SOURCES = \
+	bufferarray.cc \
+	bufferstore.cc \
+	cli_utils.cc \
+	Enum.cc \
+	iowatch.cc \
+	log.cc \
+	path.cc \
+	plpdirent.cc \
+	psibitmap.cpp \
+	psiprocess.cc \
+	psitime.cc \
+	rclip.cc \
+	rfsv.cc \
+	rfsv16.cc \
+	rfsv32.cc \
+	rfsvfactory.cc \
+	rpcs.cc \
+	rpcs16.cc \
+	rpcs32.cc \
+	rpcsfactory.cc \
+	siscomponentrecord.cpp  \
+	sisfile.cpp \
+	sisfileheader.cpp \
+	sisfilerecord.cpp \
+	sislangrecord.cpp \
+	sisreqrecord.cpp \
+	sistypes.cpp \
+	tcpsocket.cc \
+	wprt.cc
+
+noinst_HEADERS = \
+	bufferarray.h \
+	bufferstore.h \
+	cli_utils.h \
+	Enum.h \
+	iowatch.h \
+	log.h \
+	path.h \
+	plpdirent.h \
+	plpintl.h \
+	psibitmap.h \
+	psiprocess.h \
+	psitime.h \
+	rclip.h \
+	rfsv.h \
+	rfsv16.h \
+	rfsv32.h \
+	rfsvfactory.h \
+	rpcs.h \
+	rpcs16.h \
+	rpcs32.h \
+	rpcsfactory.h \
+	siscomponentrecord.h \
+	sisfile.h \
+	sisfileheader.h \
+	sisfilerecord.h \
+	sislangrecord.h \
+	sisreqrecord.h \
+	sistypes.h \
+	tcpsocket.h \
+	wprt.h
