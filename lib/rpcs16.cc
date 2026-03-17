@@ -53,7 +53,7 @@ getCmdLine(const char *process, string &ret)
 }
 
 Enum<rfsv::errs> rpcs16::
-getOwnerInfo(bufferArray &owner)
+getOwnerInfo(BufferArray &owner)
 {
     Enum<rfsv::errs> res;
     BufferStore a;

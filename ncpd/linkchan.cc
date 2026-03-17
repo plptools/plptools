@@ -58,7 +58,7 @@ ncpDataCallback(BufferStore & a)
         unsigned int ser = a.getWord(1);
         int res = a.getWord(3);
         // int dontknow = a.getWord(5);
-        bufferArray newStack;
+        BufferArray newStack;
         BufferStore se;
 
 

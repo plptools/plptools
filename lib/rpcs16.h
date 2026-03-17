@@ -39,7 +39,7 @@ class rpcs16 : public rpcs {
 
  public:
     Enum<rfsv::errs> getCmdLine(const char *, std::string &);
-    Enum<rfsv::errs> getOwnerInfo(bufferArray &owner);
+    Enum<rfsv::errs> getOwnerInfo(BufferArray &owner);
 
 
  private:
