@@ -54,7 +54,7 @@ typedef struct {
      * Packet content.
      */
     BufferStore data;
-} ackWaitQueueElement;
+} AckWaitQueueElement;
 
 extern "C" {
     static void *expire_check(void *);
@@ -162,24 +162,24 @@ private:
     void purgeAllQueues();
     unsigned long retransTimeout();
 
-    pthread_t checkthread;
-    pthread_mutex_t queueMutex;
+    pthread_t checkThreadId_;
+    pthread_mutex_t queueMutex_;
 
-    NCP *theNCP;
+    NCP * const ncp_;
     DataLink *dataLink_ = nullptr;
     bool isEPOC_ = false;
-    int txSequence;
-    int rxSequence;
-    int seqMask;
-    int maxOutstanding;
-    unsigned long conMagic;
-    unsigned short verbose;
-    bool failed;
-    Enum<link_type> linkType;
+    int txSequence_ = 1;
+    int rxSequence_ = -1;
+    int seqMask_ = 7;
+    int maxOutstanding_ = 1;
+    unsigned long conMagic_;
+    const unsigned short verbose_;
+    bool failed_;
+    Enum<link_type> linkType_;
 
-    std::vector<ackWaitQueueElement> ackWaitQueue;
-    std::vector<BufferStore> holdQueue;
-    std::vector<BufferStore> waitQueue;
+    std::vector<AckWaitQueueElement> ackWaitQueue;
+    std::vector<BufferStore> holdQueue_;
+    std::vector<BufferStore> waitQueue_;
     bool xoff[256];
 };
 
