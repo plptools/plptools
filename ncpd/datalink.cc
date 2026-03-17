@@ -55,21 +55,6 @@
 #define inc1(idx) inca(idx, 1)
 #define normalize(idx) do { idx &= BUFMASK; } while (0)
 
-struct ByteSpan {
-    const unsigned char *data;
-    const int length;
-};
-
-std::ostream& operator<<(std::ostream& os, const ByteSpan& span) {
-    for (int i = 0; i < span.length; i++) {
-        if (i > 0) {
-            os << " ";
-        }
-        os << std::hex << std::setw(2) << std::setfill('0') << (int)span.data[i];
-    }
-    return os;
-}
-
 extern "C" {
 /**
  * Signal handler does nothing. It just exists
