@@ -35,7 +35,7 @@
 #define NCP_SENDLEN 250
 
 class Link;
-class channel;
+class Channel;
 
 /**
  * Representation of a server process on the PC
@@ -62,8 +62,8 @@ public:
         void *context);
     ~NCP();
 
-    int connect(channel *c); // returns channel, or -1 if failure
-    void Register(channel *c);
+    int connect(Channel *c); // returns channel, or -1 if failure
+    void Register(Channel *c);
     void RegisterAck(int, const char *);
     void disconnect(int channel);
     void send(int channel, BufferStore &a);
@@ -105,7 +105,7 @@ private:
 
     Link *l;
     unsigned short verbose;
-    channel **channelPtr;
+    Channel **channelPtr;
     BufferStore *messageList;
     int *remoteChanList;
     bool failed = false;

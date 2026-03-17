@@ -48,7 +48,7 @@ NCP::NCP(const char *fname,
 , statusCallback_(statusCallback)
 , callbackContext_(callbackContext) {
 
-    channelPtr = new channel*[MAX_CHANNELS_PSION + 1];
+    channelPtr = new Channel*[MAX_CHANNELS_PSION + 1];
     messageList = new BufferStore[MAX_CHANNELS_PSION + 1];
     remoteChanList = new int[MAX_CHANNELS_PSION + 1];
 
@@ -348,7 +348,7 @@ int NCP::getFirstUnusedChan() {
         if (channelPtr[cNum] == NULL) {
             if (verbose & NCP_DEBUG_LOG)
                 lout << "ncp: getFirstUnusedChan=" << cNum << endl;
-            channelPtr[cNum] = (channel *)0xdeadbeef;
+            channelPtr[cNum] = (Channel *)0xdeadbeef;
             return cNum;
         }
     }
@@ -363,7 +363,7 @@ void NCP::RegisterAck(int chan, const char *name) {
     if (verbose & NCP_DEBUG_LOG)
         lout << "ncp: RegisterAck: chan=" << chan << endl;
     for (int cNum = 1; cNum < maxLinks(); cNum++) {
-        channel *ch = channelPtr[cNum];
+        Channel *ch = channelPtr[cNum];
         if (isValidChannel(cNum) && ch->getNcpChannel() == chan) {
             ch->setNcpConnectName(name);
             ch->ncpRegisterAck();
@@ -373,7 +373,7 @@ void NCP::RegisterAck(int chan, const char *name) {
     lerr << "ncp: RegisterAck: no channel to deliver" << endl;
 }
 
-void NCP::Register(channel * ch) {
+void NCP::Register(Channel * ch) {
     if (lChan) {
         int cNum = ch->getNcpChannel();
         if (cNum == 0)
@@ -388,7 +388,7 @@ void NCP::Register(channel * ch) {
         lerr << "ncp: Register without established lChan" << endl;
 }
 
-int NCP::connect(channel * ch) {
+int NCP::connect(Channel *ch) {
     // look for first unused chan
 
     int cNum = ch->getNcpChannel();

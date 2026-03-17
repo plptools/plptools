@@ -29,10 +29,10 @@ class BufferStore;
 class PcServer;
 class TCPSocket;
 
-class channel {
+class Channel {
 public:
-    channel(NCP *ncpController);
-    virtual ~channel() = 0;
+    Channel(NCP *ncpController);
+    virtual ~Channel() = 0;
     void newNcpController(NCP *ncpController);
 
     void setNcpChannel(int chan);
