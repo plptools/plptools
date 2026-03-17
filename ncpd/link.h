@@ -18,8 +18,7 @@
  *  along with this program; if not, see <https://www.gnu.org/licenses/>.
  *
  */
-#ifndef _link_h_
-#define _link_h_
+#pragma once
 
 #include "config.h"
 #include <pthread.h>
@@ -182,5 +181,3 @@ private:
     std::vector<BufferStore> waitQueue_;
     bool xoff[256];
 };
-
-#endif
