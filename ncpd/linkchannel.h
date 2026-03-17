@@ -27,7 +27,7 @@
 #define LINKCHAN_DEBUG_LOG  1
 #define LINKCHAN_DEBUG_DUMP 2
 
-class LinkChannel : public channel {
+class LinkChannel : public Channel {
 public:
     LinkChannel(NCP *ncpController, int ncpChannel = -1);
 
@@ -37,7 +37,7 @@ public:
     void ncpConnectTerminate();
     void ncpConnectNak();
     void ncpRegisterAck() {}
-    void Register(channel *);
+    void Register(Channel *);
 private:
     int registerSer;
     BufferArray registerStack;

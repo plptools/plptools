@@ -34,10 +34,11 @@
 using namespace std;
 
 LinkChannel::LinkChannel(NCP* _ncpController, int _ncpChannel)
-: channel(_ncpController) {
+: Channel(_ncpController) {
     registerSer = 0x1234;
-    if (_ncpChannel != -1)
+    if (_ncpChannel != -1) {
         setNcpChannel(_ncpChannel);
+    }
     ncpConnect();
 }
 
@@ -104,7 +105,7 @@ void LinkChannel::ncpConnectNak() {
     ncpConnectTerminate();
 }
 
-void LinkChannel::Register(channel *ch) {
+void LinkChannel::Register(Channel *ch) {
     BufferStore a;
     BufferStore stack;
 

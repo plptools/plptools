@@ -27,8 +27,7 @@
 #include "channel.h"
 #include "ncp.h"
 
-channel::channel(NCP * _ncpController)
-{
+Channel::Channel(NCP * _ncpController) {
     verbose = 0;
     ncpChannel = 0;
     connectName = 0;
@@ -36,126 +35,93 @@ channel::channel(NCP * _ncpController)
     _terminate = false;
 }
 
-channel::~channel()
-{
-    if (connectName)
+Channel::~Channel() {
+    if (connectName) {
         free((void *)connectName);
+    }
 }
 
-void channel::
-ncpSend(BufferStore & a)
-{
+void Channel::ncpSend(BufferStore & a) {
     ncpController->send(ncpChannel, a);
 }
 
-bool channel::
+bool Channel::
 shouldTerminate() const
 {
     return _terminate;
 }
 
-void channel::
+void Channel::
 terminateWhenAsked()
 {
     _terminate = true;
 }
 
-void channel::
-ncpConnect()
-{
+void Channel::ncpConnect() {
     ncpController->connect(this);
 }
 
-void channel::
-ncpRegister()
-{
+void Channel::ncpRegister() {
     ncpController->Register(this);
 }
 
-void channel::
-ncpDoRegisterAck(int ch, const char *name)
-{
+void Channel::ncpDoRegisterAck(int ch, const char *name) {
     ncpController->RegisterAck(ch, name);
 }
 
-void channel::
-ncpDisconnect()
-{
+void Channel::ncpDisconnect() {
     ncpController->disconnect(ncpChannel);
 }
 
-PcServer *channel::
-ncpFindPcServer(const char *name)
-{
+PcServer *Channel::ncpFindPcServer(const char *name) {
     return ncpController->findPcServer(name);
 }
 
-void channel::
-ncpRegisterPcServer(TCPSocket *skt, const char *name)
-{
+void Channel::ncpRegisterPcServer(TCPSocket *skt, const char *name) {
     ncpController->registerPcServer(skt, name);
 }
 
-void channel::
-ncpUnregisterPcServer(PcServer *server)
-{
+void Channel::ncpUnregisterPcServer(PcServer *server) {
     ncpController->unregisterPcServer(server);
 }
 
-int channel::
-ncpGetSpeed()
-{
+int Channel::ncpGetSpeed() {
     return ncpController->getSpeed();
 }
 
-short int channel::
-ncpProtocolVersion()
-{
+short int Channel::ncpProtocolVersion() {
     return ncpController->getProtocolVersion();
 }
 
-void channel::
-setNcpChannel(int chan)
-{
+void Channel::setNcpChannel(int chan) {
     ncpChannel = chan;
 }
 
-int channel::
-getNcpChannel()
-{
+int Channel::getNcpChannel() {
     return ncpChannel;
 }
 
-void channel::
-newNcpController(NCP * _ncpController)
-{
+void Channel::newNcpController(NCP * _ncpController) {
     ncpController = _ncpController;
 }
 
-void channel::
-setVerbose(short int _verbose)
-{
+void Channel::setVerbose(short int _verbose) {
     verbose = _verbose;
 }
 
-short int channel::
-getVerbose()
-{
+short int Channel::getVerbose() {
     return verbose;
 }
 
-const char * channel::
-getNcpConnectName()
-{
+const char * Channel::getNcpConnectName() {
     return connectName;
 }
 
-void channel::
-setNcpConnectName(const char *name)
-{
+void Channel::setNcpConnectName(const char *name) {
     if (name) {
-        if (connectName)
+        if (connectName) {
             free((void *)connectName);
+        }
         connectName = strdup(name);
     }
 }

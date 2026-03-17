@@ -25,7 +25,7 @@
 
 class TCPSocket;
 
-class SocketChannel : public channel {
+class SocketChannel : public Channel {
 public:
   SocketChannel(TCPSocket* socket, NCP* ncp);
   virtual ~SocketChannel();
