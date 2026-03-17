@@ -27,9 +27,9 @@
 #define LINKCHAN_DEBUG_LOG  1
 #define LINKCHAN_DEBUG_DUMP 2
 
-class linkChan : public channel {
+class LinkChannel : public channel {
 public:
-    linkChan(NCP *ncpController, int ncpChannel = -1);
+    LinkChannel(NCP *ncpController, int ncpChannel = -1);
 
     void ncpDataCallback(BufferStore &a);
     const char *getNcpRegisterName();

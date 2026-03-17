@@ -27,23 +27,21 @@
 #include "bufferstore.h"
 #include "bufferarray.h"
 
-#include "linkchan.h"
+#include "linkchannel.h"
 #include "ncp_log.h"
 #include "ncp.h"
 
 using namespace std;
 
-linkChan::linkChan(NCP* _ncpController, int _ncpChannel):channel(_ncpController)
-{
+LinkChannel::LinkChannel(NCP* _ncpController, int _ncpChannel)
+: channel(_ncpController) {
     registerSer = 0x1234;
     if (_ncpChannel != -1)
         setNcpChannel(_ncpChannel);
     ncpConnect();
 }
 
-void linkChan::
-ncpDataCallback(BufferStore & a)
-{
+void LinkChannel::ncpDataCallback(BufferStore & a) {
     int len = a.getLen();
     if (verbose & LINKCHAN_DEBUG_LOG) {
         lout << "linkchan: << msg ";
@@ -87,36 +85,26 @@ ncpDataCallback(BufferStore & a)
     lerr << "linkchan: unknown message " << a.getByte(0) << endl;
 }
 
-const char *linkChan::
-getNcpRegisterName()
-{
+const char *LinkChannel::getNcpRegisterName() {
     return "LINK";
 }
 
-void linkChan::
-ncpConnectAck()
-{
+void LinkChannel::ncpConnectAck() {
     if (verbose & LINKCHAN_DEBUG_LOG)
         lout << "linkchan: << cack" << endl;
 }
 
-void linkChan::
-ncpConnectTerminate()
-{
+void LinkChannel::ncpConnectTerminate() {
     if (verbose & LINKCHAN_DEBUG_LOG)
         lout << "linkchan: << ctrm" << endl;
     terminateWhenAsked();
 }
 
-void linkChan::
-ncpConnectNak()
-{
+void LinkChannel::ncpConnectNak() {
     ncpConnectTerminate();
 }
 
-void linkChan::
-Register(channel *ch)
-{
+void LinkChannel::Register(channel *ch) {
     BufferStore a;
     BufferStore stack;
 

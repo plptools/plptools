@@ -26,7 +26,7 @@
 #include <vector>
 
 #include "bufferstore.h"
-#include "linkchan.h"
+#include "linkchannel.h"
 #include "ncpstatuscallback.h"
 #include "tcpsocket.h"
 
@@ -110,7 +110,7 @@ private:
     int *remoteChanList;
     bool failed = false;
     short int protocolVersion;
-    linkChan *lChan;
+    LinkChannel *lChan;
     int maxChannels;
     std::vector<PcServer> pcServers;
     int lastSentChannel;

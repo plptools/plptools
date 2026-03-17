@@ -30,7 +30,7 @@
 #include "bufferarray.h"
 
 #include "link.h"
-#include "linkchan.h"
+#include "linkchannel.h"
 #include "ncp_log.h"
 #include "ncp.h"
 #include "ncpstatuscallback.h"
@@ -212,9 +212,9 @@ void NCP::decodeControlMessage(BufferStore & buff) {
                 // Create linkchan if it does not yet exist
                 if (!lChan) {
                     if (verbose & NCP_DEBUG_LOG)
-                        lout << "ncp: new passive linkChan" << endl;
+                        lout << "ncp: new passive LinkChannel" << endl;
                     channelPtr[localChan] =
-                        lChan = new linkChan(this, localChan);
+                        lChan = new LinkChannel(this, localChan);
                     lChan->setVerbose(verbose);
                 }
                 lChan->ncpConnectAck();
@@ -245,9 +245,9 @@ void NCP::decodeControlMessage(BufferStore & buff) {
                 // Create linkchan if it does not yet exist
                 if (!lChan) {
                     if (verbose & NCP_DEBUG_LOG)
-                        lout << "ncp: new active linkChan" << endl;
+                        lout << "ncp: new active LinkChannel" << endl;
                     channelPtr[localChan] =
-                        lChan = new linkChan(this, -1);
+                        lChan = new LinkChannel(this, -1);
                     lChan->setVerbose(verbose);
                 }
 
