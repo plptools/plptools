@@ -94,7 +94,6 @@ void log_data(unsigned short options,
     printf(")\n");
 }
 
-// TODO: `fd` isn't thread-safe.
 static void *data_pump_thread(void *arg) {
     DataLink *dataLink = (DataLink *)arg;
     pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
@@ -120,10 +119,19 @@ static void *data_pump_thread(void *arg) {
             FD_ZERO(&r_set);
             w_set = r_set;
             FD_SET(dataLink->cancellationFd_, &r_set);
-            if (hasSpace(dataLink->in))
-                FD_SET(serialFd, &r_set);
-            if (hasData(dataLink->out))
-                FD_SET(serialFd, &w_set);
+            {
+                std::lock_guard<std::mutex> inputLock(dataLink->inputMutex_);
+                if (hasSpace(dataLink->in)) {
+                    FD_SET(serialFd, &r_set);
+                }
+            }
+            {
+                std::lock_guard<std::mutex> outputLock(dataLink->outputMutex_);
+                if (hasData(dataLink->out)) {
+                    FD_SET(serialFd, &w_set);
+                }
+            }
+
             struct timeval tv = {1, 0};
             int res = select(MAX(serialFd, dataLink->cancellationFd_) + 1, &r_set, &w_set, NULL, &tv);
             if (res <= 0) {
@@ -176,8 +184,12 @@ static void *data_pump_thread(void *arg) {
             // Process any available data.
             bool isLinkStable = true;
             {
-                std::lock_guard<std::mutex> inputLock(dataLink->inputMutex_);
-                if (hasData(dataLink->in)) {
+                bool hasInputData = false;
+                {
+                    std::lock_guard<std::mutex> inputLock(dataLink->inputMutex_);
+                    hasInputData = hasData(dataLink->in);
+                }
+                if (hasInputData) {
                     isLinkStable = dataLink->processInputData();
                 }
             }
@@ -256,7 +268,7 @@ void DataLink::reset() {
     // This method stops the data pump thread and restarts it, performing a pthread_join. Given this, it's unsafe to be
     // called from the data pump itself. This is a belt and braces check to ensure we don't do that (spoiler: we were).
     assert(pthread_self() != dataPumpThreadId_);
-    if (fd != -1) {  // TODO: THis is the wrong thing to signal that we need to restart the thread.
+    if (dataPumpThreadId_) {
         pthread_cancel(dataPumpThreadId_);
         pthread_join(dataPumpThreadId_, NULL);
     }
@@ -372,7 +384,16 @@ void DataLink::opByte(unsigned char a) {
 
 void DataLink::flushOutputBuffer() {
     pthread_kill(dataPumpThreadId_, SIGUSR1);
-    while (!hasSpace(out)) {
+    while (true) {
+        bool needsFlush = false;
+        {
+            lock_guard<std::mutex> outputLock(outputMutex_);
+            needsFlush = !hasSpace(out);
+        }
+        if (!needsFlush) {
+            return;
+        }
+        // Wait on a signal from the data pump thread to let us know data has been processed.
         sigset_t sigs;
         int dummy;
         sigemptyset(&sigs);
@@ -382,6 +403,8 @@ void DataLink::flushOutputBuffer() {
 }
 
 bool DataLink::processInputData() {
+    std::lock_guard<std::mutex> inputLock(inputMutex_);
+
     int inw = inWrite;
     int p;
 
@@ -467,8 +490,14 @@ outerLoop:
                         link_->receive(rcv);
                     }
                     rcv.init();
-                    if (hasData(out))
+                    bool hasOutputData = false;
+                    {
+                        std::lock_guard<std::mutex> outputLock(outputMutex_);
+                        hasOutputData = hasData(out);
+                    }
+                    if (hasOutputData) {
                         return true;
+                    }
                     goto outerLoop;
             }
             inc1(p);

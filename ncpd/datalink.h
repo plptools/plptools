@@ -61,8 +61,6 @@ private:
     /**
     * Reads the incoming data and processes data frames.
     *
-    * Must be called with inputMutex_ held.
-    *
     * @return true if the link is stable and more data can be consumed; false otherwise.
     */
     bool processInputData();
