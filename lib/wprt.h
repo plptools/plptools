@@ -25,7 +25,7 @@
 
 class TCPSocket;
 class BufferStore;
-class bufferArray;
+class BufferArray;
 
 /**
  * Remote Print services via PLP

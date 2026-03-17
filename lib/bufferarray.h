@@ -28,36 +28,36 @@ class BufferStore;
 /**
  * An array of BufferStores
  */
-class bufferArray {
+class BufferArray {
 public:
     /**
-    * constructs a new bufferArray.
+    * constructs a new BufferArray.
     * A minimum of @ref ALLOC_MIN
     * elements is allocated.
     */
-    bufferArray();
+    BufferArray();
 
     /**
-    * Constructs a new bufferArray.
+    * Constructs a new BufferArray.
     *
     * @param a The initial contents for this array.
     */
-    bufferArray(const bufferArray &a);
+    BufferArray(const BufferArray &a);
 
     /**
-    * Destroys the bufferArray.
+    * Destroys the BufferArray.
     */
-    ~bufferArray();
+    ~BufferArray();
 
     /**
-    * Copys the bufferArray.
+    * Copys the BufferArray.
     */
-    bufferArray &operator =(const bufferArray &a);
+    BufferArray &operator =(const BufferArray &a);
 
     /**
-    * Checks if this bufferArray is empty.
+    * Checks if this BufferArray is empty.
     *
-    * @return true if the bufferArray is empty.
+    * @return true if the BufferArray is empty.
     */
     bool empty() const;
 
@@ -69,22 +69,22 @@ public:
     BufferStore &operator [](const unsigned long index);
 
     /**
-    * Appends a BufferStore to a bufferArray.
+    * Appends a BufferStore to a BufferArray.
     *
     * @param s The BufferStore to be appended.
     *
-    * @returns A new bufferArray with BufferStore appended to.
+    * @returns A new BufferArray with BufferStore appended to.
     */
-    bufferArray operator +(const BufferStore &s);
+    BufferArray operator +(const BufferStore &s);
 
     /**
-    * Concatenates two bufferArrays.
+    * Concatenates two BufferArrays.
     *
-    * @param a The bufferArray to be appended.
+    * @param a The BufferArray to be appended.
     *
-    * @returns A new bufferArray consisting with a appended.
+    * @returns A new BufferArray consisting with a appended.
     */
-    bufferArray operator +(const bufferArray &a);
+    BufferArray operator +(const BufferArray &a);
 
     /**
     * Appends a BufferStore to current instance.
@@ -93,16 +93,16 @@ public:
     *
     * @returns A reference to the current instance with s appended.
     */
-    bufferArray &operator +=(const BufferStore &s);
+    BufferArray &operator +=(const BufferStore &s);
 
     /**
-    * Appends a bufferArray to current instance.
+    * Appends a BufferArray to current instance.
     *
-    * @param a The bufferArray to append.
+    * @param a The BufferArray to append.
     *
     * @returns A reference to the current instance with a appended.
     */
-    bufferArray &operator +=(const bufferArray &a);
+    BufferArray &operator +=(const BufferArray &a);
 
     /**
     * Removes the first BufferStore.
@@ -133,7 +133,7 @@ public:
     long length(void);
 
     /**
-    * Empties the bufferArray.
+    * Empties the BufferArray.
     */
     void clear(void);
 
@@ -146,7 +146,7 @@ private:
 
     /**
     * The current number of BufferStores in
-    * this bufferArray.
+    * this BufferArray.
     */
     long len;
 
@@ -162,6 +162,6 @@ private:
     BufferStore* buff;
 };
 
-inline bool bufferArray::empty() const { return len == 0; }
+inline bool BufferArray::empty() const { return len == 0; }
 
 #endif

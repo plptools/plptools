@@ -23,14 +23,14 @@
 #include "bufferstore.h"
 #include "bufferarray.h"
 
-bufferArray::bufferArray()
+BufferArray::BufferArray()
 {
     len = 0;
     lenAllocd = ALLOC_MIN;
     buff = new BufferStore[lenAllocd];
 }
 
-bufferArray::bufferArray(const bufferArray & a)
+BufferArray::BufferArray(const BufferArray & a)
 {
     len = a.len;
     lenAllocd = a.lenAllocd;
@@ -39,12 +39,12 @@ bufferArray::bufferArray(const bufferArray & a)
         buff[i] = a.buff[i];
 }
 
-bufferArray::~bufferArray()
+BufferArray::~BufferArray()
 {
     delete []buff;
 }
 
-BufferStore bufferArray::
+BufferStore BufferArray::
 pop()
 {
     BufferStore ret;
@@ -58,7 +58,7 @@ pop()
     return ret;
 }
 
-void bufferArray::
+void BufferArray::
 append(const BufferStore & b)
 {
     if (len == lenAllocd) {
@@ -73,7 +73,7 @@ append(const BufferStore & b)
     buff[len++] = b;
 }
 
-void bufferArray::
+void BufferArray::
 push(const BufferStore & b)
 {
     if (len == lenAllocd)
@@ -88,13 +88,13 @@ push(const BufferStore & b)
     len++;
 }
 
-long bufferArray::
+long BufferArray::
 length(void)
 {
     return len;
 }
 
-void bufferArray::
+void BufferArray::
 clear(void)
 {
     len = 0;
@@ -103,8 +103,8 @@ clear(void)
     buff = new BufferStore[lenAllocd];
 }
 
-bufferArray &bufferArray::
-operator =(const bufferArray & a)
+BufferArray &BufferArray::
+operator =(const BufferArray & a)
 {
     delete []buff;
     len = a.len;
@@ -115,30 +115,30 @@ operator =(const bufferArray & a)
     return *this;
 }
 
-BufferStore &bufferArray::
+BufferStore &BufferArray::
 operator [](const unsigned long index)
 {
     return buff[index];
 }
 
-bufferArray bufferArray::
+BufferArray BufferArray::
 operator +(const BufferStore &s)
 {
-    bufferArray res = *this;
+    BufferArray res = *this;
     res += s;
     return res;
 }
 
-bufferArray bufferArray::
-operator +(const bufferArray &a)
+BufferArray BufferArray::
+operator +(const BufferArray &a)
 {
-    bufferArray res = *this;
+    BufferArray res = *this;
     res += a;
     return res;
 }
 
-bufferArray &bufferArray::
-operator +=(const bufferArray &a)
+BufferArray &BufferArray::
+operator +=(const BufferArray &a)
 {
     lenAllocd += a.lenAllocd;
     BufferStore *nb = new BufferStore[lenAllocd];
@@ -152,7 +152,7 @@ operator +=(const bufferArray &a)
     return *this;
 }
 
-bufferArray &bufferArray::
+BufferArray &BufferArray::
 operator +=(const BufferStore &s)
 {
     append(s);
