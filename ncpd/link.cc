@@ -21,6 +21,7 @@
 #include "Enum.h"
 #include "config.h"
 
+#include <cerrno>
 #include <iostream>
 
 #include <stdint.h>
@@ -40,11 +41,36 @@
 extern "C" {
 
     static void *expire_check(void *arg) {
-        Link *l = (Link *)arg;
-        pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
+        Link *link = (Link *)arg;
         while (1) {
-            usleep(l->retransTimeout() * 500);
-            l->retransmit();
+            fd_set r_set;
+            FD_ZERO(&r_set);
+            FD_SET(link->cancellationFd_, &r_set);
+
+            useconds_t duration = link->retransTimeout() * 500;
+            struct timeval tv = {
+                static_cast<time_t>(duration / 1000000),
+                static_cast<suseconds_t>(duration % 1000000)
+            };
+
+            // Wait for the timeout or cancellation.
+            // This select call will return in the if the thread is interrupted but we ignore that and simply allow
+            // the retransmit check to occur a little early, rather than adding significant complexity to match the
+            // already-estimated timeout.
+            int res = select(link->cancellationFd_ + 1, &r_set, NULL, NULL, &tv);
+
+            // Exit early with non-recoverable errors.
+            if (res == -1 && errno != EINTR) {
+                return nullptr;
+            }
+
+            // Exit if we've been cancelled.
+            if (FD_ISSET(link->cancellationFd_, &r_set)) {
+                return nullptr;
+            }
+
+            // Retransmit any packets needing retransmission.
+            link->retransmit();
         }
     }
 
@@ -60,7 +86,8 @@ ENUM_DEFINITION_END(Link::link_type)
 
 Link::Link(const char *fname, int baud, NCP *ncp, unsigned short verbose, const int cancellationFd)
 : ncp_(ncp)
-, verbose_(verbose) {
+, verbose_(verbose)
+, cancellationFd_(cancellationFd) {
     failed_ = false;
     linkType_ = LINK_TYPE_UNKNOWN;
     for (int i = 0; i < 256; i++)
@@ -79,7 +106,6 @@ Link::Link(const char *fname, int baud, NCP *ncp, unsigned short verbose, const 
 }
 
 Link::~Link() {
-    pthread_cancel(checkThreadId_);
     pthread_join(checkThreadId_, NULL);
     pthread_mutex_destroy(&queueMutex_);
     delete dataLink_;
@@ -461,13 +487,17 @@ void Link::transmitWaitQueue() {
     vector<BufferStore>::iterator i;
 
     // First, move desired packets to a temporary queue
+    pthread_mutex_lock(&queueMutex_);
     for (i = waitQueue_.begin(); i != waitQueue_.end(); i++)
         tmpQueue.push_back(*i);
     waitQueue_.clear();
+    pthread_mutex_unlock(&queueMutex_);
+
     // transmit the moved packets. If the backlock gets
     // full, they are put into waitQueue again.
-    for (i = tmpQueue.begin(); i != tmpQueue.end(); i++)
+    for (i = tmpQueue.begin(); i != tmpQueue.end(); i++) {
         transmit(*i);
+    }
 }
 
 void Link::transmit(BufferStore buf) {
@@ -485,11 +515,12 @@ void Link::transmit(BufferStore buf) {
         int ql;
         pthread_mutex_lock(&queueMutex_);
         ql = ackWaitQueue.size();
-        pthread_mutex_unlock(&queueMutex_);
         if (ql >= maxOutstanding_) {
             waitQueue_.push_back(buf);
+            pthread_mutex_unlock(&queueMutex_);
             return;
         }
+        pthread_mutex_unlock(&queueMutex_);
 
         AckWaitQueueElement e;
         e.seq = txSequence_++;

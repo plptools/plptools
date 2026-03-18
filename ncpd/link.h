@@ -174,4 +174,11 @@ private:
     std::vector<BufferStore> holdQueue_;
     std::vector<BufferStore> waitQueue_;
     bool xoff_[256];
+
+    /**
+    * Used to signal cancellation.
+    *
+    * Should never be read.
+    */
+    const int cancellationFd_;
 };
