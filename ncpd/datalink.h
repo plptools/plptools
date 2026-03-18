@@ -53,7 +53,7 @@ public:
     * there's insufficient space.
     *
     * @param b buffer to send
-    * @araam isEPOC flag indicating if additional EPOC32 byte-stuffing should be used
+    * @param isEPOC flag indicating if additional EPOC32 byte-stuffing should be used
     */
     void send(BufferStore &b, bool isEPOC);
 
