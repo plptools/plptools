@@ -313,7 +313,6 @@ void DataLink::send(BufferStore &b, bool isEPOC) {
     message.addByte(0x10);
     message.addByte(0x02);
 
-    unsigned short crcOut = 0;
     long len = b.getLen();
 
     if (verbose_ & PKT_DEBUG_LOG) {
@@ -325,6 +324,7 @@ void DataLink::send(BufferStore &b, bool isEPOC) {
         lout << endl;
     }
 
+    unsigned short crcOut = 0;
     for (int i = 0; i < len; i++) {
         unsigned char c = b.getByte(i);
         switch (c) {
