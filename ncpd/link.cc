@@ -78,7 +78,6 @@ Link::Link(const char *fname, int baud, NCP *ncp, unsigned short verbose, const 
 }
 
 Link::~Link() {
-    flush();
     pthread_cancel(checkThreadId_);
     pthread_join(checkThreadId_, NULL);
     pthread_mutex_destroy(&queueMutex_);
@@ -201,6 +200,7 @@ void Link::sendReq() {
     dataLink_->send(tmp, isEPOC_);
 }
 
+// This is called on the write queue's thread.
 void Link::receive(BufferStore buff) {
     if (!dataLink_) {
         return;
@@ -550,6 +550,7 @@ void Link::multiAck(struct timeval refstamp) {
     pthread_mutex_unlock(&queueMutex_);
 }
 
+// Called from the retransmit thread.
 void Link::retransmit() {
 
     if (hasFailed()) {
@@ -583,14 +584,12 @@ void Link::retransmit() {
     pthread_mutex_unlock(&queueMutex_);
 }
 
-void Link::flush() {
-    while (stuffToSend()) {
-        sleep(1);
-    }
-}
-
 bool Link::stuffToSend() {
-    return ((!failed_) && (!ackWaitQueue.empty()));
+    bool result;
+    pthread_mutex_lock(&queueMutex_);
+    result = ((!failed_) && (!ackWaitQueue.empty()));
+    pthread_mutex_unlock(&queueMutex_);
+    return result;
 }
 
 bool Link::hasFailed() {

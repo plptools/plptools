@@ -125,6 +125,14 @@ static void *data_pump_thread(void *arg) {
                 continue;
             }
 
+            // Check to see if we were cancelled and, if we were, unblock the writers and exit.
+            if (FD_ISSET(dataLink->cancellationFd_, &r_set)) {
+                std::lock_guard<std::mutex> outputLock(dataLink->outputMutex_);
+                dataLink->isCancelled_ = true;
+                dataLink->outputCondition_.notify_all();
+                return nullptr;
+            }
+
             // We can write to the transport; write as much as we can.
             if (FD_ISSET(serialFd, &w_set)) {
                 std::lock_guard<std::mutex> serialLock(dataLink->serialMutex_);
@@ -236,12 +244,22 @@ DataLink::DataLink(const char *fname,
 }
 
 DataLink::~DataLink() {
+
+    // Ensure there are no lingering readers.
+    {
+        std::lock_guard<std::mutex> outputLock(outputMutex_);
+        isCancelled_ = true;
+    }
+    outputCondition_.notify_all();
+
+    // Stop the data pump thread and close the serial port.
     if (fd != -1) {
         pthread_cancel(dataPumpThreadId_);
         pthread_join(dataPumpThreadId_, NULL);
         ser_exit(fd);
     }
     fd = -1;
+
     delete []inBuffer;
     delete []outBuffer;
 }
@@ -353,8 +371,14 @@ void DataLink::send(BufferStore &b, bool isEPOC) {
     std::unique_lock<std::mutex> outputLock(outputMutex_);
     outputCondition_.wait(outputLock, [&] {
         unsigned long free = (outRead - outWrite - 1 + BUFLEN) & BUFMASK;
-        return free >= message.getLen();
+        return free >= message.getLen() || isCancelled_;
     });
+
+    // Exit early if we've been cancelled, dropping the data on the floor.
+    if (isCancelled_) {
+        return;
+    }
+
     for (unsigned long i = 0; i < message.getLen(); i++) {
         outBuffer[outWrite] = message.getByte(i);
         inc1(outWrite);

@@ -53,6 +53,8 @@ public:
     * messages can't get interleaved), suspending the current thread until signaled by the data pump thread if
     * there's insufficient space.
     *
+    * Drops messages on the floor when shutting down.
+    *
     * @param b buffer to send
     * @param isEPOC flag indicating if additional EPOC32 byte-stuffing should be used
     */
@@ -117,6 +119,7 @@ private:
     // Writing to serial.
 
     std::mutex outputMutex_;
+    bool isCancelled_ = false;
     unsigned char *outBuffer; int outWrite = 0; int outRead = 0;
 
     // Signaling.

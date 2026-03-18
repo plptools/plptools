@@ -113,11 +113,6 @@ public:
     void reset();
 
     /**
-     * Wait, until all outstanding packets are acknowledged or timed out.
-     */
-    void flush();
-
-    /**
      * Purge all outstanding packets for a specified remote channel.
      *
      * @param channel The of the channel for which to remove outstanding
