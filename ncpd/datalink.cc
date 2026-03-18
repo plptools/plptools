@@ -82,7 +82,6 @@ void log_data(unsigned short options,
 
 static void *data_pump_thread(void *arg) {
     DataLink *dataLink = (DataLink *)arg;
-    pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
     while (1) {
 
         // Get the serial port file descriptor.
@@ -261,7 +260,6 @@ DataLink::~DataLink() {
 
     // Stop the data pump thread and close the serial port.
     if (fd != -1) {
-        pthread_cancel(dataPumpThreadId_);
         pthread_join(dataPumpThreadId_, NULL);
         ser_exit(fd);
     }
