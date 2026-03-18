@@ -18,6 +18,7 @@
  *  along with this program; if not, see <https://www.gnu.org/licenses/>.
  *
  */
+#include "Enum.h"
 #include "config.h"
 
 #include <iostream>
@@ -63,7 +64,7 @@ Link::Link(const char *fname, int baud, NCP *ncp, unsigned short verbose, const 
     failed_ = false;
     linkType_ = LINK_TYPE_UNKNOWN;
     for (int i = 0; i < 256; i++)
-        xoff[i] = false;
+        xoff_[i] = false;
     // generate magic number for sendReqCon()
     srandom(time(NULL));
     conMagic_ = random();
@@ -97,7 +98,7 @@ void Link::reset() {
     linkType_ = LINK_TYPE_UNKNOWN;
     purgeAllQueues();
     for (int i = 0; i < 256; i++)
-        xoff[i] = false;
+        xoff_[i] = false;
     dataLink_->reset();
     // submit a link request
     sendReqReq();
@@ -135,7 +136,7 @@ void Link::purgeQueue(int channel) {
     pthread_mutex_unlock(&queueMutex_);
 }
 
-void Link::sendAck(int seq) {
+void Link::sendAck(int seq, Enum<link_type> linkType) {
     if (hasFailed())
         return;
     BufferStore tmp;
@@ -149,7 +150,7 @@ void Link::sendAck(int seq) {
     } else {
         tmp.prependByte(seq);
     }
-    dataLink_->send(tmp, isEPOC_);
+    dataLink_->send(tmp, linkType == LINK_TYPE_EPOC);
 }
 
 void Link::sendReqCon() {
@@ -167,8 +168,9 @@ void Link::sendReqCon() {
     e.txcount = 4;
     pthread_mutex_lock(&queueMutex_);
     ackWaitQueue.push_back(e);
+    bool isEPOC = linkType_ == LINK_TYPE_EPOC;
     pthread_mutex_unlock(&queueMutex_);
-    dataLink_->send(tmp, isEPOC_);
+    dataLink_->send(tmp, isEPOC);
 }
 
 void Link::sendReqReq() {
@@ -185,11 +187,12 @@ void Link::sendReqReq() {
     e.txcount = 4;
     pthread_mutex_lock(&queueMutex_);
     ackWaitQueue.push_back(e);
+    bool isEPOC = linkType_ == LINK_TYPE_EPOC;
     pthread_mutex_unlock(&queueMutex_);
-    dataLink_->send(tmp, isEPOC_);
+    dataLink_->send(tmp, isEPOC);
 }
 
-void Link::sendReq() {
+void Link::sendReq(Enum<link_type> linkType) {
     if (hasFailed())
         return;
     BufferStore tmp;
@@ -197,7 +200,7 @@ void Link::sendReq() {
         lout << "Link: >> con seq=1" << endl;
     tmp.addByte(0x20);
     // No Ack expected for this, so no new entry in ackWaitQueue
-    dataLink_->send(tmp, isEPOC_);
+    dataLink_->send(tmp, linkType == LINK_TYPE_EPOC);
 }
 
 // This is called on the write queue's thread.
@@ -236,20 +239,20 @@ void Link::receive(BufferStore buff) {
                 rxSequence_++;
                 rxSequence_ &= seqMask_;
 
-                    sendAck(rxSequence_);
+                    sendAck(rxSequence_, linkType_);
                 // Must check for XOFF/XON ncp frames HERE!
                 if ((buff.getLen() == 3) && (buff.getByte(0) == 0)) {
                     switch (buff.getByte(2)) {
                         case 1:
                             // XOFF
-                            xoff[buff.getByte(1)] = true;
+                            xoff_[buff.getByte(1)] = true;
                             if (verbose_ & LNK_DEBUG_LOG)
                                 lout << "Link: got XOFF for channel "
                                      << buff.getByte(1) << endl;
                             break;
                         case 2:
                             // XON
-                            xoff[buff.getByte(1)] = false;
+                            xoff_[buff.getByte(1)] = false;
                             if (verbose_ & LNK_DEBUG_LOG)
                                 lout << "Link: got XON for channel "
                                      << buff.getByte(1) << endl;
@@ -263,7 +266,7 @@ void Link::receive(BufferStore buff) {
                     ncp_->receive(buff);
                 }
             } else {
-                sendAck(rxSequence_);
+                sendAck(rxSequence_, linkType_);
                 if (verbose_ & LNK_DEBUG_LOG)
                     lout << "Link: DUP\n";
             }
@@ -301,7 +304,6 @@ void Link::receive(BufferStore buff) {
                     rxSequence_ = 0;
                     txSequence_ = 1;
                     purgeAllQueues();
-                    isEPOC_ = false;
                     if (verbose_ & LNK_DEBUG_LOG)
                         lout << "Link: 1-linkType set to " << linkType_ << endl;
                 }
@@ -314,11 +316,12 @@ void Link::receive(BufferStore buff) {
                 // (Receiving an ack for a packet not on our wait queue is a
                 // hint by the Psion about which was the last packet it
                 // received successfully.)
+                vector<BufferStore> pendingData;
                 pthread_mutex_lock(&queueMutex_);
                 struct timeval now;
                 gettimeofday(&now, NULL);
                 bool nextFound = false;
-                for (i = ackWaitQueue.begin(); i != ackWaitQueue.end(); i++)
+                for (i = ackWaitQueue.begin(); i != ackWaitQueue.end(); i++) {
                     if (i->seq == seq+1) {
                         nextFound = true;
                         if (i->txcount-- == 0) {
@@ -334,11 +337,19 @@ void Link::receive(BufferStore buff) {
                             if (verbose_ & LNK_DEBUG_LOG)
                                 lout << "Link: >> RETRANSMIT seq=" << i->seq
                                      << endl;
-                            dataLink_->send(i->data, isEPOC_);
+                            pendingData.push_back(i->data);
                         }
                         break;
                     }
+                }
+                bool isEPOC = linkType_ == LINK_TYPE_EPOC;
                 pthread_mutex_unlock(&queueMutex_);
+
+                // Retransmit the data.
+                for (vector<BufferStore>::iterator i = pendingData.begin(); i != pendingData.end(); i++) {
+                    dataLink_->send(*i, isEPOC);
+                }
+
                 if ((verbose_ & LNK_DEBUG_LOG) && (!nextFound)) {
                     lout << "Link: << UNMATCHED ack seq=" << seq;
                     if (verbose_ & LNK_DEBUG_DUMP)
@@ -366,7 +377,6 @@ void Link::receive(BufferStore buff) {
                         seqMask_ = 0x7ff;
                         // EPOC can handle up to 8 unacknowledged packets
                         maxOutstanding_ = 8;
-                        isEPOC_ = true;
                         if (verbose_ & LNK_DEBUG_LOG) {
                             lout << "Link: << con seq=" << seq ;
                             if (verbose_ & LNK_DEBUG_DUMP)
@@ -380,7 +390,7 @@ void Link::receive(BufferStore buff) {
             if (conFound) {
                 rxSequence_ = 0;
                 txSequence_ = 1;
-                sendAck(rxSequence_);
+                sendAck(rxSequence_, linkType_);
             } else {
                 if (verbose_ & LNK_DEBUG_LOG) {
                     lout << "Link: << req seq=" << seq;
@@ -397,7 +407,6 @@ void Link::receive(BufferStore buff) {
                     seqMask_ = 0x7ff;
                     // EPOC can handle up to 8 unacknowledged packets
                     maxOutstanding_ = 8;
-                    isEPOC_ = true;
                     failed_ = false;
                     sendReqCon();
                 } else {
@@ -411,8 +420,7 @@ void Link::receive(BufferStore buff) {
                     rxSequence_ = 0;
                     txSequence_ = 1; // Our ReqReq was seq 0
                     purgeAllQueues();
-                    isEPOC_ = false;
-                    sendAck(rxSequence_);
+                    sendAck(rxSequence_, linkType_);
                 }
             }
             break;
@@ -467,7 +475,7 @@ void Link::transmit(BufferStore buf) {
         return;
 
     int remoteChan = buf.getByte(0);
-    if (xoff[remoteChan]) {
+    if (xoff_[remoteChan]) {
         pthread_mutex_lock(&queueMutex_);
         holdQueue_.push_back(buf);
         pthread_mutex_unlock(&queueMutex_);
@@ -507,14 +515,16 @@ void Link::transmit(BufferStore buf) {
                 int lseq = 0x30 + ((e.seq & 7) | 8);
                 int seq = (hseq << 8) + lseq;
                 buf.prependWord(seq);
-            } else
+            } else {
                 buf.prependByte(0x30 + e.seq);
+            }
         }
         e.data = buf;
         pthread_mutex_lock(&queueMutex_);
         ackWaitQueue.push_back(e);
+        bool isEPOC = linkType_ == LINK_TYPE_EPOC;
         pthread_mutex_unlock(&queueMutex_);
-        dataLink_->send(buf, isEPOC_);
+        dataLink_->send(buf, isEPOC);
     }
 }
 
@@ -586,11 +596,12 @@ void Link::retransmit() {
                 pendingData.push_back(i->data);
             }
         }
+    bool isEPOC = linkType_ == LINK_TYPE_EPOC;
     pthread_mutex_unlock(&queueMutex_);
 
     // Retransmit the data.
     for (vector<BufferStore>::iterator i = pendingData.begin(); i != pendingData.end(); i++) {
-        dataLink_->send(*i, isEPOC_);
+        dataLink_->send(*i, isEPOC);
     }
 
 }

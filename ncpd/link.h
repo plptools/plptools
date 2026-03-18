@@ -145,10 +145,10 @@ private:
     */
     void receive(BufferStore buf);
     void transmit(BufferStore buf);
-    void sendAck(int seq);
+    void sendAck(int seq, Enum<link_type> linkType);
     void sendReqReq();
     void sendReqCon();
-    void sendReq();
+    void sendReq(Enum<link_type> linkType);
     void multiAck(struct timeval);
     void retransmit();
     void transmitHoldQueue(int channel);
@@ -161,7 +161,6 @@ private:
 
     NCP * const ncp_;
     DataLink *dataLink_ = nullptr;
-    bool isEPOC_ = false;
     int txSequence_ = 1;
     int rxSequence_ = -1;
     int seqMask_ = 7;
@@ -174,5 +173,5 @@ private:
     std::vector<AckWaitQueueElement> ackWaitQueue;
     std::vector<BufferStore> holdQueue_;
     std::vector<BufferStore> waitQueue_;
-    bool xoff[256];
+    bool xoff_[256];
 };
