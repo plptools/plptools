@@ -270,17 +270,7 @@ DataLink::~DataLink() {
 }
 
 void DataLink::reset() {
-    // This method stops the data pump thread and restarts it, performing a pthread_join. Given this, it's unsafe to be
-    // called from the data pump itself. This is a belt and braces check to ensure we don't do that (spoiler: we were).
-    assert(pthread_self() != dataPumpThreadId_);
-    if (dataPumpThreadId_) {
-        pthread_cancel(dataPumpThreadId_);
-        pthread_join(dataPumpThreadId_, NULL);
-    }
     internalReset();
-    if (fd != -1) {
-        pthread_create(&dataPumpThreadId_, NULL, data_pump_thread, this);
-    }
 }
 
 void DataLink::internalReset() {
