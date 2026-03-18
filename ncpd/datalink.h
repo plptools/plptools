@@ -23,6 +23,7 @@
 
 #include "config.h"
 
+#include <condition_variable>
 #include <stdio.h>
 #include <pthread.h>
 #include <mutex>
@@ -78,7 +79,6 @@ private:
     void internalReset();
 
     pthread_t dataPumpThreadId_;
-    pthread_t ownerThreadId_;
 
     unsigned int crc_table[256];
 
@@ -118,6 +118,10 @@ private:
 
     std::mutex outputMutex_;
     unsigned char *outBuffer; int outWrite = 0; int outRead = 0;
+
+    // Signaling.
+
+    std::condition_variable outputCondition_;
 
     // Initial configuration (const).
 

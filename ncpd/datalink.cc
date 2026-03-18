@@ -140,11 +140,8 @@ static void *data_pump_thread(void *arg) {
                 res = write(serialFd, &dataLink->outBuffer[dataLink->outRead], count);
                 if (res > 0) {
                     log_data(dataLink->verbose_, PKT_DEBUG_DUMP, "wrote", dataLink->outBuffer + dataLink->outRead, res);
-                    int hadSpace = hasSpace(dataLink->out);
                     inca(dataLink->outRead, res);
-                    if (!hadSpace) {
-                        pthread_kill(dataLink->ownerThreadId_, SIGUSR1);
-                    }
+                    dataLink->outputCondition_.notify_all();
                 }
             }
 
@@ -224,7 +221,6 @@ DataLink::DataLink(const char *fname,
     inBuffer = new unsigned char[BUFLEN + 1];
     outBuffer = new unsigned char[BUFLEN + 1];
 
-    ownerThreadId_ = pthread_self();
     baudRate_ = requestedBaudRate_;
     if (requestedBaudRate_ < 0) {
         baudRateIndex_ = 1;
@@ -352,30 +348,19 @@ void DataLink::send(BufferStore &b, bool isEPOC) {
     message.addByte(crcOut >> 8);
     message.addByte(crcOut & 0xff);
 
-    // Wait for enough space to write the whole message atomically.
-    while (true) {
-        {
-            std::lock_guard<std::mutex> outputLock(outputMutex_);
-            unsigned long free = (outRead - outWrite - 1 + BUFLEN) & BUFMASK;
-            if (free >= message.getLen()) {
-                for (unsigned long i = 0; i < message.getLen(); i++) {
-                    outBuffer[outWrite] = message.getByte(i);
-                    inc1(outWrite);
-                }
-                break;
-            }
-        }
-
-        // Kick the data pump thread to write some data and wait for it to kick back.
-        pthread_kill(dataPumpThreadId_, SIGUSR1);
-        sigset_t sigs;
-        int dummy;
-        sigemptyset(&sigs);
-        sigaddset(&sigs, SIGUSR1);
-        sigwait(&sigs, &dummy);
+    // Signal the data pump thread to write some data and wait on a condition variable for enough space.
+    pthread_kill(dataPumpThreadId_, SIGUSR1);
+    std::unique_lock<std::mutex> outputLock(outputMutex_);
+    outputCondition_.wait(outputLock, [&] {
+        unsigned long free = (outRead - outWrite - 1 + BUFLEN) & BUFMASK;
+        return free >= message.getLen();
+    });
+    for (unsigned long i = 0; i < message.getLen(); i++) {
+        outBuffer[outWrite] = message.getByte(i);
+        inc1(outWrite);
     }
 
-    // Kick the data pump thread to tell it there's new data.
+    // Signal the data pump thread to tell it there's new data.
     pthread_kill(dataPumpThreadId_, SIGUSR1);
 }
 
