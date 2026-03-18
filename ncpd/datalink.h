@@ -76,7 +76,9 @@ private:
     *
     * @return true if the link is stable and more data can be consumed; false otherwise.
     */
-    bool processInputData();
+    bool processInputData(std::vector<BufferStore> &receivedData);
+
+    void sendReceivedData(std::vector<BufferStore> &receivedData);
 
     void internalReset();
 
@@ -144,4 +146,5 @@ private:
     */
     const int cancellationFd_;
     const short int verbose_;
+
 };

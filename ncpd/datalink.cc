@@ -173,6 +173,7 @@ static void *data_pump_thread(void *arg) {
             }
 
             // Process any available data.
+            std::vector<BufferStore> receivedData;
             bool isLinkStable = true;
             {
                 bool hasInputData = false;
@@ -181,7 +182,7 @@ static void *data_pump_thread(void *arg) {
                     hasInputData = hasData(dataLink->in);
                 }
                 if (hasInputData) {
-                    isLinkStable = dataLink->processInputData();
+                    isLinkStable = dataLink->processInputData(receivedData);
                 }
             }
 
@@ -189,6 +190,12 @@ static void *data_pump_thread(void *arg) {
             if (!isLinkStable) {
                 dataLink->internalReset();
             }
+
+            // Dispatch received data to @ref link_.
+            // Since receivedData is only ever accessed on this thread, we can safely perform this operation without
+            // holding any locks meaning our target can't deadlock against us by calling any of our public APIs that
+            // require locks.
+            dataLink->sendReceivedData(receivedData);
         }
     }
 }
@@ -388,7 +395,7 @@ void DataLink::send(BufferStore &b, bool isEPOC) {
     pthread_kill(dataPumpThreadId_, SIGUSR1);
 }
 
-bool DataLink::processInputData() {
+bool DataLink::processInputData(std::vector<BufferStore> &receivedData) {
     std::lock_guard<std::mutex> inputLock(inputMutex_);
 
     int inw = inWrite;
@@ -473,7 +480,7 @@ outerLoop:
                                 lout << "len=" << dec << rcv.getLen();
                             lout << endl;
                         }
-                        link_->receive(rcv);
+                        receivedData.push_back(rcv);
                     }
                     rcv.init();
                     bool hasOutputData = false;
@@ -504,6 +511,12 @@ outerLoop:
         }
     }
     return true;
+}
+
+void DataLink::sendReceivedData(std::vector<BufferStore> &receivedData) {
+    for (vector<BufferStore>::iterator i = receivedData.begin(); i != receivedData.end(); i++) {
+        link_->receive(*i);
+    }
 }
 
 bool DataLink::linkFailed() {
