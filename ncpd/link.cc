@@ -558,6 +558,11 @@ void Link::retransmit() {
         return;
     }
 
+    // Iterate over the messages awaiting an ack, remove ones that have timed out, and enqueue the data of
+    // messages to retransmit. We do not send them in the loop to ensure we can't deadlock if the
+    // @ref DataLink::send call blocks, leaving us holding a lot while threads need to process data to make space
+    // for sending.
+    vector<BufferStore> pendingData;
     pthread_mutex_lock(&queueMutex_);
     vector<AckWaitQueueElement>::iterator i;
     struct timeval now;
@@ -567,21 +572,27 @@ void Link::retransmit() {
     for (i = ackWaitQueue.begin(); i != ackWaitQueue.end(); i++)
         if (olderthan(i->stamp, expired)) {
             if (i->txcount-- == 0) {
-                // timeout, remove packet
+                // Remove timed out packets.
                 if (verbose_ & LNK_DEBUG_LOG)
                     lout << "Link: >> TRANSMIT timeout seq=" << i->seq << endl;
                 ackWaitQueue.erase(i);
                 failed_ = true;
                 i--;
             } else {
-                // retransmit it
+                // Enqueue the buffer for retransmission.
                 i->stamp = now;
                 if (verbose_ & LNK_DEBUG_LOG)
                     lout << "Link: >> RETRANSMIT seq=" << i->seq << endl;
-                dataLink_->send(i->data, isEPOC_);
+                pendingData.push_back(i->data);
             }
         }
     pthread_mutex_unlock(&queueMutex_);
+
+    // Retransmit the data.
+    for (vector<BufferStore>::iterator i = pendingData.begin(); i != pendingData.end(); i++) {
+        dataLink_->send(*i, isEPOC_);
+    }
+
 }
 
 bool Link::stuffToSend() {
