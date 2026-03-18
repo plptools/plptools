@@ -36,6 +36,9 @@ extern "C" {
 
 class Link;
 
+/**
+* Thread-safe class responsible for managing the underlying serial device and data link framing.
+*/
 class DataLink
 {
 public:
@@ -43,8 +46,15 @@ public:
     ~DataLink();
 
     /**
-     * Send a buffer out to serial line
-     */
+    * Send a buffer out to serial line.
+    *
+    * This blocks until there's enough space in the output buffer to write the whole message atomically (to ensure
+    * messages can't get interleaved), suspending the current thread until signaled by the data pump thread if
+    * there's insufficient space.
+    *
+    * @param b buffer to send
+    * @araam isEPOC flag indicating if additional EPOC32 byte-stuffing should be used
+    */
     void send(BufferStore &b, bool isEPOC);
 
     int getSpeed();
@@ -64,14 +74,6 @@ private:
     * @return true if the link is stable and more data can be consumed; false otherwise.
     */
     bool processInputData();
-
-    void opByte(unsigned char a);
-
-    /**
-    * Signal the data pump thread that there is data to write and block until
-    * there's space available.
-    */
-    void flushOutputBuffer();
 
     void internalReset();
 

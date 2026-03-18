@@ -19,6 +19,7 @@
  *  along with this program; if not, see <https://www.gnu.org/licenses/>.
  *
  */
+#include "bufferarray.h"
 #include "config.h"
 
 #include <mutex>
@@ -260,7 +261,6 @@ void DataLink::reset() {
     internalReset();
     if (fd != -1) {
         pthread_create(&dataPumpThreadId_, NULL, data_pump_thread, this);
-        flushOutputBuffer();
     }
 }
 
@@ -306,9 +306,12 @@ int DataLink:: getSpeed() {
 }
 
 void DataLink::send(BufferStore &b, bool isEPOC) {
-    opByte(0x16);
-    opByte(0x10);
-    opByte(0x02);
+
+    // Assemble the message.
+    BufferStore message;
+    message.addByte(0x16);
+    message.addByte(0x10);
+    message.addByte(0x02);
 
     unsigned short crcOut = 0;
     long len = b.getLen();
@@ -328,63 +331,52 @@ void DataLink::send(BufferStore &b, bool isEPOC) {
             case 0x03:
                 if (isEPOC) {
                     // Stuff ETX as DLE EOT
-                    opByte(0x10);
-                    opByte(0x04);
+                    message.addByte(0x10);
+                    message.addByte(0x04);
                 } else {
-                    opByte(c);
+                    message.addByte(c);
                 }
                 break;
             case 0x10:
                 // Stuff DLE as DLE DLE
-                opByte(0x10);
-                opByte(0x10);
+                message.addByte(0x10);
+                message.addByte(0x10);
                 break;
             default:
-                opByte(c);
+                message.addByte(c);
         }
         addToCrc(c, &crcOut);
     }
-    opByte(0x10);
-    opByte(0x03);
-    opByte(crcOut >> 8);
-    opByte(crcOut & 0xff);
-    flushOutputBuffer();
-}
+    message.addByte(0x10);
+    message.addByte(0x03);
+    message.addByte(crcOut >> 8);
+    message.addByte(crcOut & 0xff);
 
-void DataLink::opByte(unsigned char a) {
-    bool canWrite = false;
-    {
-        std::lock_guard<std::mutex> outputLock(outputMutex_);
-        canWrite = hasSpace(out);
-    }
-    if (!canWrite) {
-        flushOutputBuffer();
-    }
-    {
-        std::lock_guard<std::mutex> outputLock(outputMutex_);
-        outBuffer[outWrite] = a;
-        inc1(outWrite);
-    }
-}
-
-void DataLink::flushOutputBuffer() {
-    pthread_kill(dataPumpThreadId_, SIGUSR1);
+    // Wait for enough space to write the whole message atomically.
     while (true) {
-        bool needsFlush = false;
         {
-            lock_guard<std::mutex> outputLock(outputMutex_);
-            needsFlush = !hasSpace(out);
+            std::lock_guard<std::mutex> outputLock(outputMutex_);
+            unsigned long free = (outRead - outWrite - 1 + BUFLEN) & BUFMASK;
+            if (free >= message.getLen()) {
+                for (unsigned long i = 0; i < message.getLen(); i++) {
+                    outBuffer[outWrite] = message.getByte(i);
+                    inc1(outWrite);
+                }
+                break;
+            }
         }
-        if (!needsFlush) {
-            return;
-        }
-        // Wait on a signal from the data pump thread to let us know data has been processed.
+
+        // Kick the data pump thread to write some data and wait for it to kick back.
+        pthread_kill(dataPumpThreadId_, SIGUSR1);
         sigset_t sigs;
         int dummy;
         sigemptyset(&sigs);
         sigaddset(&sigs, SIGUSR1);
         sigwait(&sigs, &dummy);
     }
+
+    // Kick the data pump thread to tell it there's new data.
+    pthread_kill(dataPumpThreadId_, SIGUSR1);
 }
 
 bool DataLink::processInputData() {
