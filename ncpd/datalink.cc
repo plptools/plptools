@@ -483,6 +483,9 @@ outerLoop:
                         receivedData.push_back(rcv);
                     }
                     rcv.init();
+
+                    // Check to see if there's pending data to be sent to the Psion in an effort to avoid starvation.
+                    // We should revisit whether this is an unnecessary optimization in the future.
                     bool hasOutputData = false;
                     {
                         std::lock_guard<std::mutex> outputLock(outputMutex_);
