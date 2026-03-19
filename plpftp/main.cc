@@ -29,6 +29,8 @@
 #include <plpintl.h>
 #include <tcpsocket.h>
 #include <bufferstore.h>
+#include <ncpsession.h>
+#include <semaphore.h>
 
 #include <iostream>
 #include <vector>
@@ -60,6 +62,7 @@ help()
         "\n"
         " -h, --help              Display this text.\n"
         " -V, --version           Print version and exit.\n"
+        " -s, --serial=DEV        Use serial device DEV.\n"
         " -p, --port=[HOST:]PORT  Connect to port PORT on host HOST.\n"
         "                         Default for HOST is 127.0.0.1\n"
         "                         Default for PORT is "
@@ -75,6 +78,7 @@ static struct option opts[] = {
     {"help",     no_argument,       nullptr, 'h'},
     {"version",  no_argument,       nullptr, 'V'},
     {"port",     required_argument, nullptr, 'p'},
+    {"serial",   required_argument, nullptr, 's'},
     {NULL,       0,                 nullptr,  0 }
 };
 
@@ -106,12 +110,13 @@ main(int argc, char **argv)
     string host = "127.0.0.1";
     int status = 0;
     int sockNum = cli_utils::lookup_default_port();
+    const char *serialDevice = NULL;
 
     setlocale (LC_ALL, "");
     textdomain(PACKAGE);
 
     while (1) {
-        int c = getopt_long(argc, argv, "hVp:", opts, NULL);
+        int c = getopt_long(argc, argv, "hVps:", opts, NULL);
         if (c == -1)
             break;
         switch (c) {
@@ -130,10 +135,35 @@ main(int argc, char **argv)
                     return 1;
                 }
                 break;
+            case 's':
+                serialDevice = optarg;
+                break;
         }
     }
     if (optind == argc)
         ftpHeader();
+
+    Semaphore *sem = new Semaphore();
+
+
+    // Start ncpd.
+    NCPSession *session = nullptr;
+    if (serialDevice) {
+        session = new NCPSession(
+            sockNum,
+            115200,
+            host,
+            serialDevice,
+            false,
+            false,
+            0,
+            [](void *context, bool connected, int version) {
+                static_cast<Semaphore *>(context)->signal();
+            },
+            sem);
+        session->start();
+        sem->wait();
+    }
 
     skt = new TCPSocket();
     if (!skt->connect(host.c_str(), sockNum)) {
@@ -171,5 +201,10 @@ main(int argc, char **argv)
     }
     delete rf;
     delete rp;
+    session->cancel();
+    if (session) {
+        session->wait();
+        delete session;
+    }
     return status;
 }

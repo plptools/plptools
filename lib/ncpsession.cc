@@ -215,6 +215,25 @@ void *ncp_session_main_thread(void *arg) {
     return nullptr;
 }
 
+NCPSession::NCPSession(int portNumber,
+   int baudRate,
+   std::string host,
+   std::string serialDevice,
+   bool autoexit,
+   bool noDSRCheck,
+   unsigned short nverbose,
+   NCPStatusCallback statusCallback,
+   void *callbackContext)
+: portNumber_(portNumber)
+, baudRate_(baudRate)
+, host_(host)
+, serialDevice_(serialDevice)
+, autoexit_(autoexit)
+, noDSRCheck_(noDSRCheck)
+, nverbose_(nverbose)
+, statusCallback_(statusCallback)
+, callbackContext_(callbackContext) {}
+
 NCPSession::~NCPSession() {
     close(cancellationPipe_[0]);
     close(cancellationPipe_[1]);
@@ -223,7 +242,7 @@ NCPSession::~NCPSession() {
 }
 
 int NCPSession::start() {
-    assert(sessionMainThreadId_ == 0);
+    assert(sessionMainThreadId_ == nullptr);
     int result = pipe(cancellationPipe_);
     if (result != 0) {
         return result;
