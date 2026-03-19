@@ -22,6 +22,7 @@
 #include "bufferarray.h"
 #include "config.h"
 
+#include <cassert>
 #include <mutex>
 #include <pthread.h>
 #include <string>
@@ -58,14 +59,6 @@
 #define normalize(idx) do { idx &= BUFMASK; } while (0)
 
 extern "C" {
-/**
- * Signal handler does nothing. It just exists
- * for having the select() below return an
- * interrupted system call.
- */
-static void usr1handler(int sig) {
-    signal(SIGUSR1, usr1handler);
-}
 
 void log_data(unsigned short options,
               unsigned short category,
@@ -122,8 +115,11 @@ static void *data_pump_thread(void *arg) {
                 }
             }
 
+            FD_SET(dataLink->outputDataReadyPipe_[0], &r_set);
+
+            int nfds = MAX(MAX(serialFd, dataLink->cancellationFd_), dataLink->outputDataReadyPipe_[0]) + 1;
             struct timeval tv = {1, 0};
-            int res = select(MAX(serialFd, dataLink->cancellationFd_) + 1, &r_set, &w_set, NULL, &tv);
+            int res = select(nfds, &r_set, &w_set, NULL, &tv);
             if (res <= 0) {
                 // Ignore interrupts and timeouts.
                 continue;
@@ -133,6 +129,11 @@ static void *data_pump_thread(void *arg) {
             if (FD_ISSET(dataLink->cancellationFd_, &r_set)) {
                 dataLink->shutdown();
                 return nullptr;
+            }
+
+            if (FD_ISSET(dataLink->outputDataReadyPipe_[0], &r_set)) {
+                uint8_t byte;
+                ssize_t n = read(dataLink->outputDataReadyPipe_[0], &byte, 1);
             }
 
             // We can write to the transport; write as much as we can.
@@ -240,6 +241,9 @@ DataLink::DataLink(const char *fname,
     inBuffer = new unsigned char[BUFLEN + 1];
     outBuffer = new unsigned char[BUFLEN + 1];
 
+    int result = pipe(outputDataReadyPipe_);
+    assert(result == 0);
+
     baudRate_ = requestedBaudRate_;
     if (requestedBaudRate_ < 0) {
         baudRate_ = kBaudRatesTable[baudRateIndex_];
@@ -254,7 +258,6 @@ DataLink::DataLink(const char *fname,
         fcntl(fd, F_SETFL, O_NONBLOCK);
         lastFatal = true;
     } else {
-        signal(SIGUSR1, usr1handler);
         pthread_create(&dataPumpThreadId_, NULL, data_pump_thread, this);
     }
 }
@@ -277,6 +280,11 @@ DataLink::~DataLink() {
 
     delete []inBuffer;
     delete []outBuffer;
+
+    close(outputDataReadyPipe_[0]);
+    close(outputDataReadyPipe_[1]);
+    outputDataReadyPipe_[0] = -1;
+    outputDataReadyPipe_[1] = -1;
 }
 
 void DataLink::reset() {
@@ -332,6 +340,11 @@ void DataLink::internalReset(bool resetBaudRateIndex) {
     }
 }
 
+void DataLink::signalPumpThread() {
+    char b = 0;
+    write(outputDataReadyPipe_[1], &b, 1);
+}
+
 int DataLink:: getSpeed() {
     std::lock_guard<std::mutex> serialLock(serialMutex_);
     return baudRate_;
@@ -385,7 +398,7 @@ void DataLink::send(BufferStore &b, bool isEPOC) {
     message.addByte(crcOut & 0xff);
 
     // Signal the data pump thread to write some data and wait on a condition variable for enough space.
-    pthread_kill(dataPumpThreadId_, SIGUSR1);
+    signalPumpThread();
     std::unique_lock<std::mutex> outputLock(outputMutex_);
     outputCondition_.wait(outputLock, [&] {
         unsigned long free = (outRead - outWrite - 1 + BUFLEN) & BUFMASK;
@@ -403,7 +416,7 @@ void DataLink::send(BufferStore &b, bool isEPOC) {
     }
 
     // Signal the data pump thread to tell it there's new data.
-    pthread_kill(dataPumpThreadId_, SIGUSR1);
+    signalPumpThread();
 }
 
 bool DataLink::processInputData(std::vector<BufferStore> &receivedData) {
