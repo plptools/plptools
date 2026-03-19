@@ -80,6 +80,11 @@ private:
 
     void sendReceivedData(std::vector<BufferStore> &receivedData);
 
+    /**
+    * Store a flag that we're shutting down and signal any waiting @ref send calls.
+    */
+    void shutdown();
+
     void internalReset();
 
     pthread_t dataPumpThreadId_;

@@ -94,7 +94,11 @@ static void *data_pump_thread(void *arg) {
         if (serialFd == -1) {
             IOWatch cancellationWatch;
             cancellationWatch.addIO(dataLink->cancellationFd_);
-            cancellationWatch.watch(1, 0);
+            if (cancellationWatch.watch(1, 0)) {
+                // If the watch returned true, cancellationFd_ is readable and we need to shut down.
+                dataLink->shutdown();
+                return nullptr;
+            }
         } else {
             fd_set r_set;
             fd_set w_set;
@@ -126,9 +130,7 @@ static void *data_pump_thread(void *arg) {
 
             // Check to see if we were cancelled and, if we were, unblock the writers and exit.
             if (FD_ISSET(dataLink->cancellationFd_, &r_set)) {
-                std::lock_guard<std::mutex> outputLock(dataLink->outputMutex_);
-                dataLink->isCancelled_ = true;
-                dataLink->outputCondition_.notify_all();
+                dataLink->shutdown();
                 return nullptr;
             }
 
@@ -271,6 +273,13 @@ DataLink::~DataLink() {
 
 void DataLink::reset() {
     internalReset();
+}
+
+void DataLink::shutdown() {
+    std::lock_guard<std::mutex> outputLock(outputMutex_);
+    isCancelled_ = true;
+    outputCondition_.notify_all();
+
 }
 
 void DataLink::internalReset() {
