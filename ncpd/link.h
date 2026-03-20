@@ -77,7 +77,7 @@ public:
      * @param verbose Verbosity (for debugging/troubleshooting)
      * @param cancellationFd File descriptor that can be used to signal that the `Link` should shutdown.
      */
-    Link(const char *fname, int baud, NCP *ncp, unsigned short verbose, const int cancellationFd);
+    Link(const char *fname, int baud, NCP *ncp, bool noDSR, unsigned short verbose, const int cancellationFd);
 
     /**
      * Disconnects from device and destroys instance.

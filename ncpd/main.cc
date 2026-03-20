@@ -129,6 +129,7 @@ static struct option opts[] = {
     {"port",       required_argument, 0, 'p'},
     {"serial",     required_argument, 0, 's'},
     {"baudrate",   required_argument, 0, 'b'},
+    {"nodsr",      required_argument, 0, 'n'},
     {NULL,         0,                 0,  0 }
 };
 
@@ -144,13 +145,14 @@ main(int argc, char **argv)
     const char *serialDevice = NULL;
     unsigned short nverbose = 0;
     bool autoexit = false;
+    bool noDSR = false;
 
     dlog.useFileDescriptor();
     elog.useFileDescriptor();
     ilog.useFileDescriptor();
 
     while (1) {
-        int c = getopt_long(argc, argv, "hdeVb:s:p:v:", opts, NULL);
+        int c = getopt_long(argc, argv, "hdeVb:s:p:v:n", opts, NULL);
         if (c == -1)
             break;
         switch (c) {
@@ -208,6 +210,10 @@ main(int argc, char **argv)
                     return 1;
                 }
                 break;
+            case 'n':
+                noDSR = true;
+                cout << "Found noDSR option" << endl;
+                break;
         }
     }
     if (optind < argc) {
@@ -253,6 +259,7 @@ main(int argc, char **argv)
                                            host,
                                            serialDevice,
                                            autoexit,
+                                           noDSR,
                                            nverbose);
             sharedSession->start();
             sharedSession->wait();

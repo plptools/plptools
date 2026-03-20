@@ -56,6 +56,7 @@ class NCP {
 public:
     NCP(const char *fname,
         int baud,
+        bool noNCP,
         unsigned short verbose,
         const int cancellationFd,
         NCPStatusCallback statusCallback,
