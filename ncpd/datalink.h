@@ -23,8 +23,10 @@
 
 #include "config.h"
 
+#include <condition_variable>
 #include <stdio.h>
 #include <pthread.h>
+#include <mutex>
 
 #include "bufferstore.h"
 #include "bufferarray.h"
@@ -35,6 +37,9 @@ extern "C" {
 
 class Link;
 
+/**
+* Thread-safe class responsible for managing the underlying serial device and data link framing.
+*/
 class DataLink
 {
 public:
@@ -42,8 +47,17 @@ public:
     ~DataLink();
 
     /**
-     * Send a buffer out to serial line
-     */
+    * Send a buffer out to serial line.
+    *
+    * This blocks until there's enough space in the output buffer to write the whole message atomically (to ensure
+    * messages can't get interleaved), suspending the current thread until signaled by the data pump thread if
+    * there's insufficient space.
+    *
+    * Drops messages on the floor when shutting down.
+    *
+    * @param b buffer to send
+    * @param isEPOC flag indicating if additional EPOC32 byte-stuffing should be used
+    */
     void send(BufferStore &b, bool isEPOC);
 
     int getSpeed();
@@ -62,20 +76,18 @@ private:
     *
     * @return true if the link is stable and more data can be consumed; false otherwise.
     */
-    bool processInputData();
+    bool processInputData(std::vector<BufferStore> &receivedData);
 
-    void opByte(unsigned char a);
+    void sendReceivedData(std::vector<BufferStore> &receivedData);
 
     /**
-    * Signal the data pump thread that there is data to write and block until
-    * there's space available.
+    * Store a flag that we're shutting down and signal any waiting @ref send calls.
     */
-    void flushOutputBuffer();
+    void shutdown();
 
-    void internalReset();
+    void internalReset(bool resetBaudRateIndex);
 
     pthread_t dataPumpThreadId_;
-    pthread_t ownerThreadId_;
 
     unsigned int crc_table[256];
 
@@ -83,19 +95,24 @@ private:
     // with maintaining the underlying serial device, reading data from the serial device, and
     // writing data to the serial device. These should be treated as three distinct domains
     // wrt. concurrency and data within each group should be updated atomically.
-    //
-    // N.B. This thread-safety is not currently implemented.
+
+    // When acquiring locks, the order _must_ be:
+    // 1) serial
+    // 2) input
+    // 3) output
 
     // Serial.
 
+    std::mutex serialMutex_;
     int fd;
     int serialStatus = -1;
-    int baudRateIndex_;
+    int baudRateIndex_ = 0;
     int baudRate_;
     bool lastFatal = false;
 
     // Reading from serial.
 
+    std::mutex inputMutex_;
     bool esc = false;
     bool justStarted = true;
     BufferStore rcv;
@@ -108,7 +125,13 @@ private:
 
     // Writing to serial.
 
+    std::mutex outputMutex_;
+    bool isCancelled_ = false;
     unsigned char *outBuffer; int outWrite = 0; int outRead = 0;
+
+    // Signaling.
+
+    std::condition_variable outputCondition_;
 
     // Initial configuration (const).
 
@@ -128,4 +151,5 @@ private:
     */
     const int cancellationFd_;
     const short int verbose_;
+
 };

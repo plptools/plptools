@@ -19,8 +19,10 @@
  *  along with this program; if not, see <https://www.gnu.org/licenses/>.
  *
  */
+#include "bufferarray.h"
 #include "config.h"
 
+#include <mutex>
 #include <pthread.h>
 #include <string>
 #include <cstring>
@@ -38,6 +40,7 @@
 #include <sys/ioctl.h>
 #include <termios.h>
 #include <signal.h>
+#include <fcntl.h>
 
 #include "link.h"
 #include "mp_serial.h"
@@ -78,15 +81,25 @@ void log_data(unsigned short options,
     printf(")\n");
 }
 
-// TODO: `fd` isn't thread-safe.
 static void *data_pump_thread(void *arg) {
     DataLink *dataLink = (DataLink *)arg;
-    pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
     while (1) {
-        if (dataLink->fd == -1) {
+
+        // Get the serial port file descriptor.
+        int serialFd = -1;
+        {
+            std::lock_guard<std::mutex> lock(dataLink->serialMutex_);
+            serialFd = dataLink->fd;
+        }
+
+        if (serialFd == -1) {
             IOWatch cancellationWatch;
             cancellationWatch.addIO(dataLink->cancellationFd_);
-            cancellationWatch.watch(1, 0);
+            if (cancellationWatch.watch(1, 0)) {
+                // If the watch returned true, cancellationFd_ is readable and we need to shut down.
+                dataLink->shutdown();
+                return nullptr;
+            }
         } else {
             fd_set r_set;
             fd_set w_set;
@@ -96,19 +109,36 @@ static void *data_pump_thread(void *arg) {
             FD_ZERO(&r_set);
             w_set = r_set;
             FD_SET(dataLink->cancellationFd_, &r_set);
-            if (hasSpace(dataLink->in))
-                FD_SET(dataLink->fd, &r_set);
-            if (hasData(dataLink->out))
-                FD_SET(dataLink->fd, &w_set);
+            {
+                std::lock_guard<std::mutex> inputLock(dataLink->inputMutex_);
+                if (hasSpace(dataLink->in)) {
+                    FD_SET(serialFd, &r_set);
+                }
+            }
+            {
+                std::lock_guard<std::mutex> outputLock(dataLink->outputMutex_);
+                if (hasData(dataLink->out)) {
+                    FD_SET(serialFd, &w_set);
+                }
+            }
+
             struct timeval tv = {1, 0};
-            int res = select(MAX(dataLink->fd, dataLink->cancellationFd_) + 1, &r_set, &w_set, NULL, &tv);
+            int res = select(MAX(serialFd, dataLink->cancellationFd_) + 1, &r_set, &w_set, NULL, &tv);
             if (res <= 0) {
                 // Ignore interrupts and timeouts.
                 continue;
             }
 
+            // Check to see if we were cancelled and, if we were, unblock the writers and exit.
+            if (FD_ISSET(dataLink->cancellationFd_, &r_set)) {
+                dataLink->shutdown();
+                return nullptr;
+            }
+
             // We can write to the transport; write as much as we can.
-            if (FD_ISSET(dataLink->fd, &w_set)) {
+            if (FD_ISSET(serialFd, &w_set)) {
+                std::lock_guard<std::mutex> serialLock(dataLink->serialMutex_);
+                std::lock_guard<std::mutex> outputLock(dataLink->outputMutex_);
 
                 // Work out how much contiguous data there is to write in the out buffer.
                 int count = dataLink->outWrite - dataLink->outRead;
@@ -117,19 +147,18 @@ static void *data_pump_thread(void *arg) {
                 }
 
                 // Write as much data as possible.
-                res = write(dataLink->fd, &dataLink->outBuffer[dataLink->outRead], count);
+                res = write(serialFd, &dataLink->outBuffer[dataLink->outRead], count);
                 if (res > 0) {
                     log_data(dataLink->verbose_, PKT_DEBUG_DUMP, "wrote", dataLink->outBuffer + dataLink->outRead, res);
-                    int hadSpace = hasSpace(dataLink->out);
                     inca(dataLink->outRead, res);
-                    if (!hadSpace) {
-                        pthread_kill(dataLink->ownerThreadId_, SIGUSR1);
-                    }
+                    dataLink->outputCondition_.notify_all();
                 }
             }
 
             // We can read from the transport; read as much as we can.
-            if (FD_ISSET(dataLink->fd, &r_set)) {
+            if (FD_ISSET(serialFd, &r_set)) {
+                std::lock_guard<std::mutex> serialLock(dataLink->serialMutex_);
+                std::lock_guard<std::mutex> inputLock(dataLink->inputMutex_);
 
                 // Work out how much contiguous space there is in the buffer.
                 int count = dataLink->inRead - dataLink->inWrite;
@@ -138,7 +167,7 @@ static void *data_pump_thread(void *arg) {
                 }
 
                 // Read as much data as possible.
-                res = read(dataLink->fd, &dataLink->inBuffer[dataLink->inWrite], count);
+                res = read(serialFd, &dataLink->inBuffer[dataLink->inWrite], count);
                 if (res > 0) {
                     log_data(dataLink->verbose_, PKT_DEBUG_DUMP, "read", dataLink->inBuffer + dataLink->inWrite, res);
                     inca(dataLink->inWrite, res);
@@ -146,15 +175,29 @@ static void *data_pump_thread(void *arg) {
             }
 
             // Process any available data.
+            std::vector<BufferStore> receivedData;
             bool isLinkStable = true;
-            if (hasData(dataLink->in)) {
-                isLinkStable = dataLink->processInputData();
+            {
+                bool hasInputData = false;
+                {
+                    std::lock_guard<std::mutex> inputLock(dataLink->inputMutex_);
+                    hasInputData = hasData(dataLink->in);
+                }
+                if (hasInputData) {
+                    isLinkStable = dataLink->processInputData(receivedData);
+                }
             }
 
             // Reset if we were unable to establish a stable link.
             if (!isLinkStable) {
-                dataLink->internalReset();
+                dataLink->internalReset(false);
             }
+
+            // Dispatch received data to @ref link_.
+            // Since receivedData is only ever accessed on this thread, we can safely perform this operation without
+            // holding any locks meaning our target can't deadlock against us by calling any of our public APIs that
+            // require locks.
+            dataLink->sendReceivedData(receivedData);
         }
     }
 }
@@ -195,14 +238,18 @@ DataLink::DataLink(const char *fname,
     inBuffer = new unsigned char[BUFLEN + 1];
     outBuffer = new unsigned char[BUFLEN + 1];
 
-    ownerThreadId_ = pthread_self();
     baudRate_ = requestedBaudRate_;
     if (requestedBaudRate_ < 0) {
-        baudRateIndex_ = 1;
-        baudRate_ = kBaudRatesTable[0];
+        baudRate_ = kBaudRatesTable[baudRateIndex_];
+        baudRateIndex_ = baudRateIndex_ + 1;
     }
     fd = init_serial(devname.c_str(), baudRate_, 0);
+    if (verbose_ & PKT_DEBUG_LOG) {
+        lout << "serial connection set to " << dec << baudRate_
+            << " baud, fd=" << fd << endl;
+    }
     if (fd == -1) {
+        fcntl(fd, F_SETFL, O_NONBLOCK);
         lastFatal = true;
     } else {
         signal(SIGUSR1, usr1handler);
@@ -211,32 +258,41 @@ DataLink::DataLink(const char *fname,
 }
 
 DataLink::~DataLink() {
+
+    // Ensure there are no lingering readers.
+    {
+        std::lock_guard<std::mutex> outputLock(outputMutex_);
+        isCancelled_ = true;
+    }
+    outputCondition_.notify_all();
+
+    // Stop the data pump thread and close the serial port.
     if (fd != -1) {
-        pthread_cancel(dataPumpThreadId_);
         pthread_join(dataPumpThreadId_, NULL);
         ser_exit(fd);
     }
     fd = -1;
+
     delete []inBuffer;
     delete []outBuffer;
 }
 
 void DataLink::reset() {
-    // This method stops the data pump thread and restarts it, performing a pthread_join. Given this, it's unsafe to be
-    // called from the data pump itself. This is a belt and braces check to ensure we don't do that (spoiler: we were).
-    assert(pthread_self() != dataPumpThreadId_);
-    if (fd != -1) {
-        pthread_cancel(dataPumpThreadId_);
-        pthread_join(dataPumpThreadId_, NULL);
-    }
-    internalReset();
-    if (fd != -1) {
-        pthread_create(&dataPumpThreadId_, NULL, data_pump_thread, this);
-        flushOutputBuffer();
-    }
+    internalReset(true);
 }
 
-void DataLink::internalReset() {
+void DataLink::shutdown() {
+    std::lock_guard<std::mutex> outputLock(outputMutex_);
+    isCancelled_ = true;
+    outputCondition_.notify_all();
+
+}
+
+void DataLink::internalReset(bool resetBaudRateIndex) {
+    std::lock_guard<std::mutex> serialLock(serialMutex_);
+    std::lock_guard<std::mutex> inputLock(inputMutex_);
+    std::lock_guard<std::mutex> outputLock(outputMutex_);
+
     if (verbose_ & PKT_DEBUG_LOG)
         lout << "resetting serial connection" << endl;
     if (fd != -1) {
@@ -252,32 +308,41 @@ void DataLink::internalReset() {
     lastSYN = startPkt = -1;
     crcIn = 0;
     baudRate_ = requestedBaudRate_;
+    if (resetBaudRateIndex) {
+        baudRateIndex_ = 0;
+    }
     justStarted = true;
     if (requestedBaudRate_ < 0) {
-        baudRate_ = kBaudRatesTable[baudRateIndex_++];
+        baudRate_ = kBaudRatesTable[baudRateIndex_];
+        baudRateIndex_ = baudRateIndex_ + 1;
         if (baudRateIndex_ >= BAUD_RATES_TABLE_SIZE) {
             baudRateIndex_ = 0;
         }
     }
     fd = init_serial(devname.c_str(), baudRate_, 0);
-    if (verbose_ & PKT_DEBUG_LOG)
+    if (verbose_ & PKT_DEBUG_LOG) {
         lout << "serial connection set to " << dec << baudRate_
              << " baud, fd=" << fd << endl;
+    }
     if (fd != -1) {
+        fcntl(fd, F_SETFL, O_NONBLOCK);
         lastFatal = false;
     }
 }
 
 int DataLink:: getSpeed() {
+    std::lock_guard<std::mutex> serialLock(serialMutex_);
     return baudRate_;
 }
 
 void DataLink::send(BufferStore &b, bool isEPOC) {
-    opByte(0x16);
-    opByte(0x10);
-    opByte(0x02);
 
-    unsigned short crcOut = 0;
+    // Assemble the message.
+    BufferStore message;
+    message.addByte(0x16);
+    message.addByte(0x10);
+    message.addByte(0x02);
+
     long len = b.getLen();
 
     if (verbose_ & PKT_DEBUG_LOG) {
@@ -289,55 +354,59 @@ void DataLink::send(BufferStore &b, bool isEPOC) {
         lout << endl;
     }
 
+    unsigned short crcOut = 0;
     for (int i = 0; i < len; i++) {
         unsigned char c = b.getByte(i);
         switch (c) {
             case 0x03:
                 if (isEPOC) {
                     // Stuff ETX as DLE EOT
-                    opByte(0x10);
-                    opByte(0x04);
+                    message.addByte(0x10);
+                    message.addByte(0x04);
                 } else {
-                    opByte(c);
+                    message.addByte(c);
                 }
                 break;
             case 0x10:
                 // Stuff DLE as DLE DLE
-                opByte(0x10);
-                opByte(0x10);
+                message.addByte(0x10);
+                message.addByte(0x10);
                 break;
             default:
-                opByte(c);
+                message.addByte(c);
         }
         addToCrc(c, &crcOut);
     }
-    opByte(0x10);
-    opByte(0x03);
-    opByte(crcOut >> 8);
-    opByte(crcOut & 0xff);
-    flushOutputBuffer();
-}
+    message.addByte(0x10);
+    message.addByte(0x03);
+    message.addByte(crcOut >> 8);
+    message.addByte(crcOut & 0xff);
 
-void DataLink::opByte(unsigned char a) {
-    if (!hasSpace(out)) {
-        flushOutputBuffer();
-    }
-    outBuffer[outWrite] = a;
-    inc1(outWrite);
-}
-
-void DataLink::flushOutputBuffer() {
+    // Signal the data pump thread to write some data and wait on a condition variable for enough space.
     pthread_kill(dataPumpThreadId_, SIGUSR1);
-    while (!hasSpace(out)) {
-        sigset_t sigs;
-        int dummy;
-        sigemptyset(&sigs);
-        sigaddset(&sigs, SIGUSR1);
-        sigwait(&sigs, &dummy);
+    std::unique_lock<std::mutex> outputLock(outputMutex_);
+    outputCondition_.wait(outputLock, [&] {
+        unsigned long free = (outRead - outWrite - 1 + BUFLEN) & BUFMASK;
+        return free >= message.getLen() || isCancelled_;
+    });
+
+    // Exit early if we've been cancelled, dropping the data on the floor.
+    if (isCancelled_) {
+        return;
     }
+
+    for (unsigned long i = 0; i < message.getLen(); i++) {
+        outBuffer[outWrite] = message.getByte(i);
+        inc1(outWrite);
+    }
+
+    // Signal the data pump thread to tell it there's new data.
+    pthread_kill(dataPumpThreadId_, SIGUSR1);
 }
 
-bool DataLink::processInputData() {
+bool DataLink::processInputData(std::vector<BufferStore> &receivedData) {
+    std::lock_guard<std::mutex> inputLock(inputMutex_);
+
     int inw = inWrite;
     int p;
 
@@ -420,11 +489,20 @@ outerLoop:
                                 lout << "len=" << dec << rcv.getLen();
                             lout << endl;
                         }
-                        link_->receive(rcv);
+                        receivedData.push_back(rcv);
                     }
                     rcv.init();
-                    if (hasData(out))
+
+                    // Check to see if there's pending data to be sent to the Psion in an effort to avoid starvation.
+                    // We should revisit whether this is an unnecessary optimization in the future.
+                    bool hasOutputData = false;
+                    {
+                        std::lock_guard<std::mutex> outputLock(outputMutex_);
+                        hasOutputData = hasData(out);
+                    }
+                    if (hasOutputData) {
                         return true;
+                    }
                     goto outerLoop;
             }
             inc1(p);
@@ -447,10 +525,18 @@ outerLoop:
     return true;
 }
 
+void DataLink::sendReceivedData(std::vector<BufferStore> &receivedData) {
+    for (vector<BufferStore>::iterator i = receivedData.begin(); i != receivedData.end(); i++) {
+        link_->receive(*i);
+    }
+}
+
 bool DataLink::linkFailed() {
     int arg;
     int res;
     bool failed = false;
+
+    std::lock_guard<std::mutex> serialLock(serialMutex_);
 
     if (fd == -1)
         return false;
