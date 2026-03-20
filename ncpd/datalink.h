@@ -85,7 +85,7 @@ private:
     */
     void shutdown();
 
-    void internalReset();
+    void internalReset(bool resetBaudRateIndex);
 
     pthread_t dataPumpThreadId_;
 

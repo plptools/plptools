@@ -40,6 +40,7 @@
 #include <sys/ioctl.h>
 #include <termios.h>
 #include <signal.h>
+#include <fcntl.h>
 
 #include "link.h"
 #include "mp_serial.h"
@@ -189,7 +190,7 @@ static void *data_pump_thread(void *arg) {
 
             // Reset if we were unable to establish a stable link.
             if (!isLinkStable) {
-                dataLink->internalReset();
+                dataLink->internalReset(false);
             }
 
             // Dispatch received data to @ref link_.
@@ -239,11 +240,17 @@ DataLink::DataLink(const char *fname,
 
     baudRate_ = requestedBaudRate_;
     if (requestedBaudRate_ < 0) {
-        baudRateIndex_ = 1;
-        baudRate_ = kBaudRatesTable[0];
+        baudRateIndex_ = 0;
+        baudRate_ = kBaudRatesTable[baudRateIndex_];
+        baudRateIndex_ = baudRateIndex_ + 1;
     }
     fd = init_serial(devname.c_str(), baudRate_, 0);
+    if (verbose_ & PKT_DEBUG_LOG) {
+        lout << "serial connection set to " << dec << baudRate_
+            << " baud, fd=" << fd << endl;
+    }
     if (fd == -1) {
+        fcntl(fd, F_SETFL, O_NONBLOCK);
         lastFatal = true;
     } else {
         signal(SIGUSR1, usr1handler);
@@ -272,7 +279,7 @@ DataLink::~DataLink() {
 }
 
 void DataLink::reset() {
-    internalReset();
+    internalReset(true);
 }
 
 void DataLink::shutdown() {
@@ -282,7 +289,7 @@ void DataLink::shutdown() {
 
 }
 
-void DataLink::internalReset() {
+void DataLink::internalReset(bool resetBaudRateIndex) {
     std::lock_guard<std::mutex> serialLock(serialMutex_);
     std::lock_guard<std::mutex> inputLock(inputMutex_);
     std::lock_guard<std::mutex> outputLock(outputMutex_);
@@ -302,18 +309,24 @@ void DataLink::internalReset() {
     lastSYN = startPkt = -1;
     crcIn = 0;
     baudRate_ = requestedBaudRate_;
+    if (resetBaudRateIndex) {
+        baudRateIndex_ = 0;
+    }
     justStarted = true;
     if (requestedBaudRate_ < 0) {
         baudRate_ = kBaudRatesTable[baudRateIndex_++];
+        baudRateIndex_ = baudRateIndex_ + 1;
         if (baudRateIndex_ >= BAUD_RATES_TABLE_SIZE) {
             baudRateIndex_ = 0;
         }
     }
     fd = init_serial(devname.c_str(), baudRate_, 0);
-    if (verbose_ & PKT_DEBUG_LOG)
+    if (verbose_ & PKT_DEBUG_LOG) {
         lout << "serial connection set to " << dec << baudRate_
              << " baud, fd=" << fd << endl;
+    }
     if (fd != -1) {
+        fcntl(fd, F_SETFL, O_NONBLOCK);
         lastFatal = false;
     }
 }
