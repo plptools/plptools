@@ -30,6 +30,7 @@
 #include <stdlib.h>
 
 #include <netdb.h>
+#include <arpa/inet.h>
 
 bool cli_utils::is_number(const std::string &s) {
     if (s.empty()) {
