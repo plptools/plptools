@@ -106,7 +106,7 @@ private:
     std::mutex serialMutex_;
     int fd;
     int serialStatus = -1;
-    int baudRateIndex_;
+    int baudRateIndex_ = 0;
     int baudRate_;
     bool lastFatal = false;
 

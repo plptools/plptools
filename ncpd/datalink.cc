@@ -240,7 +240,6 @@ DataLink::DataLink(const char *fname,
 
     baudRate_ = requestedBaudRate_;
     if (requestedBaudRate_ < 0) {
-        baudRateIndex_ = 0;
         baudRate_ = kBaudRatesTable[baudRateIndex_];
         baudRateIndex_ = baudRateIndex_ + 1;
     }
