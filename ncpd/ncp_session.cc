@@ -181,8 +181,8 @@ void *ncp_session_main_thread(void *arg) {
 
     session->ncp_ = new NCP(session->serialDevice_.c_str(),
                            session->baudRate_,
-                           session->nverbose_,
                            session->noDSR_,
+                           session->nverbose_,
                            session->cancellationPipe_[0],
                            session->statusCallback_,
                            session->callbackContext_);
