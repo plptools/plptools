@@ -314,7 +314,7 @@ void DataLink::internalReset(bool resetBaudRateIndex) {
     }
     justStarted = true;
     if (requestedBaudRate_ < 0) {
-        baudRate_ = kBaudRatesTable[baudRateIndex_++];
+        baudRate_ = kBaudRatesTable[baudRateIndex_];
         baudRateIndex_ = baudRateIndex_ + 1;
         if (baudRateIndex_ >= BAUD_RATES_TABLE_SIZE) {
             baudRateIndex_ = 0;
