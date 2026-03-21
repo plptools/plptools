@@ -98,6 +98,7 @@ help()
         "                           ph  - physical I/O handshake\n"
         "                           pd  - physical I/O data dump\n"
         "                           all - All of the above\n"
+        " -n, --nodsr             Disable DSR check (for buggy serial drivers)\n"
         " -s, --serial=DEV        Use serial device DEV.\n"
         " -b, --baudrate=RATE     Set serial speed to BAUD.\n"
         );
@@ -129,7 +130,7 @@ static struct option opts[] = {
     {"port",       required_argument, 0, 'p'},
     {"serial",     required_argument, 0, 's'},
     {"baudrate",   required_argument, 0, 'b'},
-    {"nodsr",      required_argument, 0, 'n'},
+    {"nodsr",      no_argument,       0, 'n'},
     {NULL,         0,                 0,  0 }
 };
 
@@ -212,7 +213,7 @@ main(int argc, char **argv)
                 break;
             case 'n':
                 noDSRCheck = true;
-                cout << "Found noDSR option" << endl;
+                linf << "DSR check disabled" << endl;
                 break;
         }
     }
