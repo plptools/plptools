@@ -218,13 +218,13 @@ using namespace std;
 DataLink::DataLink(const char *fname,
                    int baud,
                    Link *link,
-                   bool noDSR,
+                   bool noDSRCheck,
                    unsigned short verbose,
                    const int cancellationFd)
 : devname(fname)
 , requestedBaudRate_(baud)
 , link_(link)
-, noDSR_(noDSR)
+, noDSRCheck_(noDSRCheck)
 , verbose_(verbose)
 , cancellationFd_(cancellationFd) {
 
@@ -567,7 +567,7 @@ bool DataLink::linkFailed() {
         serialStatus = arg;
     }
     // TODO: Check for a solution on Solaris.
-    if (!noDSR_ && (arg & TIOCM_DSR) == 0) {
+    if (!noDSRCheck_ && (arg & TIOCM_DSR) == 0) {
         failed = true;
     }
     if ((verbose_ & PKT_DEBUG_LOG) && lastFatal)

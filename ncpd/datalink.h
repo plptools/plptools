@@ -43,7 +43,7 @@ class Link;
 class DataLink
 {
 public:
-    DataLink(const char *fname, int baud, Link *_link, bool noDSR, unsigned short verbose, const int cancellationFd);
+    DataLink(const char *fname, int baud, Link *_link, bool noDSRCheck, unsigned short verbose, const int cancellationFd);
     ~DataLink();
 
     /**
@@ -128,7 +128,7 @@ private:
     std::mutex outputMutex_;
     bool isCancelled_ = false;
     unsigned char *outBuffer; int outWrite = 0; int outRead = 0;
-    bool noDSR_ = false;
+    bool noDSRCheck_ = false;
 
     // Signaling.
 

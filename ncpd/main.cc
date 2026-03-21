@@ -145,7 +145,7 @@ main(int argc, char **argv)
     const char *serialDevice = NULL;
     unsigned short nverbose = 0;
     bool autoexit = false;
-    bool noDSR = false;
+    bool noDSRCheck = false;
 
     dlog.useFileDescriptor();
     elog.useFileDescriptor();
@@ -211,7 +211,7 @@ main(int argc, char **argv)
                 }
                 break;
             case 'n':
-                noDSR = true;
+                noDSRCheck = true;
                 cout << "Found noDSR option" << endl;
                 break;
         }
@@ -259,7 +259,7 @@ main(int argc, char **argv)
                                            host,
                                            serialDevice,
                                            autoexit,
-                                           noDSR,
+                                           noDSRCheck,
                                            nverbose);
             sharedSession->start();
             sharedSession->wait();

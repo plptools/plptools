@@ -47,7 +47,7 @@ public:
                std::string host,
                std::string serialDevice,
                bool autoexit,
-               bool noDSR,
+               bool noDSRCheck,
                unsigned short nverbose,
                NCPStatusCallback statusCallback = nullptr,
                void *callbackContext = nullptr)
@@ -56,7 +56,7 @@ public:
     , host_(host)
     , serialDevice_(serialDevice)
     , autoexit_(autoexit)
-    , noDSR_(noDSR)
+    , noDSRCheck_(noDSRCheck)
     , nverbose_(nverbose)
     , statusCallback_(statusCallback)
     , callbackContext_(callbackContext) {}
@@ -109,7 +109,7 @@ private:
     std::string host_;
     std::string serialDevice_;
     bool autoexit_;
-    bool noDSR_;
+    bool noDSRCheck_;
     unsigned short nverbose_;
     NCPStatusCallback statusCallback_;
     void *callbackContext_;
