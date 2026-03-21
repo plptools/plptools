@@ -98,7 +98,9 @@ help()
         "                           ph  - physical I/O handshake\n"
         "                           pd  - physical I/O data dump\n"
         "                           all - All of the above\n"
-        " -n, --nodsr             Disable DSR check (for buggy serial drivers)\n"
+        " -n, --nodsr             Disable DSR check. Use this when DSR detection is\n"
+        "                         poorly implemented in RS232 drivers or hardware.\n"
+        "                         WARNING: Could cause connection instability.\n"
         " -s, --serial=DEV        Use serial device DEV.\n"
         " -b, --baudrate=RATE     Set serial speed to BAUD.\n"
         );
