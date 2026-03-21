@@ -104,9 +104,9 @@ help()
     cout <<
 #if DSPEED > 0
 #define SPEEDSTR(x) #x
-        _("                         Default: ") << DSPEED << ".\n";
+        _("                         Default: ") << DSPEED << "\n";
 #else
-    _("                         Default: Autocycle 115.2k, 57.6k 38.4k, 19.2k\n");
+    _("                         Default: Autocycle 115200, 57600, 38400, 19200, 9600\n");
 #endif
     cout << _(
         " -p, --port=[HOST:]PORT  Listen on host HOST, port PORT.\n"
