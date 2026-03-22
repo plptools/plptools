@@ -40,6 +40,7 @@ using namespace std;
 
 NCP::NCP(const char *fname,
          int baud,
+         bool noDSRCheck,
          unsigned short _verbose,
          const int cancellationFd,
          NCPStatusCallback statusCallback,
@@ -61,7 +62,7 @@ NCP::NCP(const char *fname,
     for (int i = 0; i < MAX_CHANNELS_PSION; i++)
         channelPtr[i] = NULL;
 
-    l = new Link(fname, baud, this, verbose, cancellationFd);
+    l = new Link(fname, baud, this, noDSRCheck, verbose, cancellationFd);
 }
 
 NCP::~NCP() {

@@ -74,10 +74,11 @@ public:
      * @param fname Name of serial device.
      * @param baud Speed of serial device.
      * @param ncp The calling NCP instance.
+     * @param noDSRCheck Disable checking DSR (for buggy serial drivers)
      * @param verbose Verbosity (for debugging/troubleshooting)
      * @param cancellationFd File descriptor that can be used to signal that the `Link` should shutdown.
      */
-    Link(const char *fname, int baud, NCP *ncp, unsigned short verbose, const int cancellationFd);
+    Link(const char *fname, int baud, NCP *ncp, bool noDSRCheck, unsigned short verbose, const int cancellationFd);
 
     /**
      * Disconnects from device and destroys instance.

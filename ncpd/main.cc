@@ -98,6 +98,9 @@ help()
         "                           ph  - physical I/O handshake\n"
         "                           pd  - physical I/O data dump\n"
         "                           all - All of the above\n"
+        " -n, --nodsr             Disable DSR check. Use this when DSR detection is\n"
+        "                         poorly implemented in RS232 drivers or hardware.\n"
+        "                         WARNING: Could cause connection instability.\n"
         " -s, --serial=DEV        Use serial device DEV.\n"
         " -b, --baudrate=RATE     Set serial speed to BAUD.\n"
         );
@@ -129,6 +132,7 @@ static struct option opts[] = {
     {"port",       required_argument, 0, 'p'},
     {"serial",     required_argument, 0, 's'},
     {"baudrate",   required_argument, 0, 'b'},
+    {"nodsr",      no_argument,       0, 'n'},
     {NULL,         0,                 0,  0 }
 };
 
@@ -144,13 +148,14 @@ main(int argc, char **argv)
     const char *serialDevice = NULL;
     unsigned short nverbose = 0;
     bool autoexit = false;
+    bool noDSRCheck = false;
 
     dlog.useFileDescriptor();
     elog.useFileDescriptor();
     ilog.useFileDescriptor();
 
     while (1) {
-        int c = getopt_long(argc, argv, "hdeVb:s:p:v:", opts, NULL);
+        int c = getopt_long(argc, argv, "hdeVb:s:p:v:n", opts, NULL);
         if (c == -1)
             break;
         switch (c) {
@@ -208,6 +213,10 @@ main(int argc, char **argv)
                     return 1;
                 }
                 break;
+            case 'n':
+                noDSRCheck = true;
+                linf << "DSR check disabled" << endl;
+                break;
         }
     }
     if (optind < argc) {
@@ -253,6 +262,7 @@ main(int argc, char **argv)
                                            host,
                                            serialDevice,
                                            autoexit,
+                                           noDSRCheck,
                                            nverbose);
             sharedSession->start();
             sharedSession->wait();
