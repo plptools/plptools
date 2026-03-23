@@ -82,7 +82,7 @@ jobs:
       uses: mattnotmitt/doxygen-action@v1.9.5
 
     - name: Upload artifact
-      uses: actions/upload-pages-artifact@v3
+      uses: actions/upload-pages-artifact@v4
       with:
         path: ./html
 
