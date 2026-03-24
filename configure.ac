@@ -105,7 +105,7 @@ AM_CONDITIONAL(BUILD_PLPFUSE, test x$enable_fuse = xyes)
 dnl special options for customization
 
 AC_ARG_WITH(serial,
-    [  --with-serial=DEV       override default serial line],
+    AS_HELP_STRING([--with-serial=DEV], [override default serial line]),
     [ DDEV="$withval"
       AC_MSG_RESULT(Overriding default serial device: $DDEV)
     ],
@@ -116,7 +116,7 @@ AC_DEFINE_UNQUOTED(DDEV,"$DDEV",[Define this to your serial device node])
 AC_SUBST(DDEV)
 
 AC_ARG_WITH(speed,
-    [  --with-speed=SPEED      override default serial speed [auto]],
+    AS_HELP_STRING([--with-speed=SPEED], [override default serial speed [auto]]),
     [ if "$withval" = "auto" ; then
         DSNAME=auto
         DSPEED=-1
@@ -137,7 +137,7 @@ AC_SUBST(DSPEED)
 AC_SUBST(DSNAME)
 
 AC_ARG_WITH(port,
-    [  --with-port=PORT        override default port [7501]],
+    AS_HELP_STRING([--with-port=PORT], [override default port [7501]]),
     [ DPORT="$withval"
       AC_MSG_RESULT(Overriding port: $DPORT) ],
     [ DPORT=7501
@@ -149,7 +149,7 @@ AC_DEFINE_UNQUOTED(DPORT,$DPORT,
 AC_SUBST(DPORT)
 
 AC_ARG_WITH(drive,
-    [  --with-drive=DRIVE      override default EPOC drive [AUTO]],
+    AS_HELP_STRING([--with-drive=DRIVE], [override default EPOC drive [AUTO]]),
     [ DDRIVE="$withval"
       AC_MSG_RESULT(Overriding drive: $DDRIVE) ],
     [ DDRIVE='AUTO'
@@ -160,7 +160,7 @@ AC_DEFINE_UNQUOTED(DDRIVE,"$DDRIVE",
         [Define this to your default drive on your EPOC device])
 
 AC_ARG_WITH(basedir,
-    [  --with-basedir=DIR      override default EPOC directory [\\\\]],
+    AS_HELP_STRING([--with-basedir=DIR], [override default EPOC directory [\\\\]]),
     [ DBASEDIR="$withval"
       AC_MSG_RESULT(Overriding directory: $DBASEDIR) ],
     [ DBASEDIR='\\'
@@ -171,7 +171,7 @@ AC_DEFINE_UNQUOTED(DBASEDIR,"$DBASEDIR",
         [Define this to your default directory on your EPOC device])
 
 AC_ARG_WITH(initdir,
-    [  --with-initdir=DIR      override default init dir [PREFIX/etc/rc.d/init.d]],
+    AS_HELP_STRING([--with-initdir=DIR], [override default init dir [PREFIX/etc/rc.d/init.d]]),
     [ initdir="$withval"
       AC_MSG_RESULT(Overriding initdir: $initdir) ],
     [ initdir="${sysconfdir}/rc.d/init.d"
