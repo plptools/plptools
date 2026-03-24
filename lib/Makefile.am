@@ -25,13 +25,23 @@ LDADD = $(HOSTENT_LIB) $(LIBSOCKET)
 
 pkglib_LTLIBRARIES = libplp.la
 
+libplp_la_LIBADD = $(INTLLIBS) $(LIBPMULTITHREAD) $(LIBTHREAD) $(NANOSLEEP_LIB) $(PTHREAD_SIGMASK_LIB) $(SELECT_LIB) $(top_builddir)/libgnu/libgnu.la
+
 libplp_la_SOURCES = \
 	bufferarray.cc \
 	bufferstore.cc \
+	channel.cc \
 	cli_utils.cc \
+	datalink.cc \
 	Enum.cc \
 	iowatch.cc \
+	link.cc \
+	linkchannel.cc \
 	log.cc \
+	mp_serial.c \
+	ncp_log.cc \
+	ncp_session.cc \
+	ncp.cc \
 	path.cc \
 	plpdirent.cc \
 	psibitmap.cpp \
@@ -53,16 +63,26 @@ libplp_la_SOURCES = \
 	sislangrecord.cpp \
 	sisreqrecord.cpp \
 	sistypes.cpp \
+	socketchannel.cc \
 	tcpsocket.cc \
 	wprt.cc
 
 noinst_HEADERS = \
 	bufferarray.h \
 	bufferstore.h \
+	channel.h \
 	cli_utils.h \
+	datalink.h \
 	Enum.h \
 	iowatch.h \
+	link.h  \
+	linkchannel.h \
 	log.h \
+	mp_serial.h \
+	ncp_log.h \
+	ncp_session.h \
+	ncp.h \
+	ncpstatuscallback.h \
 	path.h \
 	plpdirent.h \
 	plpintl.h \
@@ -85,5 +105,6 @@ noinst_HEADERS = \
 	sislangrecord.h \
 	sisreqrecord.h \
 	sistypes.h \
+	socketchannel.h \
 	tcpsocket.h \
 	wprt.h

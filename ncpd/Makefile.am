@@ -4,6 +4,7 @@
 #
 # Copyright (C) 1999-2002 Fritz Elfert <felfert@to.com>
 # Copyright (C) 2007-2024 Reuben Thomas <rrt@sc3d.org>
+# Copyright (C) 2026 Jason Morley <hello@jbmorley.co.uk>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -22,25 +23,6 @@ sbin_PROGRAMS = ncpd
 ncpd_CPPFLAGS = -I$(top_srcdir)/lib -I$(top_srcdir)/libgnu -I$(top_builddir)/libgnu
 ncpd_CFLAGS = $(THREADED_CFLAGS)
 ncpd_CXXFLAGS = $(THREADED_CXXFLAGS)
-ncpd_LDADD = $(LIB_PLP) $(INTLLIBS) $(LIBPMULTITHREAD) $(LIBTHREAD) $(NANOSLEEP_LIB) $(PTHREAD_SIGMASK_LIB) $(SELECT_LIB) $(top_builddir)/libgnu/libgnu.a
+ncpd_LDADD = $(LIB_PLP)
 ncpd_SOURCES = \
-	channel.cc \
-	channel.h \
-	datalink.cc \
-	datalink.h \
-	link.cc \
-	link.h  \
-	linkchannel.cc \
-	linkchannel.h \
-	main.cc \
-	mp_serial.c \
-	mp_serial.h \
-	ncp_log.cc \
-	ncp_log.h \
-	ncp_session.cc \
-	ncp_session.h \
-	ncp.cc \
-	ncp.h \
-	ncpstatuscallback.h \
-	socketchannel.cc \
-	socketchannel.h
+	main.cc
