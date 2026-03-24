@@ -7,28 +7,27 @@ plptools is a suite of programs for transferring files to and from EPOC
 setting the clock. See below for build instructions and HISTORY for some
 history.
 
-plptools is free software; you can redistribute it and/or modify it under
-the terms of the GNU General Public License as published by the Free
-Software Foundation; either version 2 of the License, or (at your option)
-any later version.
-
 See the man pages for documentation: ncpd(8), plpftp(1), sisinstall(1),
 plpprintd(8), and, where installed, plpfuse(8).
 
 
 ## Building From Source
 
-To build plpfuse, the following packages are required:
+Providing detailed instructions on how to build plptools for different operating systems is beyond the scope of this README. For specific information on Linux distros and other OSes, please read the following sources:
 
-* GNU Make
-* FUSE: https://github.com/libfuse/libfuse (MacFUSE on macOS)
-* libattr: https://savannah.nongnu.org/projects/attr (not required on macOS or BSD)
+- The [Builds page in the wiki](https://github.com/plptools/plptools/wiki/Builds)
+- The [GitHub CI workflow](.github/workflows/c-cpp.yml) for the necessary install and configuration steps for Ubuntu/Debian and macOS.
 
-For command-line editing and history support in plpftp, Readline 4.3 or later or a compatible library is required.
+What follows are general notes on building plptools from source.
 
-Providing detailed instructions on how to install these packages for different operating systems is beyond the scope of this README, but see the [GitHub CI workflow](.github/workflows/c-cpp.yml) for the necessary install and configuration steps for Ubuntu/Debian and macOS.
+### Getting started
 
-If building from a git checkout, you’ll need the following packages installed: automake, autoconf, pkg-config.
+If you are building from source, you’ll need the following packages installed:
+
+- GNU make
+- automake
+- autoconf
+- pkg-config
 
 Then run:
 
@@ -36,7 +35,7 @@ Then run:
 ./bootstrap --skip-po
 ```
 
-Some extra packages are needed; `bootstrap` will tell you what you need to install if anything is lacking.
+Some extra packages are needed; `bootstrap` will tell you what you need to install if anything is missing from your system.
 
 plptools uses GNU autotools, so the usual sequence of commands works:
 
@@ -54,21 +53,32 @@ In addition to the usual options, `configure` understands the following:
 
 - `--with-speed=baudrate`
 
-  Sets the default serial speed (normally 115200 baud).
+  Sets the default serial speed. This overrides the default behaviour of walking through 115200, 57600, 38400, 19200 and 9600 baud.
 
 - `--with-port=portnum`
 
-  Sets the default port on which ncpd listens and to which plpftp and plpfuse connect (default 7501).
+  Sets the default port on which ncpd listens and to which programs like plpftp and plpfuse connect (default 7501).
 
 - `--with-drive=drivespec`
 
-  Sets the default drive for plpftp. The default <tt>AUTO</tt> triggers a drive-scan on the psion and sets the drive to the first drive found. If you don't want that, specify <tt>C:</tt> for example.
+  Sets the default drive for plpftp. The default `AUTO` triggers a drive-scan on the psion and sets the drive to the first drive found. If you don't want that, specify `C:` for example.
 
 - `--with-basedir=dirspec`
 
-    Overrides the default directory for plpftp. The default is `\`,  which means the root directory.
+  Overrides the default directory for plpftp. The default is `\`,  which means the root directory.
 
-    Note: since backslashes need to be doubled once for C escaping and once for shell escaping, this value is actually supplied as `\\\\`.
+  **Note:** since backslashes need to be doubled once for C escaping and once for shell escaping, this value is actually supplied as `\\\\`.
+
+### plpftp
+
+For command-line editing and history support in plpftp, Readline 4.3 or later (or a compatible library) is required.
+
+### plpfuse
+
+To build plpfuse, the following packages are required:
+
+- FUSE 2: https://github.com/libfuse/libfuse (MacFUSE on macOS)
+- libattr: https://savannah.nongnu.org/projects/attr (not required on macOS or *BSD)
 
 ## Development
 
@@ -78,10 +88,13 @@ The git repository can be cloned with:
 git clone https://github.com/plptools/plptools.git
 ```
 
-To make a release you need the GitHub CLI (see https://cli.github.com).
-
 ## License
 
-plptools is licensed under the GNU General Public License (GPL) version 2. It includes the following separately licensed third-party libraries and components:
+plptools is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free
+Software Foundation; either version 2 of the License, or (at your option)
+any later version. For further details, see the LICENSE file.
+
+plptools includes the following separately licensed third-party libraries and components:
 
 - [doctest](https://github.com/doctest/doctest) (/tests/doctest.h), MIT License
