@@ -22,7 +22,7 @@
 check_PROGRAMS = tests
 tests_CPPFLAGS = -DPKGDATADIR="\"$(pkgdatadir)\"" -I$(top_srcdir)/lib -I$(top_srcdir)/libgnu -I$(top_builddir)/libgnu
 tests_CXXFLAGS = $(WARN_CXXFLAGS)
-tests_LDADD = $(LIB_PLP) $(INTLLIBS) $(SERVENT_LIB) $(top_builddir)/libgnu/libgnu.a
+tests_LDADD = $(LIB_PLP) $(INTLLIBS) $(SERVENT_LIB)
 tests_SOURCES = main.cc doctest.h
 
 TESTS = tests
