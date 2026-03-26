@@ -87,6 +87,8 @@ private:
 
     void internalReset(bool resetBaudRateIndex);
 
+    void signalPumpThread();
+
     pthread_t dataPumpThreadId_;
 
     unsigned int crc_table[256];
@@ -152,5 +154,7 @@ private:
     */
     const int cancellationFd_;
     const short int verbose_;
+
+    int outputDataReadyPipe_[2] = { -1, -1 };
 
 };
