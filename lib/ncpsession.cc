@@ -20,7 +20,7 @@
  *
  */
 #include "config.h"
-#include "ncp_session.h"
+#include "ncpsession.h"
 
 #include <algorithm>
 #include <cassert>

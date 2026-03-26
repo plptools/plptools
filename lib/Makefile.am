@@ -40,8 +40,8 @@ libplp_la_SOURCES = \
 	log.cc \
 	mp_serial.c \
 	ncp_log.cc \
-	ncp_session.cc \
 	ncp.cc \
+	ncpsession.cc \
 	path.cc \
 	plpdirent.cc \
 	psibitmap.cpp \
@@ -80,8 +80,8 @@ noinst_HEADERS = \
 	log.h \
 	mp_serial.h \
 	ncp_log.h \
-	ncp_session.h \
 	ncp.h \
+	ncpsession.h \
 	ncpstatuscallback.h \
 	path.h \
 	plpdirent.h \
