@@ -242,7 +242,7 @@ NCPSession::~NCPSession() {
 }
 
 int NCPSession::start() {
-    assert(sessionMainThreadId_ == nullptr);
+    assert(sessionMainThreadId_ == 0);
     int result = pipe(cancellationPipe_);
     if (result != 0) {
         return result;

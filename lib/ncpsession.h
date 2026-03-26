@@ -108,7 +108,7 @@ private:
 
     // State.
 
-    pthread_t sessionMainThreadId_ = nullptr;
+    pthread_t sessionMainThreadId_ = 0;
 
     /**
     * @ref NCP instance.
