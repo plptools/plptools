@@ -149,7 +149,7 @@ public:
     *
     * @returns The name of the file.
     */
-    const char * getName() const;
+    const char *getName() const;
 
     /**
     * Retrieve the modification time of a directory entry.
