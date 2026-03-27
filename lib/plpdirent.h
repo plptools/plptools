@@ -278,7 +278,7 @@ public:
     *   bit 5 = removable
     * </pre>
     */
-    uint32_t getDriveAttribute();
+    uint32_t getDriveAttributes();
 
     /**
     * Retrieve the attributes of the media.
