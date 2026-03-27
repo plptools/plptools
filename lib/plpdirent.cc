@@ -18,6 +18,7 @@
  *
  */
 #include "config.h"
+#include "rfsv.h"
 
 #include "plpdirent.h"
 
@@ -40,7 +41,11 @@ operator[](int idx) {
 }
 
 PlpDirent::PlpDirent()
-    : size(0), attr(0), name(""), time(time_t(0)), attrstr("") {
+: size(0)
+, attr(0)
+, time(time_t(0))
+, attrstr("")
+, name("") {
 }
 
 PlpDirent::PlpDirent(const PlpDirent &e) {
@@ -63,45 +68,41 @@ PlpDirent::PlpDirent(const uint32_t _size, const uint32_t _attr,
     attrstr = "";
 }
 
-uint32_t PlpDirent::
-getSize() {
+uint32_t PlpDirent::getSize() const {
     return size;
 }
 
-uint32_t PlpDirent::
-getAttr() {
+uint32_t PlpDirent::getAttr() const {
     return attr;
 }
 
-uint32_t PlpDirent::
-getUID(int uididx) {
+bool PlpDirent::isDirectory() const {
+    return (attr & rfsv::PSI_A_DIR) > 0;
+}
+
+uint32_t PlpDirent::getUID(int uididx) {
     if ((uididx >= 0) && (uididx < 4))
         return UID[uididx];
     return 0;
 }
 
-PlpUID &PlpDirent::
-getUID() {
+PlpUID &PlpDirent::getUID() {
     return UID;
 }
 
-const char *PlpDirent::
-getName() {
+const char *PlpDirent::getName() const {
     return name.c_str();
 }
 
-PsiTime PlpDirent::
-getPsiTime() {
+PsiTime PlpDirent::getPsiTime() {
     return time;
 }
 
-void PlpDirent::
-setName(const char *str) {
+void PlpDirent::setName(const char *str) {
     name = str;
 }
 
-PlpDirent &PlpDirent::
-operator=(const PlpDirent &e) {
+PlpDirent &PlpDirent::operator=(const PlpDirent &e) {
     size    = e.size;
     attr    = e.attr;
     time    = e.time;
@@ -111,8 +112,7 @@ operator=(const PlpDirent &e) {
     return *this;
 }
 
-ostream &
-operator<<(ostream &o, const PlpDirent &e) {
+ostream &operator<<(ostream &o, const PlpDirent &e) {
     ostream::fmtflags old = o.flags();
 
     o << e.attrstr << " " << dec << setw(10)
@@ -125,48 +125,48 @@ operator<<(ostream &o, const PlpDirent &e) {
 PlpDrive::PlpDrive() {
 }
 
-PlpDrive::PlpDrive(const PlpDrive &other) {
+PlpDrive::PlpDrive(const PlpDrive &other)
+: mediatype(other.mediatype)
+, driveattr(other.driveattr)
+, mediaattr(other.mediaattr)
+, uid(other.uid)
+, size(other.size)
+, space(other.space)
+, drivechar(other.drivechar)
+, name(other.name) {
 }
 
-void PlpDrive::
-setMediaType(uint32_t type) {
+void PlpDrive::setMediaType(uint32_t type) {
     mediatype = type;
 }
 
-void PlpDrive::
-setDriveAttribute(uint32_t attr) {
+void PlpDrive::setDriveAttribute(uint32_t attr) {
     driveattr = attr;
 }
 
-void PlpDrive::
-setMediaAttribute(uint32_t attr) {
+void PlpDrive::setMediaAttribute(uint32_t attr) {
     mediaattr = attr;
 }
 
-void PlpDrive::
-setUID(uint32_t attr) {
+void PlpDrive::setUID(uint32_t attr) {
     uid = attr;
 }
 
-void PlpDrive::
-setSize(uint32_t sizeLo, uint32_t sizeHi) {
+void PlpDrive::setSize(uint32_t sizeLo, uint32_t sizeHi) {
     size = ((unsigned long long)sizeHi << 32) + sizeLo;
 }
 
-void PlpDrive::
-setSpace(uint32_t spaceLo, uint32_t spaceHi) {
+void PlpDrive::setSpace(uint32_t spaceLo, uint32_t spaceHi) {
     space = ((unsigned long long)spaceHi << 32) + spaceLo;
 }
 
-void PlpDrive::
-setName(char drive, const char * const volname) {
+void PlpDrive::setName(char drive, const char * const volname) {
     drivechar = drive;
     name = "";
     name += volname;
 }
 
-uint32_t PlpDrive::
-getMediaType() {
+uint32_t PlpDrive::getMediaType() const {
     return mediatype;
 }
 
@@ -182,80 +182,89 @@ static const char * const media_types[] = {
     N_("Remote"),
 };
 
-void PlpDrive::
-getMediaType(std::string &ret) {
+void PlpDrive::getMediaType(std::string &ret) const {
     ret = media_types[mediatype];
 }
 
-uint32_t PlpDrive::
-getDriveAttribute() {
+uint32_t PlpDrive::getDriveAttribute() {
     return driveattr;
 }
 
 static void
 appendWithDelim(string &s1, const char * const s2) {
-    if (!s1.empty())
+    if (!s1.empty()) {
         s1 += ',';
+    }
     s1 += s2;
 }
 
 void PlpDrive::
 getDriveAttribute(std::string &ret) {
     ret = "";
-    if (driveattr & 1)
+    if (driveattr & 1) {
         appendWithDelim(ret, _("local"));
-    if (driveattr & 2)
+    }
+    if (driveattr & 2) {
         appendWithDelim(ret, _("ROM"));
-    if (driveattr & 4)
+    }
+    if (driveattr & 4) {
         appendWithDelim(ret, _("redirected"));
-    if (driveattr & 8)
+    }
+    if (driveattr & 8) {
         appendWithDelim(ret, _("substituted"));
-    if (driveattr & 16)
+    }
+    if (driveattr & 16) {
         appendWithDelim(ret, _("internal"));
-    if (driveattr & 32)
+    }
+    if (driveattr & 32) {
         appendWithDelim(ret, _("removable"));
+    }
 }
 
-uint32_t PlpDrive::
-getMediaAttribute() {
+uint32_t PlpDrive::getMediaAttribute() {
     return mediaattr;
 }
 
-void PlpDrive::
-getMediaAttribute(std::string &ret) {
+void PlpDrive::getMediaAttribute(std::string &ret) {
     ret = "";
 
-    if (mediaattr & 1)
+    if (mediaattr & 1) {
         appendWithDelim(ret, _("variable size"));
-    if (mediaattr & 2)
+    }
+    if (mediaattr & 2) {
         appendWithDelim(ret, _("dual density"));
-    if (mediaattr & 4)
+    }
+    if (mediaattr & 4) {
         appendWithDelim(ret, _("formattable"));
-    if (mediaattr & 8)
+    }
+    if (mediaattr & 8) {
         appendWithDelim(ret, _("write protected"));
+    }
 }
 
-uint32_t PlpDrive::
-getUID() {
+uint32_t PlpDrive::getUID() {
     return uid;
 }
 
-uint64_t PlpDrive::
-getSize() {
+uint64_t PlpDrive::getSize() {
     return size;
 }
 
-uint64_t PlpDrive::
-getSpace() {
+uint64_t PlpDrive::getSpace() {
     return space;
 }
 
-string PlpDrive::
-getName() {
+string PlpDrive::getName() const {
     return name;
 }
 
-char PlpDrive::
-getDrivechar() {
+char PlpDrive::getDrivechar() const {
     return drivechar;
+}
+
+std::string PlpDrive::getPath() const {
+    std::string path;
+    path += drivechar;
+    path += ":\\";
+    return path;
 }
