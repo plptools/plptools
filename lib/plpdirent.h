@@ -2,6 +2,7 @@
  * This file is part of plptools.
  *
  *  Copyright (C) 1999-2001 Fritz Elfert <felfert@to.com>
+ *  Copyright (c) 2026 Jason Morley <hello@jbmorley.co.uk>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -20,6 +21,7 @@
 #ifndef _PLPDIRENT_H_
 #define _PLPDIRENT_H_
 
+#include <cstdint>
 #include <iostream>
 #include <string>
 #include <cstring>
@@ -109,14 +111,21 @@ public:
     *
     * @returns The file size in bytes.
     */
-    uint32_t getSize();
+    uint32_t getSize() const;
 
     /**
     * Retrieves the file attributes of a directory entry.
     *
     * @returns The generic attributes ( @ref rfsv::file_attribs ).
     */
-    uint32_t getAttr();
+    uint32_t getAttr() const;
+
+    /**
+    * Determine if the directory entry represents a directory.
+    *
+    * @return true if the directory entry is itself a directory; false otherwise.
+    */
+    bool isDirectory() const;
 
     /**
     * Retrieves the UIDs of a directory entry.
@@ -140,7 +149,7 @@ public:
     *
     * @returns The name of the file.
     */
-    const char *getName();
+    const char *getName() const;
 
     /**
     * Retrieve the modification time of a directory entry.
@@ -185,6 +194,19 @@ private:
     std::string  name;
 };
 
+
+enum class MediaType: uint32_t {
+    kNotPresent = 0,
+    kUnknown = 1,
+    kFloppy = 2,
+    kDisk = 3,
+    kCompactDisc = 4,
+    kRAM = 5,
+    kFlashDisk = 6,
+    kROM = 7,
+    kRemote = 8,
+};
+
 /**
  * A class representing information about
  * a Disk drive on the psion. An Object of this type
@@ -202,6 +224,15 @@ public:
     * Default constructor.
     */
     PlpDrive();
+
+    PlpDrive(MediaType mediaType,
+             uint32_t driveAttributes,
+             uint32_t mediaAttributes,
+             uint32_t uid,
+             uint64_t size,
+             uint64_t space,
+             char driveLetter,
+             std::string name);
 
     /**
     * Copy constructor
@@ -228,16 +259,7 @@ public:
     *   8 = Remote
     * </pre>
     */
-    uint32_t getMediaType();
-
-    /**
-    * Retrieve the media type of the drive.
-    * Just like the above function, but returns
-    * the media type as human readable string.
-    *
-    * @param ret The string is returned here.
-    */
-    void getMediaType(std::string &ret);
+    MediaType getMediaType() const;
 
     /**
     * Retrieve the attributes of the drive.
@@ -256,16 +278,7 @@ public:
     *   bit 5 = removable
     * </pre>
     */
-    uint32_t getDriveAttribute();
-
-    /**
-    * Retrieve the attributes of the drive.
-    * Just like the above function, but returns
-    * the attributes as human readable string.
-    *
-    * @param ret The string is returned here.
-    */
-    void getDriveAttribute(std::string &ret);
+    uint32_t getDriveAttributes() const;
 
     /**
     * Retrieve the attributes of the media.
@@ -282,16 +295,7 @@ public:
     *   bit 3 = write protected
     * </pre>
     */
-    uint32_t getMediaAttribute();
-
-    /**
-    * Retrieve the attributes of the media.
-    * Just like the above function, but returns
-    * the attributes as human readable string.
-    *
-    * @param ret The string is returned here.
-    */
-    void getMediaAttribute(std::string &ret);
+    uint32_t getMediaAttributes() const;
 
     /**
     * Retrieve the UID of the drive.
@@ -300,53 +304,60 @@ public:
     *
     * @returns The UID of the probed drive.
     */
-    uint32_t getUID();
+    uint32_t getUID() const;
 
     /**
     * Retrieve the total capacity of the drive.
     *
     * @returns The capacity of the probed drive in bytes.
     */
-    uint64_t getSize();
+    uint64_t getSize() const;
 
     /**
     * Retrieve the free capacity on the drive.
     *
     * @returns The free space on the probed drive in bytes.
     */
-    uint64_t getSpace();
+    uint64_t getSpace() const;
 
     /**
     * Retrieve the volume name of the drive.
     *
     * returns The volume name of the drive.
     */
-    std::string getName();
+    std::string getName() const;
 
     /**
     * Retrieve the drive letter of the drive.
     *
     * returns The letter of the probed drive.
     */
-    char getDrivechar();
+    char getDriveLetter() const;
+
+    /**
+    * Get the file system path given by the current drive.
+    *
+    * @return the full path of the current drive (e.g., "C:\\" for the drive "C").
+    */
+    std::string getPath() const;
 
 private:
-    void setMediaType(uint32_t type);
-    void setDriveAttribute(uint32_t attr);
-    void setMediaAttribute(uint32_t attr);
+    void setMediaType(MediaType type);
+    void setDriveAttributes(uint32_t driveAttribute);
+    void setMediaAttributes(uint32_t mediaAttribute);
     void setUID(uint32_t uid);
     void setSize(uint32_t sizeLo, uint32_t sizeHi);
     void setSpace(uint32_t spaceLo, uint32_t spaceHi);
     void setName(char drive, const char * const volname);
 
-    uint32_t mediatype;
-    uint32_t driveattr;
-    uint32_t mediaattr;
-    uint32_t uid;
-    uint64_t size;
-    uint64_t space;
-    char drivechar;
-    std::string name;
+    MediaType mediaType_;
+    uint32_t driveAttributes_;
+    uint32_t mediaAttributes_;
+    uint32_t uid_;
+    uint64_t size_;
+    uint64_t space_;
+    char driveLetter_;
+    std::string name_;
 };
 
 #endif

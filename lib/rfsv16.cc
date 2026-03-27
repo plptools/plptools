@@ -23,6 +23,7 @@
 
 #include "rfsv16.h"
 #include "bufferstore.h"
+#include "plpdirent.h"
 #include "tcpsocket.h"
 #include "bufferarray.h"
 
@@ -425,20 +426,20 @@ devinfo(const char drive, PlpDrive &dinfo)
 
     int attr = a.getWord(2);
     attr = sibo_dattr[a.getWord(2) & 0xff];
-    dinfo.setMediaType(attr);
+    dinfo.setMediaType(static_cast<MediaType>(attr));
 
     attr = a.getWord(2);
     int changeable = a.getWord(4) ? 32 : 0;
     int internal = (attr & 0x2000) ? 16 : 0;
 
-    dinfo.setDriveAttribute(changeable | internal);
+    dinfo.setDriveAttributes(changeable | internal);
 
     int variable = (attr & 0x4000) ? 1 : 0;
     int dualdens = (attr & 0x1000) ? 2 : 0;
     int formattable = (attr & 0x0800) ? 4 : 0;
     int protect = ((attr & 0xff) == 6) ? 8 : 0;
 
-    dinfo.setMediaAttribute(variable|dualdens|formattable|protect);
+    dinfo.setMediaAttributes(variable|dualdens|formattable|protect);
 
     dinfo.setUID(0);
     dinfo.setSize(a.getDWord(6), 0);
