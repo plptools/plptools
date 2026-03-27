@@ -2,6 +2,7 @@
  * This file is part of plptools.
  *
  *  Copyright (C) 1999-2001 Fritz Elfert <felfert@to.com>
+ *  Copyright (c) 2026 Jason Morley <hello@jbmorley.co.uk>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
