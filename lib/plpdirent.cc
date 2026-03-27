@@ -127,48 +127,48 @@ PlpDrive::PlpDrive() {
 }
 
 PlpDrive::PlpDrive(const PlpDrive &other)
-: mediatype(other.mediatype)
-, driveattr(other.driveattr)
-, mediaattr(other.mediaattr)
-, uid(other.uid)
-, size(other.size)
-, space(other.space)
-, drivechar(other.drivechar)
-, name(other.name) {
+: mediaType_(other.mediaType_)
+, driveAttribute_(other.driveAttribute_)
+, mediaAttribute_(other.mediaAttribute_)
+, uid_(other.uid_)
+, size_(other.size_)
+, space_(other.space_)
+, driveChar_(other.driveChar_)
+, name_(other.name_) {
 }
 
 void PlpDrive::setMediaType(MediaType type) {
-    mediatype = type;
+    mediaType_ = type;
 }
 
 void PlpDrive::setDriveAttribute(uint32_t attr) {
-    driveattr = attr;
+    driveAttribute_ = attr;
 }
 
-void PlpDrive::setMediaAttribute(uint32_t attr) {
-    mediaattr = attr;
+void PlpDrive::setMediaAttribute(uint32_t mediaAttribute) {
+    mediaAttribute_ = mediaAttribute;
 }
 
-void PlpDrive::setUID(uint32_t attr) {
-    uid = attr;
+void PlpDrive::setUID(uint32_t uid) {
+    uid_ = uid;
 }
 
 void PlpDrive::setSize(uint32_t sizeLo, uint32_t sizeHi) {
-    size = ((unsigned long long)sizeHi << 32) + sizeLo;
+    size_ = ((unsigned long long)sizeHi << 32) + sizeLo;
 }
 
 void PlpDrive::setSpace(uint32_t spaceLo, uint32_t spaceHi) {
-    space = ((unsigned long long)spaceHi << 32) + spaceLo;
+    space_ = ((unsigned long long)spaceHi << 32) + spaceLo;
 }
 
 void PlpDrive::setName(char drive, const char * const volname) {
-    drivechar = drive;
-    name = "";
-    name += volname;
+    driveChar_ = drive;
+    name_ = "";
+    name_ += volname;
 }
 
 MediaType PlpDrive::getMediaType() const {
-    return mediatype;
+    return mediaType_;
 }
 
 static const char * const media_types[] = {
@@ -184,11 +184,11 @@ static const char * const media_types[] = {
 };
 
 void PlpDrive::getMediaType(std::string &ret) const {
-    ret = media_types[static_cast<uint32_t>(mediatype)];
+    ret = media_types[static_cast<uint32_t>(mediaType_)];
 }
 
 uint32_t PlpDrive::getDriveAttribute() {
-    return driveattr;
+    return driveAttribute_;
 }
 
 static void
@@ -202,70 +202,70 @@ appendWithDelim(string &s1, const char * const s2) {
 void PlpDrive::
 getDriveAttribute(std::string &ret) {
     ret = "";
-    if (driveattr & 1) {
+    if (driveAttribute_ & 1) {
         appendWithDelim(ret, _("local"));
     }
-    if (driveattr & 2) {
+    if (driveAttribute_ & 2) {
         appendWithDelim(ret, _("ROM"));
     }
-    if (driveattr & 4) {
+    if (driveAttribute_ & 4) {
         appendWithDelim(ret, _("redirected"));
     }
-    if (driveattr & 8) {
+    if (driveAttribute_ & 8) {
         appendWithDelim(ret, _("substituted"));
     }
-    if (driveattr & 16) {
+    if (driveAttribute_ & 16) {
         appendWithDelim(ret, _("internal"));
     }
-    if (driveattr & 32) {
+    if (driveAttribute_ & 32) {
         appendWithDelim(ret, _("removable"));
     }
 }
 
 uint32_t PlpDrive::getMediaAttribute() {
-    return mediaattr;
+    return mediaAttribute_;
 }
 
 void PlpDrive::getMediaAttribute(std::string &ret) {
     ret = "";
 
-    if (mediaattr & 1) {
+    if (mediaAttribute_ & 1) {
         appendWithDelim(ret, _("variable size"));
     }
-    if (mediaattr & 2) {
+    if (mediaAttribute_ & 2) {
         appendWithDelim(ret, _("dual density"));
     }
-    if (mediaattr & 4) {
+    if (mediaAttribute_ & 4) {
         appendWithDelim(ret, _("formattable"));
     }
-    if (mediaattr & 8) {
+    if (mediaAttribute_ & 8) {
         appendWithDelim(ret, _("write protected"));
     }
 }
 
 uint32_t PlpDrive::getUID() {
-    return uid;
+    return uid_;
 }
 
 uint64_t PlpDrive::getSize() {
-    return size;
+    return size_;
 }
 
 uint64_t PlpDrive::getSpace() {
-    return space;
+    return space_;
 }
 
 string PlpDrive::getName() const {
-    return name;
+    return name_;
 }
 
-char PlpDrive::getDrivechar() const {
-    return drivechar;
+char PlpDrive::getDriveChar() const {
+    return driveChar_;
 }
 
 std::string PlpDrive::getPath() const {
     std::string path;
-    path += drivechar;
+    path += driveChar_;
     path += ":\\";
     return path;
 }

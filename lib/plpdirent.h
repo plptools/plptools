@@ -349,7 +349,7 @@ public:
     *
     * returns The letter of the probed drive.
     */
-    char getDrivechar() const;
+    char getDriveChar() const;
 
     /**
     * Get the file system path given by the current drive.
@@ -360,21 +360,21 @@ public:
 
 private:
     void setMediaType(MediaType type);
-    void setDriveAttribute(uint32_t attr);
-    void setMediaAttribute(uint32_t attr);
+    void setDriveAttribute(uint32_t driveAttribute);
+    void setMediaAttribute(uint32_t mediaAttribute);
     void setUID(uint32_t uid);
     void setSize(uint32_t sizeLo, uint32_t sizeHi);
     void setSpace(uint32_t spaceLo, uint32_t spaceHi);
     void setName(char drive, const char * const volname);
 
-    MediaType mediatype;
-    uint32_t driveattr;
-    uint32_t mediaattr;
-    uint32_t uid;
-    uint64_t size;
-    uint64_t space;
-    char drivechar;
-    std::string name;
+    MediaType mediaType_;
+    uint32_t driveAttribute_;
+    uint32_t mediaAttribute_;
+    uint32_t uid_;
+    uint64_t size_;
+    uint64_t space_;
+    char driveChar_;
+    std::string name_;
 };
 
 #endif
