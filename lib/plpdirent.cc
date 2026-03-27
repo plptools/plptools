@@ -128,8 +128,8 @@ PlpDrive::PlpDrive() {
 
 PlpDrive::PlpDrive(const PlpDrive &other)
 : mediaType_(other.mediaType_)
-, driveAttribute_(other.driveAttribute_)
-, mediaAttribute_(other.mediaAttribute_)
+, driveAttributes_(other.driveAttributes_)
+, mediaAttributes_(other.mediaAttributes_)
 , uid_(other.uid_)
 , size_(other.size_)
 , space_(other.space_)
@@ -141,12 +141,12 @@ void PlpDrive::setMediaType(MediaType type) {
     mediaType_ = type;
 }
 
-void PlpDrive::setDriveAttribute(uint32_t attr) {
-    driveAttribute_ = attr;
+void PlpDrive::setDriveAttributes(uint32_t attr) {
+    driveAttributes_ = attr;
 }
 
-void PlpDrive::setMediaAttribute(uint32_t mediaAttribute) {
-    mediaAttribute_ = mediaAttribute;
+void PlpDrive::setMediaAttributes(uint32_t mediaAttribute) {
+    mediaAttributes_ = mediaAttribute;
 }
 
 void PlpDrive::setUID(uint32_t uid) {
@@ -188,59 +188,11 @@ void PlpDrive::getMediaType(std::string &ret) const {
 }
 
 uint32_t PlpDrive::getDriveAttribute() {
-    return driveAttribute_;
+    return driveAttributes_;
 }
 
-static void
-appendWithDelim(string &s1, const char * const s2) {
-    if (!s1.empty()) {
-        s1 += ',';
-    }
-    s1 += s2;
-}
-
-void PlpDrive::
-getDriveAttribute(std::string &ret) {
-    ret = "";
-    if (driveAttribute_ & 1) {
-        appendWithDelim(ret, _("local"));
-    }
-    if (driveAttribute_ & 2) {
-        appendWithDelim(ret, _("ROM"));
-    }
-    if (driveAttribute_ & 4) {
-        appendWithDelim(ret, _("redirected"));
-    }
-    if (driveAttribute_ & 8) {
-        appendWithDelim(ret, _("substituted"));
-    }
-    if (driveAttribute_ & 16) {
-        appendWithDelim(ret, _("internal"));
-    }
-    if (driveAttribute_ & 32) {
-        appendWithDelim(ret, _("removable"));
-    }
-}
-
-uint32_t PlpDrive::getMediaAttribute() {
-    return mediaAttribute_;
-}
-
-void PlpDrive::getMediaAttribute(std::string &ret) {
-    ret = "";
-
-    if (mediaAttribute_ & 1) {
-        appendWithDelim(ret, _("variable size"));
-    }
-    if (mediaAttribute_ & 2) {
-        appendWithDelim(ret, _("dual density"));
-    }
-    if (mediaAttribute_ & 4) {
-        appendWithDelim(ret, _("formattable"));
-    }
-    if (mediaAttribute_ & 8) {
-        appendWithDelim(ret, _("write protected"));
-    }
+uint32_t PlpDrive::getMediaAttributes() {
+    return mediaAttributes_;
 }
 
 uint32_t PlpDrive::getUID() {

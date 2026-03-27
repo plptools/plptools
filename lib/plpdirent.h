@@ -280,15 +280,6 @@ public:
     uint32_t getDriveAttribute();
 
     /**
-    * Retrieve the attributes of the drive.
-    * Just like the above function, but returns
-    * the attributes as human readable string.
-    *
-    * @param ret The string is returned here.
-    */
-    void getDriveAttribute(std::string &ret);
-
-    /**
     * Retrieve the attributes of the media.
     *
     * @returns The attributes of the probed media.
@@ -303,16 +294,7 @@ public:
     *   bit 3 = write protected
     * </pre>
     */
-    uint32_t getMediaAttribute();
-
-    /**
-    * Retrieve the attributes of the media.
-    * Just like the above function, but returns
-    * the attributes as human readable string.
-    *
-    * @param ret The string is returned here.
-    */
-    void getMediaAttribute(std::string &ret);
+    uint32_t getMediaAttributes();
 
     /**
     * Retrieve the UID of the drive.
@@ -360,16 +342,16 @@ public:
 
 private:
     void setMediaType(MediaType type);
-    void setDriveAttribute(uint32_t driveAttribute);
-    void setMediaAttribute(uint32_t mediaAttribute);
+    void setDriveAttributes(uint32_t driveAttribute);
+    void setMediaAttributes(uint32_t mediaAttribute);
     void setUID(uint32_t uid);
     void setSize(uint32_t sizeLo, uint32_t sizeHi);
     void setSpace(uint32_t spaceLo, uint32_t spaceHi);
     void setName(char drive, const char * const volname);
 
     MediaType mediaType_;
-    uint32_t driveAttribute_;
-    uint32_t mediaAttribute_;
+    uint32_t driveAttributes_;
+    uint32_t mediaAttributes_;
     uint32_t uid_;
     uint64_t size_;
     uint64_t space_;
