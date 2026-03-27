@@ -62,7 +62,7 @@ private:
 /**
  * Access remote file services of a Psion.
  *
- * rfsv provides an API for accessing file services
+ * RFSV provides an API for accessing file services
  * of a Psion connected via ncpd. This class defines the
  * interface and a small amount of common constants and
  * methods. The majority of implementation is provided
@@ -72,7 +72,7 @@ private:
  * the correct variant depending on the remote machine,
  * currently connected.
  */
-class rfsv {
+class RFSV {
 public:
     /**
     * The kown modes for seek.
@@ -211,7 +211,7 @@ public:
         PSI_A_TEXT       = 0x1000
     };
 
-    virtual ~rfsv();
+    virtual ~RFSV();
     void reset();
     void reconnect();
 
@@ -289,7 +289,7 @@ public:
     * @param name The name of the directory
     * @param ret  An STL deque of @ref PlpDirent entries.
     *
-    * @returns A Psion error code (One of enum @ref rfsv::errs ).
+    * @returns A Psion error code (One of enum @ref RFSV::errs ).
     */
     virtual Enum<errs> dir(const char * const name, PlpDir &ret) = 0;
 
@@ -433,7 +433,7 @@ public:
     /**
     * Copies a file from the Psion to the local machine.
     */
-    virtual Enum<rfsv::errs> copyFromPsion(const char *from, int fd, cpCallback_t cb) = 0;
+    virtual Enum<RFSV::errs> copyFromPsion(const char *from, int fd, cpCallback_t cb) = 0;
 
     /**
     * Copies a file from local machine to the Psion.
@@ -575,7 +575,7 @@ public:
     virtual Enum<errs> setVolumeName(const char drive, const char * const name) = 0;
 
     /**
-    * Converts a file attribute @ref rfsv::file_attribs to
+    * Converts a file attribute @ref RFSV::file_attribs to
     * human readable format, usable for showing them in directory
     * listings. The first 7 characters are common to all
     * machine types:

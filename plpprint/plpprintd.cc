@@ -787,10 +787,10 @@ service_loop()
             /* Job loop */
             buf.init();
             switch (wPrt->getData(buf)) {
-                case rfsv::E_PSI_FILE_DISC:
+                case RFSV::E_PSI_FILE_DISC:
                     jobLoop = false;
                     break;
-                case rfsv::E_PSI_GEN_NONE:
+                case RFSV::E_PSI_GEN_NONE:
                     if ((buf.getLen() == 15) &&
                         (!memcmp(buf.getString(0), fakePage, 15))) {
                         cancelled = false;
@@ -999,9 +999,9 @@ main(int argc, char **argv)
             while (serviceLoop) {
                 wPrt = new wprt(skt);
                 if (wPrt) {
-                    Enum<rfsv::errs> ret;
+                    Enum<RFSV::errs> ret;
                     ret = wPrt->initPrinter();
-                    if (ret == rfsv::E_PSI_GEN_NONE)
+                    if (ret == RFSV::E_PSI_GEN_NONE)
                         service_loop();
                     else {
                         if (debug)

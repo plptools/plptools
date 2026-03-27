@@ -106,17 +106,17 @@ reset(void)
 {
     BufferStore a;
     mtCacheS5mx = 0;
-    status = rfsv::E_PSI_FILE_DISC;
+    status = RFSV::E_PSI_FILE_DISC;
     a.addStringT(getConnectName());
     if (skt->sendBufferStore(a)) {
         if (skt->getBufferStore(a) == 1) {
             if (!strcmp(a.getString(0), "Ok"))
-                status = rfsv::E_PSI_GEN_NONE;
+                status = RFSV::E_PSI_GEN_NONE;
         }
     }
 }
 
-Enum<rfsv::errs> rpcs::
+Enum<RFSV::errs> rpcs::
 getStatus(void)
 {
     return status;
@@ -134,9 +134,9 @@ getConnectName(void)
 bool rpcs::
 sendCommand(enum commands cc, BufferStore & data)
 {
-    if (status == rfsv::E_PSI_FILE_DISC) {
+    if (status == RFSV::E_PSI_FILE_DISC) {
         reconnect();
-        if (status == rfsv::E_PSI_FILE_DISC)
+        if (status == RFSV::E_PSI_FILE_DISC)
             return false;
     }
     bool result;
@@ -148,54 +148,54 @@ sendCommand(enum commands cc, BufferStore & data)
         reconnect();
         result = skt->sendBufferStore(a);
         if (!result)
-            status = rfsv::E_PSI_FILE_DISC;
+            status = RFSV::E_PSI_FILE_DISC;
     }
     return result;
 }
 
-Enum<rfsv::errs> rpcs::
+Enum<RFSV::errs> rpcs::
 getResponse(BufferStore & data, bool statusIsFirstByte)
 {
-    Enum<rfsv::errs> ret;
+    Enum<RFSV::errs> ret;
     if (skt->getBufferStore(data) == 1) {
         if (statusIsFirstByte) {
-            ret = (enum rfsv::errs)((char)data.getByte(0));
+            ret = (enum RFSV::errs)((char)data.getByte(0));
             data.discardFirstBytes(1);
         } else {
             int l = data.getLen();
             if (l > 0) {
-                ret = (enum rfsv::errs)((char)data.getByte(data.getLen() - 1));
+                ret = (enum RFSV::errs)((char)data.getByte(data.getLen() - 1));
                 data.init((const unsigned char *)data.getString(), l - 1);
             } else
-                ret = rfsv::E_PSI_GEN_FAIL;
+                ret = RFSV::E_PSI_GEN_FAIL;
         }
         return ret;
     } else
-        status = rfsv::E_PSI_FILE_DISC;
+        status = RFSV::E_PSI_FILE_DISC;
     return status;
 }
 
 //
 // APIs, identical on SIBO and EPOC
 //
-Enum<rfsv::errs> rpcs::
+Enum<RFSV::errs> rpcs::
 getNCPversion(int &major, int &minor)
 {
-    Enum<rfsv::errs> res;
+    Enum<RFSV::errs> res;
     BufferStore a;
 
     if (!sendCommand(QUERY_NCP, a))
-        return rfsv::E_PSI_FILE_DISC;
-    if ((res = getResponse(a, true)) != rfsv::E_PSI_GEN_NONE)
+        return RFSV::E_PSI_FILE_DISC;
+    if ((res = getResponse(a, true)) != RFSV::E_PSI_GEN_NONE)
         return res;
     if (a.getLen() != 2)
-        return rfsv::E_PSI_GEN_FAIL;
+        return RFSV::E_PSI_GEN_FAIL;
     major = a.getByte(0);
     minor = a.getByte(1);
     return res;
 }
 
-Enum<rfsv::errs> rpcs::
+Enum<RFSV::errs> rpcs::
 execProgram(const char *program, const char *args)
 {
     BufferStore a;
@@ -217,46 +217,46 @@ execProgram(const char *program, const char *args)
     a.addStringT(args);
 
     if (!sendCommand(EXEC_PROG, a))
-        return rfsv::E_PSI_FILE_DISC;
+        return RFSV::E_PSI_FILE_DISC;
     return getResponse(a, true);
 }
 
-Enum<rfsv::errs> rpcs::
+Enum<RFSV::errs> rpcs::
 stopProgram(const char *program)
 {
     BufferStore a;
 
     a.addStringT(program);
     if (!sendCommand(STOP_PROG, a))
-        return rfsv::E_PSI_FILE_DISC;
+        return RFSV::E_PSI_FILE_DISC;
     return getResponse(a, true);
 }
 
-Enum<rfsv::errs> rpcs::
+Enum<RFSV::errs> rpcs::
 queryProgram(const char *program)
 {
     BufferStore a;
 
     a.addStringT(program);
     if (!sendCommand(QUERY_PROG, a))
-        return rfsv::E_PSI_FILE_DISC;
+        return RFSV::E_PSI_FILE_DISC;
     return getResponse(a, true);
 }
 
-Enum<rfsv::errs> rpcs::
+Enum<RFSV::errs> rpcs::
 queryPrograms(processList &ret)
 {
     BufferStore a;
     const char *drives;
     const char *dptr;
     bool anySuccess = false;
-    Enum<rfsv::errs> res;
+    Enum<RFSV::errs> res;
 
     // First, check how many drives we need to query
     a.addStringT("M:"); // Drive M only exists on a SIBO
     if (!sendCommand(rpcs::GET_UNIQUEID, a))
-        return rfsv::E_PSI_FILE_DISC;
-    if (getResponse(a, false) == rfsv::E_PSI_GEN_NONE)
+        return RFSV::E_PSI_FILE_DISC;
+    if (getResponse(a, false) == RFSV::E_PSI_GEN_NONE)
         // A SIBO; Must query all possible drives
         drives = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     else
@@ -268,22 +268,22 @@ queryPrograms(processList &ret)
 
     if ((mtCacheS5mx & 4) == 0) {
         Enum<machs> tmp;
-        if (getMachineType(tmp) != rfsv::E_PSI_GEN_NONE)
-            return rfsv::E_PSI_GEN_FAIL;
+        if (getMachineType(tmp) != RFSV::E_PSI_GEN_NONE)
+            return RFSV::E_PSI_GEN_FAIL;
 
     }
     if ((mtCacheS5mx & 9) == 1) {
         machineInfo tmp;
-        if (getMachineInfo(tmp) == rfsv::E_PSI_FILE_DISC)
-            return rfsv::E_PSI_FILE_DISC;
+        if (getMachineInfo(tmp) == RFSV::E_PSI_FILE_DISC)
+            return RFSV::E_PSI_FILE_DISC;
     }
     bool s5mx = (mtCacheS5mx == 15);
     while (*dptr) {
         a.init();
         a.addByte(*dptr);
         if (!sendCommand(rpcs::QUERY_DRIVE, a))
-            return rfsv::E_PSI_FILE_DISC;
-        if (getResponse(a, false) == rfsv::E_PSI_GEN_NONE) {
+            return RFSV::E_PSI_FILE_DISC;
+        if (getResponse(a, false) == RFSV::E_PSI_GEN_NONE) {
             anySuccess = true;
             int l = a.getLen();
             while (l > 0) {
@@ -313,92 +313,92 @@ queryPrograms(processList &ret)
     if (anySuccess && !ret.empty())
         for (processList::iterator i = ret.begin(); i != ret.end(); i++) {
             string cmdline;
-            if (getCmdLine(i->getProcId(), cmdline) == rfsv::E_PSI_GEN_NONE)
+            if (getCmdLine(i->getProcId(), cmdline) == RFSV::E_PSI_GEN_NONE)
                 i->setArgs(cmdline + " " + i->getArgs());
         }
-    return anySuccess ? rfsv::E_PSI_GEN_NONE : rfsv::E_PSI_GEN_FAIL;
+    return anySuccess ? RFSV::E_PSI_GEN_NONE : RFSV::E_PSI_GEN_FAIL;
 }
 
-Enum<rfsv::errs> rpcs::
+Enum<RFSV::errs> rpcs::
 formatOpen(const char drive, int &handle, int &count)
 {
-    Enum<rfsv::errs> res;
+    Enum<RFSV::errs> res;
     BufferStore a;
 
     a.addByte(toupper(drive));
     a.addByte(':');
     a.addByte(0);
     if (!sendCommand(FORMAT_OPEN, a))
-        return rfsv::E_PSI_FILE_DISC;
-    if ((res = getResponse(a, true)) != rfsv::E_PSI_GEN_NONE)
+        return RFSV::E_PSI_FILE_DISC;
+    if ((res = getResponse(a, true)) != RFSV::E_PSI_GEN_NONE)
         return res;
     if (a.getLen() != 4)
-        return rfsv::E_PSI_GEN_FAIL;
+        return RFSV::E_PSI_GEN_FAIL;
     handle = a.getWord(0);
     count = a.getWord(2);
     return res;
 }
 
-Enum<rfsv::errs> rpcs::
+Enum<RFSV::errs> rpcs::
 formatRead(int handle)
 {
     BufferStore a;
 
     a.addWord(handle);
     if (!sendCommand(FORMAT_READ, a))
-        return rfsv::E_PSI_FILE_DISC;
+        return RFSV::E_PSI_FILE_DISC;
     return getResponse(a, true);
 }
 
-Enum<rfsv::errs> rpcs::
+Enum<RFSV::errs> rpcs::
 getUniqueID(const char *device, long &id)
 {
-    Enum<rfsv::errs> res;
+    Enum<RFSV::errs> res;
     BufferStore a;
 
     a.addStringT(device);
     if (!sendCommand(GET_UNIQUEID, a))
-        return rfsv::E_PSI_FILE_DISC;
-    if ((res = getResponse(a, true)) != rfsv::E_PSI_GEN_NONE)
+        return RFSV::E_PSI_FILE_DISC;
+    if ((res = getResponse(a, true)) != RFSV::E_PSI_GEN_NONE)
         return res;
     if (a.getLen() != 4)
-        return rfsv::E_PSI_GEN_FAIL;
+        return RFSV::E_PSI_GEN_FAIL;
     id = a.getDWord(0);
     return res;
 }
 
-Enum<rfsv::errs> rpcs::
+Enum<RFSV::errs> rpcs::
 getMachineType(Enum<machs> &type)
 {
-    Enum<rfsv::errs> res;
+    Enum<RFSV::errs> res;
     BufferStore a;
 
     if (!sendCommand(GET_MACHINETYPE, a))
-        return rfsv::E_PSI_FILE_DISC;
-    if ((res = getResponse(a, true)) != rfsv::E_PSI_GEN_NONE)
+        return RFSV::E_PSI_FILE_DISC;
+    if ((res = getResponse(a, true)) != RFSV::E_PSI_GEN_NONE)
         return res;
     if (a.getLen() != 2)
-        return rfsv::E_PSI_GEN_FAIL;
+        return RFSV::E_PSI_GEN_FAIL;
     type = (enum machs)a.getWord(0);
     mtCacheS5mx |= 4;
-    if (res == rfsv::E_PSI_GEN_NONE) {
+    if (res == RFSV::E_PSI_GEN_NONE) {
         if (type == rpcs::PSI_MACH_S5)
             mtCacheS5mx |= 1;
     }
     return res;
 }
 
-Enum<rfsv::errs> rpcs::
+Enum<RFSV::errs> rpcs::
 fuser(const char *name, char *buf, int maxlen)
 {
-    Enum<rfsv::errs> res;
+    Enum<RFSV::errs> res;
     BufferStore a;
     char *p;
 
     a.addStringT(name);
     if (!sendCommand(FUSER, a))
-        return rfsv::E_PSI_FILE_DISC;
-    if ((res = getResponse(a, true)) != rfsv::E_PSI_GEN_NONE)
+        return RFSV::E_PSI_FILE_DISC;
+    if ((res = getResponse(a, true)) != RFSV::E_PSI_GEN_NONE)
         return res;
     strncpy(buf, a.getString(0), maxlen - 1);
     while ((p = strchr(buf, 6)))
@@ -406,11 +406,11 @@ fuser(const char *name, char *buf, int maxlen)
     return res;
 }
 
-Enum<rfsv::errs> rpcs::
+Enum<RFSV::errs> rpcs::
 quitServer(void)
 {
     BufferStore a;
     if (!sendCommand(QUIT_SERVER, a))
-        return rfsv::E_PSI_FILE_DISC;
+        return RFSV::E_PSI_FILE_DISC;
     return getResponse(a, true);
 }

@@ -183,7 +183,7 @@ public:
     *
     * @returns The connection status.
     */
-    Enum<rfsv::errs> getStatus();
+    Enum<RFSV::errs> getStatus();
 
     /**
     * Retrieves the version of the NCP protocol
@@ -199,7 +199,7 @@ public:
     *
     * @returns A psion error code. 0 = Ok.
     */
-    Enum<rfsv::errs> getNCPversion(int &major, int &minor);
+    Enum<RFSV::errs> getNCPversion(int &major, int &minor);
 
     /**
     * Starts execution of a program on the remote machine.
@@ -212,7 +212,7 @@ public:
     *
     * @returns A psion error code. 0 = Ok.
     */
-    Enum<rfsv::errs> execProgram(const char *program, const char *args);
+    Enum<RFSV::errs> execProgram(const char *program, const char *args);
 
     /**
     * Requests termination of a program running on the
@@ -225,9 +225,9 @@ public:
     *
     * @returns A psion error code. 0 = Ok.
     */
-    Enum<rfsv::errs> stopProgram(const char *program);
+    Enum<RFSV::errs> stopProgram(const char *program);
 
-    Enum<rfsv::errs> queryProgram(const char *);
+    Enum<RFSV::errs> queryProgram(const char *);
 
     /**
     * Starts formatting a drive.
@@ -244,7 +244,7 @@ public:
     *
     * @returns A psion error code. 0 = Ok.
     */
-    Enum<rfsv::errs> formatOpen(const char drive, int &handle, int &count);
+    Enum<RFSV::errs> formatOpen(const char drive, int &handle, int &count);
 
     /**
     * Continues a running format.
@@ -254,9 +254,9 @@ public:
     *
     * @returns A psion error code. 0 = Ok.
     */
-    Enum<rfsv::errs> formatRead(int handle);
+    Enum<RFSV::errs> formatRead(int handle);
 
-    Enum<rfsv::errs> getUniqueID(const char *, long &);
+    Enum<RFSV::errs> getUniqueID(const char *, long &);
 
     /**
     * Retrieve owner information of the remote machine.
@@ -269,7 +269,7 @@ public:
     *
     * @returns A psion error code. 0 = Ok.
     */
-    virtual Enum<rfsv::errs> getOwnerInfo(BufferArray &owner) = 0;
+    virtual Enum<RFSV::errs> getOwnerInfo(BufferArray &owner) = 0;
 
     /**
     * Retrieves the type of machine on the remote side
@@ -283,7 +283,7 @@ public:
     *
     * @returns A psion error code. 0 = Ok.
     */
-    Enum<rfsv::errs> getMachineType(Enum<machs> &type);
+    Enum<RFSV::errs> getMachineType(Enum<machs> &type);
 
     /**
     * Retrieves the name of a process, having a
@@ -297,7 +297,7 @@ public:
     * @param buf A buffer which gets filled with the program's name.
     * @param maxlen The maximum capacity of the buffer.
     */
-    Enum<rfsv::errs> fuser(const char *name, char *buf, int maxlen);
+    Enum<RFSV::errs> fuser(const char *name, char *buf, int maxlen);
 
     /**
     * Requests the remote server to terminate.
@@ -309,7 +309,7 @@ public:
     *
     * @returns A psion error code. 0 = Ok.
     */
-    Enum<rfsv::errs> quitServer(void);
+    Enum<RFSV::errs> quitServer(void);
 
     /**
      * Retrieves a list of all running Programs.
@@ -320,7 +320,7 @@ public:
      *
      * @returns A psion error code. 0 = Ok.
      */
-    Enum<rfsv::errs> queryPrograms(processList &ret);
+    Enum<RFSV::errs> queryPrograms(processList &ret);
 
     /**
     * Retrieves the command line of a running process.
@@ -335,7 +335,7 @@ public:
     *
     * @return Psion error code. 0 = Ok.
     */
-    virtual Enum<rfsv::errs> getCmdLine(const char *process, std::string &ret) = 0;
+    virtual Enum<RFSV::errs> getCmdLine(const char *process, std::string &ret) = 0;
 
     /**
     * Retrieve general Information about the connected
@@ -348,7 +348,7 @@ public:
     *
     * @returns Psion error code. 0 = Ok.
     */
-    virtual Enum<rfsv::errs> getMachineInfo(machineInfo &machineInfo) { return rfsv::E_PSI_NOT_SIBO;}
+    virtual Enum<RFSV::errs> getMachineInfo(machineInfo &machineInfo) { return RFSV::E_PSI_NOT_SIBO;}
 
     /**
      * Release an rpcs handle.
@@ -362,21 +362,21 @@ public:
      *
      * @returns A psion error code. 0 = Ok.
      */
-    virtual Enum<rfsv::errs> closeHandle(uint32_t handle)
-        { return rfsv::E_PSI_NOT_SIBO; }
+    virtual Enum<RFSV::errs> closeHandle(uint32_t handle)
+        { return RFSV::E_PSI_NOT_SIBO; }
 
-    virtual Enum<rfsv::errs> regOpenIter(uint32_t, char *, uint16_t &)
-        { return rfsv::E_PSI_NOT_SIBO;}
-    virtual Enum<rfsv::errs> regReadIter(uint16_t)
-        { return rfsv::E_PSI_NOT_SIBO;}
-    virtual Enum<rfsv::errs> regWrite(void)
-        { return rfsv::E_PSI_NOT_SIBO;}
-    virtual Enum<rfsv::errs> regRead(void)
-        { return rfsv::E_PSI_NOT_SIBO;}
-    virtual Enum<rfsv::errs> regDelete(void)
-        { return rfsv::E_PSI_NOT_SIBO;}
-    virtual Enum<rfsv::errs> setTime(time_t time)
-        { return rfsv::E_PSI_NOT_SIBO;}
+    virtual Enum<RFSV::errs> regOpenIter(uint32_t, char *, uint16_t &)
+        { return RFSV::E_PSI_NOT_SIBO;}
+    virtual Enum<RFSV::errs> regReadIter(uint16_t)
+        { return RFSV::E_PSI_NOT_SIBO;}
+    virtual Enum<RFSV::errs> regWrite(void)
+        { return RFSV::E_PSI_NOT_SIBO;}
+    virtual Enum<RFSV::errs> regRead(void)
+        { return RFSV::E_PSI_NOT_SIBO;}
+    virtual Enum<RFSV::errs> regDelete(void)
+        { return RFSV::E_PSI_NOT_SIBO;}
+    virtual Enum<RFSV::errs> setTime(time_t time)
+        { return RFSV::E_PSI_NOT_SIBO;}
 
     /**
      * Read from Series 5 scratch RAM
@@ -390,8 +390,8 @@ public:
      *
      * @returns A psion error code. 0 = Ok.
      */
-    virtual Enum<rfsv::errs> configRead(uint32_t size, BufferStore &data)
-        { return rfsv::E_PSI_NOT_SIBO; }
+    virtual Enum<RFSV::errs> configRead(uint32_t size, BufferStore &data)
+        { return RFSV::E_PSI_NOT_SIBO; }
 
     /**
      * Write to Series 5 scratch RAM
@@ -404,13 +404,13 @@ public:
      *
      * @returns A psion error code. 0 = Ok.
      */
-    virtual Enum<rfsv::errs> configWrite(BufferStore data)
-        { return rfsv::E_PSI_NOT_SIBO;}
+    virtual Enum<RFSV::errs> configWrite(BufferStore data)
+        { return RFSV::E_PSI_NOT_SIBO;}
 
-    virtual Enum<rfsv::errs> queryOpen(void)
-        { return rfsv::E_PSI_NOT_SIBO;}
-    virtual Enum<rfsv::errs> queryRead(void)
-        { return rfsv::E_PSI_NOT_SIBO;}
+    virtual Enum<RFSV::errs> queryOpen(void)
+        { return RFSV::E_PSI_NOT_SIBO;}
+    virtual Enum<RFSV::errs> queryRead(void)
+        { return RFSV::E_PSI_NOT_SIBO;}
 
 protected:
     /**
@@ -422,7 +422,7 @@ protected:
     /**
     * The current status of the connection.
     */
-    Enum<rfsv::errs> status;
+    Enum<RFSV::errs> status;
 
    /**
     * The possible commands.
@@ -480,8 +480,8 @@ protected:
      *
      * @returns A psion error code. 0 = Ok.
      */
-    virtual Enum<rfsv::errs> configOpen(uint16_t &handle, uint32_t size)
-        { return rfsv::E_PSI_NOT_SIBO; }
+    virtual Enum<RFSV::errs> configOpen(uint16_t &handle, uint32_t size)
+        { return RFSV::E_PSI_NOT_SIBO; }
 
    /**
     * Sends a command to the remote side.
@@ -498,7 +498,7 @@ protected:
     * @returns true on success, false on failure.
     */
     bool sendCommand(enum commands cc, BufferStore &data);
-    Enum<rfsv::errs> getResponse(BufferStore &data, bool statusIsFirstByte);
+    Enum<RFSV::errs> getResponse(BufferStore &data, bool statusIsFirstByte);
     const char *getConnectName();
 };
 

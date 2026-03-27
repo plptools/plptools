@@ -54,19 +54,19 @@ void rclip::
 reset(void)
 {
     BufferStore a;
-    status = rfsv::E_PSI_FILE_DISC;
+    status = RFSV::E_PSI_FILE_DISC;
     a.addStringT(getConnectName());
     if (skt->sendBufferStore(a)) {
         if (skt->getBufferStore(a) == 1) {
             if (!strcmp(a.getString(0), "NAK"))
-                status = rfsv::E_PSI_GEN_NSUP;
+                status = RFSV::E_PSI_GEN_NSUP;
             if (!strcmp(a.getString(0), "Ok"))
-                status = rfsv::E_PSI_GEN_NONE;
+                status = RFSV::E_PSI_GEN_NONE;
         }
     }
 }
 
-Enum<rfsv::errs> rclip::
+Enum<RFSV::errs> rclip::
 getStatus(void)
 {
     return status;
@@ -84,12 +84,12 @@ getConnectName(void)
 bool rclip::
 sendCommand(enum commands cc)
 {
-    if (status == rfsv::E_PSI_FILE_DISC) {
+    if (status == RFSV::E_PSI_FILE_DISC) {
         reconnect();
-        if (status == rfsv::E_PSI_FILE_DISC)
+        if (status == RFSV::E_PSI_FILE_DISC)
             return false;
     }
-    if (status != rfsv::E_PSI_GEN_NONE)
+    if (status != RFSV::E_PSI_GEN_NONE)
         return false;
 
     bool result;
@@ -107,92 +107,92 @@ sendCommand(enum commands cc)
         reconnect();
         result = skt->sendBufferStore(a);
         if (!result)
-            status = rfsv::E_PSI_FILE_DISC;
+            status = RFSV::E_PSI_FILE_DISC;
     }
     return result;
 }
 
-Enum<rfsv::errs> rclip::
+Enum<RFSV::errs> rclip::
 sendListen() {
     if (sendCommand(RCLIP_LISTEN))
-        return rfsv::E_PSI_GEN_NONE;
+        return RFSV::E_PSI_GEN_NONE;
     else
         return status;
 }
 
-Enum<rfsv::errs> rclip::
+Enum<RFSV::errs> rclip::
 checkNotify() {
-    Enum<rfsv::errs> ret;
+    Enum<RFSV::errs> ret;
     BufferStore a;
 
     int r = skt->getBufferStore(a, false);
     if (r < 0) {
-        ret = status = rfsv::E_PSI_FILE_DISC;
+        ret = status = RFSV::E_PSI_FILE_DISC;
     } else {
         if (r == 0)
-            ret = rfsv::E_PSI_FILE_EOF;
+            ret = RFSV::E_PSI_FILE_EOF;
         else {
             if ((a.getLen() != 1) || (a.getByte(0) != 0))
-                ret = rfsv::E_PSI_GEN_FAIL;
+                ret = RFSV::E_PSI_GEN_FAIL;
         }
     }
     return ret;
 }
 
-Enum<rfsv::errs> rclip::
+Enum<RFSV::errs> rclip::
 waitNotify() {
-    Enum<rfsv::errs> ret;
+    Enum<RFSV::errs> ret;
 
     BufferStore a;
     sendCommand(RCLIP_LISTEN);
-    if ((ret = getResponse(a)) == rfsv::E_PSI_GEN_NONE) {
+    if ((ret = getResponse(a)) == RFSV::E_PSI_GEN_NONE) {
         if ((a.getLen() != 1) || (a.getByte(0) != 0))
-            ret = rfsv::E_PSI_GEN_FAIL;
+            ret = RFSV::E_PSI_GEN_FAIL;
     }
     return ret;
 }
 
-Enum<rfsv::errs> rclip::
+Enum<RFSV::errs> rclip::
 notify() {
-    Enum<rfsv::errs> ret;
+    Enum<RFSV::errs> ret;
     BufferStore a;
 
     sendCommand(RCLIP_NOTIFY);
-    if ((ret = getResponse(a)) == rfsv::E_PSI_GEN_NONE) {
+    if ((ret = getResponse(a)) == RFSV::E_PSI_GEN_NONE) {
         if ((a.getLen() != 1) || (a.getByte(0) != RCLIP_NOTIFY))
-            ret = rfsv::E_PSI_GEN_FAIL;
+            ret = RFSV::E_PSI_GEN_FAIL;
     }
     return ret;
 }
 
-Enum<rfsv::errs> rclip::
+Enum<RFSV::errs> rclip::
 initClipbd() {
-    Enum<rfsv::errs> ret;
+    Enum<RFSV::errs> ret;
     BufferStore a;
 
-    if (status != rfsv::E_PSI_GEN_NONE)
+    if (status != RFSV::E_PSI_GEN_NONE)
         return status;
 
     sendCommand(RCLIP_INIT);
-    if ((ret = getResponse(a)) == rfsv::E_PSI_GEN_NONE) {
+    if ((ret = getResponse(a)) == RFSV::E_PSI_GEN_NONE) {
         if ((a.getLen() != 3) || (a.getByte(0) != RCLIP_INIT) ||
             (a.getWord(1) != 0x100))
-            ret = rfsv::E_PSI_GEN_FAIL;
+            ret = RFSV::E_PSI_GEN_FAIL;
     }
     return ret;
 }
 
-Enum<rfsv::errs> rclip::
+Enum<RFSV::errs> rclip::
 getResponse(BufferStore & data)
 {
-    Enum<rfsv::errs> ret = rfsv::E_PSI_GEN_NONE;
+    Enum<RFSV::errs> ret = RFSV::E_PSI_GEN_NONE;
 
-    if (status == rfsv::E_PSI_GEN_NSUP)
+    if (status == RFSV::E_PSI_GEN_NSUP)
         return status;
 
     if (skt->getBufferStore(data) == 1)
         return ret;
     else
-        status = rfsv::E_PSI_FILE_DISC;
+        status = RFSV::E_PSI_FILE_DISC;
     return status;
 }

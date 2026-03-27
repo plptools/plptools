@@ -98,7 +98,7 @@ main(int argc, char **argv)
 {
     TCPSocket *skt;
     TCPSocket *skt2;
-    rfsv *a;
+    RFSV *a;
     rpcs *r;
     TCPSocket *rclipSocket;
     rclip *rc;

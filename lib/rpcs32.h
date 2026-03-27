@@ -37,26 +37,26 @@ class rpcs32 : public rpcs {
     friend class rpcsfactory;
 
  public:
-    Enum<rfsv::errs> getCmdLine(const char *, std::string &);
-    Enum<rfsv::errs> getMachineInfo(machineInfo &);
-    Enum<rfsv::errs> getOwnerInfo(BufferArray &owner);
-    Enum<rfsv::errs> configRead(uint32_t, BufferStore &);
-    Enum<rfsv::errs> configWrite(BufferStore);
-    Enum<rfsv::errs> closeHandle(uint16_t);
-    Enum<rfsv::errs> regOpenIter(uint32_t uid, char *match, uint16_t &handle);
-    Enum<rfsv::errs> regReadIter(uint16_t handle);
-    Enum<rfsv::errs> setTime(time_t time);
+    Enum<RFSV::errs> getCmdLine(const char *, std::string &);
+    Enum<RFSV::errs> getMachineInfo(machineInfo &);
+    Enum<RFSV::errs> getOwnerInfo(BufferArray &owner);
+    Enum<RFSV::errs> configRead(uint32_t, BufferStore &);
+    Enum<RFSV::errs> configWrite(BufferStore);
+    Enum<RFSV::errs> closeHandle(uint16_t);
+    Enum<RFSV::errs> regOpenIter(uint32_t uid, char *match, uint16_t &handle);
+    Enum<RFSV::errs> regReadIter(uint16_t handle);
+    Enum<RFSV::errs> setTime(time_t time);
 #if 0
-    Enum<rfsv::errs> regWrite(void);
-    Enum<rfsv::errs> regRead(void);
-    Enum<rfsv::errs> regDelete(void);
-    Enum<rfsv::errs> queryOpen(void);
-    Enum<rfsv::errs> queryRead(void);
-    Enum<rfsv::errs> quitServer(void);
+    Enum<RFSV::errs> regWrite(void);
+    Enum<RFSV::errs> regRead(void);
+    Enum<RFSV::errs> regDelete(void);
+    Enum<RFSV::errs> queryOpen(void);
+    Enum<RFSV::errs> queryRead(void);
+    Enum<RFSV::errs> quitServer(void);
 #endif
 
 protected:
-    Enum<rfsv::errs> configOpen(uint16_t &, uint32_t);
+    Enum<RFSV::errs> configOpen(uint16_t &, uint32_t);
 
  private:
     rpcs32(TCPSocket *);

@@ -33,21 +33,21 @@ public:
 
     virtual bool connect();
 
-    virtual Enum<rfsv::errs> copyToPsion(const char * const from,
+    virtual Enum<RFSV::errs> copyToPsion(const char * const from,
                                          const char * const to,
                                          void *, cpCallback_t func);
 
-    virtual Enum<rfsv::errs> devinfo(const char drive, PlpDrive& plpDrive);
+    virtual Enum<RFSV::errs> devinfo(const char drive, PlpDrive& plpDrive);
 
-    virtual Enum<rfsv::errs> devlist(uint32_t& devbits);
+    virtual Enum<RFSV::errs> devlist(uint32_t& devbits);
 
-    virtual Enum<rfsv::errs> dir(const char* dir, PlpDir& files);
+    virtual Enum<RFSV::errs> dir(const char* dir, PlpDir& files);
 
     virtual bool dirExists(const char* name);
 
     virtual void disconnect();
 
-    virtual Enum<rfsv::errs> mkdir(const char* dir);
+    virtual Enum<RFSV::errs> mkdir(const char* dir);
 
     virtual void remove(const char* name);
 

@@ -69,7 +69,7 @@ public:
     * @returns A pointer to a newly created rfsv instance or
     * NULL on failure.
     */
-    virtual rfsv * create(bool);
+    virtual RFSV* create(bool);
 
     /**
     * Retrieve an error code.
