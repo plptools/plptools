@@ -253,15 +253,6 @@ public:
     MediaType getMediaType() const;
 
     /**
-    * Retrieve the media type of the drive.
-    * Just like the above function, but returns
-    * the media type as human readable string.
-    *
-    * @param ret The string is returned here.
-    */
-    void getMediaType(std::string &ret) const;
-
-    /**
     * Retrieve the attributes of the drive.
     *
     * @returns The attributes of the probed drive.

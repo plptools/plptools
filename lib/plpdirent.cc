@@ -172,22 +172,6 @@ MediaType PlpDrive::getMediaType() const {
     return mediaType_;
 }
 
-static const char * const media_types[] = {
-    N_("Not present"),
-    N_("Unknown"),
-    N_("Floppy"),
-    N_("Disk"),
-    N_("CD-ROM"),
-    N_("RAM"),
-    N_("Flash Disk"),
-    N_("ROM"),
-    N_("Remote"),
-};
-
-void PlpDrive::getMediaType(std::string &ret) const {
-    ret = media_types[static_cast<uint32_t>(mediaType_)];
-}
-
 uint32_t PlpDrive::getDriveAttribute() {
     return driveAttributes_;
 }
