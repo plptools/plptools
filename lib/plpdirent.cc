@@ -127,6 +127,24 @@ ostream &operator<<(ostream &o, const PlpDirent &e) {
 PlpDrive::PlpDrive() {
 }
 
+PlpDrive::PlpDrive(MediaType mediaType,
+                   uint32_t driveAttributes,
+                   uint32_t mediaAttributes,
+                   uint32_t uid,
+                   uint64_t size,
+                   uint64_t space,
+                   char driveChar,
+                   std::string name)
+: mediaType_(mediaType)
+, driveAttributes_(driveAttributes)
+, mediaAttributes_(mediaAttributes)
+, uid_(uid)
+, size_(size)
+, space_(space)
+, driveChar_(driveChar)
+, name_(name) {
+}
+
 PlpDrive::PlpDrive(const PlpDrive &other)
 : mediaType_(other.mediaType_)
 , driveAttributes_(other.driveAttributes_)

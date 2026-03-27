@@ -225,6 +225,15 @@ public:
     */
     PlpDrive();
 
+    PlpDrive(MediaType mediaType,
+             uint32_t driveAttributes,
+             uint32_t mediaAttributes,
+             uint32_t uid,
+             uint64_t size,
+             uint64_t space,
+             char driveChar,
+             std::string name);
+
     /**
     * Copy constructor
     */
