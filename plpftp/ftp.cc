@@ -1324,10 +1324,11 @@ session(rfsv & a, rpcs & r, rclip & rc, TCPSocket & rclipSocket, vector<char *> 
             }
             continue;
         }
-        if (strcmp(argv[0], "bye") == 0 || strcmp(argv[0], "quit") == 0)
+        if (strcmp(argv[0], "bye") == 0 || strcmp(argv[0], "quit") == 0) {
             continueRunning = 0;
-        else
+        } else {
             cerr << _("syntax error. Try \"help\"") << endl;
+        }
     } while (!once && continueRunning);
     return a.getStatus();
 }
@@ -1515,6 +1516,8 @@ getCommand()
             }
     } else {
         cout << "bye" << endl;
+        buf = strdup("bye");
+        argv.push_back(buf);
     }
     signal(SIGINT, sigint_handler);
 
