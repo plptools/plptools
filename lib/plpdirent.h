@@ -278,7 +278,7 @@ public:
     *   bit 5 = removable
     * </pre>
     */
-    uint32_t getDriveAttributes();
+    uint32_t getDriveAttributes() const;
 
     /**
     * Retrieve the attributes of the media.
@@ -295,7 +295,7 @@ public:
     *   bit 3 = write protected
     * </pre>
     */
-    uint32_t getMediaAttributes();
+    uint32_t getMediaAttributes() const;
 
     /**
     * Retrieve the UID of the drive.
@@ -304,21 +304,21 @@ public:
     *
     * @returns The UID of the probed drive.
     */
-    uint32_t getUID();
+    uint32_t getUID() const;
 
     /**
     * Retrieve the total capacity of the drive.
     *
     * @returns The capacity of the probed drive in bytes.
     */
-    uint64_t getSize();
+    uint64_t getSize() const;
 
     /**
     * Retrieve the free capacity on the drive.
     *
     * @returns The free space on the probed drive in bytes.
     */
-    uint64_t getSpace();
+    uint64_t getSpace() const;
 
     /**
     * Retrieve the volume name of the drive.

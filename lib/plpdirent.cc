@@ -190,23 +190,23 @@ MediaType PlpDrive::getMediaType() const {
     return mediaType_;
 }
 
-uint32_t PlpDrive::getDriveAttributes() {
+uint32_t PlpDrive::getDriveAttributes() const {
     return driveAttributes_;
 }
 
-uint32_t PlpDrive::getMediaAttributes() {
+uint32_t PlpDrive::getMediaAttributes() const {
     return mediaAttributes_;
 }
 
-uint32_t PlpDrive::getUID() {
+uint32_t PlpDrive::getUID() const {
     return uid_;
 }
 
-uint64_t PlpDrive::getSize() {
+uint64_t PlpDrive::getSize() const {
     return size_;
 }
 
-uint64_t PlpDrive::getSpace() {
+uint64_t PlpDrive::getSpace() const {
     return space_;
 }
 
