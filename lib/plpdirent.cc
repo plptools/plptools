@@ -154,11 +154,11 @@ void PlpDrive::setUID(uint32_t uid) {
 }
 
 void PlpDrive::setSize(uint32_t sizeLo, uint32_t sizeHi) {
-    size_ = ((unsigned long long)sizeHi << 32) + sizeLo;
+    size_ = (static_cast<unsigned long long>(sizeHi) << 32) + sizeLo;
 }
 
 void PlpDrive::setSpace(uint32_t spaceLo, uint32_t spaceHi) {
-    space_ = ((unsigned long long)spaceHi << 32) + spaceLo;
+    space_ = (static_cast<unsigned long long>(spaceHi) << 32) + spaceLo;
 }
 
 void PlpDrive::setName(char drive, const char * const volname) {
