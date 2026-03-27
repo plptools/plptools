@@ -231,7 +231,7 @@ public:
              uint32_t uid,
              uint64_t size,
              uint64_t space,
-             char driveChar,
+             char driveLetter,
              std::string name);
 
     /**
@@ -332,7 +332,7 @@ public:
     *
     * returns The letter of the probed drive.
     */
-    char getDriveChar() const;
+    char getDriveLetter() const;
 
     /**
     * Get the file system path given by the current drive.
@@ -356,7 +356,7 @@ private:
     uint32_t uid_;
     uint64_t size_;
     uint64_t space_;
-    char driveChar_;
+    char driveLetter_;
     std::string name_;
 };
 

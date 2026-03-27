@@ -133,7 +133,7 @@ PlpDrive::PlpDrive(MediaType mediaType,
                    uint32_t uid,
                    uint64_t size,
                    uint64_t space,
-                   char driveChar,
+                   char driveLetter,
                    std::string name)
 : mediaType_(mediaType)
 , driveAttributes_(driveAttributes)
@@ -141,7 +141,7 @@ PlpDrive::PlpDrive(MediaType mediaType,
 , uid_(uid)
 , size_(size)
 , space_(space)
-, driveChar_(driveChar)
+, driveLetter_(driveLetter)
 , name_(name) {
 }
 
@@ -152,7 +152,7 @@ PlpDrive::PlpDrive(const PlpDrive &other)
 , uid_(other.uid_)
 , size_(other.size_)
 , space_(other.space_)
-, driveChar_(other.driveChar_)
+, driveLetter_(other.driveLetter_)
 , name_(other.name_) {
 }
 
@@ -181,7 +181,7 @@ void PlpDrive::setSpace(uint32_t spaceLo, uint32_t spaceHi) {
 }
 
 void PlpDrive::setName(char drive, const char * const volname) {
-    driveChar_ = drive;
+    driveLetter_ = drive;
     name_ = "";
     name_ += volname;
 }
@@ -214,13 +214,13 @@ string PlpDrive::getName() const {
     return name_;
 }
 
-char PlpDrive::getDriveChar() const {
-    return driveChar_;
+char PlpDrive::getDriveLetter() const {
+    return driveLetter_;
 }
 
 std::string PlpDrive::getPath() const {
     std::string path;
-    path += driveChar_;
+    path += driveLetter_;
     path += ":\\";
     return path;
 }
