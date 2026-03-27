@@ -38,8 +38,8 @@ class rpcs16 : public rpcs {
     friend class rpcsfactory;
 
  public:
-    Enum<rfsv::errs> getCmdLine(const char *, std::string &);
-    Enum<rfsv::errs> getOwnerInfo(BufferArray &owner);
+    Enum<RFSV::errs> getCmdLine(const char *, std::string &);
+    Enum<RFSV::errs> getOwnerInfo(BufferArray &owner);
 
 
  private:

@@ -28,7 +28,7 @@ class TCPSocket;
 
 /**
  * A factory for automatically instantiating the correct
- * @ref rfsv protocol variant depending on the connected Psion.
+ * @ref RFSV protocol variant depending on the connected Psion.
  */
 class rfsvfactory {
 
@@ -61,7 +61,7 @@ public:
     virtual ~rfsvfactory();
 
     /**
-    * Creates a new @ref rfsv instance.
+    * Creates a new @ref RFSV instance.
     *
     * @param reconnect Set to true, if automatic reconnect
     * should be performed on failure.
@@ -69,7 +69,7 @@ public:
     * @returns A pointer to a newly created rfsv instance or
     * NULL on failure.
     */
-    virtual rfsv * create(bool);
+    virtual RFSV* create(bool);
 
     /**
     * Retrieve an error code.

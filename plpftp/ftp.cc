@@ -80,7 +80,7 @@ extern char *readline ();
 using namespace std;
 
 static char *psionDir;
-static rfsv *comp_a;
+static RFSV *comp_a;
 static int continueRunning;
 
 #define CLIPFILE "C:/System/Data/Clpboard.cbd"
@@ -187,7 +187,7 @@ sigint_handler2(int) {
 
 static int
 stopPrograms(rpcs & r, const char *file) {
-    Enum<rfsv::errs> res;
+    Enum<RFSV::errs> res;
     processList tmp;
     FILE *fp = fopen(file, "w");
 
@@ -196,7 +196,7 @@ stopPrograms(rpcs & r, const char *file) {
         return 1;
     }
     fputs("#plpftp processlist\n", fp);
-    if ((res = r.queryPrograms(tmp)) != rfsv::E_PSI_GEN_NONE) {
+    if ((res = r.queryPrograms(tmp)) != RFSV::E_PSI_GEN_NONE) {
         cerr << _("Could not get process list, Error: ") << res << endl;
         return 1;
     }
@@ -218,7 +218,7 @@ stopPrograms(rpcs & r, const char *file) {
             cin.getline((char *)&tstart, 1);
             tstart = time(nullptr) + 5;
         }
-        if ((res = r.queryPrograms(tmp)) != rfsv::E_PSI_GEN_NONE) {
+        if ((res = r.queryPrograms(tmp)) != RFSV::E_PSI_GEN_NONE) {
             cerr << _("Could not get process list, Error: ") << res << endl;
             return 1;
         }
@@ -263,8 +263,8 @@ getln(FILE *fp)
 }
 
 static int
-startPrograms(rpcs & r, rfsv & a, const char *file) {
-    Enum<rfsv::errs> res;
+startPrograms(rpcs & r, RFSV &a, const char *file) {
+    Enum<RFSV::errs> res;
     FILE *fp = fopen(file, "r");
     string cmd;
 
@@ -293,7 +293,7 @@ startPrograms(rpcs & r, rfsv & a, const char *file) {
                 res = r.execProgram(arg.c_str(), "");
             else
                 res = r.execProgram(prog.c_str(), arg.c_str());
-            if (res != rfsv::E_PSI_GEN_NONE) {
+            if (res != RFSV::E_PSI_GEN_NONE) {
                 // If we got an error here, that happened probably because
                 // we have no path at all (e.g. Macro5) and the program is
                 // not registered in the Psion's path properly. Now try
@@ -301,7 +301,7 @@ startPrograms(rpcs & r, rfsv & a, const char *file) {
                 // on all drives.
                 if (prog.find('\\') == prog.npos) {
                     uint32_t devbits;
-                    if ((res = a.devlist(devbits)) == rfsv::E_PSI_GEN_NONE) {
+                    if ((res = a.devlist(devbits)) == RFSV::E_PSI_GEN_NONE) {
                         int i;
                         for (i = 0; i < 26; i++) {
                             if (devbits & (1 << i)) {
@@ -309,14 +309,14 @@ startPrograms(rpcs & r, rfsv & a, const char *file) {
                                 tmp += ('A' + i);
                                 tmp += ":\\System\\Apps\\" + prog + "\\" + prog + ".app";
                                 res = r.execProgram(tmp.c_str(), "");
-                                if (res == rfsv::E_PSI_GEN_NONE)
+                                if (res == RFSV::E_PSI_GEN_NONE)
                                     break;
                             }
                         }
                     }
                 }
             }
-            if (res != rfsv::E_PSI_GEN_NONE) {
+            if (res != RFSV::E_PSI_GEN_NONE) {
                 cerr << _("Could not start ") << cmd << endl;
                 cerr << _("Error: ") << res << endl;
             }
@@ -326,7 +326,7 @@ startPrograms(rpcs & r, rfsv & a, const char *file) {
 }
 
 bool
-ftp::checkClipConnection(rfsv &a, rclip & rc, TCPSocket &)
+ftp::checkClipConnection(RFSV &a, rclip & rc, TCPSocket &)
 {
     if (canClip == false)
         return false;
@@ -336,10 +336,10 @@ ftp::checkClipConnection(rfsv &a, rclip & rc, TCPSocket &)
         return false;
     }
 
-    Enum<rfsv::errs> ret;
-    if ((ret = rc.initClipbd()) == rfsv::E_PSI_GEN_NONE)
+    Enum<RFSV::errs> ret;
+    if ((ret = rc.initClipbd()) == RFSV::E_PSI_GEN_NONE)
         return true;
-    else if (ret == rfsv::E_PSI_GEN_NSUP)
+    else if (ret == RFSV::E_PSI_GEN_NSUP)
         cerr << _("Your Psion does not support the clipboard protocol.\n\
                 The reason for that is usually a missing server library.\n\
                 Make sure that C:\\System\\Libs\\clipsvr.rsy exists.\n\
@@ -404,9 +404,9 @@ slurp(FILE *fp, size_t *final_len)
 }
 
 int
-ftp::putClipText(rpcs &, rfsv & a, rclip & rc, TCPSocket & rclipSocket, const char *file)
+ftp::putClipText(rpcs &, RFSV &a, rclip & rc, TCPSocket & rclipSocket, const char *file)
 {
-    Enum<rfsv::errs> res;
+    Enum<RFSV::errs> res;
     uint32_t fh;
     uint32_t l;
     const unsigned char *p;
@@ -426,7 +426,7 @@ ftp::putClipText(rpcs &, rfsv & a, rclip & rc, TCPSocket & rclipSocket, const ch
     ascii2PsiText(data, len);
 
     res = a.freplacefile(0x200, CLIPFILE, fh);
-    if (res == rfsv::E_PSI_GEN_NONE) {
+    if (res == RFSV::E_PSI_GEN_NONE) {
         // Base Header
         b.addDWord(0x10000037);   // @00 UID 0
         b.addDWord(0x1000003b);   // @04 UID 1
@@ -465,16 +465,16 @@ ftp::putClipText(rpcs &, rfsv & a, rclip & rc, TCPSocket & rclipSocket, const ch
 
 // void TopLevel::
 // putClipImage(QImage &img) {
-//     Enum<rfsv::errs> res;
+//     Enum<RFSV::errs> res;
 //     uint32_t fh;
 //     uint32_t l;
 //     const unsigned char *p;
 //     BufferStore b;
 
 //     res = rf->freplacefile(0x200, CLIPFILE, fh);
-//     if (res == rfsv::E_PSI_GEN_NONE) {
-//         while ((res = rc->checkNotify()) != rfsv::E_PSI_GEN_NONE) {
-//             if (res != rfsv::E_PSI_FILE_EOF) {
+//     if (res == RFSV::E_PSI_GEN_NONE) {
+//         while ((res = rc->checkNotify()) != RFSV::E_PSI_GEN_NONE) {
+//             if (res != RFSV::E_PSI_FILE_EOF) {
 //                 rf->fclose(fh);
 //                 closeConnection();
 //                 return;
@@ -532,15 +532,15 @@ ftp::putClipText(rpcs &, rfsv & a, rclip & rc, TCPSocket & rclipSocket, const ch
 // }
 
 int
-ftp::getClipData(rpcs &, rfsv & a, rclip &, TCPSocket &, const char *file) {
-    Enum<rfsv::errs> res;
+ftp::getClipData(rpcs &, RFSV &a, rclip &, TCPSocket &, const char *file) {
+    Enum<RFSV::errs> res;
     PlpDirent de;
     uint32_t fh;
     string clipText;
 
     res = a.fgeteattr(CLIPFILE, de);
-    if (res == rfsv::E_PSI_GEN_NONE) {
-        if (de.getAttr() & rfsv::PSI_A_ARCHIVE) {
+    if (res == RFSV::E_PSI_GEN_NONE) {
+        if (de.getAttr() & RFSV::PSI_A_ARCHIVE) {
             uint32_t len = de.getSize();
             char *buf = (char *)malloc(len);
 
@@ -548,14 +548,14 @@ ftp::getClipData(rpcs &, rfsv & a, rclip &, TCPSocket &, const char *file) {
                 cerr << "Out of memory in getClipData" << endl;
                 return 1;
             }
-            res = a.fopen(a.opMode(rfsv::PSI_O_RDONLY | rfsv::PSI_O_SHARE),
+            res = a.fopen(a.opMode(RFSV::PSI_O_RDONLY | RFSV::PSI_O_SHARE),
                            CLIPFILE, fh);
-            if (res == rfsv::E_PSI_GEN_NONE) {
+            if (res == RFSV::E_PSI_GEN_NONE) {
                 uint32_t tmp;
                 res = a.fread(fh, (unsigned char *)buf, len, tmp);
                 a.fclose(fh);
 
-                if ((res == rfsv::E_PSI_GEN_NONE) && (tmp == len)) {
+                if ((res == RFSV::E_PSI_GEN_NONE) && (tmp == len)) {
                     char *p = buf;
                     int lcount;
                     uint32_t *ti = (uint32_t*)buf;
@@ -638,9 +638,9 @@ static char *epoc_dir_from(const char *path) {
 }
 
 int ftp::
-session(rfsv & a, rpcs & r, rclip & rc, TCPSocket & rclipSocket, vector<char *> argv)
+session(RFSV &a, rpcs & r, rclip & rc, TCPSocket & rclipSocket, vector<char *> argv)
 {
-    Enum<rfsv::errs> res;
+    Enum<RFSV::errs> res;
     bool prompt = true;
     bool hash = false;
     cpCallback_t cab = checkAbortNoHash;
@@ -653,7 +653,7 @@ session(rfsv & a, rpcs & r, rclip & rc, TCPSocket & rclipSocket, vector<char *> 
     {
         Enum<rpcs::machs> machType;
         BufferArray b;
-        if ((res = r.getOwnerInfo(b)) == rfsv::E_PSI_GEN_NONE) {
+        if ((res = r.getOwnerInfo(b)) == RFSV::E_PSI_GEN_NONE) {
             r.getMachineType(machType);
             if (!once) {
                 int speed = a.getSpeed();
@@ -672,11 +672,11 @@ session(rfsv & a, rpcs & r, rclip & rc, TCPSocket & rclipSocket, vector<char *> 
         int i;
 
         strcpy(defDrive, "::");
-        if (a.devlist(devbits) == rfsv::E_PSI_GEN_NONE) {
+        if (a.devlist(devbits) == RFSV::E_PSI_GEN_NONE) {
 
             for (i = 0; i < 26; i++) {
                 PlpDrive drive;
-                if ((devbits & 1) && a.devinfo(i + 'A', drive) == rfsv::E_PSI_GEN_NONE) {
+                if ((devbits & 1) && a.devinfo(i + 'A', drive) == RFSV::E_PSI_GEN_NONE) {
                     defDrive[0] = 'A' + i;
                     break;
                 }
@@ -728,7 +728,7 @@ session(rfsv & a, rpcs & r, rclip & rc, TCPSocket & rclipSocket, vector<char *> 
             continue;
         }
         if (!strcmp(argv[0], "volname") && (argc == 3) && (strlen(argv[1]) == 1)) {
-            if ((res = a.setVolumeName(toupper(argv[1][0]), argv[2])) != rfsv::E_PSI_GEN_NONE)
+            if ((res = a.setVolumeName(toupper(argv[1][0]), argv[2])) != RFSV::E_PSI_GEN_NONE)
                 cerr << _("Error: ") << res << endl;
             continue;
 
@@ -736,7 +736,7 @@ session(rfsv & a, rpcs & r, rclip & rc, TCPSocket & rclipSocket, vector<char *> 
         if (!strcmp(argv[0], "ren") && (argc == 3)) {
             char *f1 = xasprintf("%s%s", psionDir, argv[1]);
             char *f2 = xasprintf("%s%s", psionDir, argv[2]);
-            if ((res = a.rename(f1, f2)) != rfsv::E_PSI_GEN_NONE)
+            if ((res = a.rename(f1, f2)) != RFSV::E_PSI_GEN_NONE)
                 cerr << _("Error: ") << res << endl;
             free(f1);
             free(f2);
@@ -745,7 +745,7 @@ session(rfsv & a, rpcs & r, rclip & rc, TCPSocket & rclipSocket, vector<char *> 
         if (!strcmp(argv[0], "cp") && (argc == 3)) {
             char *f1 = xasprintf("%s%s", psionDir, argv[1]);
             char *f2 = xasprintf("%s%s", psionDir, argv[2]);
-            if ((res = a.copyOnPsion(f1, f2, NULL, cab)) != rfsv::E_PSI_GEN_NONE)
+            if ((res = a.copyOnPsion(f1, f2, NULL, cab)) != RFSV::E_PSI_GEN_NONE)
                 cerr << _("Error: ") << res << endl;
             free(f1);
             free(f2);
@@ -754,7 +754,7 @@ session(rfsv & a, rpcs & r, rclip & rc, TCPSocket & rclipSocket, vector<char *> 
         if (!strcmp(argv[0], "touch") && (argc == 2)) {
             char *f1 = xasprintf("%s%s", psionDir, argv[1]);
             PsiTime pt;
-            if ((res = a.fsetmtime(f1, pt)) != rfsv::E_PSI_GEN_NONE)
+            if ((res = a.fsetmtime(f1, pt)) != RFSV::E_PSI_GEN_NONE)
                 cerr << _("Error: ") << res << endl;
             free(f1);
             continue;
@@ -762,7 +762,7 @@ session(rfsv & a, rpcs & r, rclip & rc, TCPSocket & rclipSocket, vector<char *> 
         if (!strcmp(argv[0], "test") && (argc == 2)) {
             PlpDirent e;
             char *f1 = xasprintf("%s%s", psionDir, argv[1]);
-            if ((res = a.fgeteattr(f1, e)) != rfsv::E_PSI_GEN_NONE)
+            if ((res = a.fgeteattr(f1, e)) != RFSV::E_PSI_GEN_NONE)
                 cerr << _("Error: ") << res << endl;
             else
                 cout << e << endl;
@@ -772,7 +772,7 @@ session(rfsv & a, rpcs & r, rclip & rc, TCPSocket & rclipSocket, vector<char *> 
         if (!strcmp(argv[0], "gattr") && (argc == 2)) {
             uint32_t attr;
             char *f1 = xasprintf("%s%s", psionDir, argv[1]);
-            if ((res = a.fgetattr(f1, attr)) != rfsv::E_PSI_GEN_NONE)
+            if ((res = a.fgetattr(f1, attr)) != RFSV::E_PSI_GEN_NONE)
                 cerr << _("Error: ") << res << endl;
             else {
                 cout << hex << setw(4) << setfill('0') << attr;
@@ -784,7 +784,7 @@ session(rfsv & a, rpcs & r, rclip & rc, TCPSocket & rclipSocket, vector<char *> 
         if (!strcmp(argv[0], "gtime") && (argc == 2)) {
             PsiTime mtime;
             char *f1 = xasprintf("%s%s", psionDir, argv[1]);
-            if ((res = a.fgetmtime(f1, mtime)) != rfsv::E_PSI_GEN_NONE)
+            if ((res = a.fgetmtime(f1, mtime)) != RFSV::E_PSI_GEN_NONE)
                 cerr << _("Error: ") << res << endl;
             else
                 cout << mtime << "(" << hex
@@ -812,36 +812,36 @@ session(rfsv & a, rpcs & r, rclip & rc, TCPSocket & rclipSocket, vector<char *> 
                         aidx = 1;
                         break;
                     case 'r':
-                        attr[aidx] |= rfsv::PSI_A_READ;
-                        attr[aidx] &= ~rfsv::PSI_A_READ;
+                        attr[aidx] |= RFSV::PSI_A_READ;
+                        attr[aidx] &= ~RFSV::PSI_A_READ;
                         break;
                     case 'w':
-                        attr[1 - aidx] |= rfsv::PSI_A_RDONLY;
-                        attr[aidx] &= ~rfsv::PSI_A_RDONLY;
+                        attr[1 - aidx] |= RFSV::PSI_A_RDONLY;
+                        attr[aidx] &= ~RFSV::PSI_A_RDONLY;
                         break;
                     case 'h':
-                        attr[aidx] |= rfsv::PSI_A_HIDDEN;
-                        attr[1 - aidx] &= ~rfsv::PSI_A_HIDDEN;
+                        attr[aidx] |= RFSV::PSI_A_HIDDEN;
+                        attr[1 - aidx] &= ~RFSV::PSI_A_HIDDEN;
                         break;
                     case 's':
-                        attr[aidx] |= rfsv::PSI_A_SYSTEM;
-                        attr[1 - aidx] &= ~rfsv::PSI_A_SYSTEM;
+                        attr[aidx] |= RFSV::PSI_A_SYSTEM;
+                        attr[1 - aidx] &= ~RFSV::PSI_A_SYSTEM;
                         break;
                     case 'a':
-                        attr[aidx] |= rfsv::PSI_A_ARCHIVE;
-                        attr[1 - aidx] &= ~rfsv::PSI_A_ARCHIVE;
+                        attr[aidx] |= RFSV::PSI_A_ARCHIVE;
+                        attr[1 - aidx] &= ~RFSV::PSI_A_ARCHIVE;
                         break;
                 }
                 p++;
             }
-            if ((res = a.fsetattr(f1, attr[0], attr[1])) != rfsv::E_PSI_GEN_NONE)
+            if ((res = a.fsetattr(f1, attr[0], attr[1])) != RFSV::E_PSI_GEN_NONE)
                 cerr << _("Error: ") << res << endl;
             free(f1);
             continue;
         }
         if (!strcmp(argv[0], "dircnt")) {
             uint32_t cnt;
-            if ((res = a.dircount(psionDir, cnt)) != rfsv::E_PSI_GEN_NONE)
+            if ((res = a.dircount(psionDir, cnt)) != RFSV::E_PSI_GEN_NONE)
                 cerr << _("Error: ") << res << endl;
             else
                 cout << cnt << _(" Entries") << endl;
@@ -849,13 +849,13 @@ session(rfsv & a, rpcs & r, rclip & rc, TCPSocket & rclipSocket, vector<char *> 
         }
         if (!strcmp(argv[0], "devs")) {
             uint32_t devbits;
-            if ((res = a.devlist(devbits)) == rfsv::E_PSI_GEN_NONE) {
+            if ((res = a.devlist(devbits)) == RFSV::E_PSI_GEN_NONE) {
                 cout << _("Drive Type Volname     Total     Free      UniqueID") << endl;
                 for (int i = 0; i < 26; i++) {
                     PlpDrive drive;
 
                     if ((devbits & 1) != 0) {
-                        if (a.devinfo(i + 'A', drive) == rfsv::E_PSI_GEN_NONE)
+                        if (a.devinfo(i + 'A', drive) == RFSV::E_PSI_GEN_NONE)
                             cout << (char) ('A' + i) << "     " << hex
                                  << setw(4) << setfill('0')
                                  << static_cast<uint32_t>(drive.getMediaType()) << " " << setw(12)
@@ -876,7 +876,7 @@ session(rfsv & a, rpcs & r, rclip & rc, TCPSocket & rclipSocket, vector<char *> 
         if (!strcmp(argv[0], "ls") || !strcmp(argv[0], "dir")) {
             PlpDir files;
             char *dname = argc > 1 ? epoc_dir_from(argv[1]) : xstrdup(psionDir);
-            if ((res = a.dir(dname, files)) != rfsv::E_PSI_GEN_NONE)
+            if ((res = a.dir(dname, files)) != RFSV::E_PSI_GEN_NONE)
                 cerr << _("Error: ") << res << endl;
             else
                 while (!files.empty()) {
@@ -905,7 +905,7 @@ session(rfsv & a, rpcs & r, rclip & rc, TCPSocket & rclipSocket, vector<char *> 
             } else {
                 char *newDir = epoc_dir_from(argv[1]);
                 uint32_t tmp;
-                if ((res = a.dircount(newDir, tmp)) != rfsv::E_PSI_GEN_NONE) {
+                if ((res = a.dircount(newDir, tmp)) != RFSV::E_PSI_GEN_NONE) {
                     cerr << _("Error: ") << res << endl;
                     cerr << _("Keeping original directory \"") << psionDir << "\"" << endl;
                     free(newDir);
@@ -926,7 +926,7 @@ session(rfsv & a, rpcs & r, rclip & rc, TCPSocket & rclipSocket, vector<char *> 
             char *f2 = xasprintf("%s%s%s", localDir, "/", argc == 2 ? basename.c_str() : argv[2]);
 
             gettimeofday(&stime, nullptr);
-            if ((res = a.copyFromPsion(f1, f2, NULL, cab)) != rfsv::E_PSI_GEN_NONE) {
+            if ((res = a.copyFromPsion(f1, f2, NULL, cab)) != RFSV::E_PSI_GEN_NONE) {
                 if (hash)
                     cout << endl;
                 continueRunning = 1;
@@ -957,7 +957,7 @@ session(rfsv & a, rpcs & r, rclip & rc, TCPSocket & rclipSocket, vector<char *> 
         } else if ((!strcmp(argv[0], "mget")) && (argc == 2)) {
             char *pattern = argv[1];
             PlpDir files;
-            if ((res = a.dir(psionDir, files)) != rfsv::E_PSI_GEN_NONE) {
+            if ((res = a.dir(psionDir, files)) != RFSV::E_PSI_GEN_NONE) {
                 cerr << _("Error: ") << res << endl;
                 continue;
             }
@@ -965,7 +965,7 @@ session(rfsv & a, rpcs & r, rclip & rc, TCPSocket & rclipSocket, vector<char *> 
                 PlpDirent e = files[i];
                 long attr = e.getAttr();
 
-                if (attr & (rfsv::PSI_A_DIR | rfsv::PSI_A_VOLUME))
+                if (attr & (RFSV::PSI_A_DIR | RFSV::PSI_A_VOLUME))
                     continue;
                 if (fnmatch(pattern, e.getName(), FNM_NOESCAPE) == FNM_NOMATCH)
                     continue;
@@ -982,7 +982,7 @@ session(rfsv & a, rpcs & r, rclip & rc, TCPSocket & rclipSocket, vector<char *> 
                 if (yes) {
                     char *f1 = xasprintf("%s%s", psionDir, e.getName());
                     char *f2 = xasprintf("%s%s%s", localDir, "/", e.getName());
-                    if ((res = a.copyFromPsion(f1, f2, NULL, cab)) != rfsv::E_PSI_GEN_NONE) {
+                    if ((res = a.copyFromPsion(f1, f2, NULL, cab)) != RFSV::E_PSI_GEN_NONE) {
                         if (hash)
                             cout << endl;
                         continueRunning = 1;
@@ -1007,7 +1007,7 @@ session(rfsv & a, rpcs & r, rclip & rc, TCPSocket & rclipSocket, vector<char *> 
             char *f1 = xasprintf("%s%s%s", localDir, "/", argv[1]);
             char *f2 = xasprintf("%s%s", psionDir, argc == 2 ? argv[1] : argv[2]);
             gettimeofday(&stime, nullptr);
-            if ((res = a.copyToPsion(f1, f2, NULL, cab)) != rfsv::E_PSI_GEN_NONE) {
+            if ((res = a.copyToPsion(f1, f2, NULL, cab)) != RFSV::E_PSI_GEN_NONE) {
                 if (hash)
                     cout << endl;
                 continueRunning = 1;
@@ -1061,7 +1061,7 @@ session(rfsv & a, rpcs & r, rclip & rc, TCPSocket & rclipSocket, vector<char *> 
                             }
                             if (yes) {
                                 char *f2 = xasprintf("%s%s", psionDir, de->d_name);
-                                if ((res = a.copyToPsion(f1, f2, NULL, cab)) != rfsv::E_PSI_GEN_NONE) {
+                                if ((res = a.copyToPsion(f1, f2, NULL, cab)) != RFSV::E_PSI_GEN_NONE) {
                                     if (hash)
                                         cout << endl;
                                     continueRunning = 1;
@@ -1088,21 +1088,21 @@ session(rfsv & a, rpcs & r, rclip & rc, TCPSocket & rclipSocket, vector<char *> 
         if ((!strcmp(argv[0], "del") ||
              !strcmp(argv[0], "rm")) && (argc == 2)) {
             char *f1 = xasprintf("%s%s", psionDir, argv[1]);
-            if ((res = a.remove(f1)) != rfsv::E_PSI_GEN_NONE)
+            if ((res = a.remove(f1)) != RFSV::E_PSI_GEN_NONE)
                 cerr << _("Error: ") << res << endl;
             free(f1);
             continue;
         }
         if (!strcmp(argv[0], "mkdir") && (argc == 2)) {
             char *f1 = xasprintf("%s%s", psionDir, argv[1]);
-            if ((res = a.mkdir(f1)) != rfsv::E_PSI_GEN_NONE)
+            if ((res = a.mkdir(f1)) != RFSV::E_PSI_GEN_NONE)
                 cerr << _("Error: ") << res << endl;
             free(f1);
             continue;
         }
         if (!strcmp(argv[0], "rmdir") && (argc == 2)) {
             char *f1 = xasprintf("%s%s", psionDir, argv[1]);
-            if ((res = a.rmdir(f1)) != rfsv::E_PSI_GEN_NONE)
+            if ((res = a.rmdir(f1)) != RFSV::E_PSI_GEN_NONE)
                 cerr << _("Error: ") << res << endl;
             free(f1);
             continue;
@@ -1124,15 +1124,15 @@ session(rfsv & a, rpcs & r, rclip & rc, TCPSocket & rclipSocket, vector<char *> 
         }
         // RPCS commands
         if (!strcmp(argv[0], "settime")) {
-            if ((res = r.setTime(time(NULL))) != rfsv::E_PSI_GEN_NONE)
+            if ((res = r.setTime(time(NULL))) != RFSV::E_PSI_GEN_NONE)
                 cerr << _("Error: ") << res << endl;
             continue;
         }
         if (!strcmp(argv[0], "setupinfo")) {
-            Enum<rfsv::errs> res;
+            Enum<RFSV::errs> res;
             BufferStore db;
 
-            if ((res = r.configRead(0, db)) != rfsv::E_PSI_GEN_NONE) {
+            if ((res = r.configRead(0, db)) != RFSV::E_PSI_GEN_NONE) {
                 cerr << _("Error: ") << res << endl;
                 continue;
             }
@@ -1208,7 +1208,7 @@ session(rfsv & a, rpcs & r, rclip & rc, TCPSocket & rclipSocket, vector<char *> 
         }
         if (!strcmp(argv[0], "ownerinfo")) {
             BufferArray b;
-            if ((res = r.getOwnerInfo(b)) != rfsv::E_PSI_GEN_NONE) {
+            if ((res = r.getOwnerInfo(b)) != RFSV::E_PSI_GEN_NONE) {
                 cerr << _("Error: ") << res << endl;
                 continue;
             }
@@ -1218,7 +1218,7 @@ session(rfsv & a, rpcs & r, rclip & rc, TCPSocket & rclipSocket, vector<char *> 
         }
         if (!strcmp(argv[0], "machinfo")) {
             rpcs::machineInfo mi;
-            if ((res = r.getMachineInfo(mi)) != rfsv::E_PSI_GEN_NONE) {
+            if ((res = r.getMachineInfo(mi)) != RFSV::E_PSI_GEN_NONE) {
                 cerr << _("Error: ") << res << endl;
                 continue;
             }
@@ -1290,7 +1290,7 @@ session(rfsv & a, rpcs & r, rclip & rc, TCPSocket & rclipSocket, vector<char *> 
         if (!strcmp(argv[0], "kill") && (argc >= 2)) {
             processList tmp;
             bool anykilled = false;
-            if ((res = r.queryPrograms(tmp)) != rfsv::E_PSI_GEN_NONE)
+            if ((res = r.queryPrograms(tmp)) != RFSV::E_PSI_GEN_NONE)
                 cerr << _("Error: ") << res << endl;
             else {
                 for (int i = 1; i < argc; i++) {
@@ -1316,7 +1316,7 @@ session(rfsv & a, rpcs & r, rclip & rc, TCPSocket & rclipSocket, vector<char *> 
         }
         if (!strcmp(argv[0], "ps")) {
             processList tmp;
-            if ((res = r.queryPrograms(tmp)) != rfsv::E_PSI_GEN_NONE)
+            if ((res = r.queryPrograms(tmp)) != RFSV::E_PSI_GEN_NONE)
                 cerr << _("Error: ") << res << endl;
             else {
                 cout << "PID   CMD          ARGS" << endl;
@@ -1363,14 +1363,14 @@ filename_generator(const char *text, int state)
     string tmp;
 
     if (!state) {
-        Enum<rfsv::errs> res;
+        Enum<RFSV::errs> res;
         len = strlen(text);
         tmp = psionDir;
         // cplPath will always be non-NULL here, having been initialized in
         // do_completion.
         tmp += cplPath;
-        tmp = rfsv::convertSlash(tmp);
-        if ((res = comp_a->dir(tmp.c_str(), comp_files)) != rfsv::E_PSI_GEN_NONE) {
+        tmp = RFSV::convertSlash(tmp);
+        if ((res = comp_a->dir(tmp.c_str(), comp_files)) != RFSV::E_PSI_GEN_NONE) {
             cerr << _("Error: ") << res << endl;
             return NULL;
         }
@@ -1385,7 +1385,7 @@ filename_generator(const char *text, int state)
         tmp = cplPath;
         tmp += e.getName();
         if (!(strncmp(tmp.c_str(), text, len))) {
-            if (attr & rfsv::PSI_A_DIR) {
+            if (attr & RFSV::PSI_A_DIR) {
                 rl_completion_append_character = '\0';
                 tmp += '/';
             }
@@ -1457,7 +1457,7 @@ do_completion(const char *text, int start, int)
         while ((name = remote_dir_commands[idx])) {
             idx++;
             if (!strncmp(name, rl_line_buffer, strlen(name)))
-                maskAttr = rfsv::PSI_A_DIR;
+                maskAttr = RFSV::PSI_A_DIR;
         }
 
         matches = MATCHFUNCTION(text, filename_generator);

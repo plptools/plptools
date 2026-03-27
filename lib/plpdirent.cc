@@ -79,7 +79,7 @@ uint32_t PlpDirent::getAttr() const {
 }
 
 bool PlpDirent::isDirectory() const {
-    return (attr & rfsv::PSI_A_DIR) > 0;
+    return (attr & RFSV::PSI_A_DIR) > 0;
 }
 
 uint32_t PlpDirent::getUID(int uididx) {

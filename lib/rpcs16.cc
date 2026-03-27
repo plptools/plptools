@@ -38,30 +38,30 @@ rpcs16::rpcs16(TCPSocket *_skt)
     reset();
 }
 
-Enum<rfsv::errs> rpcs16::
+Enum<RFSV::errs> rpcs16::
 getCmdLine(const char *process, string &ret)
 {
     BufferStore a;
-    Enum<rfsv::errs> res;
+    Enum<RFSV::errs> res;
 
     a.addStringT(process);
     if (!sendCommand(rpcs::GET_CMDLINE, a))
-        return rfsv::E_PSI_FILE_DISC;
-    if ((res = getResponse(a, true)) == rfsv::E_PSI_GEN_NONE)
+        return RFSV::E_PSI_FILE_DISC;
+    if ((res = getResponse(a, true)) == RFSV::E_PSI_GEN_NONE)
         ret = a.getString(0);
     return res;
 }
 
-Enum<rfsv::errs> rpcs16::
+Enum<RFSV::errs> rpcs16::
 getOwnerInfo(BufferArray &owner)
 {
-    Enum<rfsv::errs> res;
+    Enum<RFSV::errs> res;
     BufferStore a;
 
     if (!sendCommand(GET_OWNERINFO, a)) {
-        return rfsv::E_PSI_FILE_DISC;
+        return RFSV::E_PSI_FILE_DISC;
     }
-    if ((res = (enum rfsv::errs)getResponse(a, true)) != rfsv::E_PSI_GEN_NONE) {
+    if ((res = (enum RFSV::errs)getResponse(a, true)) != RFSV::E_PSI_GEN_NONE) {
         return res;
     }
 
@@ -77,5 +77,5 @@ getOwnerInfo(BufferArray &owner)
         owner += b;
     }
 
-    return rfsv::E_PSI_GEN_NONE;
+    return RFSV::E_PSI_GEN_NONE;
 }

@@ -103,7 +103,7 @@ bool SocketChannel::ncpCommand(BufferStore & a) {
     } else if (!strncmp(str, "GSPD", 4)) {
         // Get Speed of serial device
         a.init();
-        a.addByte(rfsv::E_PSI_GEN_NONE);
+        a.addByte(RFSV::E_PSI_GEN_NONE);
         a.addDWord(ncpGetSpeed());
         socket_->sendBufferStore(a);
         ok = true;
@@ -113,10 +113,10 @@ bool SocketChannel::ncpCommand(BufferStore & a) {
         a.init();
         const char *name = a.getString(8);
         if (ncpFindPcServer(name))
-            a.addByte(rfsv::E_PSI_FILE_EXIST);
+            a.addByte(RFSV::E_PSI_FILE_EXIST);
         else {
             ncpRegisterPcServer(socket_, name);
-            a.addByte(rfsv::E_PSI_GEN_NONE);
+            a.addByte(RFSV::E_PSI_GEN_NONE);
         }
         socket_->sendBufferStore(a);
         ok = true;
@@ -124,7 +124,7 @@ bool SocketChannel::ncpCommand(BufferStore & a) {
     if (!ok) {
         lerr << "SocketChannel:: received unknown NCP command (" << a << ")" << endl;
         a.init();
-        a.addByte(rfsv::E_PSI_GEN_NSUP);
+        a.addByte(RFSV::E_PSI_GEN_NSUP);
         socket_->sendBufferStore(a);
     }
     return ok;

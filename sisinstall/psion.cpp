@@ -78,38 +78,38 @@ Psion::connect()
     return false;
 }
 
-Enum<rfsv::errs>
+Enum<RFSV::errs>
 Psion::copyFromPsion(const char * const from, int fd,
                      cpCallback_t func)
 {
     return m_rfsv->copyFromPsion(from, fd, func);
 }
 
-Enum<rfsv::errs>
+Enum<RFSV::errs>
 Psion::copyToPsion(const char * const from, const char * const to,
                    void *, cpCallback_t func)
 {
-    Enum<rfsv::errs> res;
+    Enum<RFSV::errs> res;
     res = m_rfsv->copyToPsion(from, to, NULL, func);
 //    printf("Returned to Psion\n");
     return res;
 }
 
-Enum<rfsv::errs>
+Enum<RFSV::errs>
 Psion::devinfo(const char drive, PlpDrive& plpDrive)
 {
     return m_rfsv->devinfo(drive, plpDrive);
 }
 
-Enum<rfsv::errs>
+Enum<RFSV::errs>
 Psion::devlist(uint32_t& devbits)
 {
-    Enum<rfsv::errs> res;
+    Enum<RFSV::errs> res;
     res = m_rfsv->devlist(devbits);
     return res;
 }
 
-Enum<rfsv::errs>
+Enum<RFSV::errs>
 Psion::dir(const char* dir, PlpDir& files)
 {
     return m_rfsv->dir(dir, files);
@@ -119,10 +119,10 @@ bool
 Psion::dirExists(const char* name)
 {
     rfsvDirhandle handle;
-    Enum<rfsv::errs> res;
+    Enum<RFSV::errs> res;
     bool exists = false;
-    res = m_rfsv->opendir(rfsv::PSI_A_ARCHIVE, name, handle);
-    if (res == rfsv::E_PSI_GEN_NONE)
+    res = m_rfsv->opendir(RFSV::PSI_A_ARCHIVE, name, handle);
+    if (res == RFSV::E_PSI_GEN_NONE)
         exists = true;
     res = m_rfsv->closedir(handle);
     return exists;
@@ -139,7 +139,7 @@ Psion::disconnect()
     delete m_rpcsFactory;
 }
 
-Enum<rfsv::errs>
+Enum<RFSV::errs>
 Psion::mkdir(const char* dir)
 {
     return m_rfsv->mkdir(dir);

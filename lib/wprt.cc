@@ -58,17 +58,17 @@ void wprt::
 reset(void)
 {
     BufferStore a;
-    status = rfsv::E_PSI_FILE_DISC;
+    status = RFSV::E_PSI_FILE_DISC;
     a.addStringT(getConnectName());
     if (skt->sendBufferStore(a)) {
         if (skt->getBufferStore(a) == 1) {
             if (!strcmp(a.getString(0), "Ok"))
-                status = rfsv::E_PSI_GEN_NONE;
+                status = RFSV::E_PSI_GEN_NONE;
         }
     }
 }
 
-Enum<rfsv::errs> wprt::
+Enum<RFSV::errs> wprt::
 getStatus(void)
 {
     return status;
@@ -86,9 +86,9 @@ getConnectName(void)
 bool wprt::
 sendCommand(enum commands cc, BufferStore & data)
 {
-    if (status == rfsv::E_PSI_FILE_DISC) {
+    if (status == RFSV::E_PSI_FILE_DISC) {
         reconnect();
-        if (status == rfsv::E_PSI_FILE_DISC)
+        if (status == RFSV::E_PSI_FILE_DISC)
             return false;
     }
     bool result;
@@ -100,47 +100,47 @@ sendCommand(enum commands cc, BufferStore & data)
         reconnect();
         result = skt->sendBufferStore(a);
         if (!result)
-            status = rfsv::E_PSI_FILE_DISC;
+            status = RFSV::E_PSI_FILE_DISC;
     }
     return result;
 }
 
-Enum<rfsv::errs> wprt::
+Enum<RFSV::errs> wprt::
 initPrinter() {
-    Enum<rfsv::errs> ret;
+    Enum<RFSV::errs> ret;
 
     BufferStore a;
     a.addByte(2); // Major printer version
     a.addByte(0); // Minor printer version
     sendCommand(WPRT_INIT, a);
-    if ((ret = getResponse(a)) != rfsv::E_PSI_GEN_NONE)
+    if ((ret = getResponse(a)) != RFSV::E_PSI_GEN_NONE)
         cerr << "WPRT ERR:" << a << endl;
     else {
         if (a.getLen() != 3)
-            ret = rfsv::E_PSI_GEN_FAIL;
+            ret = RFSV::E_PSI_GEN_FAIL;
         if ((a.getByte(0) != 0) || (a.getWord(1) != 2))
-            ret = rfsv::E_PSI_GEN_FAIL;
+            ret = RFSV::E_PSI_GEN_FAIL;
     }
     return ret;
 }
 
-Enum<rfsv::errs> wprt::
+Enum<RFSV::errs> wprt::
 getData(BufferStore &buf) {
-    Enum<rfsv::errs> ret;
+    Enum<RFSV::errs> ret;
 
     sendCommand(WPRT_GET, buf);
-    if ((ret = getResponse(buf)) != rfsv::E_PSI_GEN_NONE)
+    if ((ret = getResponse(buf)) != RFSV::E_PSI_GEN_NONE)
         cerr << "WPRT ERR:" << buf << endl;
     return ret;
 }
 
-Enum<rfsv::errs> wprt::
+Enum<RFSV::errs> wprt::
 cancelJob() {
-    Enum<rfsv::errs> ret;
+    Enum<RFSV::errs> ret;
     BufferStore a;
 
     sendCommand(WPRT_CANCEL, a);
-    if ((ret = getResponse(a)) != rfsv::E_PSI_GEN_NONE)
+    if ((ret = getResponse(a)) != RFSV::E_PSI_GEN_NONE)
         cerr << "WPRT ERR:" << a << endl;
     return ret;
 }
@@ -151,13 +151,13 @@ stop() {
     return sendCommand(WPRT_STOP, a);
 }
 
-Enum<rfsv::errs> wprt::
+Enum<RFSV::errs> wprt::
 getResponse(BufferStore & data)
 {
-    Enum<rfsv::errs> ret = rfsv::E_PSI_GEN_NONE;
+    Enum<RFSV::errs> ret = RFSV::E_PSI_GEN_NONE;
     if (skt->getBufferStore(data) == 1)
         return ret;
     else
-        status = rfsv::E_PSI_FILE_DISC;
+        status = RFSV::E_PSI_FILE_DISC;
     return status;
 }

@@ -232,12 +232,12 @@ void NCP::decodeControlMessage(BufferStore & buff) {
                 }
                 b.addByte(remoteChan);
                 if (ok) {
-                    b.addByte(rfsv::E_PSI_GEN_NONE);
+                    b.addByte(RFSV::E_PSI_GEN_NONE);
                     if (verbose & NCP_DEBUG_LOG)
                         lout << "ncp: ACCEPT client connect" << endl;
                 } else {
                     localChan = 0;
-                    b.addByte(rfsv::E_PSI_FILE_NXIST);
+                    b.addByte(RFSV::E_PSI_FILE_NXIST);
                     if (verbose & NCP_DEBUG_LOG)
                         lout << "ncp: REJECT client connect" << endl;
                 }

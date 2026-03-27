@@ -71,8 +71,8 @@ inline bool operator<(const PlpUID &u1, const PlpUID &u2) {
 
 /**
  * A class, representing a directory entry of the Psion.
- * Objects of this type are used by @ref rfsv::readdir ,
- * @ref rfsv::dir and @ref rfsv::fgeteattr for returning
+ * Objects of this type are used by @ref RFSV::readdir ,
+ * @ref RFSV::dir and @ref RFSV::fgeteattr for returning
  * the entries of a directory.
  *
  * @author Fritz Elfert <felfert@to.com>
@@ -116,7 +116,7 @@ public:
     /**
     * Retrieves the file attributes of a directory entry.
     *
-    * @returns The generic attributes ( @ref rfsv::file_attribs ).
+    * @returns The generic attributes ( @ref RFSV::file_attribs ).
     */
     uint32_t getAttr() const;
 
@@ -210,7 +210,7 @@ enum class MediaType: uint32_t {
 /**
  * A class representing information about
  * a Disk drive on the psion. An Object of this type
- * is used by @ref rfsv::devinfo for returning the
+ * is used by @ref RFSV::devinfo for returning the
  * information of the probed drive.
  *
  * @author Fritz Elfert <felfert@to.com>

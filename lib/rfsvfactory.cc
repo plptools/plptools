@@ -51,7 +51,7 @@ rfsvfactory::~rfsvfactory()
 {
 }
 
-rfsv * rfsvfactory::create(bool reconnect)
+RFSV* rfsvfactory::create(bool reconnect)
 {
     // skt is connected to the ncp daemon, which will have (hopefully) seen
     // an INFO exchange, where the protocol version of the remote Psion was
