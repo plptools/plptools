@@ -26,6 +26,7 @@
 #include <bufferarray.h>
 #include <bufferstore.h>
 #include <Enum.h>
+#include <cstdint>
 #include <path.h>
 #include <plpintl.h>
 #include <tcpsocket.h>
@@ -857,7 +858,7 @@ session(rfsv & a, rpcs & r, rclip & rc, TCPSocket & rclipSocket, vector<char *> 
                         if (a.devinfo(i + 'A', drive) == rfsv::E_PSI_GEN_NONE)
                             cout << (char) ('A' + i) << "     " << hex
                                  << setw(4) << setfill('0')
-                                 << drive.getMediaType() << " " << setw(12)
+                                 << static_cast<uint32_t>(drive.getMediaType()) << " " << setw(12)
                                  << setfill(' ') << setiosflags(ios::left)
                                  << drive.getName().c_str()
                                  << resetiosflags(ios::left) << dec << setw(9)

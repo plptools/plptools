@@ -22,6 +22,7 @@
 
 #include "plpdirent.h"
 
+#include <cstdint>
 #include <iomanip>
 
 using namespace std;
@@ -136,7 +137,7 @@ PlpDrive::PlpDrive(const PlpDrive &other)
 , name(other.name) {
 }
 
-void PlpDrive::setMediaType(uint32_t type) {
+void PlpDrive::setMediaType(MediaType type) {
     mediatype = type;
 }
 
@@ -166,7 +167,7 @@ void PlpDrive::setName(char drive, const char * const volname) {
     name += volname;
 }
 
-uint32_t PlpDrive::getMediaType() const {
+MediaType PlpDrive::getMediaType() const {
     return mediatype;
 }
 
@@ -183,7 +184,7 @@ static const char * const media_types[] = {
 };
 
 void PlpDrive::getMediaType(std::string &ret) const {
-    ret = media_types[mediatype];
+    ret = media_types[static_cast<uint32_t>(mediatype)];
 }
 
 uint32_t PlpDrive::getDriveAttribute() {

@@ -22,6 +22,7 @@
 #include "config.h"
 
 #include <cli_utils.h>
+#include <cstdint>
 #include <rfsv.h>
 #include <rpcs.h>
 #include <rfsvfactory.h>
@@ -324,7 +325,7 @@ int rfsv_drivelist(int *cnt, device **dlist) {
                 (*dlist)->total = drive.getSize();
                 (*dlist)->free = drive.getSpace();
                 (*dlist)->letter = 'A' + i;
-                (*dlist)->attrib = drive.getMediaType();
+                (*dlist)->attrib = static_cast<uint32_t>(drive.getMediaType());
                 (*cnt)++;
             }
             devbits >>= 1;

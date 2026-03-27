@@ -22,6 +22,7 @@
 
 #include "sisinstaller.h"
 
+#include "plpdirent.h"
 #include "sisfile.h"
 #include "sisfilelink.h"
 #include "sisfilerecord.h"
@@ -566,8 +567,8 @@ SISInstaller::selectDrive()
                         if (((devbits & 1) != 0) &&
                                 (m_psion->devinfo(i + 'A', plpdrive) == rfsv::E_PSI_GEN_NONE))
                                 {
-                                uint32_t mediaType = plpdrive.getMediaType();
-                                if ((mediaType == 3) || (mediaType == 5))
+                                MediaType mediaType = plpdrive.getMediaType();
+                                if ((mediaType == MediaType::kDisk) || (mediaType == MediaType::kRAM))
                                         {
                                         drivelist[ndrives] = 'A' + i;
                                         printf("%c: %lud bytes free, %lud bytes total\n",

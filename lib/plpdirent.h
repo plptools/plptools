@@ -249,7 +249,7 @@ public:
     *   8 = Remote
     * </pre>
     */
-    uint32_t getMediaType() const;  // Return an ENUM?
+    MediaType getMediaType() const;
 
     /**
     * Retrieve the media type of the drive.
@@ -359,7 +359,7 @@ public:
     std::string getPath() const;
 
 private:
-    void setMediaType(uint32_t type);
+    void setMediaType(MediaType type);
     void setDriveAttribute(uint32_t attr);
     void setMediaAttribute(uint32_t attr);
     void setUID(uint32_t uid);
@@ -367,7 +367,7 @@ private:
     void setSpace(uint32_t spaceLo, uint32_t spaceHi);
     void setName(char drive, const char * const volname);
 
-    uint32_t mediatype;
+    MediaType mediatype;
     uint32_t driveattr;
     uint32_t mediaattr;
     uint32_t uid;

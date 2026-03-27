@@ -370,7 +370,7 @@ devinfo(const char drive, PlpDrive &dinfo)
         return E_PSI_FILE_DISC;
     res = getResponse(a);
     if (res == E_PSI_GEN_NONE) {
-        dinfo.setMediaType(a.getDWord(0));
+        dinfo.setMediaType(static_cast<MediaType>(a.getDWord(0)));
         dinfo.setDriveAttribute(a.getDWord(8));
         dinfo.setMediaAttribute(a.getDWord(12));
         dinfo.setUID(a.getDWord(16));
