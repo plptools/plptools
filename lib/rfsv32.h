@@ -28,11 +28,11 @@
 class rfsvfactory;
 
 /**
- * This is the implementation of the @ref rfsv protocol for
+ * This is the implementation of the @ref RFSV protocol for
  * Psion series 5 (EPOC) variant. You normally never create
  * objects of this class directly. Thus the constructor is
  * private. Use @ref rfsvfactory for creating an instance of
- * @ref rfsv . For a complete documentation, see @ref rfsv .
+ * @ref RFSV . For a complete documentation, see @ref RFSV .
  */
 class rfsv32 : public RFSV {
 

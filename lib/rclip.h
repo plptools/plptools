@@ -33,7 +33,7 @@ class BufferArray;
  * This class implements access to the remote clipboard notification
  * feature of the Psion. The Psion uses the file 'C:\\System\\Data\\Clpboard.cbd'
  * for storing the content of its clipboard. This file can be accessed like
- * any other regular file on the Psion using the @ref rfsv implementation.
+ * any other regular file on the Psion using the @ref RFSV implementation.
  * This class handles notification about changes of this file.
  * There are two methods of notification implemented. Using @ref waitNotify ,
  * a blocking method can be used and using @ref sendListen followed by
