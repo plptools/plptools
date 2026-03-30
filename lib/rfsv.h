@@ -41,17 +41,17 @@ inline const int RFSV_SENDLEN = 2000;
  */
 typedef int (*cpCallback_t)(void *, uint32_t);
 
-class rfsv16;
+class RFSV16;
 class rfsv32;
 
 /**
  * A helper class for storing
- * intermediate internal information in rfsv16 and
+ * intermediate internal information in RFSV16 and
  * rfsv32 .
  * @internal
  */
 class rfsvDirhandle {
-    friend class rfsv16;
+    friend class RFSV16;
     friend class rfsv32;
 
 private:
@@ -66,7 +66,7 @@ private:
  * of a Psion connected via ncpd. This class defines the
  * interface and a small amount of common constants and
  * methods. The majority of implementation is provided
- * by @ref rfsv32 and @ref rfsv16 , which implement the
+ * by @ref rfsv32 and @ref RFSV16 , which implement the
  * variations of the protocol for EPOC and SIBO respectively.
  * Usually, the class @ref rfsvfactory is used to instantiate
  * the correct variant depending on the remote machine,
