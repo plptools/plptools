@@ -34,7 +34,7 @@ class rfsvfactory;
  * private. Use @ref rfsvfactory for creating an instance of
  * @ref RFSV . For a complete documentation, see @ref RFSV .
  */
-class rfsv32 : public RFSV {
+class RFSV32 : public RFSV {
 
     /**
      * rfsvfactory may call our constructor.
@@ -190,7 +190,7 @@ private:
     * Private constructor. Shall be called by
     * rfsvfactory only.
     */
-    rfsv32(TCPSocket *);
+    RFSV32(TCPSocket *);
 
     Enum<RFSV::errs> err2psierr(int32_t);
     Enum<RFSV::errs> fopendir(const uint32_t, const char *, uint32_t &);

@@ -80,7 +80,7 @@ RFSV* rfsvfactory::create(bool reconnect)
             return new RFSV16(skt);
         }
         else if (a.getLen() > 8 && !strncmp(a.getString(), "Series 5", 8)) {
-            return new rfsv32(skt);
+            return new RFSV32(skt);
         }
         if ((a.getLen() > 8) && !strncmp(a.getString(), "No Psion", 8)) {
             skt->closeSocket();
