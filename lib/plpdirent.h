@@ -79,7 +79,7 @@ inline bool operator<(const PlpUID &u1, const PlpUID &u2) {
  */
 class PlpDirent {
     friend class rfsv32;
-    friend class rfsv16;
+    friend class RFSV16;
 
 public:
     /**
@@ -217,7 +217,7 @@ enum class MediaType: uint32_t {
  */
 class PlpDrive {
     friend class rfsv32;
-    friend class rfsv16;
+    friend class RFSV16;
 
 public:
     /**
