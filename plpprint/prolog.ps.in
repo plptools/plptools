@@ -1,4 +1,4 @@
-%%BeginResource: plpprint_prolog 1.0.26 0
+%%BeginResource: plpprint_prolog @VERSION@ 0
 /bd{bind def}bind def
 /ed{exch def}bd
 /d{def}bd
