@@ -1,4 +1,4 @@
-%%BeginResource: plpprint_prolog @VERSION@ 0
+%%BeginResource: plpprint_prolog 1.0.26 0
 /bd{bind def}bind def
 /ed{exch def}bd
 /d{def}bd
@@ -24,7 +24,7 @@ putinterval d
 /s{
   pen_st 0 ne{
     dashes pen_st 1 sub get 0 setdash
-    stroke
+    currentpoint stroke moveto
   }if
 }bd
 /bp1{begin 0 setgray}bd
@@ -56,10 +56,13 @@ putinterval d
   1000 div 24 mul
 }bd
 /m{
-  top e sub moveto
+  pageheight e sub moveto
+}bd
+/mb{
+  moveby
 }bd
 /l{
-  top e sub lineto
+  pageheight e sub lineto
 }bd
 /f{
   dofill{
@@ -141,9 +144,29 @@ putinterval d
   % end of reencoding
   e twips scalefont setfont
 }bd
+/MT{ % x y MT - (move to)
+    twips e twips e m
+}bd
+/MB{ % x y MB - (move by)
+    twips e twips e moveby
+}bd
+/PT{ % x y PT - (draw point)
+  2 dict begin
+    twips/y ed
+    twips/x ed
+    newpath x y pageheight e sub pen_th 2 div 0 360 arc closepath fg SC fill
+    newpath
+  end
+}bd
 /L{ % x1 y1 x2 y2 L - (draw line from x1,y1 to x2,y2)
   4 -1 roll twips 4 -1 roll twips m
   twips e twips e l fg SC s
+}bd
+/LT{ % x y LT - (draw line to x,y)
+  twips e twips e l fg SC s
+}bd
+/LB{ % x y LB - (draw line by x,y)
+  twips e twips e rlineto fg SC s
 }bd
 /R{ % left top right bottom R - (draw rectangle)
   4 dict begin
@@ -152,54 +175,171 @@ putinterval d
     twips/y1 ed
     twips/x1 ed
     newpath
-    x1 y1 m x2 y1 l x2 y2 l x1 y2 l closepath
+    x1 y1 m x2 y1 l x2 y2 l x1 y2 l
+    closepath
     gsave bg SC f grestore fg SC s
+    newpath
   end
 }bd
-/E{ % ulx uly llx lly E - (draw ellipse)
+/RR{ % left top right bottom cornerwidth cornerheight RR - (draw rounded rectangle)
+  7 dict begin
+    twips/ch ed
+    twips/cw ed
+    twips/bottom ed
+    twips/right ed
+    twips/top ed
+    twips/left ed
+
+    cw right left sub 2 div gt{/cw right left sub 2 div d}if
+    ch bottom top sub 2 div gt{/ch bottom top sub 2 div d}if
+    /radius cw ch lt{cw}{ch}ifelse d
+
+    newpath
+    right radius sub top m
+    right radius sub pageheight top radius add sub radius 90 0 arcn
+    right bottom radius sub l
+    right radius sub pageheight bottom radius sub sub radius 0 -90 arcn
+    left radius add bottom l
+    left radius add pageheight bottom radius sub sub radius -90 -180 arcn
+    left top radius add l
+    left radius add pageheight top radius add sub radius -180 90 arcn
+    closepath
+    gsave bg SC f grestore fg SC s
+    newpath
+  end
+}bd
+/E{ % left top right bottom E - (draw ellipse)
   6 dict begin
-    twips/lly ed
-    twips/llx ed
-    twips/uly ed
-    twips/ulx ed
-    /wx llx ulx sub d
-    /wy lly uly sub d
-    gsave
-      newpath
-      ulx wx 2 div add top uly sub wy 2 div sub translate
-      1 wy wx div scale
-      newpath wx 2 div 0 moveto
-      0 0 wx 2 div 0 360 arc closepath
-      gsave bg SC f grestore fg SC s
-    grestore
+    twips /bottom ed
+    twips /right ed
+    twips /top ed
+    twips /left ed
+    /w right left sub d
+    /h bottom top sub d
+
+    newpath
+    matrix currentmatrix
+      left w 2 div add pageheight top sub h 2 div sub translate
+      1 h w div scale
+      w 2 div 0 moveto
+      0 0 w 2 div 0 360 arc
+    setmatrix
+    closepath
+    gsave bg SC f grestore fg SC s
+    newpath
   end
 }bd
-/P{ % pointarray eofill P - (draw polygon)
-  5 dict begin
-    /efmode ed
+/A { % left top right bottom x1 y1 x2 x2 A - (draw arc)
+  14 dict begin
+    twips /y2 ed
+    twips /x2 ed
+    twips /y1 ed
+    twips /x1 ed
+    twips /bottom ed
+    twips /right ed
+    twips /top ed
+    twips /left ed
+
+    /x0 left right add 2 div d
+    /y0 top bottom add 2 div d
+    /rx right left sub abs 2 div d
+    /ry bottom top sub abs 2 div d
+
+    /a1 y0 y1 sub ry div  x1 x0 sub rx div atan d
+    /a2 y0 y2 sub ry div  x2 x0 sub rx div atan d
+
+    newpath
+    matrix currentmatrix
+      x0 pageheight y0 sub translate
+      rx ry scale
+      0 0 1 a1 a2 arc
+    setmatrix
+    fg SC s
+    newpath
+  end
+}bd
+/AP { % left top right bottom x1 y1 x2 x2 A - (draw arc pie)
+  18 dict begin
+    twips /y2 ed
+    twips /x2 ed
+    twips /y1 ed
+    twips /x1 ed
+    twips /bottom ed
+    twips /right ed
+    twips /top ed
+    twips /left ed
+
+    /x0 left right add 2 div d
+    /y0 top bottom add 2 div d
+    /rx right left sub abs 2 div d
+    /ry bottom top sub abs 2 div d
+
+    /a1 y0 y1 sub ry div  x1 x0 sub rx div atan d
+    /a2 y0 y2 sub ry div  x2 x0 sub rx div atan d
+
+    newpath
+    matrix currentmatrix
+      x0 pageheight y0 sub translate
+      rx ry scale
+      0 0 1 a1 a2 arc
+    setmatrix
+    x0 y0 l
+    closepath
+    gsave bg SC f grestore fg SC s
+    newpath
+  end
+}bd
+/PL{ % pointarray PL - (draw polyline)
+  4 dict begin
     /points ed
+    newpath
     0 2 points length 1 sub{
       /idx ed
       points idx get twips
       points idx 1 add get twips
       idx 0 eq{m}{l}ifelse
     }for
-    gsave bg SC efmode{ef}{f}ifelse grestore fg SC s
+    fg SC s
+    newpath
   end
 }bd
+/PG{ % pointarray eofill PG - (draw polygon)
+  5 dict begin
+    /efmode ed
+    /points ed
+    newpath
+    0 2 points length 1 sub{
+      /idx ed
+      points idx get twips
+      points idx 1 add get twips
+      idx 0 eq{m}{l}ifelse
+    }for
+    closepath
+    gsave bg SC efmode{ef}{f}ifelse grestore fg SC s
+    newpath
+  end
+}bd
+/spacecount{ % string spacecount
+  /str ed
+  /cnt 0 d
+  0 1 str length 1 sub{str e get 32 eq{/cnt cnt 1 add d}if}for
+  cnt
+}bd
 /T{ % string left bottom top right justify T - (draw text)
-  6 dict begin
+  8 dict begin
     /just ed
     twips/x2 ed
     twips/y2 ed
     twips/y1 ed
     twips/x1 ed
     dup stringwidth pop/sw ed
+    x2 0 eq{/x2 x1 sw add d}if
+    x2 x1 sub sw sub/extra ed
     just 0 gt{
       just 1 gt{x2 sw sub}{x2 x1 sub sw sub 2 div x1 add}ifelse
     }{x1}ifelse
+
     y1 m
-    gsave
     ul{
       gsave
         currentfont/FontInfo known{
@@ -208,7 +348,8 @@ putinterval d
             UnderlineThickness fs setlinewidth
           end
         }{
-          0 -10 rmoveto 0.5 setlinewidth
+          gsave newpath 0 0 moveto (_) false charpath pathbbox e pop e sub e pop grestore
+          dup 0 e neg 2 mul rmoveto setlinewidth
         }ifelse
         sw 0 rlineto s
         pen_th setlinewidth
@@ -216,37 +357,66 @@ putinterval d
     }if
     st{
       gsave
-        newpath 0 0 moveto (I) false charpath pathbbox
-        e pop e sub e pop 2 div 0 e
-      grestore
-      gsave
+        gsave newpath 0 0 moveto (I) false charpath pathbbox e pop e sub e pop 2 div 0 e grestore
         rmoveto
+        gsave newpath 0 0 moveto (_) false charpath pathbbox e pop e sub e pop grestore
+        setlinewidth
         sw 0 rlineto s
-      grestore
+        grestore
     }if
-    show
-    grestore
+    fg SC
+    dup spacecount dup 0 gt extra 0 lt and{extra e div 0 32 4 -1 roll widthshow}{pop show}ifelse
   end
 }bd
-/I{
+/I{ % left bottom right top width height I - (image)
   7 dict begin
-    /rows ed
-    /cols ed
-    twips/ury ed
-    twips/urx ed
-    twips/lly ed
-    twips/llx ed
-    /ibuf cols string d
+    /height ed
+    /width ed
+    twips/top ed
+    twips/right ed
+    twips/bottom ed
+    twips/left ed
+    /ibuf width string d
     gsave
-      llx top lly sub translate
-      urx llx sub lly ury sub scale
-      cols rows 8 [cols 0 0 rows neg 0 rows]
+      left pageheight bottom sub translate
+      right left sub bottom top sub scale
+      width height 8 [width 0 0 height neg 0 height]
       {currentfile ibuf readhexstring pop}image
     grestore
   end
 }bd
-/TH{ % xwid ywid TH - (set pen thickness)
-  pop pixel/pen_th ed
+/IC{ % left bottom right top width height srcleft srcbottom srcright srctop IC - (image cropped)
+  14 dict begin
+    /srctop ed
+    /srcright ed
+    /srcbottom ed
+    /srcleft ed
+    /height ed
+    /width ed
+    twips/top ed
+    twips/right ed
+    twips/bottom ed
+    twips/left ed
+    /linebuf width string d
+    /ibuf srcright srcleft sub string d
+    /leftbuf srcleft string d
+    /rightbuf width srcright sub string d
+    gsave
+      left pageheight bottom sub translate
+      right left sub bottom top sub scale
+      0 1 height srctop sub 1 sub {currentfile linebuf readhexstring pop pop}for  % skip first rows
+      srcright srcleft sub srctop srcbottom sub 8 [srcright srcleft sub 0 0 srctop srcbottom sub neg 0 srctop srcbottom sub]
+      {
+          currentfile leftbuf readhexstring pop pop  % skip first cols
+          currentfile ibuf readhexstring pop
+          currentfile rightbuf readhexstring pop pop  % skip last cols
+      }image
+      0 1 srcbottom 1 sub {currentfile linebuf readhexstring pop pop} for  % skip last rows
+    grestore
+  end
+}bd
+/TH{ % xwid ywid TH - (set pen thickness, ignoring ywid)
+  pop twips /pen_th ed
   pen_th setlinewidth
 }bd
 /DM{ % mode DM - (set drawing mode)
