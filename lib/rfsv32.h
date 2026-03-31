@@ -23,6 +23,8 @@
 #define _RFSV32_H_
 
 #include "rfsv.h"
+
+#include "drive.h"
 #include "plpdirent.h"
 
 class rfsvfactory;

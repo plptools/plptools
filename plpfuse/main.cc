@@ -21,14 +21,15 @@
 
 #include "config.h"
 
+#include <bufferarray.h>
+#include <bufferstore.h>
 #include <cli_utils.h>
 #include <cstdint>
+#include <drive.h>
 #include <rfsv.h>
-#include <rpcs.h>
 #include <rfsvfactory.h>
+#include <rpcs.h>
 #include <rpcsfactory.h>
-#include <bufferstore.h>
-#include <bufferarray.h>
 #include <tcpsocket.h>
 
 #include <iostream>

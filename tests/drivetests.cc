@@ -23,7 +23,7 @@
 #include <stdio.h>
 
 #include "doctest.h"
-#include "plpdirent.h"
+#include "drive.h"
 #include "rfsv.h"
 
 TEST_CASE("Drive::getPath") {
