@@ -44,7 +44,7 @@ FakePsion::copyToPsion(const char * const from, const char * const to,
 }
 
 Enum<RFSV::errs>
-FakePsion::devinfo(const char drive, PlpDrive& plpDrive)
+FakePsion::devinfo(const char drive, Drive& plpDrive)
 {
     return RFSV::E_PSI_GEN_NONE;
 }

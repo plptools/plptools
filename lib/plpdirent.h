@@ -215,7 +215,7 @@ enum class MediaType: uint32_t {
  *
  * @author Fritz Elfert <felfert@to.com>
  */
-class PlpDrive {
+class Drive {
     friend class RFSV32;
     friend class RFSV16;
 
@@ -223,9 +223,9 @@ public:
     /**
     * Default constructor.
     */
-    PlpDrive();
+    Drive();
 
-    PlpDrive(MediaType mediaType,
+    Drive(MediaType mediaType,
              uint32_t driveAttributes,
              uint32_t mediaAttributes,
              uint32_t uid,
@@ -237,7 +237,7 @@ public:
     /**
     * Copy constructor
     */
-    PlpDrive(const PlpDrive &other);
+    Drive(const Drive &other);
 
     /**
     * Retrieve the media type of the drive.

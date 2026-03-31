@@ -563,7 +563,7 @@ SISInstaller::selectDrive()
                 {
                 for (int i = 0; i < 26; i++)
                         {
-                        PlpDrive plpdrive;
+                        Drive plpdrive;
                         if (((devbits & 1) != 0) &&
                                 (m_psion->devinfo(i + 'A', plpdrive) == RFSV::E_PSI_GEN_NONE))
                                 {

@@ -37,7 +37,7 @@ public:
                                          const char * const to,
                                          void *, cpCallback_t func);
 
-    virtual Enum<RFSV::errs> devinfo(const char drive, PlpDrive& plpDrive);
+    virtual Enum<RFSV::errs> devinfo(const char drive, Drive& plpDrive);
 
     virtual Enum<RFSV::errs> devlist(uint32_t& devbits);
 

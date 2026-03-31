@@ -124,10 +124,10 @@ ostream &operator<<(ostream &o, const PlpDirent &e) {
     return o;
 }
 
-PlpDrive::PlpDrive() {
+Drive::Drive() {
 }
 
-PlpDrive::PlpDrive(MediaType mediaType,
+Drive::Drive(MediaType mediaType,
                    uint32_t driveAttributes,
                    uint32_t mediaAttributes,
                    uint32_t uid,
@@ -145,7 +145,7 @@ PlpDrive::PlpDrive(MediaType mediaType,
 , name_(name) {
 }
 
-PlpDrive::PlpDrive(const PlpDrive &other)
+Drive::Drive(const Drive &other)
 : mediaType_(other.mediaType_)
 , driveAttributes_(other.driveAttributes_)
 , mediaAttributes_(other.mediaAttributes_)
@@ -156,69 +156,69 @@ PlpDrive::PlpDrive(const PlpDrive &other)
 , name_(other.name_) {
 }
 
-void PlpDrive::setMediaType(MediaType type) {
+void Drive::setMediaType(MediaType type) {
     mediaType_ = type;
 }
 
-void PlpDrive::setDriveAttributes(uint32_t attr) {
+void Drive::setDriveAttributes(uint32_t attr) {
     driveAttributes_ = attr;
 }
 
-void PlpDrive::setMediaAttributes(uint32_t mediaAttribute) {
+void Drive::setMediaAttributes(uint32_t mediaAttribute) {
     mediaAttributes_ = mediaAttribute;
 }
 
-void PlpDrive::setUID(uint32_t uid) {
+void Drive::setUID(uint32_t uid) {
     uid_ = uid;
 }
 
-void PlpDrive::setSize(uint32_t sizeLo, uint32_t sizeHi) {
+void Drive::setSize(uint32_t sizeLo, uint32_t sizeHi) {
     size_ = (static_cast<unsigned long long>(sizeHi) << 32) + sizeLo;
 }
 
-void PlpDrive::setSpace(uint32_t spaceLo, uint32_t spaceHi) {
+void Drive::setSpace(uint32_t spaceLo, uint32_t spaceHi) {
     space_ = (static_cast<unsigned long long>(spaceHi) << 32) + spaceLo;
 }
 
-void PlpDrive::setName(char drive, const char * const volname) {
+void Drive::setName(char drive, const char * const volname) {
     driveLetter_ = drive;
     name_ = "";
     name_ += volname;
 }
 
-MediaType PlpDrive::getMediaType() const {
+MediaType Drive::getMediaType() const {
     return mediaType_;
 }
 
-uint32_t PlpDrive::getDriveAttributes() const {
+uint32_t Drive::getDriveAttributes() const {
     return driveAttributes_;
 }
 
-uint32_t PlpDrive::getMediaAttributes() const {
+uint32_t Drive::getMediaAttributes() const {
     return mediaAttributes_;
 }
 
-uint32_t PlpDrive::getUID() const {
+uint32_t Drive::getUID() const {
     return uid_;
 }
 
-uint64_t PlpDrive::getSize() const {
+uint64_t Drive::getSize() const {
     return size_;
 }
 
-uint64_t PlpDrive::getSpace() const {
+uint64_t Drive::getSpace() const {
     return space_;
 }
 
-string PlpDrive::getName() const {
+string Drive::getName() const {
     return name_;
 }
 
-char PlpDrive::getDriveLetter() const {
+char Drive::getDriveLetter() const {
     return driveLetter_;
 }
 
-std::string PlpDrive::getPath() const {
+std::string Drive::getPath() const {
     std::string path;
     path += driveLetter_;
     path += ":\\";
