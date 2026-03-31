@@ -118,7 +118,7 @@ Psion::dir(const char* dir, PlpDir& files)
 bool
 Psion::dirExists(const char* name)
 {
-    rfsvDirhandle handle;
+    RFSVDirHandle handle;
     Enum<RFSV::errs> res;
     bool exists = false;
     res = m_rfsv->opendir(RFSV::PSI_A_ARCHIVE, name, handle);

@@ -50,7 +50,7 @@ class RFSV32;
  * RFSV32 .
  * @internal
  */
-class rfsvDirhandle {
+class RFSVDirHandle {
     friend class RFSV16;
     friend class RFSV32;
 
@@ -75,7 +75,7 @@ private:
 class RFSV {
 public:
     /**
-    * The kown modes for seek.
+    * The known modes for seek.
     */
     enum seek_mode {
         PSI_SEEK_SET = 1,
@@ -541,7 +541,7 @@ public:
     *
     * @returns A Psion error code (One of enum @ref #errs ).
     */
-    virtual Enum<errs> opendir(const uint32_t attr, const char * const name, rfsvDirhandle &handle) = 0;
+    virtual Enum<errs> opendir(const uint32_t attr, const char * const name, RFSVDirHandle &handle) = 0;
 
     /**
     * Read directory entries.
@@ -553,7 +553,7 @@ public:
     *
     * @returns A Psion error code (One of enum @ref #errs ).
     */
-    virtual Enum<errs> readdir(rfsvDirhandle &handle, PlpDirent &entry) = 0;
+    virtual Enum<errs> readdir(RFSVDirHandle &handle, PlpDirent &entry) = 0;
 
     /**
     * Close a directory, previously opened with @ref opendir.
@@ -562,7 +562,7 @@ public:
     *
     * @returns A Psion error code (One of enum @ref #errs ).
     */
-    virtual Enum<errs> closedir(rfsvDirhandle &handle) = 0;
+    virtual Enum<errs> closedir(RFSVDirHandle &handle) = 0;
 
     /**
     * Set the name of a Psion Volume (Drive).

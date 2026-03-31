@@ -118,7 +118,7 @@ fclose(uint32_t fileHandle)
 }
 
 Enum<RFSV::errs> RFSV16::
-opendir(const uint32_t attr, const char *name, rfsvDirhandle &dH) {
+opendir(const uint32_t attr, const char *name, RFSVDirHandle &dH) {
     uint32_t handle;
     Enum<RFSV::errs> res = fopendir(name, handle);
     dH.h = handle;
@@ -127,12 +127,12 @@ opendir(const uint32_t attr, const char *name, rfsvDirhandle &dH) {
 }
 
 Enum<RFSV::errs> RFSV16::
-closedir(rfsvDirhandle &dH) {
+closedir(RFSVDirHandle &dH) {
     return fclose(dH.h);
 }
 
 Enum<RFSV::errs> RFSV16::
-readdir(rfsvDirhandle &dH, PlpDirent &e) {
+readdir(RFSVDirHandle &dH, PlpDirent &e) {
     Enum<RFSV::errs> res = E_PSI_GEN_NONE;
 
     if (dH.b.getLen() < 17) {
@@ -168,7 +168,7 @@ readdir(rfsvDirhandle &dH, PlpDirent &e) {
 Enum<RFSV::errs> RFSV16::
 dir(const char *name, PlpDir &files)
 {
-    rfsvDirhandle h;
+    RFSVDirHandle h;
     files.clear();
     Enum<RFSV::errs> res = opendir(PSI_A_HIDDEN|PSI_A_SYSTEM|PSI_A_DIR, name, h);
     while (res == E_PSI_GEN_NONE) {
@@ -308,7 +308,7 @@ fsetattr(const char *name, uint32_t seta, uint32_t unseta)
 Enum<RFSV::errs> RFSV16::
 dircount(const char * const name, uint32_t &count)
 {
-    rfsvDirhandle h;
+    RFSVDirHandle h;
     Enum<RFSV::errs> res = opendir(PSI_A_HIDDEN|PSI_A_SYSTEM|PSI_A_DIR, name, h);
     while (res == E_PSI_GEN_NONE) {
         PlpDirent e;
@@ -448,7 +448,6 @@ devinfo(const char drive, Drive &dinfo)
     dinfo.setSpace(a.getDWord(10), 0);
 
     dinfo.setName(toupper(drive), a.getString(14));
-
 
     return res;
 }

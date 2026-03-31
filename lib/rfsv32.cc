@@ -135,7 +135,7 @@ fclose(uint32_t handle)
 }
 
 Enum<RFSV::errs> RFSV32::
-opendir(const uint32_t attr, const char *name, rfsvDirhandle &dH) {
+opendir(const uint32_t attr, const char *name, RFSVDirHandle &dH) {
     uint32_t handle;
     Enum<RFSV::errs> res = fopendir(std2attr(attr), name, handle);
     dH.h = handle;
@@ -144,12 +144,12 @@ opendir(const uint32_t attr, const char *name, rfsvDirhandle &dH) {
 }
 
 Enum<RFSV::errs> RFSV32::
-closedir(rfsvDirhandle &dH) {
+closedir(RFSVDirHandle &dH) {
     return fclose(dH.h);
 }
 
 Enum<RFSV::errs> RFSV32::
-readdir(rfsvDirhandle &dH, PlpDirent &e) {
+readdir(RFSVDirHandle &dH, PlpDirent &e) {
     Enum<RFSV::errs> res = E_PSI_GEN_NONE;
 
     if (dH.b.getLen() < 17) {
@@ -186,7 +186,7 @@ readdir(rfsvDirhandle &dH, PlpDirent &e) {
 Enum<RFSV::errs> RFSV32::
 dir(const char *name, PlpDir &files)
 {
-    rfsvDirhandle h;
+    RFSVDirHandle h;
     files.clear();
     Enum<RFSV::errs> res = opendir(PSI_A_HIDDEN | PSI_A_SYSTEM | PSI_A_DIR, name, h);
     while (res == E_PSI_GEN_NONE) {
