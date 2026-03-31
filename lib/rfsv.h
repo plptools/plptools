@@ -31,7 +31,7 @@
 typedef std::deque<class PlpDirent> PlpDir;
 
 class TCPSocket;
-class PlpDrive;
+class Drive;
 
 inline const int RFSV_SENDLEN = 2000;
 
@@ -384,12 +384,12 @@ public:
     * @param drive The drive character of the drive to get details from
     *              (e.g: 'C', 'D' etc.).
     *              (0 represents A:, 1 is B: and so on ...)
-    * @param dinfo A @ref PlpDrive object which is filled with the drive's
+    * @param dinfo A @ref Drive object which is filled with the drive's
     *              information upon return.
     *
     * @returns A Psion error code (One of enum @ref #errs ).
     */
-    virtual Enum<errs> devinfo(const char drive, PlpDrive &dinfo) = 0;
+    virtual Enum<errs> devinfo(const char drive, Drive &dinfo) = 0;
 
     /**
     * Reads from a file on the Psion.

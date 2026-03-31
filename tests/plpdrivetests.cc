@@ -26,15 +26,15 @@
 #include "plpdirent.h"
 #include "rfsv.h"
 
-TEST_CASE("PlpDrive::getPath") {
+TEST_CASE("Drive::getPath") {
 
     SUBCASE("M") {
-        PlpDrive drive(MediaType::kRAM, 0, 0, 0, 0, 0, 'M', "Drive");
+        Drive drive(MediaType::kRAM, 0, 0, 0, 0, 0, 'M', "Drive");
         CHECK(drive.getPath() == "M:\\");
     }
 
     SUBCASE("C") {
-        PlpDrive drive(MediaType::kRAM, 0, 0, 0, 0, 0, 'C', "Drive");
+        Drive drive(MediaType::kRAM, 0, 0, 0, 0, 0, 'C', "Drive");
         CHECK(drive.getPath() == "C:\\");
     }
 

@@ -69,7 +69,7 @@ public:
     Enum<RFSV::errs> fclose(const uint32_t);
 
     Enum<RFSV::errs> devlist(uint32_t &);
-    Enum<RFSV::errs> devinfo(const char, PlpDrive&);
+    Enum<RFSV::errs> devinfo(const char, Drive&);
     Enum<RFSV::errs> opendir(const uint32_t, const char * const, rfsvDirhandle &);
     Enum<RFSV::errs> readdir(rfsvDirhandle &, PlpDirent &);
     Enum<RFSV::errs> closedir(rfsvDirhandle &);

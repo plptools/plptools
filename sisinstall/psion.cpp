@@ -96,7 +96,7 @@ Psion::copyToPsion(const char * const from, const char * const to,
 }
 
 Enum<RFSV::errs>
-Psion::devinfo(const char drive, PlpDrive& plpDrive)
+Psion::devinfo(const char drive, Drive& plpDrive)
 {
     return m_rfsv->devinfo(drive, plpDrive);
 }

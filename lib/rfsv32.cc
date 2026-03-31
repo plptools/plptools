@@ -360,7 +360,7 @@ devlist(uint32_t &devbits)
 }
 
 Enum<RFSV::errs> RFSV32::
-devinfo(const char drive, PlpDrive &dinfo)
+devinfo(const char drive, Drive &dinfo)
 {
     BufferStore a;
     Enum<RFSV::errs> res;

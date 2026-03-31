@@ -563,18 +563,18 @@ SISInstaller::selectDrive()
                 {
                 for (int i = 0; i < 26; i++)
                         {
-                        PlpDrive plpdrive;
+                        Drive drive;
                         if (((devbits & 1) != 0) &&
-                                (m_psion->devinfo(i + 'A', plpdrive) == RFSV::E_PSI_GEN_NONE))
+                                (m_psion->devinfo(i + 'A', drive) == RFSV::E_PSI_GEN_NONE))
                                 {
-                                MediaType mediaType = plpdrive.getMediaType();
+                                MediaType mediaType = drive.getMediaType();
                                 if ((mediaType == MediaType::kDisk) || (mediaType == MediaType::kRAM))
                                         {
                                         drivelist[ndrives] = 'A' + i;
                                         printf("%c: %lud bytes free, %lud bytes total\n",
                                                'A' + i,
-                                               plpdrive.getSpace(),
-                                               plpdrive.getSize());
+                                               drive.getSpace(),
+                                               drive.getSize());
                                         ++ndrives;
                                         }
                                 }
