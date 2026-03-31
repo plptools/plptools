@@ -22,12 +22,13 @@
 
 #include "sisinstaller.h"
 
+#include "drive.h"
 #include "plpdirent.h"
+#include "psion.h"
 #include "sisfile.h"
 #include "sisfilelink.h"
 #include "sisfilerecord.h"
 #include "sisreqrecord.h"
-#include "psion.h"
 
 #include <cstdlib>
 #include <errno.h>

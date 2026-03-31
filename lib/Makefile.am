@@ -33,6 +33,7 @@ libplp_la_SOURCES = \
 	channel.cc \
 	cli_utils.cc \
 	datalink.cc \
+	drive.cc \
 	Enum.cc \
 	iowatch.cc \
 	link.cc \
@@ -73,6 +74,7 @@ noinst_HEADERS = \
 	channel.h \
 	cli_utils.h \
 	datalink.h \
+	drive.h \
 	Enum.h \
 	iowatch.h \
 	link.h  \
