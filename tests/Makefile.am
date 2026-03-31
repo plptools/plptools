@@ -25,7 +25,7 @@ tests_CXXFLAGS = $(WARN_CXXFLAGS)
 tests_LDADD = $(LIB_PLP) $(INTLLIBS) $(SERVENT_LIB)
 tests_SOURCES = \
     doctest.h \
-    main.cc \
-    plpdrivetests.cc
+    drivetests.cc \
+    main.cc
 
 TESTS = tests
