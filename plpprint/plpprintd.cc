@@ -1,7 +1,7 @@
 /*
  * This file is part of plptools.
  *
- *  Copyright (C) 1999-2026 Fritz Elfert <felfert@to.com>
+ *  Copyright (C) 1999-2001 Fritz Elfert <felfert@to.com>
  *  Copyright (C) 2026 Fabrice Cappaert <captfab@somesite.net>
  *
  *  This program is free software; you can redistribute it and/or modify
