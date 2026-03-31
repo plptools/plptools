@@ -128,13 +128,13 @@ Drive::Drive() {
 }
 
 Drive::Drive(MediaType mediaType,
-                   uint32_t driveAttributes,
-                   uint32_t mediaAttributes,
-                   uint32_t uid,
-                   uint64_t size,
-                   uint64_t space,
-                   char driveLetter,
-                   std::string name)
+             uint32_t driveAttributes,
+             uint32_t mediaAttributes,
+             uint32_t uid,
+             uint64_t size,
+             uint64_t space,
+             char driveLetter,
+             std::string name)
 : mediaType_(mediaType)
 , driveAttributes_(driveAttributes)
 , mediaAttributes_(mediaAttributes)
