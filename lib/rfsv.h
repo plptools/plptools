@@ -75,7 +75,7 @@ private:
 class RFSV {
 public:
     /**
-    * The kown modes for seek.
+    * The known modes for seek.
     */
     enum seek_mode {
         PSI_SEEK_SET = 1,
