@@ -30,6 +30,7 @@ TEST_CASE("PlpDirent::getPath") {
 
     SUBCASE("No trailing backslash") {
         PlpDirent dirent(0, 0, 0, 0, "C:\\Projects", "foo.txt");
+        CHECK(dirent.isDirectory() == false);
         std::string name = dirent.getName();
         CHECK(name == "foo.txt");
         CHECK(dirent.getPath() == "C:\\Projects\\foo.txt");
@@ -37,6 +38,7 @@ TEST_CASE("PlpDirent::getPath") {
 
     SUBCASE("Trailing backslash") {
         PlpDirent dirent(0, 0, 0, 0, "C:\\Projects\\", "foo.txt");
+        CHECK(dirent.isDirectory() == false);
         std::string name = dirent.getName();
         CHECK(name == "foo.txt");
         CHECK(dirent.getPath() == "C:\\Projects\\foo.txt");
@@ -44,9 +46,18 @@ TEST_CASE("PlpDirent::getPath") {
 
     SUBCASE("Empty directory name") {
         PlpDirent dirent(0, 0, 0, 0, "", "foo.txt");
+        CHECK(dirent.isDirectory() == false);
         std::string name = dirent.getName();
         CHECK(name == "foo.txt");
         CHECK(dirent.getPath() == "\\foo.txt");
+    }
+
+    SUBCASE("Directory must have trailing backslash") {
+        PlpDirent dirent(0, RFSV::PSI_A_DIR, 0, 0, "M:\\", "FOO");
+        CHECK(dirent.isDirectory() == true);
+        std::string name = dirent.getName();
+        CHECK(name == "FOO");
+        CHECK(dirent.getPath() == "M:\\FOO\\");
     }
 
 }
