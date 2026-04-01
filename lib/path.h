@@ -70,12 +70,12 @@ public:
     static char *resolveEPOCPath(const char *path, const char *initialPath);
 
     /**
-    * Return a new string that represents the path, @ref path, with a guaranteed
-    * trailing separator, @ref separator.
+    * Return a new string that represents the path, @p path, with a guaranteed
+    * trailing separator, @p separator.
     *
     * This function makes no attempt to normalize paths or convert path separators.
     *
-    * @return @ref path + @ref separator if path does not end in a separator; @ref path, otherwise.
+    * @return @p path + @p separator if path does not end in a separator; @p path, otherwise.
     */
     static std::string ensuring_trailing_separator(const std::string &path,
                                                    const char separator = kHostSeparator);
