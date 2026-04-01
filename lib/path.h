@@ -37,6 +37,20 @@ class Path {
 public:
 
     /**
+    * Psion-native path separator.
+    *
+    * Always backslash.
+    */
+    static constexpr char kEPOCSeparator = '\\';
+
+    /**
+    * Host-native path separator.
+    *
+    * Forward slash on POSIX operating systems; backslash on Windows.
+    */
+    static constexpr char kHostSeparator = '/';
+
+    /**
     * Returns the last path component of an EPOC path.
     *
     * If the path doesn't contain any EPOC path separators (`\`), the returned string matches the path.
@@ -54,5 +68,16 @@ public:
     * If `path` is already an absolute path, this returns `path`.
     */
     static char *resolveEPOCPath(const char *path, const char *initialPath);
+
+    /**
+    * Return a new string that represents the path, @ref path, with a guaranteed
+    * trailing separator, @ref separator.
+    *
+    * This function makes no attempt to normalize paths or convert path separators.
+    *
+    * @return @ref path + @ref separator if path does not end in a separator; @ref path, otherwise.
+    */
+    static std::string ensuring_trailing_separator(const std::string &path,
+                                                   const char separator = kHostSeparator);
 
 };

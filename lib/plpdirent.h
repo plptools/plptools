@@ -97,8 +97,12 @@ public:
     /**
     * Initializing Constructor
     */
-    PlpDirent(const uint32_t size, const uint32_t attr, const uint32_t tHi,
-              const uint32_t tLo, const char * const name);
+    PlpDirent(const uint32_t size,
+              const uint32_t attr,
+              const uint32_t tHi,
+              const uint32_t tLo,
+              const std::string &dirname,
+              const char *const name);
 
     /**
     * Default destructor.
@@ -142,6 +146,8 @@ public:
     * @returns The PlpUID object.
     */
     PlpUID &getUID();
+
+    std::string getPath() const;
 
     /**
     * Retrieve the file name of a directory entry.
@@ -189,6 +195,7 @@ private:
     uint32_t attr;
     PlpUID  UID;
     PsiTime time;
-    std::string  attrstr;
-    std::string  name;
+    std::string attrstr;
+    std::string dirname_;
+    std::string name;
 };
