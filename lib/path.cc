@@ -92,6 +92,5 @@ std::string Path::ensuring_trailing_separator(const std::string &path,
     if (!path.empty() && path.back() == separator) {
         return path;
     }
-    std::string result = path;
-    return result + separator;
+    return path + separator;
 }
