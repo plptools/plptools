@@ -53,15 +53,6 @@ PlpDirent::PlpDirent()
 , name("") {
 }
 
-PlpDirent::PlpDirent(const PlpDirent &e) {
-    size    = e.size;
-    attr    = e.attr;
-    time    = e.time;
-    UID     = e.UID;
-    name    = e.name;
-    attrstr = e.attrstr;
-}
-
 PlpDirent::PlpDirent(const uint32_t _size,
                      const uint32_t _attr,
                      const uint32_t tHi,
@@ -100,7 +91,12 @@ PlpUID &PlpDirent::getUID() {
 }
 
 std::string PlpDirent::getPath() const {
-    return Path::ensuring_trailing_separator(dirname_, '\\') + name;
+    std::string path = Path::ensuring_trailing_separator(dirname_, Path::kEPOCSeparator) + name;
+    if (isDirectory()) {
+        return Path::ensuring_trailing_separator(path, Path::kEPOCSeparator);
+    } else {
+        return path;
+    }
 }
 
 const char *PlpDirent::getName() const {
@@ -113,17 +109,6 @@ PsiTime PlpDirent::getPsiTime() {
 
 void PlpDirent::setName(const char *str) {
     name = str;
-}
-
-PlpDirent &PlpDirent::operator=(const PlpDirent &e) {
-    size = e.size;
-    attr = e.attr;
-    time = e.time;
-    UID = e.UID;
-    dirname_ = e.dirname_;
-    name = e.name;
-    attrstr = e.attrstr;
-    return *this;
 }
 
 ostream &operator<<(ostream &o, const PlpDirent &e) {

@@ -90,9 +90,9 @@ public:
     * A copy constructor.
     * Mainly used by STL container classes.
     *
-    * @param d The object to be used as initializer.
+    * @param e The object to be used as initializer.
     */
-    PlpDirent(const PlpDirent &d);
+    PlpDirent(const PlpDirent &e) = default;
 
     /**
     * Initializing Constructor
@@ -181,7 +181,7 @@ public:
     *
     * @returns The modified object.
     */
-    PlpDirent &operator=(const PlpDirent &e);
+    PlpDirent &operator=(const PlpDirent &e) = default;
 
     /**
     * Prints the object contents.
