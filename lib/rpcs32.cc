@@ -32,30 +32,27 @@
 
 using namespace std;
 
-rpcs32::rpcs32(TCPSocket * _skt)
-{
+RPCS32::RPCS32(TCPSocket * _skt) {
     skt = _skt;
     mtCacheS5mx = 0;
     reset();
 }
 
-Enum<RFSV::errs> rpcs32::
-getCmdLine(const char *process, string &ret)
-{
+Enum<RFSV::errs> RPCS32::getCmdLine(const char *process, string &ret) {
     BufferStore a;
     Enum<RFSV::errs> res;
 
     a.addStringT(process);
-    if (!sendCommand(rpcs::GET_CMDLINE, a))
+    if (!sendCommand(rpcs::GET_CMDLINE, a)) {
         return RFSV::E_PSI_FILE_DISC;
-    if ((res = getResponse(a, true)) == RFSV::E_PSI_GEN_NONE)
+    }
+    if ((res = getResponse(a, true)) == RFSV::E_PSI_GEN_NONE) {
         ret = a.getString(0);
+    }
     return res;
 }
 
-Enum<RFSV::errs> rpcs32::
-getMachineInfo(machineInfo &mi)
-{
+Enum<RFSV::errs> RPCS32::getMachineInfo(machineInfo &mi) {
     BufferStore a;
     Enum<RFSV::errs> res;
 
@@ -118,23 +115,23 @@ getMachineInfo(machineInfo &mi)
 
     mtCacheS5mx |= 8;
     if (res == RFSV::E_PSI_GEN_NONE) {
-        if (!strcmp(mi.machineName, "SERIES5mx"))
+        if (!strcmp(mi.machineName, "SERIES5mx")) {
             mtCacheS5mx |= 2;
+        }
     }
 
     return res;
 }
 
-Enum<RFSV::errs> rpcs32::
-getOwnerInfo(BufferArray &owner)
-{
+Enum<RFSV::errs> RPCS32::getOwnerInfo(BufferArray &owner) {
     Enum<RFSV::errs> res;
     BufferStore a;
 
     if (!sendCommand(GET_OWNERINFO, a))
         return RFSV::E_PSI_FILE_DISC;
-    if ((res = (enum RFSV::errs)getResponse(a, true)) != RFSV::E_PSI_GEN_NONE)
+    if ((res = (enum RFSV::errs)getResponse(a, true)) != RFSV::E_PSI_GEN_NONE) {
         return res;
+    }
     a.addByte(0);
     string s = a.getString(0);
     owner.clear();
@@ -154,9 +151,7 @@ getOwnerInfo(BufferArray &owner)
     return res;
 }
 
-Enum<RFSV::errs> rpcs32::
-regOpenIter(uint32_t uid, char *match, uint16_t &handle)
-{
+Enum<RFSV::errs> RPCS32::regOpenIter(uint32_t uid, char *match, uint16_t &handle) {
     BufferStore a;
     Enum<RFSV::errs> res;
 
@@ -164,35 +159,35 @@ regOpenIter(uint32_t uid, char *match, uint16_t &handle)
     a.addDWord(uid);
     a.addDWord(strlen(match));
     a.addStringT(match);
-    if (!sendCommand(rpcs::REG_OPEN_ITER, a))
+    if (!sendCommand(rpcs::REG_OPEN_ITER, a)) {
         return RFSV::E_PSI_FILE_DISC;
+    }
     res = getResponse(a, true);
     cout << "ro: r=" << res << " a=" << a << endl;
-    if (a.getLen() == 2)
+    if (a.getLen() == 2) {
         handle = a.getWord(0);
+    }
     return RFSV::E_PSI_GEN_NONE;
 }
 
-Enum<RFSV::errs> rpcs32::
-regReadIter(uint16_t handle)
-{
+Enum<RFSV::errs> RPCS32::regReadIter(uint16_t handle) {
     BufferStore a;
     Enum<RFSV::errs> res;
 
     cout << "Riter" << endl;
     a.addWord(handle);
-    if (!sendCommand(rpcs::REG_READ_ITER, a))
+    if (!sendCommand(rpcs::REG_READ_ITER, a)) {
         return RFSV::E_PSI_FILE_DISC;
+    }
     res = getResponse(a, true);
     cout << "ro: r=" << res << " a=" << a << endl;
-    if ((a.getLen() == 3) && (a.getByte(2) == 0xff))
+    if ((a.getLen() == 3) && (a.getByte(2) == 0xff)) {
         return RFSV::E_PSI_FILE_EOF;
+    }
     return RFSV::E_PSI_GEN_NONE;
 }
 
-Enum<RFSV::errs> rpcs32::
-setTime(time_t time)
-{
+Enum<RFSV::errs> RPCS32::setTime(time_t time) {
     BufferStore a;
     Enum<RFSV::errs> res;
     PsiTime pt;
@@ -219,9 +214,7 @@ setTime(time_t time)
         return res;
 }
 
-Enum<RFSV::errs> rpcs32::
-configOpen(uint16_t &handle, uint32_t size)
-{
+Enum<RFSV::errs> RPCS32::configOpen(uint16_t &handle, uint32_t size) {
     BufferStore a;
     Enum<RFSV::errs> res;
 
@@ -234,9 +227,7 @@ configOpen(uint16_t &handle, uint32_t size)
     return res;
 }
 
-Enum<RFSV::errs> rpcs32::
-configRead(uint32_t size, BufferStore &ret)
-{
+Enum<RFSV::errs> RPCS32::configRead(uint32_t size, BufferStore &ret) {
     BufferStore a;
     uint16_t handle;
     Enum<RFSV::errs> res;
@@ -260,9 +251,7 @@ configRead(uint32_t size, BufferStore &ret)
     return RFSV::E_PSI_GEN_NONE;
 }
 
-Enum<RFSV::errs> rpcs32::
-configWrite(BufferStore data)
-{
+Enum<RFSV::errs> RPCS32::configWrite(BufferStore data) {
     BufferStore a;
     uint16_t handle;
     Enum<RFSV::errs> res;
@@ -286,9 +275,7 @@ configWrite(BufferStore data)
     return RFSV::E_PSI_GEN_NONE;
 }
 
-Enum<RFSV::errs> rpcs32::
-closeHandle(uint16_t handle)
-{
+Enum<RFSV::errs> RPCS32::closeHandle(uint16_t handle) {
     BufferStore a;
 
     a.addWord(handle);
