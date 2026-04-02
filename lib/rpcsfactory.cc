@@ -72,7 +72,7 @@ rpcs * rpcsfactory::create(bool reconnect)
             return new RPCS16(skt);
         }
         else if (a.getLen() > 8 && !strncmp(a.getString(), "Series 5", 8)) {
-            return new rpcs32(skt);
+            return new RPCS32(skt);
         }
         if ((a.getLen() > 8) && !strncmp(a.getString(), "No Psion", 8)) {
             skt->closeSocket();

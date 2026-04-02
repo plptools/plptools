@@ -324,7 +324,7 @@ private:
  * @author Fritz Elfert <felfert@to.com>
  */
 class PsiZone {
-    friend class rpcs32;
+    friend class RPCS32;
 
 public:
     /**
