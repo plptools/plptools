@@ -53,15 +53,15 @@ class rpcsfactory {
     rpcsfactory(TCPSocket *skt);
 
     /**
-    * Creates a new rpcs instance.
+    * Creates a new RPCS instance.
     *
     * @param reconnect Set to true, if automatic reconnect
     * should be performed on failure.
     *
-    * @returns A pointer to a newly created rpcs instance or
+    * @returns A pointer to a newly created RPCS instance or
     * NULL on failure.
     */
-    virtual rpcs * create(bool reconnect);
+    virtual RPCS *create(bool reconnect);
 
     /**
     * Retrieve an error code.

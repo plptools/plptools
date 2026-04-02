@@ -99,7 +99,7 @@ main(int argc, char **argv)
     TCPSocket *skt;
     TCPSocket *skt2;
     RFSV *a;
-    rpcs *r;
+    RPCS *r;
     TCPSocket *rclipSocket;
     rclip *rc;
     ftp f;

@@ -42,7 +42,7 @@ Enum<RFSV::errs> RPCS16::getCmdLine(const char *process, string &ret) {
     Enum<RFSV::errs> res;
 
     a.addStringT(process);
-    if (!sendCommand(rpcs::GET_CMDLINE, a)) {
+    if (!sendCommand(RPCS::GET_CMDLINE, a)) {
         return RFSV::E_PSI_FILE_DISC;
     }
     if ((res = getResponse(a, true)) == RFSV::E_PSI_GEN_NONE) {

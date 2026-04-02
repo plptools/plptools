@@ -36,7 +36,7 @@ typedef std::vector<PsiProcess> processList;
 /**
  * Remote procedure call services via PLP
  *
- * rpcs provides an interface for communicating
+ * RPCS provides an interface for communicating
  * with the Psion's remote procedure call
  * service. The generic facilities for both,
  * EPOC and SIBO are implemented here, while
@@ -48,7 +48,7 @@ typedef std::vector<PsiProcess> processList;
  *
  * @author Fritz Elfert <felfert@to.com>
  */
-class rpcs {
+class RPCS {
 public:
     /**
     * The known machine types.
@@ -115,7 +115,7 @@ public:
 
     /**
     * This struct holds the data returned
-    * by @ref rpcs::getMachineInfo.
+    * by @ref RPCS::getMachineInfo.
     */
     typedef struct machineInfo_t {
         Enum<machs> machineType;
@@ -161,7 +161,7 @@ public:
     /**
     * Virtual destructor.
     */
-    virtual ~rpcs();
+    virtual ~RPCS();
 
     /**
     * Initializes a connection to the remote
@@ -326,7 +326,7 @@ public:
     * Retrieves the command line of a running process.
     *
     * This function works with both SIBO and EPOC.
-    * Note: @ref rpcs::queryPrograms calls this method internally and sets
+    * Note: @ref RPCS::queryPrograms calls this method internally and sets
     * the args member of @ref PsiProcess , so you usually don't have to call
     * this method yourself.
     *
@@ -351,12 +351,12 @@ public:
     virtual Enum<RFSV::errs> getMachineInfo(machineInfo &machineInfo) { return RFSV::E_PSI_NOT_SIBO;}
 
     /**
-     * Release an rpcs handle.
+     * Release an RPCS handle.
      *
      * This function works with EPOC only. Using it with SIBO
      * machines, returns always an error code E_PSI_NOT_SIBO.
      * It releases a handle, obtained by a previous call to
-     * @ref rpcs::configOpen .
+     * @ref RPCS::configOpen .
      *
      * @param handle The handle to close.
      *
@@ -468,13 +468,13 @@ protected:
      * This function works with EPOC only. Using it with SIBO
      * machines, returns always an error code E_PSI_NOT_SIBO.
      * It prepares a scratch area on the EPOC machine for a following
-     * use from within @ref rpcs::configRead or @ref rpcs::configWrite .
-     * These functions call @ref rpcs::closeHandle on exit. The contents
+     * use from within @ref RPCS::configRead or @ref RPCS::configWrite .
+     * These functions call @ref RPCS::closeHandle on exit. The contents
      * of the scratch area is stored in RAM of the Series 5, therefore it
      * gets lost when the Series 5 is switched off.
      *
-     * @param handle The handle to be used in @ref rpcs::configRead ,
-     *               @ref rpcs::configWrite and @ref rpcs::closeHandle is
+     * @param handle The handle to be used in @ref RPCS::configRead ,
+     *               @ref RPCS::configWrite and @ref RPCS::closeHandle is
      *               returned here.
      * @param size   The number of bytes you want to use.
      *
@@ -489,7 +489,7 @@ protected:
     * If communication fails, a reconnect is triggered
     * and a second attempt to transmit the request
     * is attempted. If that second attempt fails,
-    * the function returns an error and sets rpcs::status
+    * the function returns an error and sets RPCS::status
     * to E_PSI_FILE_DISC.
     *
     * @param cc The command to execute on the remote side.
