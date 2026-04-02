@@ -209,7 +209,7 @@ Enum<RFSV::errs> RFSV::dir(const std::string &path,
     return RFSV::E_PSI_GEN_NONE;
 }
 
-Enum<RFSV::errs> RFSV::drives(std::vector<Drive> &drives) {
+Enum<RFSV::errs> RFSV::drives(std::vector<Drive> &_drives) {
     Enum<RFSV::errs> result;
 
     // Get the supported drives.
@@ -228,9 +228,10 @@ Enum<RFSV::errs> RFSV::drives(std::vector<Drive> &drives) {
     }
 
     // Iterate over the devices and get the info for the available drives.
+    std::vector<Drive> drives;
     for (const auto &device : devices) {
-        Drive driveInfo;
-        result = devinfo(device, driveInfo);
+        Drive drive;
+        result = devinfo(device, drive);
         if (result == RFSV::E_PSI_FILE_NOTREADY) {
             // Ignore drives that aren't available.
             continue;
@@ -238,7 +239,9 @@ Enum<RFSV::errs> RFSV::drives(std::vector<Drive> &drives) {
         if (result != RFSV::E_PSI_GEN_NONE) {
             return result;
         }
-        drives.push_back(driveInfo);
+        drives.push_back(drive);
     }
+
+    _drives = drives;
     return RFSV::E_PSI_GEN_NONE;
 }
