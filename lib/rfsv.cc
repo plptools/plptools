@@ -214,25 +214,25 @@ Enum<RFSV::errs> RFSV::drives(std::vector<Drive> &_drives) {
     Enum<RFSV::errs> result;
 
     // Get the supported drives.
-    uint32_t deviceBits = 0;
-    result = devlist(deviceBits);
+    uint32_t driveBits = 0;
+    result = devlist(driveBits);
     if (result != RFSV::E_PSI_GEN_NONE) {
         return result;
     }
 
     // Convert them to drive letters.
-    std::vector<char> devices;
+    std::vector<char> driveLetters;
     for (int i = 0; i < 26; i++) {
-        if (deviceBits & (1 << i)) {
-            devices.push_back('A' + i);
+        if (driveBits & (1 << i)) {
+            driveLetters.push_back('A' + i);
         }
     }
 
-    // Iterate over the devices and get the info for the available drives.
+    // Iterate over the drive letters and get the info for the available drives.
     std::vector<Drive> drives;
-    for (const auto &device : devices) {
+    for (const auto &driveLetter : driveLetters) {
         Drive drive;
-        result = devinfo(device, drive);
+        result = devinfo(driveLetter, drive);
         if (result == RFSV::E_PSI_FILE_NOTREADY) {
             // Ignore drives that aren't available.
             continue;
