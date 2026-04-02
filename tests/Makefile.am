@@ -26,6 +26,8 @@ tests_LDADD = $(LIB_PLP) $(INTLLIBS) $(SERVENT_LIB)
 tests_SOURCES = \
     doctest.h \
     drivetests.cc \
-    main.cc
+    main.cc \
+    pathtests.cc \
+    plpdirenttests.cc
 
 TESTS = tests

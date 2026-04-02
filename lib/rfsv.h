@@ -57,6 +57,7 @@ class RFSVDirHandle {
 private:
     uint32_t h;
     BufferStore b;
+    std::string name_;
 };
 
 /**

@@ -140,6 +140,7 @@ opendir(const uint32_t attr, const char *name, RFSVDirHandle &dH) {
     Enum<RFSV::errs> res = fopendir(std2attr(attr), name, handle);
     dH.h = handle;
     dH.b.init();
+    dH.name_ = name;
     return res;
 }
 
@@ -155,29 +156,34 @@ readdir(RFSVDirHandle &dH, PlpDirent &e) {
     if (dH.b.getLen() < 17) {
         dH.b.init();
         dH.b.addDWord(dH.h);
-        if (!sendCommand(READ_DIR, dH.b))
+        if (!sendCommand(READ_DIR, dH.b)) {
             return E_PSI_FILE_DISC;
+        }
         res = getResponse(dH.b);
     }
     if ((res == E_PSI_GEN_NONE) && (dH.b.getLen() > 16)) {
-        long shortLen   = dH.b.getDWord(0);
-        long longLen    = dH.b.getDWord(32);
+        long shortLen = dH.b.getDWord(0);
+        long longLen = dH.b.getDWord(32);
 
-        e.attr    = attr2std(dH.b.getDWord(4));
-        e.size    = dH.b.getDWord(8);
-        e.UID     = PlpUID(dH.b.getDWord(20), dH.b.getDWord(24), dH.b.getDWord(28));
-        e.time    = PsiTime(dH.b.getDWord(16), dH.b.getDWord(12));
-        e.name    = "";
+        e.attr = attr2std(dH.b.getDWord(4));
+        e.size = dH.b.getDWord(8);
+        e.UID = PlpUID(dH.b.getDWord(20), dH.b.getDWord(24), dH.b.getDWord(28));
+        e.time = PsiTime(dH.b.getDWord(16), dH.b.getDWord(12));
+        e.dirname_ = dH.name_;
+        e.name = "";
         e.attrstr = string(attr2String(e.attr));
 
         int d = 36;
-        for (int i = 0; i < longLen; i++, d++)
+        for (int i = 0; i < longLen; i++, d++) {
             e.name += dH.b.getByte(d);
-        while (d % 4)
+        }
+        while (d % 4) {
             d++;
+        }
         d += shortLen;
-        while (d % 4)
+        while (d % 4) {
             d++;
+        }
         dH.b.discardFirstBytes(d);
     }
     return res;

@@ -86,3 +86,11 @@ char *Path::resolveEPOCPath(const char *path, const char *relativeToPath) {
 
     return f1;
 }
+
+std::string Path::ensuring_trailing_separator(const std::string &path,
+                                              const char separator) {
+    if (!path.empty() && path.back() == separator) {
+        return path;
+    }
+    return path + separator;
+}

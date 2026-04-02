@@ -123,6 +123,7 @@ opendir(const uint32_t attr, const char *name, RFSVDirHandle &dH) {
     Enum<RFSV::errs> res = fopendir(name, handle);
     dH.h = handle;
     dH.b.init();
+    dH.name_ = name;
     return res;
 }
 
@@ -150,13 +151,14 @@ readdir(RFSVDirHandle &dH, PlpDirent &e) {
     }
     if ((res == E_PSI_GEN_NONE) && (dH.b.getLen() > 16)) {
         uint16_t version = dH.b.getWord(0);
-        if (version != 2)
+        if (version != 2) {
             return E_PSI_GEN_FAIL;
-        e.attr    = attr2std((uint32_t)dH.b.getWord(2));
-        e.size    = dH.b.getDWord(4);
+        }
+        e.attr = attr2std((uint32_t)dH.b.getWord(2));
+        e.size = dH.b.getDWord(4);
         e.time.setSiboTime(dH.b.getDWord(8));
-        e.name    = dH.b.getString(16);
-        //e.UID     = PlpUID(0,0,0);
+        e.dirname_ = dH.name_;
+        e.name = dH.b.getString(16);
         e.attrstr = attr2String(e.attr);
 
         dH.b.discardFirstBytes(17 + e.name.length());

@@ -23,6 +23,8 @@
 
 #include "plpdirent.h"
 
+#include "path.h"
+
 #include <cstdint>
 #include <iomanip>
 
@@ -36,8 +38,7 @@ PlpUID::PlpUID(const uint32_t u1, const uint32_t u2, const uint32_t u3) {
     uid[0] = u1; uid[1] = u2; uid[2] = u3;
 }
 
-uint32_t PlpUID::
-operator[](int idx) {
+uint32_t PlpUID::operator[](int idx) {
     assert ((idx > -1) && (idx < 3));
     return uid[idx];
 }
@@ -45,29 +46,26 @@ operator[](int idx) {
 PlpDirent::PlpDirent()
 : size(0)
 , attr(0)
+, UID()
 , time(time_t(0))
 , attrstr("")
+, dirname_("")
 , name("") {
 }
 
-PlpDirent::PlpDirent(const PlpDirent &e) {
-    size    = e.size;
-    attr    = e.attr;
-    time    = e.time;
-    UID     = e.UID;
-    name    = e.name;
-    attrstr = e.attrstr;
-}
-
-PlpDirent::PlpDirent(const uint32_t _size, const uint32_t _attr,
-                     const uint32_t tHi, const uint32_t tLo,
-                     const char * const _name) {
-    size = _size;
-    attr = _attr;
-    time = PsiTime(tHi, tLo);
-    UID  = PlpUID();
-    name = _name;
-    attrstr = "";
+PlpDirent::PlpDirent(const uint32_t _size,
+                     const uint32_t _attr,
+                     const uint32_t tHi,
+                     const uint32_t tLo,
+                     const std::string &dirname,
+                     const char * const _name)
+: size(_size)
+, attr(_attr)
+, UID()
+, time(tHi, tLo)
+, attrstr("")
+, dirname_(dirname)
+, name(_name) {
 }
 
 uint32_t PlpDirent::getSize() const {
@@ -92,6 +90,15 @@ PlpUID &PlpDirent::getUID() {
     return UID;
 }
 
+std::string PlpDirent::getPath() const {
+    std::string path = Path::ensuring_trailing_separator(dirname_, Path::kEPOCSeparator) + name;
+    if (isDirectory()) {
+        return Path::ensuring_trailing_separator(path, Path::kEPOCSeparator);
+    } else {
+        return path;
+    }
+}
+
 const char *PlpDirent::getName() const {
     return name.c_str();
 }
@@ -102,16 +109,6 @@ PsiTime PlpDirent::getPsiTime() {
 
 void PlpDirent::setName(const char *str) {
     name = str;
-}
-
-PlpDirent &PlpDirent::operator=(const PlpDirent &e) {
-    size    = e.size;
-    attr    = e.attr;
-    time    = e.time;
-    UID     = e.UID;
-    name    = e.name;
-    attrstr = e.attrstr;
-    return *this;
 }
 
 ostream &operator<<(ostream &o, const PlpDirent &e) {
