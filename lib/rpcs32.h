@@ -33,7 +33,7 @@ class rpcsfactory;
  * private. Use @ref rpcsfactory for creating an instance of
  * @ref rpcs . For a complete documentation, see @ref rpcs .
  */
-class rpcs32 : public rpcs {
+class RPCS32 : public rpcs {
     friend class rpcsfactory;
 
  public:
@@ -59,7 +59,7 @@ protected:
     Enum<RFSV::errs> configOpen(uint16_t &, uint32_t);
 
  private:
-    rpcs32(TCPSocket *);
+    RPCS32(TCPSocket *);
 };
 
 #endif
