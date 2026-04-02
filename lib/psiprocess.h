@@ -23,11 +23,11 @@
 #include <string>
 #include <iostream>
 
-class rpcs;
+class RPCS;
 
 /**
  * A class, describing a Process on the Psion.
- * Objects of this type are used by @ref rpcs::queryPrograms
+ * Objects of this type are used by @ref RPCS::queryPrograms
  * for returning the currently running processes.
  *
  * @author Fritz Elfert <felfert@to.com>
@@ -105,7 +105,7 @@ public:
     friend std::ostream &operator<<(std::ostream &o, const PsiProcess &p);
 
 private:
-    friend class rpcs;
+    friend class RPCS;
 
     void setArgs(std::string _args);
 

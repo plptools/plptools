@@ -27,7 +27,7 @@
 class TCPSocket;
 class rfsvfactory;
 class rpcsfactory;
-class rpcs;
+class RPCS;
 
 /**
  * Semi smart proxy for communicating with a Psion.
@@ -67,7 +67,7 @@ private:
     TCPSocket* m_skt2;
     rfsvfactory* m_rfsvFactory;
     rpcsfactory* m_rpcsFactory;
-    rpcs* m_rpcs;
+    RPCS* m_rpcs;
     RFSV* m_rfsv;
 
 };

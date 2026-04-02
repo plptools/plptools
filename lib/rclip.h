@@ -160,7 +160,7 @@ protected:
     * If communication fails, a reconnect is triggered
     * and a second attempt to transmit the request
     * is attempted. If that second attempt fails,
-    * the function returns an error an sets rpcs::status
+    * the function returns an error an sets RPCS::status
     * to E_PSI_FILE_DISC.
     *
     * @param cc The command to execute on the remote side.

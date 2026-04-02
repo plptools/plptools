@@ -28,13 +28,13 @@ class BufferStore;
 class rpcsfactory;
 
 /**
- * This is the implementation of the @ref rpcs protocol for
+ * This is the implementation of the @ref RPCS protocol for
  * Psion series 3 (SIBO) variant.  You normally never create
  * objects of this class directly. Thus the constructor is
  * private. Use @ref rpcsfactory for creating an instance of
- * @ref rpcs . For a complete documentation, see @ref rpcs .
+ * @ref RPCS . For a complete documentation, see @ref RPCS .
  */
-class RPCS16 : public rpcs {
+class RPCS16 : public RPCS {
     friend class rpcsfactory;
 
  public:

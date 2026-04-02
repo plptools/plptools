@@ -29,7 +29,7 @@
 #include "rfsv.h"
 #include "Enum.h"
 
-class rpcs;
+class RPCS;
 class BufferStore;
 class BufferArray;
 
@@ -37,14 +37,14 @@ class ftp {
     public:
     ftp();
     ~ftp();
-    int session(RFSV &a, rpcs & r, rclip & rc, TCPSocket & rclipSocket, std::vector<char *> argv);
+    int session(RFSV &a, RPCS & r, rclip & rc, TCPSocket & rclipSocket, std::vector<char *> argv);
     bool canClip;
 
     private:
     std::vector<char *> getCommand();
     void initReadline(void);
-    int putClipText(rpcs & r, RFSV &a, rclip & rc, TCPSocket & rclipSocket, const char *data);
-    int getClipData(rpcs & r, RFSV &a, rclip & rc, TCPSocket & rclipSocket, const char *file);
+    int putClipText(RPCS & r, RFSV &a, rclip & rc, TCPSocket & rclipSocket, const char *data);
+    int getClipData(RPCS & r, RFSV &a, rclip & rc, TCPSocket & rclipSocket, const char *file);
     bool checkClipConnection(RFSV &a, rclip & rc, TCPSocket & rclipSocket);
 
     // utilities

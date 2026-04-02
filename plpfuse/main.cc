@@ -55,7 +55,7 @@ using namespace std;
 static RFSV *a;
 static rfsvfactory *rf;
 
-static rpcs *r;
+static RPCS *r;
 static rpcsfactory *rp;
 static BufferStore owner;
 
@@ -436,6 +436,6 @@ int main(int argc, char**argv) {
     if (a != NULL && r != NULL)
         debuglog("plpfuse: connected");
     else
-        debuglog("plpfuse: could not create rfsv or rpcs object, connect delayed");
+        debuglog("plpfuse: could not create rfsv or RPCS object, connect delayed");
     return fuse(argc, argv);
 }

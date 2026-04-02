@@ -187,7 +187,7 @@ sigint_handler2(int) {
 }
 
 static int
-stopPrograms(rpcs & r, const char *file) {
+stopPrograms(RPCS & r, const char *file) {
     Enum<RFSV::errs> res;
     processList tmp;
     FILE *fp = fopen(file, "w");
@@ -264,7 +264,7 @@ getln(FILE *fp)
 }
 
 static int
-startPrograms(rpcs & r, RFSV &a, const char *file) {
+startPrograms(RPCS & r, RFSV &a, const char *file) {
     Enum<RFSV::errs> res;
     FILE *fp = fopen(file, "r");
     string cmd;
@@ -405,7 +405,7 @@ slurp(FILE *fp, size_t *final_len)
 }
 
 int
-ftp::putClipText(rpcs &, RFSV &a, rclip & rc, TCPSocket & rclipSocket, const char *file)
+ftp::putClipText(RPCS &, RFSV &a, rclip & rc, TCPSocket & rclipSocket, const char *file)
 {
     Enum<RFSV::errs> res;
     uint32_t fh;
@@ -533,7 +533,7 @@ ftp::putClipText(rpcs &, RFSV &a, rclip & rc, TCPSocket & rclipSocket, const cha
 // }
 
 int
-ftp::getClipData(rpcs &, RFSV &a, rclip &, TCPSocket &, const char *file) {
+ftp::getClipData(RPCS &, RFSV &a, rclip &, TCPSocket &, const char *file) {
     Enum<RFSV::errs> res;
     PlpDirent de;
     uint32_t fh;
@@ -639,7 +639,7 @@ static char *epoc_dir_from(const char *path) {
 }
 
 int ftp::
-session(RFSV &a, rpcs & r, rclip & rc, TCPSocket & rclipSocket, vector<char *> argv)
+session(RFSV &a, RPCS & r, rclip & rc, TCPSocket & rclipSocket, vector<char *> argv)
 {
     Enum<RFSV::errs> res;
     bool prompt = true;
@@ -652,7 +652,7 @@ session(RFSV &a, rpcs & r, rclip & rc, TCPSocket & rclipSocket, vector<char *> a
         once = true;
 
     {
-        Enum<rpcs::machs> machType;
+        Enum<RPCS::machs> machType;
         BufferArray b;
         if ((res = r.getOwnerInfo(b)) == RFSV::E_PSI_GEN_NONE) {
             r.getMachineType(machType);
@@ -1218,7 +1218,7 @@ session(RFSV &a, rpcs & r, rclip & rc, TCPSocket & rclipSocket, vector<char *> a
             continue;
         }
         if (!strcmp(argv[0], "machinfo")) {
-            rpcs::machineInfo mi;
+            RPCS::machineInfo mi;
             if ((res = r.getMachineInfo(mi)) != RFSV::E_PSI_GEN_NONE) {
                 cerr << _("Error: ") << res << endl;
                 continue;

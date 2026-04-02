@@ -109,7 +109,7 @@ typedef struct psi_timezone_t {
  * NOTE: For proper conversion, the current timezone of
  * the Psion has to be set. For EPOC devices, the
  * timezone can be evaluated using
- * @ref rpcs::getMachineInfo . For SIBO devices,
+ * @ref RPCS::getMachineInfo . For SIBO devices,
  * unfortunately there is no known method of retrieving
  * this information. Therefore, if the timezone is
  * <em>not</em> set, a fallback using the environment
@@ -316,7 +316,7 @@ private:
 /**
  * A singleton wrapper for a @ref psi_timezone . This class is used
  * by @ref PsiTime to initialize its psi_timezone variable.
- * PsiZone itself is initialized from within @ref rpcs::getMachineInfo .
+ * PsiZone itself is initialized from within @ref RPCS::getMachineInfo .
  * In an application, you typically call this at the very beginning, just
  * after connection setup. From then on, a single PsiZone instance is
  * held in memory and used by the various constructors of PsiTime.
