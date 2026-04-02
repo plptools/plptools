@@ -23,6 +23,7 @@
 
 #include <deque>
 #include <string>
+#include <vector>
 
 #include "Enum.h"
 #include "plpdirent.h"
