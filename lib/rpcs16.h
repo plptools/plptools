@@ -34,7 +34,7 @@ class rpcsfactory;
  * private. Use @ref rpcsfactory for creating an instance of
  * @ref rpcs . For a complete documentation, see @ref rpcs .
  */
-class rpcs16 : public rpcs {
+class RPCS16 : public rpcs {
     friend class rpcsfactory;
 
  public:
@@ -43,7 +43,7 @@ class rpcs16 : public rpcs {
 
 
  private:
-    rpcs16(TCPSocket *);
+    RPCS16(TCPSocket *);
 };
 
 #endif

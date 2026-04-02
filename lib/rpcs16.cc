@@ -31,30 +31,27 @@
 
 using namespace std;
 
-rpcs16::rpcs16(TCPSocket *_skt)
-{
+RPCS16::RPCS16(TCPSocket *_skt) {
     skt = _skt;
     mtCacheS5mx = 0;
     reset();
 }
 
-Enum<RFSV::errs> rpcs16::
-getCmdLine(const char *process, string &ret)
-{
+Enum<RFSV::errs> RPCS16::getCmdLine(const char *process, string &ret) {
     BufferStore a;
     Enum<RFSV::errs> res;
 
     a.addStringT(process);
-    if (!sendCommand(rpcs::GET_CMDLINE, a))
+    if (!sendCommand(rpcs::GET_CMDLINE, a)) {
         return RFSV::E_PSI_FILE_DISC;
-    if ((res = getResponse(a, true)) == RFSV::E_PSI_GEN_NONE)
+    }
+    if ((res = getResponse(a, true)) == RFSV::E_PSI_GEN_NONE) {
         ret = a.getString(0);
+    }
     return res;
 }
 
-Enum<RFSV::errs> rpcs16::
-getOwnerInfo(BufferArray &owner)
-{
+Enum<RFSV::errs> RPCS16::getOwnerInfo(BufferArray &owner) {
     Enum<RFSV::errs> res;
     BufferStore a;
 

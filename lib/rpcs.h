@@ -42,7 +42,7 @@ typedef std::vector<PsiProcess> processList;
  * EPOC and SIBO are implemented here, while
  * the facilities, unique to each of those
  * variants are implemented in
- * @ref rpcs32 or @ref rpcs16 respectively.
+ * @ref rpcs32 or @ref RPCS16 respectively.
  * These normally are instantiated by using
  * @ref rpcsfactory .
  *

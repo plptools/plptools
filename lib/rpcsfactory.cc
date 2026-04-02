@@ -69,7 +69,7 @@ rpcs * rpcsfactory::create(bool reconnect)
     }
     if (skt->getBufferStore(a) == 1) {
         if (a.getLen() > 8 && !strncmp(a.getString(), "Series 3", 8)) {
-            return new rpcs16(skt);
+            return new RPCS16(skt);
         }
         else if (a.getLen() > 8 && !strncmp(a.getString(), "Series 5", 8)) {
             return new rpcs32(skt);
