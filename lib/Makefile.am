@@ -57,6 +57,7 @@ libplp_la_SOURCES = \
 	rpcs16.cc \
 	rpcs32.cc \
 	rpcsfactory.cc \
+	semaphore.cc \
 	siscomponentrecord.cpp  \
 	sisfile.cpp \
 	sisfileheader.cpp \
@@ -100,6 +101,7 @@ noinst_HEADERS = \
 	rpcs16.h \
 	rpcs32.h \
 	rpcsfactory.h \
+	semaphore.h \
 	siscomponentrecord.h \
 	sisfile.h \
 	sisfileheader.h \
