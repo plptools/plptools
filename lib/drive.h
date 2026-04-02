@@ -68,9 +68,14 @@ public:
           std::string name);
 
     /**
-    * Copy constructor
+    * Copy constructor.
     */
-    Drive(const Drive &other);
+    Drive(const Drive &other) = default;
+
+    /**
+    * Assignment operator.
+    */
+    Drive &operator=(const Drive &other) = default;
 
     /**
     * Retrieve the media type of the drive.

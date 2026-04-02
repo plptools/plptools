@@ -49,17 +49,6 @@ Drive::Drive(MediaType mediaType,
 , name_(name) {
 }
 
-Drive::Drive(const Drive &other)
-: mediaType_(other.mediaType_)
-, driveAttributes_(other.driveAttributes_)
-, mediaAttributes_(other.mediaAttributes_)
-, uid_(other.uid_)
-, size_(other.size_)
-, space_(other.space_)
-, driveLetter_(other.driveLetter_)
-, name_(other.name_) {
-}
-
 void Drive::setMediaType(MediaType type) {
     mediaType_ = type;
 }
