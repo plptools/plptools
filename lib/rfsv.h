@@ -294,6 +294,10 @@ public:
     */
     virtual Enum<errs> dir(const char * const name, PlpDir &ret) = 0;
 
+    Enum<errs> dir(const std::string &path,
+                   bool recursive,
+                   std::vector<PlpDirent> &files);
+
     /**
     * Retrieves the modification time of a file on the Psion.
     *
@@ -392,6 +396,8 @@ public:
     */
     virtual Enum<errs> devinfo(const char drive, Drive &dinfo) = 0;
 
+    Enum<errs> drives(std::vector<Drive> &drives);
+
     /**
     * Reads from a file on the Psion.
     *
@@ -421,6 +427,7 @@ public:
     *
     * @param from Name of the file on the Psion to be copied.
     * @param to Name of the destination file on the local machine.
+    * @param context Callback context passed to the callback function @ref func.
     * @param func Pointer to a function which gets called on every read.
     *             This function can be used to show some progress etc. May be
     *             set to NULL, where no callback is performed. If the callback
@@ -429,7 +436,7 @@ public:
     *
     * @returns A Psion error code (One of enum @ref #errs ).
     */
-    virtual Enum<errs> copyFromPsion(const char *from, const char *to, void *, cpCallback_t func) = 0;
+    virtual Enum<errs> copyFromPsion(const char *from, const char *to, void *context, cpCallback_t func) = 0;
 
     /**
     * Copies a file from the Psion to the local machine.
