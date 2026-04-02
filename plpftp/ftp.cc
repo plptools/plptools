@@ -669,27 +669,11 @@ session(RFSV &a, RPCS & r, rclip & rc, TCPSocket & rclipSocket, vector<char *> a
     }
 
     if (!strcmp(DDRIVE, "AUTO")) {
-        uint32_t devbits;
-        int i;
-
         strcpy(defDrive, "::");
-        if (a.devlist(devbits) == RFSV::E_PSI_GEN_NONE) {
-
-            for (i = 0; i < 26; i++) {
-                Drive drive;
-                if ((devbits & 1) && a.devinfo(i + 'A', drive) == RFSV::E_PSI_GEN_NONE) {
-                    defDrive[0] = 'A' + i;
-                    break;
-                }
-                devbits >>= 1;
-            }
-        }
-        if (!strcmp(defDrive, "::")) {
-            cerr << _("FATAL: Couldn't find default Drive") << endl;
-            return -1;
-        }
-    } else
+        defDrive[0] = a.defaultInternalDriveLetter();
+    } else {
         strcpy(defDrive, DDRIVE);
+    }
     free(psionDir);
     psionDir = xasprintf("%s%s", defDrive, DBASEDIR);
     comp_a = &a;

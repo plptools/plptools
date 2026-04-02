@@ -74,6 +74,7 @@ public:
 
     uint32_t opMode(const uint32_t);
     int getProtocolVersion() { return 3; }
+    char defaultInternalDriveLetter() { return 'M'; };
 
 private:
     enum commands {
