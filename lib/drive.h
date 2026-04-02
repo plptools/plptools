@@ -68,7 +68,7 @@ public:
           std::string name);
 
     /**
-    * Copy constructor,
+    * Copy constructor.
     */
     Drive(const Drive &other) = default;
 
