@@ -644,6 +644,8 @@ public:
      */
     virtual int getProtocolVersion() = 0;
 
+    virtual char defaultInternalDriveLetter() = 0;
+
 protected:
     /**
     * Retrieves the PLP protocol name. Mainly internal use.
