@@ -70,7 +70,7 @@ Enum<RFSV::errs> RPCS16::getOwnerInfo(BufferArray &owner) {
     owner.clear();
     for (int i = 0; i < 4; i++) {
         BufferStore b;
-        b.addString(a.getString(52 * i));
+        b.addStringT(a.getString(52 * i));
         owner += b;
     }
 
