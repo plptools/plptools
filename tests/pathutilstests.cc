@@ -143,6 +143,9 @@ TEST_CASE("pathutils::resolve_path") {
     CHECK(pathutils::resolve_path("/foo/bar/baz", "/one/two", '/') == "/foo/bar/baz");
     CHECK(pathutils::resolve_path("baz", "/foo/bar", '/') == "/foo/bar/baz");
     CHECK(pathutils::resolve_path("../baz", "/foo/bar", '/') == "/foo/baz");
+    CHECK(pathutils::resolve_path("../..", "/foo", '/') == "../..");  // TODO: Should this fail instead?
+    CHECK(pathutils::resolve_path("../../..", "/foo", '/') == "../../..");  // TODO: Should this fail instead?
+    CHECK(pathutils::resolve_path("..", "bob", '/') == ".");
 
     // Windows (and EPOC).
     CHECK(pathutils::resolve_path("C:\\foo\\bar\\baz", "", '\\') == "C:\\foo\\bar\\baz");

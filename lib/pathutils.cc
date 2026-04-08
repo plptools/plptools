@@ -161,18 +161,29 @@ std::string pathutils::resolve_path(const std::string &path,
                                     const char separator) {
     std::vector<std::string> pathComponents = split(path, separator);
     std::vector<std::string> startingPathComponents = split(startingPath, separator);
+    auto pathIsAbsolute = !pathComponents.empty() && is_root(pathComponents.front(), separator);
+    auto startingPathIsAbsolute = !startingPathComponents.empty() && is_root(startingPathComponents.front(), separator);
 
     // Check to see if the path is already absolute by inspecting the first component.
-    if (!pathComponents.empty() && is_root(pathComponents.front(), separator)) {
+    if (pathIsAbsolute) {
         return path;
     }
 
     for (const auto &pathComponent : pathComponents) {
         if (pathComponent == "..") {
+            if (startingPathComponents.empty() || (startingPathIsAbsolute && startingPathComponents.size() == 1)) {
+                return path;
+            }
             startingPathComponents.pop_back();
         } else {
             startingPathComponents.push_back(pathComponent);
         }
+    }
+
+    // If the starting path is relative and the resulting path is an empty string, we return '.' to ensure that the
+    // resulting path is valid.
+    if (!startingPathIsAbsolute && startingPathComponents.empty()) {
+        return ".";
     }
 
     return pathutils::join(startingPathComponents, separator);
