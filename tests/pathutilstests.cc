@@ -52,6 +52,7 @@ TEST_CASE("pathutils::epoc_basename") {
     // Legacy behavior (might be a bug).
     CHECK(pathutils::epoc_basename("C:\\Random\\") == "");
     CHECK(pathutils::epoc_basename("hello") == "hello");
+    CHECK(pathutils::epoc_basename("") == "");
 }
 
 TEST_CASE("pathutils::epoc_dirname") {
