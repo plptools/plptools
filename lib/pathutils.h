@@ -69,7 +69,18 @@ extern char *epoc_dirname(const char *path);
 */
 extern char *resolve_epoc_path(const char *path, const char *initialPath);
 
-extern std::vector<std::string> split(const std::string string, const char separator);
+/**
+* Split a path, @p path, into its components, using the path separator, @p separator.
+*
+* If the path is absolute, the first element of the path separator will represent the volume component appropriate to
+* the path type (POSIX or Windows) as implied by the path separator (e.g., '/' or 'C:').
+*
+* @param path Path to split.
+* @param separator Path separator to use (should be one of '/' or '\\').
+*
+* @return Vector containing the path components.
+*/
+extern std::vector<std::string> split(const std::string path, const char separator);
 
 /**
 * Return a new path by joining the path components, @p components, with path separator, @p separator.

@@ -89,11 +89,11 @@ char *pathutils::resolve_epoc_path(const char *path, const char *relativeToPath)
     return f1;
 }
 
-std::vector<std::string> pathutils::split(const std::string string, const char separator) {
+std::vector<std::string> pathutils::split(const std::string path, const char separator) {
     std::vector<std::string> result;
     size_t offset = 0;
     size_t index = 0;
-    while ((index = string.find(separator, offset)) != std::string::npos) {
+    while ((index = path.find(separator, offset)) != std::string::npos) {
         // If the index of the first separator is 0, then we know the path is absolute and we insert the
         // root directory path component.
         if (index == 0) {
@@ -101,12 +101,12 @@ std::vector<std::string> pathutils::split(const std::string string, const char s
         }
         int length = index-offset;
         if (length > 0) {
-            result.push_back(string.substr(offset, index-offset));
+            result.push_back(path.substr(offset, index-offset));
         }
         offset = index + 1;
     }
-    if (offset - string.length() > 0) {
-        result.push_back(string.substr(offset));
+    if (offset - path.length() > 0) {
+        result.push_back(path.substr(offset));
     }
     return result;
 }
