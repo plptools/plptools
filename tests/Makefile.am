@@ -27,7 +27,7 @@ tests_SOURCES = \
     doctest.h \
     drivetests.cc \
     main.cc \
-    pathtests.cc \
+    pathutilstests.cc \
     plpdirenttests.cc
 
 TESTS = tests

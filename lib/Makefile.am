@@ -43,7 +43,7 @@ libplp_la_SOURCES = \
 	ncp_log.cc \
 	ncp.cc \
 	ncpsession.cc \
-	path.cc \
+	pathutils.cc \
 	plpdirent.cc \
 	psibitmap.cpp \
 	psiprocess.cc \
@@ -85,7 +85,7 @@ noinst_HEADERS = \
 	ncp.h \
 	ncpsession.h \
 	ncpstatuscallback.h \
-	path.h \
+	pathutils.h \
 	plpdirent.h \
 	plpintl.h \
 	psibitmap.h \
