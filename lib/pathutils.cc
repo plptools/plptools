@@ -171,10 +171,13 @@ std::string pathutils::resolve_path(const std::string &path,
 
     for (const auto &pathComponent : pathComponents) {
         if (pathComponent == "..") {
-            if (startingPathComponents.empty() || (startingPathIsAbsolute && startingPathComponents.size() == 1)) {
+            if (startingPathIsAbsolute && startingPathComponents.size() == 1) {
                 return path;
+            } else if (startingPathComponents.empty() || startingPathComponents.back() == "..") {
+                startingPathComponents.push_back("..");
+            } else {
+                startingPathComponents.pop_back();
             }
-            startingPathComponents.pop_back();
         } else {
             startingPathComponents.push_back(pathComponent);
         }

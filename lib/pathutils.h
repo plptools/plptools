@@ -72,7 +72,7 @@ extern char *resolve_epoc_path(const char *path, const char *initialPath);
 /**
 * Split a path, @p path, into its components, using the path separator, @p separator.
 *
-* If the path is absolute, the first element of the path separator will represent the volume component appropriate to
+* If the path is absolute, the first element of the path separator will represent the root component appropriate to
 * the path type (POSIX or Windows) as implied by the path separator (e.g., '/' or 'C:').
 *
 * @param path Path to split.
@@ -85,7 +85,7 @@ extern std::vector<std::string> split(const std::string path, const char separat
 /**
 * Return a new path by joining the path components, @p components, with path separator, @p separator.
 *
-* For absolute paths, the first path component should be a volume component (e.g., '/' or 'C:').
+* For absolute paths, the first path component should be a root component (e.g., '/' or 'C:').
 *
 * @param components Path components to join.
 * @param separator Path separator to use (should be one of '/' or '\\').

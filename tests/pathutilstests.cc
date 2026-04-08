@@ -129,11 +129,15 @@ TEST_CASE("pathutils::join") {
     CHECK(pathutils::join({"hello"}, '/') == "hello");
     CHECK(pathutils::join({"hello", "world"}, '/') == "hello/world");
     CHECK(pathutils::join({"/hello", "world"}, '/') == "/hello/world");
+    CHECK(pathutils::join({"/hello/", "world"}, '/') == "/hello/world");
     CHECK(pathutils::join({"/", "hello", "world"}, '/') == "/hello/world");
+    CHECK(pathutils::join({"..", ".."}, '/') == "../..");
     CHECK(pathutils::join({"hello", "world"}, '\\') == "hello\\world");
     CHECK(pathutils::join({"C:\\hello", "world"}, '\\') == "C:\\hello\\world");
+    CHECK(pathutils::join({"C:\\hello\\", "world"}, '\\') == "C:\\hello\\world");
     CHECK(pathutils::join({"C:\\", "hello", "world"}, '\\') == "C:\\hello\\world");
     CHECK(pathutils::join({"C:", "hello", "world"}, '\\') == "C:\\hello\\world");
+    CHECK(pathutils::join({"..", ".."}, '\\') == "..\\..");
 }
 
 TEST_CASE("pathutils::resolve_path") {
@@ -145,11 +149,20 @@ TEST_CASE("pathutils::resolve_path") {
     CHECK(pathutils::resolve_path("../baz", "/foo/bar", '/') == "/foo/baz");
     CHECK(pathutils::resolve_path("../..", "/foo", '/') == "../..");  // TODO: Should this fail instead?
     CHECK(pathutils::resolve_path("../../..", "/foo", '/') == "../../..");  // TODO: Should this fail instead?
+    CHECK(pathutils::resolve_path("../../..", "foo", '/') == "../..");
+    CHECK(pathutils::resolve_path("../../bar", "foo", '/') == "../bar");
     CHECK(pathutils::resolve_path("..", "bob", '/') == ".");
+    CHECK(pathutils::resolve_path("../foo/../bar/../baz", "bob", '/') == "baz");
 
     // Windows (and EPOC).
     CHECK(pathutils::resolve_path("C:\\foo\\bar\\baz", "", '\\') == "C:\\foo\\bar\\baz");
     CHECK(pathutils::resolve_path("C:\\foo\\bar\\baz", "C:\\one\\two", '\\') == "C:\\foo\\bar\\baz");
     CHECK(pathutils::resolve_path("baz", "C:\\foo\\bar", '\\') == "C:\\foo\\bar\\baz");
     CHECK(pathutils::resolve_path("..\\baz", "D:\\foo\\bar", '\\') == "D:\\foo\\baz");
+    CHECK(pathutils::resolve_path("..\\..", "C:\\foo", '\\') == "..\\..");  // TODO: Should this fail instead?
+    CHECK(pathutils::resolve_path("..\\..\\..", "C:\\foo", '\\') == "..\\..\\..");  // TODO: Should this fail instead?
+    CHECK(pathutils::resolve_path("..\\..\\..", "foo", '\\') == "..\\..");
+    CHECK(pathutils::resolve_path("..\\..\\bar", "foo", '\\') == "..\\bar");
+    CHECK(pathutils::resolve_path("..", "bob", '\\') == ".");
+    CHECK(pathutils::resolve_path("..\\foo\\..\\bar\\..\\baz", "bob", '\\') == "baz");
 }
