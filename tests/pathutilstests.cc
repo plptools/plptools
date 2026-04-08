@@ -87,11 +87,16 @@ TEST_CASE("pathutils::epoc_dirname") {
 
 TEST_CASE("pathutils::is_absolute") {
 
+    CHECK(pathutils::is_absolute("/", '/') == true);
+    CHECK(pathutils::is_absolute("\\", '\\') == false);
+
     CHECK(pathutils::is_absolute("C:\\", '\\') == true);
     CHECK(pathutils::is_absolute("C:\\", '/') == false);
 
     CHECK(pathutils::is_absolute("C:", '\\') == true);
     CHECK(pathutils::is_absolute("C:", '/') == false);
+    CHECK(pathutils::is_absolute("C:foo", '\\') == false);
+    CHECK(pathutils::is_absolute("C:foo", '/') == false);
 
     CHECK(pathutils::is_absolute("", '\\') == false);
     CHECK(pathutils::is_absolute("", '/') == false);
