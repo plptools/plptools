@@ -70,72 +70,6 @@ extern char *epoc_dirname(const char *path);
 extern char *resolve_epoc_path(const char *path, const char *initialPath);
 
 /**
-* Split a path, @p path, into its components, using the path separator, @p separator.
-*
-* If the path is absolute, the first element of the path separator will represent the root component appropriate to
-* the path type (POSIX or Windows) as implied by the path separator (e.g., '/' or 'C:').
-*
-* @param path Path to split.
-* @param separator Path separator to use (should be one of '/' or '\\').
-*
-* @return Vector containing the path components.
-*/
-extern std::vector<std::string> split(const std::string path, const char separator);
-
-/**
-* Return a new path by joining the path components, @p components, with path separator, @p separator.
-*
-* For absolute paths, the first path component should be a root component (e.g., '/' or 'C:').
-*
-* @param components Path components to join.
-* @param separator Path separator to use (should be one of '/' or '\\').
-*
-* @return String containing the resulting path.
-*/
-extern std::string join(const std::vector<std::string> &components, const char separator);
-
-/**
-* Check if a path component is a root component (e.g., `/` or `C:`).
-*
-* Behavior is dependent on the path separator used: if a POSIX path separators is used, this returns true if the path
-* component matches the path separator ('/'); if a Windows path separator is used, this returns true if the path
-* component is a drive ('A:', 'B:', 'C:', ... etc).
-*
-* @param pathComponent Path component to test.
-* @param separator Path separator to use (should be one of '/' or '\\').
-*
-* @return true if the path component, @p pathComponent, is a root component; false otherwise.
-*/
-extern bool is_root(const std::string &pathComponent, const char separator);  // TODO: Hide.
-
-/**
-* Check if a path is absolute.
-*
-* Uses @ref is_root internally, applying the same documented logic. Behavior is dependent on the path separator,
-* @p separator, used.
-*
-* @param path Path to test.
-* @param separator Path separator to use (should be one of '/' or '\\').
-*
-* @return true if the path, @p path, is absolute; false otherwise.
-*/
-extern bool is_absolute(const std::string &path, const char separator);
-
-/**
-* Convenience wrapper for @ref join that returns a new path resulting from appending path components, @p components,
-* to path, @p path, using separator, @p separator.
-*
-* @param path Base path to append components to.
-* @param components Components to append to @p path.
-* @param separator Path separator to use (should be one of '/' or '\\').
-*
-* @return String containing the resulting path.
-*/
-extern std::string appending_components(const std::string &path,
-                                        const std::vector<std::string> &components,
-                                        const char separator);
-
-/**
 * Return a new string that represents the path, @p path, with a guaranteed
 * trailing separator, @p separator.
 *
@@ -147,14 +81,5 @@ extern std::string appending_components(const std::string &path,
 * @return @p path + @p separator if path does not end in a separator; @p path, otherwise.
 */
 extern std::string ensuring_trailing_separator(const std::string &path, const char separator);
-
-/**
-* Returns a path by resolving a relative or absolute path against a starting path.
-*
-* @p startingPath may be relative or absolute, but @p path must be contained within that path.
-*/
-extern std::string resolve_path(const std::string &path,
-                                const std::string &startingPath,
-                                const char separator);
 
 };

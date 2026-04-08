@@ -89,105 +89,10 @@ char *pathutils::resolve_epoc_path(const char *path, const char *relativeToPath)
     return f1;
 }
 
-std::vector<std::string> pathutils::split(const std::string path, const char separator) {
-    std::vector<std::string> result;
-    size_t offset = 0;
-    size_t index = 0;
-    while ((index = path.find(separator, offset)) != std::string::npos) {
-        // If the index of the first separator is 0, then we know the path is absolute and we insert the
-        // root directory path component.
-        if (index == 0) {
-            result.push_back("/");
-        }
-        int length = index-offset;
-        if (length > 0) {
-            result.push_back(path.substr(offset, index-offset));
-        }
-        offset = index + 1;
-    }
-    if (offset - path.length() > 0) {
-        result.push_back(path.substr(offset));
-    }
-    return result;
-}
-
-std::string pathutils::join(const std::vector<std::string> &components, const char separator) {
-    std::string result;
-    for (const auto &component : components) {
-        if (!result.empty() && result.back() != separator) {
-            result += separator;
-        }
-        result += component;
-    }
-    return result;
-}
-
-std::string pathutils::appending_components(const std::string &path,
-                                            const std::vector<std::string> &_components,
-                                            const char separator) {
-    std::vector<std::string> components = {path};
-    components.insert(components.end(), _components.begin(), _components.end());
-    return join(components, separator);
-}
-
 std::string pathutils::ensuring_trailing_separator(const std::string &path,
                                               const char separator) {
     if (!path.empty() && path.back() == separator) {
         return path;
     }
     return path + separator;
-}
-
-bool pathutils::is_root(const std::string &pathComponent, const char separator) {
-    if (separator == '/' && pathComponent.length() == 1 && pathComponent[0] == separator) {
-        return true;
-    } else if (separator == '\\' && pathComponent.length() == 2) {
-        return std::isalpha(static_cast<unsigned char>(pathComponent[0])) && pathComponent[1] == ':';
-    } else {
-        return false;
-    }
-}
-
-bool pathutils::is_absolute(const std::string &path, const char separator) {
-    auto components = split(path, separator);
-    if (components.empty()) {
-        return false;
-    }
-    return is_root(components.front(), separator);
-}
-
-std::string pathutils::resolve_path(const std::string &path,
-                                    const std::string &startingPath,
-                                    const char separator) {
-    std::vector<std::string> pathComponents = split(path, separator);
-    std::vector<std::string> startingPathComponents = split(startingPath, separator);
-    auto pathIsAbsolute = !pathComponents.empty() && is_root(pathComponents.front(), separator);
-    auto startingPathIsAbsolute = !startingPathComponents.empty() && is_root(startingPathComponents.front(), separator);
-
-    // Check to see if the path is already absolute by inspecting the first component.
-    if (pathIsAbsolute) {
-        return path;
-    }
-
-    for (const auto &pathComponent : pathComponents) {
-        if (pathComponent == "..") {
-            if (startingPathIsAbsolute && startingPathComponents.size() == 1) {
-                return path;
-            } else if (startingPathComponents.empty() || startingPathComponents.back() == "..") {
-                startingPathComponents.push_back("..");
-            } else {
-                startingPathComponents.pop_back();
-            }
-        } else {
-            startingPathComponents.push_back(pathComponent);
-        }
-    }
-
-    // If the starting path is relative and the resulting path is an empty string, we return '.' to ensure that the
-    // resulting path is valid.
-    if (!startingPathIsAbsolute && startingPathComponents.empty()) {
-        return ".";
-    }
-
-    return pathutils::join(startingPathComponents, separator);
 }
