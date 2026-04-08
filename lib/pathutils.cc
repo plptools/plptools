@@ -130,13 +130,6 @@ std::string pathutils::appending_components(const std::string &path,
     return join(components, separator);
 }
 
-std::string pathutils::appending_component(const std::string &path,
-                                           const std::string component,
-                                           const char separator) {
-    std::vector<std::string> components = {path, component};
-    return join(components, separator);
-}
-
 std::string pathutils::ensuring_trailing_separator(const std::string &path,
                                               const char separator) {
     if (!path.empty() && path.back() == separator) {

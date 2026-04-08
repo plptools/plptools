@@ -124,10 +124,6 @@ extern std::string appending_components(const std::string &path,
                                         const std::vector<std::string> &components,
                                         const char separator);
 
-extern std::string appending_component(const std::string &path,
-                                       const std::string component,
-                                       const char separator);
-
 /**
 * Return a new string that represents the path, @p path, with a guaranteed
 * trailing separator, @p separator.
