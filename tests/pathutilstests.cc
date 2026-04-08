@@ -51,9 +51,9 @@ TEST_CASE("pathutils::epoc_basename") {
 
     // Legacy behavior (might be a bug).
     CHECK(pathutils::epoc_basename("C:\\Random\\") == "");
+    CHECK(pathutils::epoc_basename("hello") == "hello");
 }
 
-// TODO: Rename to get parent path?
 TEST_CASE("pathutils::epoc_dirname") {
     SUBCASE("C:\\Random") {
         std::string result;
