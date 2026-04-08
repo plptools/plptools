@@ -86,14 +86,40 @@ extern std::string join(const std::vector<std::string> &components, const char s
 /**
 * Check if a path component is a root component (e.g., `/` or `C:`).
 *
-* Behavior depends on the path separator used: if a POSIX path separators is used, this returns true if the path
+* Behavior is dependent on the path separator used: if a POSIX path separators is used, this returns true if the path
 * component matches the path separator ('/'); if a Windows path separator is used, this returns true if the path
 * component is a drive ('A:', 'B:', 'C:', ... etc).
+*
+* @param pathComponent Path component to test.
+* @param separator Path separator to use (should be one of '/' or '\\').
+*
+* @return true if the path component, @p pathComponent, is a root component; false otherwise.
 */
 extern bool is_root(const std::string &pathComponent, const char separator);
 
+/**
+* Check if a path is absolute.
+*
+* Uses @ref is_root internally, applying the same documented logic. Behavior is dependent on the path separator,
+* @p separator, used.
+*
+* @param path Path to test.
+* @param separator Path separator to use (should be one of '/' or '\\').
+*
+* @return true if the path, @p path, is absolute; false otherwise.
+*/
 extern bool is_absolute(const std::string &path, const char separator);
 
+/**
+* Convenience wrapper for @ref join that returns a new path resulting from appending path components, @p components,
+* to path, @p path, using separator, @p separator.
+*
+* @param path Base path to append components to.
+* @param components Components to append to @p path.
+* @param separator Path separator to use (should be one of '/' or '\\').
+*
+* @return String containing the resulting path.
+*/
 extern std::string appending_components(const std::string &path,
                                         const std::vector<std::string> &components,
                                         const char separator);
