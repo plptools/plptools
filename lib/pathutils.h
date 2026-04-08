@@ -71,6 +71,16 @@ extern char *resolve_epoc_path(const char *path, const char *initialPath);
 
 extern std::vector<std::string> split(const std::string string, const char separator);
 
+/**
+* Return a new path by joining the path components, @p components, with path separator, @p separator.
+*
+* For absolute paths, the first path component should be a volume component (e.g., '/' or 'C:').
+*
+* @param components Path components to join.
+* @param separator Path separator to use (should be one of '/' or '\\').
+*
+* @return String containing the resulting path.
+*/
 extern std::string join(const std::vector<std::string> &components, const char separator);
 
 /**
