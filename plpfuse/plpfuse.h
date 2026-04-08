@@ -19,7 +19,7 @@
  */
 #pragma once
 
-#include <fuse.h>
+#include <fuse3/fuse.h>
 
 typedef struct p_inode {
     int inode;

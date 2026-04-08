@@ -224,11 +224,12 @@ static int getlinks(const char *path, struct stat *st)
     return ret;
 }
 
-static int plp_getattr(const char *path, struct stat *st)
+static int plp_getattr(const char *path, struct stat *st, struct fuse_file_info *fi)
 {
     char xattr[XATTR_MAXLEN + 1];
     int ret = 0;
 
+    (void)fi;
     debuglog("plp_getattr `%s'", ++path);
 
     if (strcmp(path, "") == 0) {
@@ -291,12 +292,16 @@ static int plp_readlink(const char *path, char *buf, size_t size)
 
 
 static int plp_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
-                       off_t offset, struct fuse_file_info *fi)
+                       off_t offset, struct fuse_file_info *fi, enum fuse_readdir_flags flags)
 {
     device *dp;
     dentry *e = NULL;
     char xattr[XATTR_MAXLEN + 1];
+    enum fuse_fill_dir_flags fill_flags = FUSE_FILL_DIR_DEFAULTS;
 
+    if (flags & FUSE_READDIR_PLUS) {
+        fill_flags |= FUSE_FILL_DIR_PLUS;
+    }
     debuglog("plp_readdir `%s'", ++path);
 
     (void)offset;
@@ -313,7 +318,7 @@ static int plp_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
               name[1] = ':';
               name[2] = '\0';
               pattr2attr(dp->attrib, 1, 0, &st, xattr);
-              if (filler(buf, (char *)name, &st, 0))
+              if (filler(buf, (char *)name, &st, 0, fill_flags))
                   break;
             }
         }
@@ -331,7 +336,7 @@ static int plp_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
 
             pattr2attr(e->attr, e->size, e->time, &st, xattr);
             debuglog("  %s %o %d %d", name, st.st_mode, st.st_size, st.st_mtime);
-            if (filler(buf, name, &st, 0))
+            if (filler(buf, name, &st, 0, fill_flags))
                 break;
             free(e->name);
             o = e;
@@ -383,8 +388,9 @@ static int plp_symlink(const char *from, const char *to)
     return -EPERM;
 }
 
-static int plp_rename(const char *from, const char *to)
+static int plp_rename(const char *from, const char *to, unsigned int flag)
 {
+    (void)flag;
     debuglog("plp_rename `%s' -> `%s'", ++from, ++to);
     rfsv_remove(to);
     return rfsv_rename(from, to);
@@ -396,13 +402,14 @@ static int plp_link(const char *from, const char *to)
     return -EPERM;
 }
 
-static int plp_chmod(const char *path, mode_t mode)
+static int plp_chmod(const char *path, mode_t mode,  struct fuse_file_info *fi)
 {
     int ret;
     long psisattr, psidattr, pattr, psize, ptime;
     struct stat st;
     char xattr[XATTR_MAXLEN + 1];
 
+    (void)fi;
     debuglog("plp_chmod `%s'", ++path);
 
     if ((ret = rfsv_getattr(path, &pattr, &psize, &ptime)) == 0) {
@@ -499,22 +506,25 @@ static int plp_removexattr(const char *path, const char *name)
     return -ENOTSUP;
 }
 
-static int plp_chown(const char *path, uid_t uid, gid_t gid)
+static int plp_chown(const char *path, uid_t uid, gid_t gid, struct fuse_file_info *fi)
 {
     (void)uid;
     (void)gid;
+    (void)fi;
     debuglog("plp_chown `%s'", ++path);
     return -EPERM;
 }
 
-static int plp_truncate(const char *path, off_t size)
+static int plp_truncate(const char *path, off_t size, struct fuse_file_info *fi)
 {
+    (void)fi;
     debuglog("plp_truncate `%s'", ++path);
     return rfsv_setsize(path, size);
 }
 
-static int plp_utimens(const char *path, const struct timespec ts[2])
+static int plp_utimens(const char *path, const struct timespec ts[2], struct fuse_file_info *fi)
 {
+    (void)fi;
     debuglog("plp_utimens `%s'", ++path);
     return rfsv_setmtime(path, ts[1].tv_sec);
 }
