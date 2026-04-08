@@ -121,12 +121,15 @@ TEST_CASE("pathutils::split") {
     CHECK(pathutils::split("one\\two\\three\\", '\\') == std::vector<std::string>({"one", "two", "three"}));
     CHECK(pathutils::split("one\\two\\\\three\\", '\\') == std::vector<std::string>({"one", "two", "three"}));
     CHECK(pathutils::split("C:\\one\\two\\\\three\\", '\\') == std::vector<std::string>({"C:", "one", "two", "three"}));
+    CHECK(pathutils::split("\\one\\two\\\\three\\", '\\') == std::vector<std::string>({"\\", "one", "two", "three"}));
 
     CHECK(pathutils::split("", '/') == std::vector<std::string>({}));
     CHECK(pathutils::split("one/two/three", '/') == std::vector<std::string>({"one", "two", "three"}));
     CHECK(pathutils::split("one/two/three/", '/') == std::vector<std::string>({"one", "two", "three"}));
     CHECK(pathutils::split("one/two//three/", '/') == std::vector<std::string>({"one", "two", "three"}));
     CHECK(pathutils::split("/one/two/three/", '/') == std::vector<std::string>({"/", "one", "two", "three"}));
+
+    // TODO: Support windows paths without drive letters.
 }
 
 TEST_CASE("pathutils::join") {
@@ -142,6 +145,7 @@ TEST_CASE("pathutils::join") {
     CHECK(pathutils::join({"C:\\hello\\", "world"}, '\\') == "C:\\hello\\world");
     CHECK(pathutils::join({"C:\\", "hello", "world"}, '\\') == "C:\\hello\\world");
     CHECK(pathutils::join({"C:", "hello", "world"}, '\\') == "C:\\hello\\world");
+    CHECK(pathutils::join({"C:", "\\", "hello", "world"}, '\\') == "C:\\hello\\world");
     CHECK(pathutils::join({"..", ".."}, '\\') == "..\\..");
 }
 
@@ -158,6 +162,8 @@ TEST_CASE("pathutils::resolve_path") {
     CHECK(pathutils::resolve_path("../../bar", "foo", '/') == "../bar");
     CHECK(pathutils::resolve_path("..", "bob", '/') == ".");
     CHECK(pathutils::resolve_path("../foo/../bar/../baz", "bob", '/') == "baz");
+
+    // CHECK(pathutils::resolve_path("../foo/bar/../foo/../baz", "bob", '/') == "baz");
 
     // Windows (and EPOC).
     CHECK(pathutils::resolve_path("C:\\foo\\bar\\baz", "", '\\') == "C:\\foo\\bar\\baz");

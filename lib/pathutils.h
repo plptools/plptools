@@ -106,7 +106,7 @@ extern std::string join(const std::vector<std::string> &components, const char s
 *
 * @return true if the path component, @p pathComponent, is a root component; false otherwise.
 */
-extern bool is_root(const std::string &pathComponent, const char separator);
+extern bool is_root(const std::string &pathComponent, const char separator);  // TODO: Hide.
 
 /**
 * Check if a path is absolute.
