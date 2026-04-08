@@ -169,7 +169,6 @@ std::string pathutils::resolve_path(const std::string &path,
 
     for (const auto &pathComponent : pathComponents) {
         if (pathComponent == "..") {
-            // TODO: We should probably crash intentionally if this doesn't work?
             startingPathComponents.pop_back();
         } else {
             startingPathComponents.push_back(pathComponent);
