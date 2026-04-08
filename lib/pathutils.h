@@ -130,6 +130,9 @@ extern std::string appending_components(const std::string &path,
 *
 * This function makes no attempt to normalize paths or convert path separators.
 *
+* @param path Path to test.
+* @param separator Path separator to use (should be one of '/' or '\\').
+*
 * @return @p path + @p separator if path does not end in a separator; @p path, otherwise.
 */
 extern std::string ensuring_trailing_separator(const std::string &path, const char separator);
