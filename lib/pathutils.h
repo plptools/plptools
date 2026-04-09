@@ -111,6 +111,9 @@ extern std::string join(const std::vector<std::string> &components, const PathFo
 /**
 * Check if a path is absolute.
 *
+* For a Windows path to be absolute, it must be both fully qualified (with a drive), and rooted (with a leading path
+* separator.
+*
 * @param path Path to test.
 * @param format Path format.
 *

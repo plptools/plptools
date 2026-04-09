@@ -168,8 +168,6 @@ std::string pathutils::join(const std::vector<std::string> &components, const Pa
     return result;
 }
 
-// TODO: Talk about rooted paths vs. fully qualified paths and drive-relative paths. And root directory vs root name.
-
 std::string pathutils::appending_components(const std::string &path,
                                             const std::vector<std::string> &_components,
                                             const PathFormat format) {
