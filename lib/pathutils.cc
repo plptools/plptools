@@ -127,22 +127,22 @@ std::vector<std::string> pathutils::split(const std::string &path, const PathFor
 
     // Once we've handled the drive, it's safe to treat the remaining path consistently across Windows and POSIX---we
     // want to preserve the leading path separator regardless of path format.
-    size_t offset = pathStartIndex;
+    size_t previousIndex = pathStartIndex;
     size_t index = pathStartIndex;
-    while ((index = path.find(separator, offset)) != std::string::npos) {
+    while ((index = path.find(separator, previousIndex)) != std::string::npos) {
         // If the index of the first separator is 0, then we know the path is absolute and we insert the root directory
         // path component.
         if (index == pathStartIndex) {
             result.push_back(path.substr(index, 1));
         }
-        size_t length = index - offset;
+        size_t length = index - previousIndex;
         if (length > 0) {
-            result.push_back(path.substr(offset, length));
+            result.push_back(path.substr(previousIndex, length));
         }
-        offset = index + 1;
+        previousIndex = index + 1;
     }
-    if (offset < path.length()) {
-        result.push_back(path.substr(offset));
+    if (previousIndex < path.length()) {
+        result.push_back(path.substr(previousIndex));
     }
     return result;
 }
