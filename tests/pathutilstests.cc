@@ -29,22 +29,22 @@ using namespace pathutils;
 
 TEST_CASE("pathutils::ensuring_trailing_separator") {
 
-    CHECK(ensuring_trailing_separator("", Platform::kWindows) == "\\");
-    CHECK(ensuring_trailing_separator("\\", Platform::kWindows) == "\\");
-    CHECK(ensuring_trailing_separator("C:", Platform::kWindows) == "C:\\");
-    CHECK(ensuring_trailing_separator("C:\\", Platform::kWindows) == "C:\\");
+    CHECK(ensuring_trailing_separator("", PathFormat::kWindows) == "\\");
+    CHECK(ensuring_trailing_separator("\\", PathFormat::kWindows) == "\\");
+    CHECK(ensuring_trailing_separator("C:", PathFormat::kWindows) == "C:\\");
+    CHECK(ensuring_trailing_separator("C:\\", PathFormat::kWindows) == "C:\\");
 
     // N.B. These tests assume a POSIX host and will need updating for future Windows support.
-    CHECK(ensuring_trailing_separator("", Platform::kPOSIX) == "/");
-    CHECK(ensuring_trailing_separator("/", Platform::kPOSIX) == "/");
-    CHECK(ensuring_trailing_separator("/mnt", Platform::kPOSIX) == "/mnt/");
-    CHECK(ensuring_trailing_separator("/mnt/", Platform::kPOSIX) == "/mnt/");
+    CHECK(ensuring_trailing_separator("", PathFormat::kPOSIX) == "/");
+    CHECK(ensuring_trailing_separator("/", PathFormat::kPOSIX) == "/");
+    CHECK(ensuring_trailing_separator("/mnt", PathFormat::kPOSIX) == "/mnt/");
+    CHECK(ensuring_trailing_separator("/mnt/", PathFormat::kPOSIX) == "/mnt/");
 
     // Unsupported path normalization and separator conversion.
-    CHECK(ensuring_trailing_separator("/mnt/", Platform::kWindows) == "/mnt/\\");
-    CHECK(ensuring_trailing_separator("C:\\", Platform::kPOSIX) == "C:\\/");
-    CHECK(ensuring_trailing_separator("C:\\\\", Platform::kWindows) == "C:\\\\");
-    CHECK(ensuring_trailing_separator("/mnt//", Platform::kPOSIX) == "/mnt//");
+    CHECK(ensuring_trailing_separator("/mnt/", PathFormat::kWindows) == "/mnt/\\");
+    CHECK(ensuring_trailing_separator("C:\\", PathFormat::kPOSIX) == "C:\\/");
+    CHECK(ensuring_trailing_separator("C:\\\\", PathFormat::kWindows) == "C:\\\\");
+    CHECK(ensuring_trailing_separator("/mnt//", PathFormat::kPOSIX) == "/mnt//");
 }
 
 TEST_CASE("pathutils::epoc_basename") {
@@ -89,96 +89,96 @@ TEST_CASE("pathutils::epoc_dirname") {
 
 TEST_CASE("pathutils::is_absolute") {
 
-    CHECK(is_absolute("/", Platform::kPOSIX) == true);
-    CHECK(is_absolute("\\", Platform::kWindows) == false);
+    CHECK(is_absolute("/", PathFormat::kPOSIX) == true);
+    CHECK(is_absolute("\\", PathFormat::kWindows) == false);
 
-    CHECK(is_absolute("C:\\", Platform::kWindows) == true);
-    CHECK(is_absolute("C:\\", Platform::kPOSIX) == false);
+    CHECK(is_absolute("C:\\", PathFormat::kWindows) == true);
+    CHECK(is_absolute("C:\\", PathFormat::kPOSIX) == false);
 
-    CHECK(is_absolute("C:", Platform::kWindows) == false);
-    CHECK(is_absolute("C:", Platform::kPOSIX) == false);
-    CHECK(is_absolute("C:foo", Platform::kWindows) == false);
-    CHECK(is_absolute("C:foo", Platform::kPOSIX) == false);
+    CHECK(is_absolute("C:", PathFormat::kWindows) == false);
+    CHECK(is_absolute("C:", PathFormat::kPOSIX) == false);
+    CHECK(is_absolute("C:foo", PathFormat::kWindows) == false);
+    CHECK(is_absolute("C:foo", PathFormat::kPOSIX) == false);
 
-    CHECK(is_absolute("", Platform::kWindows) == false);
-    CHECK(is_absolute("", Platform::kPOSIX) == false);
+    CHECK(is_absolute("", PathFormat::kWindows) == false);
+    CHECK(is_absolute("", PathFormat::kPOSIX) == false);
 
-    CHECK(is_absolute("foo", Platform::kWindows) == false);
-    CHECK(is_absolute("foo", Platform::kPOSIX) == false);
-    CHECK(is_absolute("foo\\bar", Platform::kWindows) == false);
-    CHECK(is_absolute("foo/bar", Platform::kPOSIX) == false);
+    CHECK(is_absolute("foo", PathFormat::kWindows) == false);
+    CHECK(is_absolute("foo", PathFormat::kPOSIX) == false);
+    CHECK(is_absolute("foo\\bar", PathFormat::kWindows) == false);
+    CHECK(is_absolute("foo/bar", PathFormat::kPOSIX) == false);
 
-    CHECK(is_absolute("\\C:\\", Platform::kWindows) == false);
-    CHECK(is_absolute("/C:/", Platform::kPOSIX) == true);
+    CHECK(is_absolute("\\C:\\", PathFormat::kWindows) == false);
+    CHECK(is_absolute("/C:/", PathFormat::kPOSIX) == true);
 }
 
 TEST_CASE("pathutils::appending_components") {
-    CHECK(appending_components("C:\\", {"Documents"}, Platform::kWindows) == "C:\\Documents");
-    CHECK(appending_components("C:\\", {"Documents"}, Platform::kWindows) == "C:\\Documents");
-    CHECK(appending_components("C:foo\\bar\\", {"baz"}, Platform::kWindows) == "C:foo\\bar\\baz");
+    CHECK(appending_components("C:\\", {"Documents"}, PathFormat::kWindows) == "C:\\Documents");
+    CHECK(appending_components("C:\\", {"Documents"}, PathFormat::kWindows) == "C:\\Documents");
+    CHECK(appending_components("C:foo\\bar\\", {"baz"}, PathFormat::kWindows) == "C:foo\\bar\\baz");
 }
 
 TEST_CASE("pathutils::split") {
-    CHECK(split("", Platform::kWindows) == std::vector<std::string>({}));
-    CHECK(split("one\\two\\three", Platform::kWindows) == std::vector<std::string>({"one", "two", "three"}));
-    CHECK(split("one\\two\\three\\", Platform::kWindows) == std::vector<std::string>({"one", "two", "three"}));
-    CHECK(split("one\\two\\\\three\\", Platform::kWindows) == std::vector<std::string>({"one", "two", "three"}));
-    CHECK(split("C:\\one\\two\\\\three\\", Platform::kWindows) == std::vector<std::string>({"C:", "\\", "one", "two", "three"}));
-    CHECK(split("\\one\\two\\\\three\\", Platform::kWindows) == std::vector<std::string>({"\\", "one", "two", "three"}));
-    CHECK(split("C:\\one\\two\\\\three\\", Platform::kWindows) == std::vector<std::string>({"C:", "\\", "one", "two", "three"}));
-    CHECK(split("C:foo\\bar\\", Platform::kWindows) == std::vector<std::string>({"C:", "foo", "bar"}));
+    CHECK(split("", PathFormat::kWindows) == std::vector<std::string>({}));
+    CHECK(split("one\\two\\three", PathFormat::kWindows) == std::vector<std::string>({"one", "two", "three"}));
+    CHECK(split("one\\two\\three\\", PathFormat::kWindows) == std::vector<std::string>({"one", "two", "three"}));
+    CHECK(split("one\\two\\\\three\\", PathFormat::kWindows) == std::vector<std::string>({"one", "two", "three"}));
+    CHECK(split("C:\\one\\two\\\\three\\", PathFormat::kWindows) == std::vector<std::string>({"C:", "\\", "one", "two", "three"}));
+    CHECK(split("\\one\\two\\\\three\\", PathFormat::kWindows) == std::vector<std::string>({"\\", "one", "two", "three"}));
+    CHECK(split("C:\\one\\two\\\\three\\", PathFormat::kWindows) == std::vector<std::string>({"C:", "\\", "one", "two", "three"}));
+    CHECK(split("C:foo\\bar\\", PathFormat::kWindows) == std::vector<std::string>({"C:", "foo", "bar"}));
 
-    CHECK(split("", Platform::kPOSIX) == std::vector<std::string>({}));
-    CHECK(split("one/two/three", Platform::kPOSIX) == std::vector<std::string>({"one", "two", "three"}));
-    CHECK(split("one/two/three/", Platform::kPOSIX) == std::vector<std::string>({"one", "two", "three"}));
-    CHECK(split("/two//three/", Platform::kPOSIX) == std::vector<std::string>({"/", "two", "three"}));
-    CHECK(split("/one/two/three/", Platform::kPOSIX) == std::vector<std::string>({"/", "one", "two", "three"}));
+    CHECK(split("", PathFormat::kPOSIX) == std::vector<std::string>({}));
+    CHECK(split("one/two/three", PathFormat::kPOSIX) == std::vector<std::string>({"one", "two", "three"}));
+    CHECK(split("one/two/three/", PathFormat::kPOSIX) == std::vector<std::string>({"one", "two", "three"}));
+    CHECK(split("/two//three/", PathFormat::kPOSIX) == std::vector<std::string>({"/", "two", "three"}));
+    CHECK(split("/one/two/three/", PathFormat::kPOSIX) == std::vector<std::string>({"/", "one", "two", "three"}));
 
     // TODO: Support windows paths without drive letters.
 }
 
 TEST_CASE("pathutils::join") {
-    CHECK(join({""}, Platform::kPOSIX) == "");
-    CHECK(join({"hello"}, Platform::kPOSIX) == "hello");
-    CHECK(join({"hello", "world"}, Platform::kPOSIX) == "hello/world");
-    CHECK(join({"/hello", "world"}, Platform::kPOSIX) == "/hello/world");
-    CHECK(join({"/hello/", "world"}, Platform::kPOSIX) == "/hello/world");
-    CHECK(join({"/", "hello", "world"}, Platform::kPOSIX) == "/hello/world");
-    CHECK(join({"..", ".."}, Platform::kPOSIX) == "../..");
-    CHECK(join({"hello", "world"}, Platform::kWindows) == "hello\\world");
-    CHECK(join({"C:\\hello", "world"}, Platform::kWindows) == "C:\\hello\\world");
-    CHECK(join({"C:\\hello\\", "world"}, Platform::kWindows) == "C:\\hello\\world");
-    CHECK(join({"C:\\", "hello", "world"}, Platform::kWindows) == "C:\\hello\\world");
-    CHECK(join({"C:", "hello", "world"}, Platform::kWindows) == "C:hello\\world");
-    CHECK(join({"C:", "\\", "hello", "world"}, Platform::kWindows) == "C:\\hello\\world");
-    CHECK(join({"..", ".."}, Platform::kWindows) == "..\\..");
+    CHECK(join({""}, PathFormat::kPOSIX) == "");
+    CHECK(join({"hello"}, PathFormat::kPOSIX) == "hello");
+    CHECK(join({"hello", "world"}, PathFormat::kPOSIX) == "hello/world");
+    CHECK(join({"/hello", "world"}, PathFormat::kPOSIX) == "/hello/world");
+    CHECK(join({"/hello/", "world"}, PathFormat::kPOSIX) == "/hello/world");
+    CHECK(join({"/", "hello", "world"}, PathFormat::kPOSIX) == "/hello/world");
+    CHECK(join({"..", ".."}, PathFormat::kPOSIX) == "../..");
+    CHECK(join({"hello", "world"}, PathFormat::kWindows) == "hello\\world");
+    CHECK(join({"C:\\hello", "world"}, PathFormat::kWindows) == "C:\\hello\\world");
+    CHECK(join({"C:\\hello\\", "world"}, PathFormat::kWindows) == "C:\\hello\\world");
+    CHECK(join({"C:\\", "hello", "world"}, PathFormat::kWindows) == "C:\\hello\\world");
+    CHECK(join({"C:", "hello", "world"}, PathFormat::kWindows) == "C:hello\\world");
+    CHECK(join({"C:", "\\", "hello", "world"}, PathFormat::kWindows) == "C:\\hello\\world");
+    CHECK(join({"..", ".."}, PathFormat::kWindows) == "..\\..");
 }
 
 TEST_CASE("pathutils::resolve_path") {
 
     // Posix.
-    CHECK(resolve_path("/foo/bar/baz", "", Platform::kPOSIX) == "/foo/bar/baz");
-    CHECK(resolve_path("/foo/bar/baz", "/one/two", Platform::kPOSIX) == "/foo/bar/baz");
-    CHECK(resolve_path("baz", "/foo/bar", Platform::kPOSIX) == "/foo/bar/baz");
-    CHECK(resolve_path("../baz", "/foo/bar", Platform::kPOSIX) == "/foo/baz");
-    CHECK(resolve_path("../..", "/foo", Platform::kPOSIX) == "../..");  // TODO: Should this fail instead?
-    CHECK(resolve_path("../../..", "/foo", Platform::kPOSIX) == "../../..");  // TODO: Should this fail instead?
-    CHECK(resolve_path("../../..", "foo", Platform::kPOSIX) == "../..");
-    CHECK(resolve_path("../../bar", "foo", Platform::kPOSIX) == "../bar");
-    CHECK(resolve_path("..", "bob", Platform::kPOSIX) == ".");
-    CHECK(resolve_path("../foo/../bar/../baz", "bob", Platform::kPOSIX) == "baz");
+    CHECK(resolve_path("/foo/bar/baz", "", PathFormat::kPOSIX) == "/foo/bar/baz");
+    CHECK(resolve_path("/foo/bar/baz", "/one/two", PathFormat::kPOSIX) == "/foo/bar/baz");
+    CHECK(resolve_path("baz", "/foo/bar", PathFormat::kPOSIX) == "/foo/bar/baz");
+    CHECK(resolve_path("../baz", "/foo/bar", PathFormat::kPOSIX) == "/foo/baz");
+    CHECK(resolve_path("../..", "/foo", PathFormat::kPOSIX) == "../..");  // TODO: Should this fail instead?
+    CHECK(resolve_path("../../..", "/foo", PathFormat::kPOSIX) == "../../..");  // TODO: Should this fail instead?
+    CHECK(resolve_path("../../..", "foo", PathFormat::kPOSIX) == "../..");
+    CHECK(resolve_path("../../bar", "foo", PathFormat::kPOSIX) == "../bar");
+    CHECK(resolve_path("..", "bob", PathFormat::kPOSIX) == ".");
+    CHECK(resolve_path("../foo/../bar/../baz", "bob", PathFormat::kPOSIX) == "baz");
 
-    // CHECK(resolve_path("../foo/bar/../foo/../baz", "bob", Platform::kPOSIX) == "baz");
+    // CHECK(resolve_path("../foo/bar/../foo/../baz", "bob", PathFormat::kPOSIX) == "baz");
 
     // Windows (and EPOC).
-    CHECK(resolve_path("C:\\foo\\bar\\baz", "", Platform::kWindows) == "C:\\foo\\bar\\baz");
-    CHECK(resolve_path("C:\\foo\\bar\\baz", "C:\\one\\two", Platform::kWindows) == "C:\\foo\\bar\\baz");
-    CHECK(resolve_path("baz", "C:\\foo\\bar", Platform::kWindows) == "C:\\foo\\bar\\baz");
-    CHECK(resolve_path("..\\baz", "D:\\foo\\bar", Platform::kWindows) == "D:\\foo\\baz");
-    CHECK(resolve_path("..\\..", "C:\\foo", Platform::kWindows) == "..\\..");  // TODO: Should this fail instead?
-    CHECK(resolve_path("..\\..\\..", "C:\\foo", Platform::kWindows) == "..\\..\\..");  // TODO: Should this fail instead?
-    CHECK(resolve_path("..\\..\\..", "foo", Platform::kWindows) == "..\\..");
-    CHECK(resolve_path("..\\..\\bar", "foo", Platform::kWindows) == "..\\bar");
-    CHECK(resolve_path("..", "bob", Platform::kWindows) == ".");
-    CHECK(resolve_path("..\\foo\\..\\bar\\..\\baz", "bob", Platform::kWindows) == "baz");
+    CHECK(resolve_path("C:\\foo\\bar\\baz", "", PathFormat::kWindows) == "C:\\foo\\bar\\baz");
+    CHECK(resolve_path("C:\\foo\\bar\\baz", "C:\\one\\two", PathFormat::kWindows) == "C:\\foo\\bar\\baz");
+    CHECK(resolve_path("baz", "C:\\foo\\bar", PathFormat::kWindows) == "C:\\foo\\bar\\baz");
+    CHECK(resolve_path("..\\baz", "D:\\foo\\bar", PathFormat::kWindows) == "D:\\foo\\baz");
+    CHECK(resolve_path("..\\..", "C:\\foo", PathFormat::kWindows) == "..\\..");  // TODO: Should this fail instead?
+    CHECK(resolve_path("..\\..\\..", "C:\\foo", PathFormat::kWindows) == "..\\..\\..");  // TODO: Should this fail instead?
+    CHECK(resolve_path("..\\..\\..", "foo", PathFormat::kWindows) == "..\\..");
+    CHECK(resolve_path("..\\..\\bar", "foo", PathFormat::kWindows) == "..\\bar");
+    CHECK(resolve_path("..", "bob", PathFormat::kWindows) == ".");
+    CHECK(resolve_path("..\\foo\\..\\bar\\..\\baz", "bob", PathFormat::kWindows) == "baz");
 }

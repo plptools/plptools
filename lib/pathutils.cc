@@ -36,20 +36,20 @@ static bool is_windows_drive(const std::string &pathComponent) {
             pathComponent[1] == ':');
 }
 
-static bool is_absolute(const std::vector<std::string> &components, const pathutils::Platform platform) {
-    switch (platform) {
-        case pathutils::Platform::kPOSIX:
+static bool is_absolute(const std::vector<std::string> &components, const pathutils::PathFormat format) {
+    switch (format) {
+        case pathutils::PathFormat::kPOSIX:
             return components.size() > 0 && components[0] == "/";
-        case pathutils::Platform::kWindows:
+        case pathutils::PathFormat::kWindows:
             return components.size() > 1 && is_windows_drive(components[0]) && components[1] == "\\";
     }
 }
 
-char pathutils::platform_separator(const Platform platform) {
-    switch (platform) {
-    case pathutils::Platform::kPOSIX:
+char pathutils::platform_separator(const PathFormat format) {
+    switch (format) {
+    case pathutils::PathFormat::kPOSIX:
         return kPOSIXSeparator;
-    case pathutils::Platform::kWindows:
+    case pathutils::PathFormat::kWindows:
         return kWindowsSeparator;
     }
 }
@@ -113,14 +113,14 @@ char *pathutils::resolve_epoc_path(const char *path, const char *relativeToPath)
     return f1;
 }
 
-std::vector<std::string> pathutils::split(const std::string &path, const Platform platform) {
-    auto separator = platform_separator(platform);
+std::vector<std::string> pathutils::split(const std::string &path, const PathFormat format) {
+    auto separator = platform_separator(format);
     std::vector<std::string> result;
     size_t pathStartIndex = 0;
 
     // If we're on windows, we need to consume the drive first so we pattern match on that and update the starting
     // index accordingly.
-    if (platform == Platform::kWindows && path.length() >= 2 && is_windows_drive(path.substr(0, 2))) {
+    if (format == PathFormat::kWindows && path.length() >= 2 && is_windows_drive(path.substr(0, 2))) {
         result.push_back(path.substr(0, 2));
         pathStartIndex = 2;
     }
@@ -147,18 +147,18 @@ std::vector<std::string> pathutils::split(const std::string &path, const Platfor
     return result;
 }
 
-std::string pathutils::join(const std::vector<std::string> &components, const Platform platform) {
+std::string pathutils::join(const std::vector<std::string> &components, const PathFormat format) {
     std::string result;
     auto begin = components.begin();
 
     // Special-case handling of Windows drives.
-    if (platform == Platform::kWindows && components.size() >= 1 && is_windows_drive(components[0])) {
+    if (format == PathFormat::kWindows && components.size() >= 1 && is_windows_drive(components[0])) {
         result += components[0];
         ++begin;
     }
 
     // Handle drive paths consistently, taking care not to make relative paths absolute by over-inserting a separator.
-    auto separator = platform_separator(platform);
+    auto separator = platform_separator(format);
     for (auto iterator = begin; iterator != components.end(); iterator++) {
         if (iterator != begin && result.back() != separator) {
             result += separator;
@@ -172,32 +172,32 @@ std::string pathutils::join(const std::vector<std::string> &components, const Pl
 
 std::string pathutils::appending_components(const std::string &path,
                                             const std::vector<std::string> &_components,
-                                            const Platform platform) {
-    auto pathComponents = split(path, platform);
+                                            const PathFormat format) {
+    auto pathComponents = split(path, format);
     pathComponents.insert(pathComponents.end(), _components.begin(), _components.end());
-    return join(pathComponents, platform);
+    return join(pathComponents, format);
 }
 
-std::string pathutils::ensuring_trailing_separator(const std::string &path, const Platform platform) {
-    auto separator = platform_separator(platform);
+std::string pathutils::ensuring_trailing_separator(const std::string &path, const PathFormat format) {
+    auto separator = platform_separator(format);
     if (!path.empty() && path.back() == separator) {
         return path;
     }
     return path + separator;
 }
 
-bool pathutils::is_absolute(const std::string &path, const Platform platform) {
-    auto components = split(path, platform);
-    return ::is_absolute(components, platform);
+bool pathutils::is_absolute(const std::string &path, const PathFormat format) {
+    auto components = split(path, format);
+    return ::is_absolute(components, format);
 }
 
 std::string pathutils::resolve_path(const std::string &path,
                                     const std::string &startingPath,
-                                    const Platform platform) {
-    std::vector<std::string> pathComponents = split(path, platform);
-    std::vector<std::string> startingPathComponents = split(startingPath, platform);
-    auto pathIsAbsolute = ::is_absolute(pathComponents, platform);
-    auto startingPathIsAbsolute = ::is_absolute(startingPathComponents, platform);
+                                    const PathFormat format) {
+    std::vector<std::string> pathComponents = split(path, format);
+    std::vector<std::string> startingPathComponents = split(startingPath, format);
+    auto pathIsAbsolute = ::is_absolute(pathComponents, format);
+    auto startingPathIsAbsolute = ::is_absolute(startingPathComponents, format);
 
     // Don't do anything if the path is already absolute.
     if (pathIsAbsolute) {
@@ -205,7 +205,7 @@ std::string pathutils::resolve_path(const std::string &path,
     }
 
     size_t absolutePrefixLength = 1;
-    if (platform == Platform::kWindows) {
+    if (format == PathFormat::kWindows) {
         absolutePrefixLength = 2;
     }
 
@@ -229,5 +229,5 @@ std::string pathutils::resolve_path(const std::string &path,
         return ".";
     }
 
-    return pathutils::join(startingPathComponents, platform);
+    return pathutils::join(startingPathComponents, format);
 }

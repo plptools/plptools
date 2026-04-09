@@ -36,7 +36,7 @@
 */
 namespace pathutils {
 
-enum class Platform {
+enum class PathFormat {
     kPOSIX = 0,
     kWindows = 1,
 
@@ -62,7 +62,7 @@ constexpr char kWindowsSeparator = '\\';
 */
 constexpr char kPOSIXSeparator = '/';
 
-extern char platform_separator(const Platform platform);
+extern char platform_separator(const PathFormat platform);
 
 /**
 * Returns the last path component of an EPOC path.
@@ -94,7 +94,7 @@ extern char *resolve_epoc_path(const char *path, const char *initialPath);
 *
 * @return Vector containing the path components.
 */
-extern std::vector<std::string> split(const std::string &path, const Platform platform);
+extern std::vector<std::string> split(const std::string &path, const PathFormat platform);
 
 /**
 * Return a new path by joining the path components, @p components, with path separator, @p separator.
@@ -106,7 +106,7 @@ extern std::vector<std::string> split(const std::string &path, const Platform pl
 *
 * @return String containing the resulting path.
 */
-extern std::string join(const std::vector<std::string> &components, const Platform platform);
+extern std::string join(const std::vector<std::string> &components, const PathFormat platform);
 
 /**
 * Check if a path is absolute.
@@ -116,7 +116,7 @@ extern std::string join(const std::vector<std::string> &components, const Platfo
 *
 * @return true if the path, @p path, is absolute; false otherwise.
 */
-extern bool is_absolute(const std::string &path, const Platform platform);
+extern bool is_absolute(const std::string &path, const PathFormat platform);
 
 /**
 * Convenience wrapper for @ref join that returns a new path resulting from appending path components, @p components,
@@ -130,7 +130,7 @@ extern bool is_absolute(const std::string &path, const Platform platform);
 */
 extern std::string appending_components(const std::string &path,
                                         const std::vector<std::string> &components,
-                                        const Platform platform);
+                                        const PathFormat platform);
 
 /**
 * Return a new string that represents the path, @p path, with a guaranteed
@@ -143,13 +143,13 @@ extern std::string appending_components(const std::string &path,
 *
 * @return @p path + @p separator if path does not end in a separator; @p path, otherwise.
 */
-extern std::string ensuring_trailing_separator(const std::string &path, const Platform platform);
+extern std::string ensuring_trailing_separator(const std::string &path, const PathFormat platform);
 
 /**
 * Returns a path by resolving a relative or absolute path against a starting path.
 *
 * @p startingPath may be relative or absolute, but @p path must be contained within that path.
 */
-extern std::string resolve_path(const std::string &path, const std::string &startingPath, const Platform platform);
+extern std::string resolve_path(const std::string &path, const std::string &startingPath, const PathFormat platform);
 
 };
