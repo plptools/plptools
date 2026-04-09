@@ -27,6 +27,7 @@
 
 #include "xalloc.h"
 #include "xvasprintf.h"
+#include <ios>
 #include <string>
 #include <unistd.h>
 
@@ -34,6 +35,10 @@ static bool is_windows_drive(const std::string &pathComponent) {
     return (pathComponent.size() == 2 &&
             std::isalpha(static_cast<unsigned char>(pathComponent[0])) &&
             pathComponent[1] == ':');
+}
+
+static bool is_separator(const std::string &pathComponent, const pathutils::PathFormat format) {
+    return pathComponent.length() == 1 && pathComponent[0] == pathutils::platform_separator(format);
 }
 
 static bool is_absolute(const std::vector<std::string> &components, const pathutils::PathFormat format) {
@@ -189,43 +194,78 @@ bool pathutils::is_absolute(const std::string &path, const PathFormat format) {
     return ::is_absolute(components, format);
 }
 
-std::string pathutils::resolve_path(const std::string &path,
-                                    const std::string &startingPath,
-                                    const PathFormat format) {
-    std::vector<std::string> pathComponents = split(path, format);
-    std::vector<std::string> startingPathComponents = split(startingPath, format);
-    auto pathIsAbsolute = ::is_absolute(pathComponents, format);
-    auto startingPathIsAbsolute = ::is_absolute(startingPathComponents, format);
+/**
+* Return the iterator corresponding with the beginning of the path components. May be used to split the path into the
+* vectors containing the root markers ('C:', '\\', '/') and the remaining path components.
+*
+* The implementation is pretty simple---it just scans forward through the path components looking for the drive and/or
+* root path component.
+*/
+static std::vector<std::string>::const_iterator path_find_rootless_components_begin(const std::vector<std::string> &components,
+                                                                                    const pathutils::PathFormat format) {
+    std::vector<std::string>::const_iterator iterator = components.begin();
 
-    // Don't do anything if the path is already absolute.
-    if (pathIsAbsolute) {
-        return path;
+    // Check we're not already at the end of the vector.
+    if (iterator == components.end()) {
+        return iterator;
     }
 
-    size_t absolutePrefixLength = 1;
-    if (format == PathFormat::kWindows) {
-        absolutePrefixLength = 2;
-    }
-
-    for (const auto &pathComponent : pathComponents) {
-        if (pathComponent == "..") {
-            if (startingPathIsAbsolute && startingPathComponents.size() == absolutePrefixLength) {
-                return path;
-            } else if (startingPathComponents.empty() || startingPathComponents.back() == "..") {
-                startingPathComponents.push_back("..");
-            } else {
-                startingPathComponents.pop_back();
-            }
-        } else {
-            startingPathComponents.push_back(pathComponent);
+    // Consume the windows drive component if appropriate and then check we're not at the end of the vector.
+    if (format == pathutils::PathFormat::kWindows) {
+        if (is_windows_drive(*iterator)) {
+            ++iterator;
+        }
+        if (iterator == components.end()) {
+            return iterator;
         }
     }
 
-    // If the starting path is relative and the resulting path is an empty string, we return '.' to ensure that the
-    // resulting path is valid.
-    if (!startingPathIsAbsolute && startingPathComponents.empty()) {
+    // Consume the root component ('\\' or '/') if present.
+    if (is_separator(*iterator, format)) {
+        ++iterator;
+    }
+
+    return iterator;
+}
+
+std::string pathutils::resolve_path(const std::string &path,
+                                    const std::string &basePath,
+                                    const PathFormat format) {
+    std::vector<std::string> pathComponents = split(path, format);
+    std::vector<std::string> basePathComponents = split(basePath, format);
+
+    // Don't do anything if the path is already absolute.
+    if (::is_absolute(pathComponents, format)) {
+        return path;
+    }
+
+    // Work out where the path starts.
+    auto basePathComponentsPathBegin = path_find_rootless_components_begin(basePathComponents, format);
+    std::vector<std::string> resolvedPathRootComponents(basePathComponents.cbegin(), basePathComponentsPathBegin);
+    std::vector<std::string> resolvedPathRootlessComponents(basePathComponentsPathBegin, basePathComponents.cend());
+
+    // Fold the incoming path components into our base path components.
+    for (const auto &pathComponent : pathComponents) {
+        if (pathComponent == "..") {
+            if (resolvedPathRootlessComponents.empty() || resolvedPathRootlessComponents.back() == "..") {
+                resolvedPathRootlessComponents.push_back("..");
+            } else {
+                resolvedPathRootlessComponents.pop_back();
+            }
+        } else {
+            resolvedPathRootlessComponents.push_back(pathComponent);
+        }
+    }
+
+    // Reconstitute the path.
+    std::vector<std::string> resolvedPathComponents = resolvedPathRootComponents;
+    resolvedPathComponents.insert(resolvedPathComponents.end(), resolvedPathRootlessComponents.begin(), resolvedPathRootlessComponents.end());
+    std::string resolvedPath = join(resolvedPathComponents, format);
+
+    // If the resulting path is resulting path is an empty string, we return '.' to ensure it's valid.
+    if (resolvedPath.empty()) {
         return ".";
     }
 
-    return pathutils::join(startingPathComponents, format);
+    return resolvedPath;
 }

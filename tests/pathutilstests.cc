@@ -156,26 +156,44 @@ TEST_CASE("pathutils::join") {
 TEST_CASE("pathutils::resolve_path") {
 
     // Posix.
+
     CHECK(resolve_path("/foo/bar/baz", "", PathFormat::kPOSIX) == "/foo/bar/baz");
     CHECK(resolve_path("/foo/bar/baz", "/one/two", PathFormat::kPOSIX) == "/foo/bar/baz");
+
     CHECK(resolve_path("baz", "/foo/bar", PathFormat::kPOSIX) == "/foo/bar/baz");
     CHECK(resolve_path("../baz", "/foo/bar", PathFormat::kPOSIX) == "/foo/baz");
-    CHECK(resolve_path("../..", "/foo", PathFormat::kPOSIX) == "../..");  // TODO: Should this fail instead?
-    CHECK(resolve_path("../../..", "/foo", PathFormat::kPOSIX) == "../../..");  // TODO: Should this fail instead?
+    CHECK(resolve_path("../..", "/foo", PathFormat::kPOSIX) == "/..");
+    CHECK(resolve_path("../../..", "/foo", PathFormat::kPOSIX) == "/../..");
+
     CHECK(resolve_path("../../..", "foo", PathFormat::kPOSIX) == "../..");
     CHECK(resolve_path("../../bar", "foo", PathFormat::kPOSIX) == "../bar");
     CHECK(resolve_path("..", "bob", PathFormat::kPOSIX) == ".");
     CHECK(resolve_path("../foo/../bar/../baz", "bob", PathFormat::kPOSIX) == "baz");
 
-    // Windows (and EPOC).
+    // Windows.
+
     CHECK(resolve_path("C:\\foo\\bar\\baz", "", PathFormat::kWindows) == "C:\\foo\\bar\\baz");
     CHECK(resolve_path("C:\\foo\\bar\\baz", "C:\\one\\two", PathFormat::kWindows) == "C:\\foo\\bar\\baz");
+
     CHECK(resolve_path("baz", "C:\\foo\\bar", PathFormat::kWindows) == "C:\\foo\\bar\\baz");
     CHECK(resolve_path("..\\baz", "D:\\foo\\bar", PathFormat::kWindows) == "D:\\foo\\baz");
-    CHECK(resolve_path("..\\..", "C:\\foo", PathFormat::kWindows) == "..\\..");  // TODO: Should this fail instead?
-    CHECK(resolve_path("..\\..\\..", "C:\\foo", PathFormat::kWindows) == "..\\..\\..");  // TODO: Should this fail instead?
+    CHECK(resolve_path("..\\..", "C:\\foo", PathFormat::kWindows) == "C:\\..");
+    CHECK(resolve_path("..\\..\\..", "C:\\foo", PathFormat::kWindows) == "C:\\..\\..");
+
+    CHECK(resolve_path("baz", "\\foo\\bar", PathFormat::kWindows) == "\\foo\\bar\\baz");
+    CHECK(resolve_path("..\\baz", "\\foo\\bar", PathFormat::kWindows) == "\\foo\\baz");
+    CHECK(resolve_path("..\\..", "\\foo", PathFormat::kWindows) == "\\..");
+    CHECK(resolve_path("..\\..\\..", "\\foo", PathFormat::kWindows) == "\\..\\..");
+
+    CHECK(resolve_path("baz", "C:foo\\bar", PathFormat::kWindows) == "C:foo\\bar\\baz");
+    CHECK(resolve_path("..\\baz", "C:foo\\bar", PathFormat::kWindows) == "C:foo\\baz");
+    CHECK(resolve_path("..\\..", "C:foo", PathFormat::kWindows) == "C:..");
+    CHECK(resolve_path("..\\..\\..", "C:foo", PathFormat::kWindows) == "C:..\\..");
+
     CHECK(resolve_path("..\\..\\..", "foo", PathFormat::kWindows) == "..\\..");
     CHECK(resolve_path("..\\..\\bar", "foo", PathFormat::kWindows) == "..\\bar");
     CHECK(resolve_path("..", "bob", PathFormat::kWindows) == ".");
-    CHECK(resolve_path("..\\foo\\..\\bar\\..\\baz", "bob", PathFormat::kWindows) == "baz");
+
+    // TODO: Check behavior with empty paths.
+    // TODO: Resolve relative windows paths on a different drive to the base path.
 }
