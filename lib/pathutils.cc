@@ -48,9 +48,9 @@ static bool is_absolute(const std::vector<std::string> &components, const pathut
 char pathutils::platform_separator(const PathFormat format) {
     switch (format) {
     case pathutils::PathFormat::kPOSIX:
-        return kPOSIXSeparator;
+        return '/';
     case pathutils::PathFormat::kWindows:
-        return kWindowsSeparator;
+        return '\\';
     }
 }
 

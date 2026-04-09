@@ -48,20 +48,6 @@ enum class PathFormat {
     kEPOC = kWindows,
 };
 
-/**
-* Psion-native path separator.
-*
-* Always backslash.
-*/
-constexpr char kWindowsSeparator = '\\';
-
-/**
-* Host-native path separator.
-*
-* Forward slash on POSIX operating systems; backslash on Windows.
-*/
-constexpr char kPOSIXSeparator = '/';
-
 extern char platform_separator(const PathFormat format);
 
 /**
