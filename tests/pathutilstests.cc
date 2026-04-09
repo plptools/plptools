@@ -29,22 +29,22 @@ using namespace pathutils;
 
 TEST_CASE("pathutils::ensuring_trailing_separator") {
 
-    CHECK(ensuring_trailing_separator("", kWindowsSeparator) == "\\");
-    CHECK(ensuring_trailing_separator("\\", kWindowsSeparator) == "\\");
-    CHECK(ensuring_trailing_separator("C:", kWindowsSeparator) == "C:\\");
-    CHECK(ensuring_trailing_separator("C:\\", kWindowsSeparator) == "C:\\");
+    CHECK(ensuring_trailing_separator("", Platform::kWindows) == "\\");
+    CHECK(ensuring_trailing_separator("\\", Platform::kWindows) == "\\");
+    CHECK(ensuring_trailing_separator("C:", Platform::kWindows) == "C:\\");
+    CHECK(ensuring_trailing_separator("C:\\", Platform::kWindows) == "C:\\");
 
     // N.B. These tests assume a POSIX host and will need updating for future Windows support.
-    CHECK(ensuring_trailing_separator("", kPOSIXSeparator) == "/");
-    CHECK(ensuring_trailing_separator("/", kPOSIXSeparator) == "/");
-    CHECK(ensuring_trailing_separator("/mnt", kPOSIXSeparator) == "/mnt/");
-    CHECK(ensuring_trailing_separator("/mnt/", kPOSIXSeparator) == "/mnt/");
+    CHECK(ensuring_trailing_separator("", Platform::kPOSIX) == "/");
+    CHECK(ensuring_trailing_separator("/", Platform::kPOSIX) == "/");
+    CHECK(ensuring_trailing_separator("/mnt", Platform::kPOSIX) == "/mnt/");
+    CHECK(ensuring_trailing_separator("/mnt/", Platform::kPOSIX) == "/mnt/");
 
     // Unsupported path normalization and separator conversion.
-    CHECK(ensuring_trailing_separator("/mnt/", kWindowsSeparator) == "/mnt/\\");
-    CHECK(ensuring_trailing_separator("C:\\", kPOSIXSeparator) == "C:\\/");
-    CHECK(ensuring_trailing_separator("C:\\\\", kWindowsSeparator) == "C:\\\\");
-    CHECK(ensuring_trailing_separator("/mnt//", kPOSIXSeparator) == "/mnt//");
+    CHECK(ensuring_trailing_separator("/mnt/", Platform::kWindows) == "/mnt/\\");
+    CHECK(ensuring_trailing_separator("C:\\", Platform::kPOSIX) == "C:\\/");
+    CHECK(ensuring_trailing_separator("C:\\\\", Platform::kWindows) == "C:\\\\");
+    CHECK(ensuring_trailing_separator("/mnt//", Platform::kPOSIX) == "/mnt//");
 }
 
 TEST_CASE("pathutils::epoc_basename") {
@@ -115,7 +115,7 @@ TEST_CASE("pathutils::is_absolute") {
 TEST_CASE("pathutils::appending_components") {
     CHECK(appending_components("C:\\", {"Documents"}, Platform::kWindows) == "C:\\Documents");
     CHECK(appending_components("C:\\", {"Documents"}, Platform::kWindows) == "C:\\Documents");
-    CHECK(split("C:foo\\bar\\", Platform::kWindows) == std::vector<std::string>({"C:", "foo", "bar"}));
+    CHECK(appending_components("C:foo\\bar\\", {"baz"}, Platform::kWindows) == "C:foo\\bar\\baz");
 }
 
 TEST_CASE("pathutils::split") {

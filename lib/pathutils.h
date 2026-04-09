@@ -143,7 +143,7 @@ extern std::string appending_components(const std::string &path,
 *
 * @return @p path + @p separator if path does not end in a separator; @p path, otherwise.
 */
-extern std::string ensuring_trailing_separator(const std::string &path, const char separator);
+extern std::string ensuring_trailing_separator(const std::string &path, const Platform platform);
 
 /**
 * Returns a path by resolving a relative or absolute path against a starting path.

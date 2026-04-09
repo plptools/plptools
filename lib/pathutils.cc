@@ -178,7 +178,8 @@ std::string pathutils::appending_components(const std::string &path,
     return join(pathComponents, platform);
 }
 
-std::string pathutils::ensuring_trailing_separator(const std::string &path, const char separator) {
+std::string pathutils::ensuring_trailing_separator(const std::string &path, const Platform platform) {
+    auto separator = platform_separator(platform);
     if (!path.empty() && path.back() == separator) {
         return path;
     }
