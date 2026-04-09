@@ -168,8 +168,6 @@ TEST_CASE("pathutils::resolve_path") {
     CHECK(resolve_path("..", "bob", PathFormat::kPOSIX) == ".");
     CHECK(resolve_path("../foo/../bar/../baz", "bob", PathFormat::kPOSIX) == "baz");
 
-    // CHECK(resolve_path("../foo/bar/../foo/../baz", "bob", PathFormat::kPOSIX) == "baz");
-
     // Windows (and EPOC).
     CHECK(resolve_path("C:\\foo\\bar\\baz", "", PathFormat::kWindows) == "C:\\foo\\bar\\baz");
     CHECK(resolve_path("C:\\foo\\bar\\baz", "C:\\one\\two", PathFormat::kWindows) == "C:\\foo\\bar\\baz");
