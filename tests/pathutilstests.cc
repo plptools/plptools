@@ -95,7 +95,7 @@ TEST_CASE("pathutils::is_absolute") {
     CHECK(is_absolute("C:\\", Platform::kWindows) == true);
     CHECK(is_absolute("C:\\", Platform::kPOSIX) == false);
 
-    CHECK(is_absolute("C:", Platform::kWindows) == true);
+    CHECK(is_absolute("C:", Platform::kWindows) == false);
     CHECK(is_absolute("C:", Platform::kPOSIX) == false);
     CHECK(is_absolute("C:foo", Platform::kWindows) == false);
     CHECK(is_absolute("C:foo", Platform::kPOSIX) == false);
@@ -113,8 +113,9 @@ TEST_CASE("pathutils::is_absolute") {
 }
 
 TEST_CASE("pathutils::appending_components") {
-    CHECK(appending_components("C:\\", {"Documents"}, '\\') == "C:\\Documents");
-    CHECK(appending_components("C:\\", {"Documents"}, '\\') == "C:\\Documents");
+    CHECK(appending_components("C:\\", {"Documents"}, Platform::kWindows) == "C:\\Documents");
+    CHECK(appending_components("C:\\", {"Documents"}, Platform::kWindows) == "C:\\Documents");
+    CHECK(split("C:foo\\bar\\", Platform::kWindows) == std::vector<std::string>({"C:", "foo", "bar"}));
 }
 
 TEST_CASE("pathutils::split") {
@@ -122,33 +123,35 @@ TEST_CASE("pathutils::split") {
     CHECK(split("one\\two\\three", Platform::kWindows) == std::vector<std::string>({"one", "two", "three"}));
     CHECK(split("one\\two\\three\\", Platform::kWindows) == std::vector<std::string>({"one", "two", "three"}));
     CHECK(split("one\\two\\\\three\\", Platform::kWindows) == std::vector<std::string>({"one", "two", "three"}));
-    CHECK(split("C:\\one\\two\\\\three\\", Platform::kWindows) == std::vector<std::string>({"C:", "one", "two", "three"}));
+    CHECK(split("C:\\one\\two\\\\three\\", Platform::kWindows) == std::vector<std::string>({"C:", "\\", "one", "two", "three"}));
     CHECK(split("\\one\\two\\\\three\\", Platform::kWindows) == std::vector<std::string>({"\\", "one", "two", "three"}));
+    CHECK(split("C:\\one\\two\\\\three\\", Platform::kWindows) == std::vector<std::string>({"C:", "\\", "one", "two", "three"}));
+    CHECK(split("C:foo\\bar\\", Platform::kWindows) == std::vector<std::string>({"C:", "foo", "bar"}));
 
     CHECK(split("", Platform::kPOSIX) == std::vector<std::string>({}));
     CHECK(split("one/two/three", Platform::kPOSIX) == std::vector<std::string>({"one", "two", "three"}));
     CHECK(split("one/two/three/", Platform::kPOSIX) == std::vector<std::string>({"one", "two", "three"}));
-    CHECK(split("/two//three/", Platform::kPOSIX) == std::vector<std::string>({"one", "two", "three"}));
+    CHECK(split("/two//three/", Platform::kPOSIX) == std::vector<std::string>({"/", "two", "three"}));
     CHECK(split("/one/two/three/", Platform::kPOSIX) == std::vector<std::string>({"/", "one", "two", "three"}));
 
     // TODO: Support windows paths without drive letters.
 }
 
 TEST_CASE("pathutils::join") {
-    CHECK(join({""}, '/') == "");
-    CHECK(join({"hello"}, '/') == "hello");
-    CHECK(join({"hello", "world"}, '/') == "hello/world");
-    CHECK(join({"/hello", "world"}, '/') == "/hello/world");
-    CHECK(join({"/hello/", "world"}, '/') == "/hello/world");
-    CHECK(join({"/", "hello", "world"}, '/') == "/hello/world");
-    CHECK(join({"..", ".."}, '/') == "../..");
-    CHECK(join({"hello", "world"}, '\\') == "hello\\world");
-    CHECK(join({"C:\\hello", "world"}, '\\') == "C:\\hello\\world");
-    CHECK(join({"C:\\hello\\", "world"}, '\\') == "C:\\hello\\world");
-    CHECK(join({"C:\\", "hello", "world"}, '\\') == "C:\\hello\\world");
-    CHECK(join({"C:", "hello", "world"}, '\\') == "C:\\hello\\world");
-    CHECK(join({"C:", "\\", "hello", "world"}, '\\') == "C:\\hello\\world");
-    CHECK(join({"..", ".."}, '\\') == "..\\..");
+    CHECK(join({""}, Platform::kPOSIX) == "");
+    CHECK(join({"hello"}, Platform::kPOSIX) == "hello");
+    CHECK(join({"hello", "world"}, Platform::kPOSIX) == "hello/world");
+    CHECK(join({"/hello", "world"}, Platform::kPOSIX) == "/hello/world");
+    CHECK(join({"/hello/", "world"}, Platform::kPOSIX) == "/hello/world");
+    CHECK(join({"/", "hello", "world"}, Platform::kPOSIX) == "/hello/world");
+    CHECK(join({"..", ".."}, Platform::kPOSIX) == "../..");
+    CHECK(join({"hello", "world"}, Platform::kWindows) == "hello\\world");
+    CHECK(join({"C:\\hello", "world"}, Platform::kWindows) == "C:\\hello\\world");
+    CHECK(join({"C:\\hello\\", "world"}, Platform::kWindows) == "C:\\hello\\world");
+    CHECK(join({"C:\\", "hello", "world"}, Platform::kWindows) == "C:\\hello\\world");
+    CHECK(join({"C:", "hello", "world"}, Platform::kWindows) == "C:hello\\world");
+    CHECK(join({"C:", "\\", "hello", "world"}, Platform::kWindows) == "C:\\hello\\world");
+    CHECK(join({"..", ".."}, Platform::kWindows) == "..\\..");
 }
 
 TEST_CASE("pathutils::resolve_path") {
@@ -165,7 +168,7 @@ TEST_CASE("pathutils::resolve_path") {
     CHECK(resolve_path("..", "bob", Platform::kPOSIX) == ".");
     CHECK(resolve_path("../foo/../bar/../baz", "bob", Platform::kPOSIX) == "baz");
 
-    // CHECK(pathutils::resolve_path("../foo/bar/../foo/../baz", "bob", pathutils::Platform::kPOSIX) == "baz");
+    // CHECK(resolve_path("../foo/bar/../foo/../baz", "bob", Platform::kPOSIX) == "baz");
 
     // Windows (and EPOC).
     CHECK(resolve_path("C:\\foo\\bar\\baz", "", Platform::kWindows) == "C:\\foo\\bar\\baz");

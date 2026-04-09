@@ -48,22 +48,19 @@ enum class Platform {
     kEPOC = kWindows,
 };
 
-// static constexpr PathType kPathTypeHost = PathType::kPOSIX;
-// static constexpr PathType kPathTypeEPOC = PathType::kWindows;
-
 /**
 * Psion-native path separator.
 *
 * Always backslash.
 */
-inline constexpr char kWindowsSeparator = '\\';
+constexpr char kWindowsSeparator = '\\';
 
 /**
 * Host-native path separator.
 *
 * Forward slash on POSIX operating systems; backslash on Windows.
 */
-inline constexpr char kPOSIXSeparator = '/';
+constexpr char kPOSIXSeparator = '/';
 
 extern char platform_separator(const Platform platform);
 
@@ -97,7 +94,7 @@ extern char *resolve_epoc_path(const char *path, const char *initialPath);
 *
 * @return Vector containing the path components.
 */
-extern std::vector<std::string> split(const std::string path, const Platform platform);
+extern std::vector<std::string> split(const std::string &path, const Platform platform);
 
 /**
 * Return a new path by joining the path components, @p components, with path separator, @p separator.
@@ -109,27 +106,10 @@ extern std::vector<std::string> split(const std::string path, const Platform pla
 *
 * @return String containing the resulting path.
 */
-extern std::string join(const std::vector<std::string> &components, const char separator);
-
-/**
-* Check if a path component is a root component (e.g., `/` or `C:`).
-*
-* Behavior is dependent on the path separator used: if a POSIX path separators is used, this returns true if the path
-* component matches the path separator ('/'); if a Windows path separator is used, this returns true if the path
-* component is a drive ('A:', 'B:', 'C:', ... etc).
-*
-* @param pathComponent Path component to test.
-* @param separator Path separator to use (should be one of '/' or '\\').
-*
-* @return true if the path component, @p pathComponent, is a root component; false otherwise.
-*/
-extern bool is_root(const std::string &pathComponent, const Platform platform);  // TODO: Hide.
+extern std::string join(const std::vector<std::string> &components, const Platform platform);
 
 /**
 * Check if a path is absolute.
-*
-* Uses @ref is_root internally, applying the same documented logic. Behavior is dependent on the path separator,
-* @p separator, used.
 *
 * @param path Path to test.
 * @param separator Path separator to use (should be one of '/' or '\\').
@@ -150,7 +130,7 @@ extern bool is_absolute(const std::string &path, const Platform platform);
 */
 extern std::string appending_components(const std::string &path,
                                         const std::vector<std::string> &components,
-                                        const char separator);
+                                        const Platform platform);
 
 /**
 * Return a new string that represents the path, @p path, with a guaranteed
@@ -170,8 +150,6 @@ extern std::string ensuring_trailing_separator(const std::string &path, const ch
 *
 * @p startingPath may be relative or absolute, but @p path must be contained within that path.
 */
-extern std::string resolve_path(const std::string &path,
-                                const std::string &startingPath,
-                                const Platform platform);
+extern std::string resolve_path(const std::string &path, const std::string &startingPath, const Platform platform);
 
 };
