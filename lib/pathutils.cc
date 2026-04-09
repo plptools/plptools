@@ -23,12 +23,14 @@
 
 #include "config.h"
 
-#include "path.h"
+#include "pathutils.h"
 
 #include "xalloc.h"
 #include "xvasprintf.h"
+#include <string>
+#include <unistd.h>
 
-std::string Path::getEPOCBasename(std::string path) {
+std::string pathutils::epoc_basename(std::string path) {
     size_t end = path.find_last_of("\\");
     if (end == std::string::npos) {
         return std::string(path);
@@ -36,7 +38,7 @@ std::string Path::getEPOCBasename(std::string path) {
     return path.substr(end+1);
 }
 
-char *Path::getEPOCDirname(const char *path) {
+char *pathutils::epoc_dirname(const char *path) {
     char *f1 = xstrdup(path);
     char *p = f1 + strlen(f1);
 
@@ -61,12 +63,12 @@ char *Path::getEPOCDirname(const char *path) {
     return f1;
 }
 
-char *Path::resolveEPOCPath(const char *path, const char *relativeToPath) {
+char *pathutils::resolve_epoc_path(const char *path, const char *relativeToPath) {
     char *f1;
 
     // If we have asked for parent dir, get dirname of cwd.
     if (!strcmp(path, "..")) {
-        f1 = getEPOCDirname(relativeToPath);
+        f1 = epoc_dirname(relativeToPath);
     } else {
         if ((path[0] != '/') && (path[0] != '\\') && (path[1] != ':')) {
             // If path is relative, append it to cwd.
@@ -87,8 +89,7 @@ char *Path::resolveEPOCPath(const char *path, const char *relativeToPath) {
     return f1;
 }
 
-std::string Path::ensuring_trailing_separator(const std::string &path,
-                                              const char separator) {
+std::string pathutils::ensuring_trailing_separator(const std::string &path, const char separator) {
     if (!path.empty() && path.back() == separator) {
         return path;
     }

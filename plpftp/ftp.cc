@@ -28,7 +28,7 @@
 #include <cstdint>
 #include <drive.h>
 #include <Enum.h>
-#include <path.h>
+#include <pathutils.h>
 #include <plpintl.h>
 #include <rclip.h>
 #include <rfsv.h>
@@ -626,7 +626,7 @@ ftp::getClipData(RPCS &, RFSV &a, rclip &, TCPSocket &, const char *file) {
 static char *epoc_dir_from(const char *path) {
 
     // Resolve the path against the current remote working directory (global).
-    char *f1 = Path::resolveEPOCPath(path, psionDir);
+    char *f1 = pathutils::resolve_epoc_path(path, psionDir);
 
     // Ensure path ends with a slash.
     if ((f1[strlen(f1) - 1] != '/') && (f1[strlen(f1) - 1] != '\\')) {
@@ -906,8 +906,8 @@ session(RFSV &a, RPCS & r, rclip & rc, TCPSocket & rclipSocket, vector<char *> a
             struct timeval etime;
             struct stat stbuf;
 
-            char *f1 = Path::resolveEPOCPath(argv[1], psionDir);
-            string basename = Path::getEPOCBasename(string(f1));
+            char *f1 = pathutils::resolve_epoc_path(argv[1], psionDir);
+            string basename = pathutils::epoc_basename(string(f1));
             char *f2 = xasprintf("%s%s%s", localDir, "/", argc == 2 ? basename.c_str() : argv[2]);
 
             gettimeofday(&stime, nullptr);
