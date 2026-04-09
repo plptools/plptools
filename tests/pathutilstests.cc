@@ -34,7 +34,6 @@ TEST_CASE("pathutils::ensuring_trailing_separator") {
     CHECK(ensuring_trailing_separator("C:", PathFormat::kWindows) == "C:\\");
     CHECK(ensuring_trailing_separator("C:\\", PathFormat::kWindows) == "C:\\");
 
-    // N.B. These tests assume a POSIX host and will need updating for future Windows support.
     CHECK(ensuring_trailing_separator("", PathFormat::kPOSIX) == "/");
     CHECK(ensuring_trailing_separator("/", PathFormat::kPOSIX) == "/");
     CHECK(ensuring_trailing_separator("/mnt", PathFormat::kPOSIX) == "/mnt/");
