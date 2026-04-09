@@ -169,10 +169,10 @@ std::string pathutils::join(const std::vector<std::string> &components, const Pa
 }
 
 std::string pathutils::appending_components(const std::string &path,
-                                            const std::vector<std::string> &_components,
+                                            const std::vector<std::string> &components,
                                             const PathFormat format) {
     auto pathComponents = split(path, format);
-    pathComponents.insert(pathComponents.end(), _components.begin(), _components.end());
+    pathComponents.insert(pathComponents.end(), components.begin(), components.end());
     return join(pathComponents, format);
 }
 
