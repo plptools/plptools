@@ -36,19 +36,36 @@
 */
 namespace pathutils {
 
+enum class Platform {
+    kPOSIX = 0,
+    kWindows = 1,
+
+#if defined(_WIN32)
+    kHost = kWindows,
+#else
+    kHost = kPOSIX,
+#endif
+    kEPOC = kWindows,
+};
+
+// static constexpr PathType kPathTypeHost = PathType::kPOSIX;
+// static constexpr PathType kPathTypeEPOC = PathType::kWindows;
+
 /**
 * Psion-native path separator.
 *
 * Always backslash.
 */
-static constexpr char kEPOCSeparator = '\\';
+inline constexpr char kWindowsSeparator = '\\';
 
 /**
 * Host-native path separator.
 *
 * Forward slash on POSIX operating systems; backslash on Windows.
 */
-static constexpr char kHostSeparator = '/';
+inline constexpr char kPOSIXSeparator = '/';
+
+extern char platform_separator(const Platform platform);
 
 /**
 * Returns the last path component of an EPOC path.
@@ -80,7 +97,7 @@ extern char *resolve_epoc_path(const char *path, const char *initialPath);
 *
 * @return Vector containing the path components.
 */
-extern std::vector<std::string> split(const std::string path, const char separator);
+extern std::vector<std::string> split(const std::string path, const Platform platform);
 
 /**
 * Return a new path by joining the path components, @p components, with path separator, @p separator.
@@ -106,7 +123,7 @@ extern std::string join(const std::vector<std::string> &components, const char s
 *
 * @return true if the path component, @p pathComponent, is a root component; false otherwise.
 */
-extern bool is_root(const std::string &pathComponent, const char separator);  // TODO: Hide.
+extern bool is_root(const std::string &pathComponent, const Platform platform);  // TODO: Hide.
 
 /**
 * Check if a path is absolute.
@@ -119,7 +136,7 @@ extern bool is_root(const std::string &pathComponent, const char separator);  //
 *
 * @return true if the path, @p path, is absolute; false otherwise.
 */
-extern bool is_absolute(const std::string &path, const char separator);
+extern bool is_absolute(const std::string &path, const Platform platform);
 
 /**
 * Convenience wrapper for @ref join that returns a new path resulting from appending path components, @p components,
@@ -155,6 +172,6 @@ extern std::string ensuring_trailing_separator(const std::string &path, const ch
 */
 extern std::string resolve_path(const std::string &path,
                                 const std::string &startingPath,
-                                const char separator);
+                                const Platform platform);
 
 };

@@ -30,6 +30,15 @@
 #include <string>
 #include <unistd.h>
 
+char pathutils::platform_separator(const Platform platform) {
+    switch (platform) {
+    case pathutils::Platform::kPOSIX:
+        return kPOSIXSeparator;
+    case pathutils::Platform::kWindows:
+        return kWindowsSeparator;
+    }
+}
+
 std::string pathutils::epoc_basename(std::string path) {
     size_t end = path.find_last_of("\\");
     if (end == std::string::npos) {
@@ -89,7 +98,8 @@ char *pathutils::resolve_epoc_path(const char *path, const char *relativeToPath)
     return f1;
 }
 
-std::vector<std::string> pathutils::split(const std::string path, const char separator) {
+std::vector<std::string> pathutils::split(const std::string path, const Platform platform) {
+    auto separator = platform_separator(platform);
     std::vector<std::string> result;
     size_t offset = 0;
     size_t index = 0;
@@ -137,31 +147,31 @@ std::string pathutils::ensuring_trailing_separator(const std::string &path, cons
     return path + separator;
 }
 
-bool pathutils::is_root(const std::string &pathComponent, const char separator) {
-    if (separator == '/' && pathComponent.length() == 1 && pathComponent[0] == separator) {
-        return true;
-    } else if (separator == '\\' && pathComponent.length() == 2) {
-        return std::isalpha(static_cast<unsigned char>(pathComponent[0])) && pathComponent[1] == ':';
-    } else {
-        return false;
+bool pathutils::is_root(const std::string &pathComponent, const Platform platform) {
+    auto separator = platform_separator(platform);
+    switch (platform) {
+        case pathutils::Platform::kPOSIX:
+            return pathComponent.length() == 1 && pathComponent[0] == separator;
+        case pathutils::Platform::kWindows:
+            return std::isalpha(static_cast<unsigned char>(pathComponent[0])) && pathComponent[1] == ':';
     }
 }
 
-bool pathutils::is_absolute(const std::string &path, const char separator) {
-    auto components = split(path, separator);
+bool pathutils::is_absolute(const std::string &path, const Platform platform) {
+    auto components = split(path, platform);
     if (components.empty()) {
         return false;
     }
-    return is_root(components.front(), separator);
+    return is_root(components.front(), platform);
 }
 
 std::string pathutils::resolve_path(const std::string &path,
                                     const std::string &startingPath,
-                                    const char separator) {
-    std::vector<std::string> pathComponents = split(path, separator);
-    std::vector<std::string> startingPathComponents = split(startingPath, separator);
-    auto pathIsAbsolute = !pathComponents.empty() && is_root(pathComponents.front(), separator);
-    auto startingPathIsAbsolute = !startingPathComponents.empty() && is_root(startingPathComponents.front(), separator);
+                                    const Platform platform) {
+    std::vector<std::string> pathComponents = split(path, platform);
+    std::vector<std::string> startingPathComponents = split(startingPath, platform);
+    auto pathIsAbsolute = !pathComponents.empty() && is_root(pathComponents.front(), platform);
+    auto startingPathIsAbsolute = !startingPathComponents.empty() && is_root(startingPathComponents.front(), platform);
 
     // Check to see if the path is already absolute by inspecting the first component.
     if (pathIsAbsolute) {
@@ -188,5 +198,5 @@ std::string pathutils::resolve_path(const std::string &path,
         return ".";
     }
 
-    return pathutils::join(startingPathComponents, separator);
+    return pathutils::join(startingPathComponents, platform_separator(platform));
 }

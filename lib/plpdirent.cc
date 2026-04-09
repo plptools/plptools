@@ -91,9 +91,9 @@ PlpUID &PlpDirent::getUID() {
 }
 
 std::string PlpDirent::getPath() const {
-    std::string path = pathutils::ensuring_trailing_separator(dirname_, pathutils::kEPOCSeparator) + name;
+    std::string path = pathutils::ensuring_trailing_separator(dirname_, pathutils::kWindowsSeparator) + name;
     if (isDirectory()) {
-        return pathutils::ensuring_trailing_separator(path, pathutils::kEPOCSeparator);
+        return pathutils::ensuring_trailing_separator(path, pathutils::kWindowsSeparator);
     } else {
         return path;
     }
