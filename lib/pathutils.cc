@@ -277,7 +277,7 @@ std::string pathutils::resolve_path(const std::string &path,
     resolvedPathComponents.insert(resolvedPathComponents.end(), resolvedPathRootlessComponents.begin(), resolvedPathRootlessComponents.end());
     std::string resolvedPath = join(resolvedPathComponents, format);
 
-    // If the resulting path is resulting path is an empty string, we return '.' to ensure it's valid.
+    // If the resulting path is an empty string, we return '.' to ensure it's valid.
     if (resolvedPath.empty()) {
         return ".";
     }
