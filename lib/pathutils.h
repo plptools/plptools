@@ -75,6 +75,9 @@ extern char *resolve_epoc_path(const char *path, const char *initialPath);
 * If the path is absolute, the first element of the path separator will represent the root component appropriate to
 * the path type (POSIX or Windows) as implied by the path separator (e.g., '/' or 'C:').
 *
+* If the path ends in a trailing separator, the returned vector will contain a last empty string component as an
+* intentional marker.
+*
 * @param path Path to split.
 * @param format Path format.
 *
@@ -86,6 +89,11 @@ extern std::vector<std::string> split(const std::string &path, const PathFormat 
 * Return a new path by joining the path components, @p components, with path separator, @p separator.
 *
 * For absolute paths, the first path component should be a root component (e.g., '/' or 'C:').
+*
+* Empty strings indicate an intentional directory marker. These are valid anywhere, but have no effect and are therefore
+* ignored unless they occur at the end of the path where they cause the returned path to have a trailing separator. If a
+* path comprises only a single empty string component (directory marker) then the returned path will be the relative
+* path '.' followed by the relevant separator.
 *
 * @param components Path components to join.
 * @param format Path format.
@@ -120,19 +128,6 @@ extern bool is_absolute(const std::string &path, const PathFormat format);
 extern std::string appending_components(const std::string &path,
                                         const std::vector<std::string> &components,
                                         const PathFormat format);
-
-/**
-* Return a new string that represents the path, @p path, with a guaranteed
-* trailing separator, @p separator.
-*
-* This function makes no attempt to normalize paths or convert path separators.
-*
-* @param path Path to test.
-* @param format Path format.
-*
-* @return @p path + @p separator if path does not end in a separator; @p path, otherwise.
-*/
-extern std::string ensuring_trailing_separator(const std::string &path, const PathFormat format);
 
 /**
 * Returns a path by resolving a relative or absolute path against a starting path.

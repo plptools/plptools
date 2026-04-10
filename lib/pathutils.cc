@@ -27,7 +27,6 @@
 
 #include "xalloc.h"
 #include "xvasprintf.h"
-#include <ios>
 #include <string>
 #include <unistd.h>
 
@@ -134,11 +133,14 @@ std::vector<std::string> pathutils::split(const std::string &path, const PathFor
     // want to preserve the leading path separator regardless of path format.
     size_t previousIndex = pathStartIndex;
     size_t index = pathStartIndex;
+    bool foundNonRootSeparator = false;
     while ((index = path.find(separator, previousIndex)) != std::string::npos) {
         // If the index of the first separator is 0, then we know the path is absolute and we insert the root directory
         // path component.
         if (index == pathStartIndex) {
             result.push_back(path.substr(index, 1));
+        } else {
+            foundNonRootSeparator = true;
         }
         size_t length = index - previousIndex;
         if (length > 0) {
@@ -146,31 +148,46 @@ std::vector<std::string> pathutils::split(const std::string &path, const PathFor
         }
         previousIndex = index + 1;
     }
-    if (previousIndex < path.length()) {
+    if (previousIndex < path.length() || foundNonRootSeparator) {
         result.push_back(path.substr(previousIndex));
     }
     return result;
 }
 
 std::string pathutils::join(const std::vector<std::string> &components, const PathFormat format) {
-    std::string result;
+    std::string drive;
     auto begin = components.begin();
 
     // Special-case handling of Windows drives.
     if (format == PathFormat::kWindows && components.size() >= 1 && is_windows_drive(components[0])) {
-        result += components[0];
+        drive += components[0];
         ++begin;
     }
 
     // Handle drive paths consistently, taking care not to make relative paths absolute by over-inserting a separator.
+    std::string path;
     auto separator = platform_separator(format);
     for (auto iterator = begin; iterator != components.end(); iterator++) {
-        if (iterator != begin && result.back() != separator) {
-            result += separator;
+        if (iterator != begin && path.back() != separator) {
+            path += separator;
         }
-        result += *iterator;
+
+        // An empty string is a directory marker. We don't need to do anything special if the path is already non-empty
+        // but if the path is empty then we need to set it to '.' followed by the path separator to ensure it can be
+        // correctly resolved by the platform.
+        // Note that this implementation implicitly performs some path normalization. While this does go beyond the
+        // intended responsibility of this function, it also ensures the output paths are clean. We might choose to
+        // move this normalization out into a separate method which walks the components and drops unnecessary directory
+        // markers (and flattens parent markers, etc).
+        if ((*iterator).empty() && path.empty()) {
+            path += ".";
+            path += separator;
+        }
+
+        path += *iterator;
     }
-    return result;
+
+    return drive + path;
 }
 
 std::string pathutils::appending_components(const std::string &path,
@@ -179,14 +196,6 @@ std::string pathutils::appending_components(const std::string &path,
     auto pathComponents = split(path, format);
     pathComponents.insert(pathComponents.end(), components.begin(), components.end());
     return join(pathComponents, format);
-}
-
-std::string pathutils::ensuring_trailing_separator(const std::string &path, const PathFormat format) {
-    auto separator = platform_separator(format);
-    if (!path.empty() && path.back() == separator) {
-        return path;
-    }
-    return path + separator;
 }
 
 bool pathutils::is_absolute(const std::string &path, const PathFormat format) {
@@ -246,6 +255,12 @@ std::string pathutils::resolve_path(const std::string &path,
 
     // Fold the incoming path components into our base path components.
     for (const auto &pathComponent : pathComponents) {
+
+        // Ensure there aren't any trailing directory markers before processing the next component.
+        while (!resolvedPathRootlessComponents.empty() && resolvedPathRootlessComponents.back().empty()) {
+            resolvedPathRootlessComponents.pop_back();
+        }
+
         if (pathComponent == "..") {
             if (resolvedPathRootlessComponents.empty() || resolvedPathRootlessComponents.back() == "..") {
                 resolvedPathRootlessComponents.push_back("..");

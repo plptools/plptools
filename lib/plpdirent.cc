@@ -91,12 +91,12 @@ PlpUID &PlpDirent::getUID() {
 }
 
 std::string PlpDirent::getPath() const {
-    std::string path = pathutils::ensuring_trailing_separator(dirname_, pathutils::PathFormat::kEPOC) + name;
+    auto pathComponents = pathutils::split(dirname_, pathutils::PathFormat::kEPOC);
+    pathComponents.push_back(name);
     if (isDirectory()) {
-        return pathutils::ensuring_trailing_separator(path, pathutils::PathFormat::kEPOC);
-    } else {
-        return path;
+        pathComponents.push_back("");
     }
+    return join(pathComponents, pathutils::PathFormat::kEPOC);
 }
 
 const char *PlpDirent::getName() const {

@@ -49,7 +49,7 @@ TEST_CASE("PlpDirent::getPath") {
         CHECK(dirent.isDirectory() == false);
         std::string name = dirent.getName();
         CHECK(name == "foo.txt");
-        CHECK(dirent.getPath() == "\\foo.txt");
+        CHECK(dirent.getPath() == "foo.txt");
     }
 
     SUBCASE("Directory dirent must have trailing backslash") {
