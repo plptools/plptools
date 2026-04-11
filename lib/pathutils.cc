@@ -37,7 +37,7 @@ static bool is_windows_drive(const std::string &pathComponent) {
 }
 
 static bool is_separator(const std::string &pathComponent, const pathutils::PathFormat format) {
-    return pathComponent.length() == 1 && pathComponent[0] == pathutils::platform_separator(format);
+    return pathComponent.length() == 1 && pathComponent[0] == pathutils::path_separator(format);
 }
 
 static bool is_absolute(const std::vector<std::string> &components, const pathutils::PathFormat format) {
@@ -71,7 +71,7 @@ static std::string drive_component(const std::vector<std::string> components, co
     return front;
 }
 
-char pathutils::platform_separator(const PathFormat format) {
+char pathutils::path_separator(const PathFormat format) {
     switch (format) {
     case pathutils::PathFormat::kPOSIX:
         return '/';
@@ -140,7 +140,7 @@ char *pathutils::resolve_epoc_path(const char *path, const char *relativeToPath)
 }
 
 std::vector<std::string> pathutils::split(const std::string &path, const PathFormat format) {
-    auto separator = platform_separator(format);
+    auto separator = path_separator(format);
     std::vector<std::string> result;
     size_t pathStartIndex = 0;
 
@@ -188,7 +188,7 @@ std::string pathutils::join(const std::vector<std::string> &components, const Pa
 
     // Handle drive paths consistently, taking care not to make relative paths absolute by over-inserting a separator.
     std::string path;
-    auto separator = platform_separator(format);
+    auto separator = path_separator(format);
     for (auto iterator = begin; iterator != components.end(); iterator++) {
         if (iterator != begin && path.back() != separator) {
             path += separator;
@@ -287,7 +287,7 @@ std::string pathutils::resolve_path(const std::string &path,
 
         // If the path is rooted (but not absolute), then we can simply set the resolved components to that of the path.
         std::string pathSeparator;
-        pathSeparator += platform_separator(format);
+        pathSeparator += path_separator(format);
         if (resolvedPathRootComponents.empty() || resolvedPathRootComponents.back() != pathSeparator) {
             resolvedPathRootComponents.push_back(pathSeparator);
         }

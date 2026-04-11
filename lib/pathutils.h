@@ -48,7 +48,7 @@ enum class PathFormat {
     kEPOC = kWindows,
 };
 
-extern char platform_separator(const PathFormat format);
+extern char path_separator(const PathFormat format);
 
 /**
 * Returns the last path component of an EPOC path.
