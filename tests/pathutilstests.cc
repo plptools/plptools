@@ -204,6 +204,10 @@ TEST_CASE("pathutils::resolve_path") {
     CHECK(resolve_path("..", "bob", PathFormat::kPOSIX) == ".");
     CHECK(resolve_path("../foo/../bar/../baz", "bob", PathFormat::kPOSIX) == "baz");
 
+    CHECK(resolve_path("", "", PathFormat::kPOSIX) == ".");
+    CHECK(resolve_path("./", "", PathFormat::kPOSIX) == "./");
+    CHECK(resolve_path("../", "foo", PathFormat::kPOSIX) == "./");
+
     // Windows.
 
     CHECK(resolve_path("C:\\foo\\bar\\baz", "", PathFormat::kWindows) == "C:\\foo\\bar\\baz");
@@ -233,7 +237,10 @@ TEST_CASE("pathutils::resolve_path") {
     CHECK(resolve_path("..\\..\\bar", "foo", PathFormat::kWindows) == "..\\bar");
     CHECK(resolve_path("..", "bob", PathFormat::kWindows) == ".");
 
-    // TODO: Check behavior with empty paths.
+    CHECK(resolve_path("", "", PathFormat::kWindows) == ".");
+    CHECK(resolve_path(".\\", "", PathFormat::kWindows) == ".\\");
+    CHECK(resolve_path("..\\", "", PathFormat::kWindows) == "..\\");
+    CHECK(resolve_path("..\\", "foo", PathFormat::kWindows) == ".\\");
+
     // TODO: Resolve relative windows paths on a different drive to the base path.
-    // TODO: Resolving against paths with trialing separators.
 }
