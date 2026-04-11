@@ -41,18 +41,16 @@ ENUM_DEFINITION_BEGIN(RFSVFactory::errs, RFSVFactory::FACERR_NONE)
     stringRep.add(RFSVFactory::FACERR_NORESPONSE,     N_("no response from ncpd"));
 ENUM_DEFINITION_END(RFSVFactory::errs)
 
-RFSVFactory::RFSVFactory(TCPSocket *_skt) : serNum(0)
-{
+RFSVFactory::RFSVFactory(TCPSocket *_skt)
+: serNum(0) {
     err = FACERR_NONE;
     skt = _skt;
 }
 
-RFSVFactory::~RFSVFactory()
-{
+RFSVFactory::~RFSVFactory() {
 }
 
-RFSV* RFSVFactory::create(bool reconnect)
-{
+RFSV* RFSVFactory::create(bool reconnect) {
     // skt is connected to the ncp daemon, which will have (hopefully) seen
     // an INFO exchange, where the protocol version of the remote Psion was
     // sent, and noted. We have to ask the ncp daemon which protocol it saw,
