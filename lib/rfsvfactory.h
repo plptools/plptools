@@ -19,8 +19,7 @@
  *  along with this program; if not, see <https://www.gnu.org/licenses/>.
  *
  */
-#ifndef _RFSVFACTORY_H_
-#define _RFSVFACTORY_H_
+#pragma once
 
 #include "rfsv.h"
 
@@ -30,7 +29,7 @@ class TCPSocket;
  * A factory for automatically instantiating the correct
  * @ref RFSV protocol variant depending on the connected Psion.
  */
-class rfsvfactory {
+class RFSVFactory {
 
 public:
     /**
@@ -46,19 +45,19 @@ public:
     };
 
     /**
-    * Constructs a rfsvfactory.
+    * Constructs a RFSVFactory.
     *
     * Does not take ownership of the socket.
     *
     * @param skt The socket to be used for connecting
     * to the ncpd daemon.
     */
-    rfsvfactory(TCPSocket *skt);
+    RFSVFactory(TCPSocket *skt);
 
     /**
-     * Delete the rfsvfactory, cleaning up any resources.
+     * Delete the RFSVFactory, cleaning up any resources.
      */
-    virtual ~rfsvfactory();
+    virtual ~RFSVFactory();
 
     /**
     * Creates a new @ref RFSV instance.
@@ -88,5 +87,3 @@ private:
     int serNum;
     Enum<errs> err;
 };
-
-#endif

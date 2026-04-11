@@ -32,27 +32,25 @@
 
 using namespace std;
 
-ENUM_DEFINITION_BEGIN(rfsvfactory::errs, rfsvfactory::FACERR_NONE)
-    stringRep.add(rfsvfactory::FACERR_NONE,           N_("no error"));
-    stringRep.add(rfsvfactory::FACERR_COULD_NOT_SEND, N_("could not send version request"));
-    stringRep.add(rfsvfactory::FACERR_AGAIN,          N_("try again"));
-    stringRep.add(rfsvfactory::FACERR_NOPSION,        N_("no EPOC device connected"));
-    stringRep.add(rfsvfactory::FACERR_PROTVERSION,    N_("wrong protocol version"));
-    stringRep.add(rfsvfactory::FACERR_NORESPONSE,     N_("no response from ncpd"));
-ENUM_DEFINITION_END(rfsvfactory::errs)
+ENUM_DEFINITION_BEGIN(RFSVFactory::errs, RFSVFactory::FACERR_NONE)
+    stringRep.add(RFSVFactory::FACERR_NONE,           N_("no error"));
+    stringRep.add(RFSVFactory::FACERR_COULD_NOT_SEND, N_("could not send version request"));
+    stringRep.add(RFSVFactory::FACERR_AGAIN,          N_("try again"));
+    stringRep.add(RFSVFactory::FACERR_NOPSION,        N_("no EPOC device connected"));
+    stringRep.add(RFSVFactory::FACERR_PROTVERSION,    N_("wrong protocol version"));
+    stringRep.add(RFSVFactory::FACERR_NORESPONSE,     N_("no response from ncpd"));
+ENUM_DEFINITION_END(RFSVFactory::errs)
 
-rfsvfactory::rfsvfactory(TCPSocket *_skt) : serNum(0)
-{
+RFSVFactory::RFSVFactory(TCPSocket *_skt)
+: serNum(0) {
     err = FACERR_NONE;
     skt = _skt;
 }
 
-rfsvfactory::~rfsvfactory()
-{
+RFSVFactory::~RFSVFactory() {
 }
 
-RFSV* rfsvfactory::create(bool reconnect)
-{
+RFSV* RFSVFactory::create(bool reconnect) {
     // skt is connected to the ncp daemon, which will have (hopefully) seen
     // an INFO exchange, where the protocol version of the remote Psion was
     // sent, and noted. We have to ask the ncp daemon which protocol it saw,

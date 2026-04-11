@@ -23,21 +23,21 @@
 
 #include "rfsv.h"
 
-class rfsvfactory;
+class RFSVFactory;
 
 /**
  * This is the implementation of the @ref RFSV protocol for
  * Psion series 3 (SIBO) variant. You normally never create
  * objects of this class directly. Thus the constructor is
- * private. Use @ref rfsvfactory for creating an instance of
+ * private. Use @ref RFSVFactory for creating an instance of
  * @ref RFSV . For a complete documentation, see @ref RFSV .
  */
 class RFSV16 : public RFSV {
 
     /**
-     * rfsvfactory may call our constructor.
+     * RFSVFactory may call our constructor.
      */
-    friend class rfsvfactory;
+    friend class RFSVFactory;
 
 public:
     Enum<RFSV::errs> fopen(const uint32_t, const char * const, uint32_t &);
@@ -136,7 +136,7 @@ private:
 
     /**
     * Private constructor. Shall be called by
-    * rfsvfactory only.
+    * RFSVFactory only.
     */
     RFSV16(TCPSocket *);
 

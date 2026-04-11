@@ -145,7 +145,7 @@ main(int argc, char **argv)
         cout << _("plpftp: could not connect to ncpd") << endl;
         return 1;
     }
-    rfsvfactory *rf = new rfsvfactory(skt);
+    RFSVFactory *rf = new RFSVFactory(skt);
     rpcsfactory *rp = new rpcsfactory(skt2);
     a = rf->create(false);
     r = rp->create(false);

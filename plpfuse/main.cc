@@ -53,7 +53,7 @@
 using namespace std;
 
 static RFSV *a;
-static rfsvfactory *rf;
+static RFSVFactory *rf;
 
 static RPCS *r;
 static rpcsfactory *rp;
@@ -429,7 +429,7 @@ int main(int argc, char**argv) {
         return 1;
     }
 
-    rf = new rfsvfactory(skt);
+    rf = new RFSVFactory(skt);
     rp = new rpcsfactory(skt2);
     a = rf->create(true);
     r = rp->create(true);

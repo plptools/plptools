@@ -69,7 +69,7 @@ Psion::connect()
     if (!m_skt2->connect(NULL, sockNum)) {
         return false;
     }
-    m_rfsvFactory = new rfsvfactory(m_skt);
+    m_rfsvFactory = new RFSVFactory(m_skt);
     m_rpcsFactory = new rpcsfactory(m_skt2);
     m_rfsv = m_rfsvFactory->create(true);
     m_rpcs = m_rpcsFactory->create(true);

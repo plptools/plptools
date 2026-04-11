@@ -25,7 +25,7 @@
 #include "rfsv.h"
 
 class TCPSocket;
-class rfsvfactory;
+class RFSVFactory;
 class rpcsfactory;
 class RPCS;
 
@@ -65,7 +65,7 @@ private:
 
     TCPSocket* m_skt;
     TCPSocket* m_skt2;
-    rfsvfactory* m_rfsvFactory;
+    RFSVFactory* m_rfsvFactory;
     rpcsfactory* m_rpcsFactory;
     RPCS* m_rpcs;
     RFSV* m_rfsv;
