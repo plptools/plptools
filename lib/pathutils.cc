@@ -43,10 +43,32 @@ static bool is_separator(const std::string &pathComponent, const pathutils::Path
 static bool is_absolute(const std::vector<std::string> &components, const pathutils::PathFormat format) {
     switch (format) {
         case pathutils::PathFormat::kPOSIX:
-            return components.size() > 0 && components[0] == "/";
+            return components.size() >= 1 && components[0] == "/";
         case pathutils::PathFormat::kWindows:
-            return components.size() > 1 && is_windows_drive(components[0]) && components[1] == "\\";
+            return components.size() >= 2 && is_windows_drive(components[0]) && components[1] == "\\";
     }
+}
+
+static bool is_rooted(const std::vector<std::string> &components, const pathutils::PathFormat format) {
+    switch (format) {
+        case pathutils::PathFormat::kPOSIX:
+            return components.size() >= 1 && components[0] == "/";
+        case pathutils::PathFormat::kWindows:
+            return ((components.size() >= 2 && is_windows_drive(components[0]) && components[1] == "\\") ||
+                    (components.size() >= 1 && components[0] == "\\"));
+    }
+}
+
+static std::string get_windows_drive(const std::vector<std::string> components, const pathutils::PathFormat format) {
+    if (format != pathutils::PathFormat::kWindows || components.empty()) {
+        return "";
+    }
+    std::string front = components.front();
+    if (!is_windows_drive(front)) {
+        return "";
+    }
+    front[0] = static_cast<char>(std::toupper(static_cast<unsigned char>(front[0])));
+    return front;
 }
 
 char pathutils::platform_separator(const PathFormat format) {
@@ -248,28 +270,50 @@ std::string pathutils::resolve_path(const std::string &path,
         return path;
     }
 
+    // Windows paths are pretty gnarly as they can cross drive boundaries. If both paths refer to different drives,
+    // we perform some special case checks to ensure we can do something meaningful.
+    std::string pathDrive = get_windows_drive(pathComponents, format);
+    std::string basePathDrive = get_windows_drive(basePathComponents, format);
+    if (!pathDrive.empty() && pathDrive != basePathDrive && !is_rooted(pathComponents, format)) {
+        return path;
+    }
+
     // Work out where the path starts.
     auto basePathComponentsPathBegin = path_find_rootless_components_begin(basePathComponents, format);
     std::vector<std::string> resolvedPathRootComponents(basePathComponents.cbegin(), basePathComponentsPathBegin);
     std::vector<std::string> resolvedPathRootlessComponents(basePathComponentsPathBegin, basePathComponents.cend());
 
-    // Fold the incoming path components into our base path components.
-    for (const auto &pathComponent : pathComponents) {
+    if (is_rooted(pathComponents, format)) {
 
-        // Ensure there aren't any trailing directory markers before processing the next component.
-        while (!resolvedPathRootlessComponents.empty() && resolvedPathRootlessComponents.back().empty()) {
-            resolvedPathRootlessComponents.pop_back();
+        // If the path is rooted (but not absolute), then we can simply set the resolved components to that of the path.
+        std::string pathSeparator;
+        pathSeparator += platform_separator(format);
+        if (resolvedPathRootComponents.empty() || resolvedPathRootComponents.back() != pathSeparator) {
+            resolvedPathRootComponents.push_back(pathSeparator);
         }
+        resolvedPathRootlessComponents = std::vector<std::string>(++pathComponents.begin(), pathComponents.end());
 
-        if (pathComponent == "..") {
-            if (resolvedPathRootlessComponents.empty() || resolvedPathRootlessComponents.back() == "..") {
-                resolvedPathRootlessComponents.push_back("..");
-            } else {
+    } else {
+
+        // Otherwise, we fold the incoming path components into our base path components.
+        for (const auto &pathComponent : pathComponents) {
+
+            // Ensure there aren't any trailing directory markers before processing the next component.
+            while (!resolvedPathRootlessComponents.empty() && resolvedPathRootlessComponents.back().empty()) {
                 resolvedPathRootlessComponents.pop_back();
             }
-        } else {
-            resolvedPathRootlessComponents.push_back(pathComponent);
+
+            if (pathComponent == "..") {
+                if (resolvedPathRootlessComponents.empty() || resolvedPathRootlessComponents.back() == "..") {
+                    resolvedPathRootlessComponents.push_back("..");
+                } else {
+                    resolvedPathRootlessComponents.pop_back();
+                }
+            } else {
+                resolvedPathRootlessComponents.push_back(pathComponent);
+            }
         }
+
     }
 
     // Reconstitute the path.

@@ -242,5 +242,10 @@ TEST_CASE("pathutils::resolve_path") {
     CHECK(resolve_path("..\\", "", PathFormat::kWindows) == "..\\");
     CHECK(resolve_path("..\\", "foo", PathFormat::kWindows) == ".\\");
 
-    // TODO: Resolve relative windows paths on a different drive to the base path.
+    CHECK(resolve_path("C:\\foo\\bar", "D:\\baz", PathFormat::kWindows) == "C:\\foo\\bar");
+    CHECK(resolve_path("C:", "D:", PathFormat::kWindows) == "C:");
+    CHECK(resolve_path("\\foo\\bar", "D:\\baz", PathFormat::kWindows) == "D:\\foo\\bar");
+    CHECK(resolve_path("\\foo\\bar", "D:", PathFormat::kWindows) == "D:\\foo\\bar");
+    CHECK(resolve_path("C:\\foo\\bar", "D:\\baz", PathFormat::kWindows) == "C:\\foo\\bar");
+    CHECK(resolve_path("C:\\baz", "D:", PathFormat::kWindows) == "C:\\baz");
 }
