@@ -30,7 +30,7 @@
 #include <string>
 #include <unistd.h>
 
-static bool is_windows_drive(const std::string &pathComponent) {
+static bool is_drive_component(const std::string &pathComponent) {
     return (pathComponent.size() == 2 &&
             std::isalpha(static_cast<unsigned char>(pathComponent[0])) &&
             pathComponent[1] == ':');
@@ -45,7 +45,7 @@ static bool is_absolute(const std::vector<std::string> &components, const pathut
         case pathutils::PathFormat::kPOSIX:
             return components.size() >= 1 && components[0] == "/";
         case pathutils::PathFormat::kWindows:
-            return components.size() >= 2 && is_windows_drive(components[0]) && components[1] == "\\";
+            return components.size() >= 2 && is_drive_component(components[0]) && components[1] == "\\";
     }
 }
 
@@ -54,7 +54,7 @@ static bool is_rooted(const std::vector<std::string> &components, const pathutil
         case pathutils::PathFormat::kPOSIX:
             return components.size() >= 1 && components[0] == "/";
         case pathutils::PathFormat::kWindows:
-            return ((components.size() >= 2 && is_windows_drive(components[0]) && components[1] == "\\") ||
+            return ((components.size() >= 2 && is_drive_component(components[0]) && components[1] == "\\") ||
                     (components.size() >= 1 && components[0] == "\\"));
     }
 }
@@ -64,7 +64,7 @@ static std::string drive_component(const std::vector<std::string> components, co
         return "";
     }
     std::string front = components.front();
-    if (!is_windows_drive(front)) {
+    if (!is_drive_component(front)) {
         return "";
     }
     front[0] = static_cast<char>(std::toupper(static_cast<unsigned char>(front[0])));
@@ -146,7 +146,7 @@ std::vector<std::string> pathutils::split(const std::string &path, const PathFor
 
     // If we're on windows, we need to consume the drive first so we pattern match on that and update the starting
     // index accordingly.
-    if (format == PathFormat::kWindows && path.length() >= 2 && is_windows_drive(path.substr(0, 2))) {
+    if (format == PathFormat::kWindows && path.length() >= 2 && is_drive_component(path.substr(0, 2))) {
         result.push_back(path.substr(0, 2));
         pathStartIndex = 2;
     }
@@ -181,7 +181,7 @@ std::string pathutils::join(const std::vector<std::string> &components, const Pa
     auto begin = components.begin();
 
     // Special-case handling of Windows drives.
-    if (format == PathFormat::kWindows && components.size() >= 1 && is_windows_drive(components[0])) {
+    if (format == PathFormat::kWindows && components.size() >= 1 && is_drive_component(components[0])) {
         drive += components[0];
         ++begin;
     }
@@ -243,7 +243,7 @@ static std::vector<std::string>::const_iterator path_find_rootless_components_be
 
     // Consume the windows drive component if appropriate and then check we're not at the end of the vector.
     if (format == pathutils::PathFormat::kWindows) {
-        if (is_windows_drive(*iterator)) {
+        if (is_drive_component(*iterator)) {
             ++iterator;
         }
         if (iterator == components.end()) {
