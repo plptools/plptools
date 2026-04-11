@@ -194,9 +194,9 @@ void SocketChannel::socketPoll() {
                 }
 
                 // There is a magic process name called "NCP$INFO.*"
-                // which is announced by the rfsvfactory. This causes a
+                // which is announced by the RFSVFactory. This causes a
                 // response to be issued containing the NCP version
-                // number. The rfsvfactory will create the correct type
+                // number. The RFSVFactory will create the correct type
                 // of RFSV protocol handler, which will then announce
                 // itself. So, first time in here, we might get the
                 // NCP$INFO.*
