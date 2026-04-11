@@ -27,44 +27,6 @@
 
 using namespace pathutils;
 
-// TEST_CASE("pathutils::ensuring_directory_marker") {
-//
-//     // Exists.
-//
-//     CHECK(ensuring_directory_marker(true, "", PathFormat::kWindows) == ".\\");
-//     CHECK(ensuring_directory_marker(true, "\\", PathFormat::kWindows) == "\\");
-//     CHECK(ensuring_directory_marker(true, "C:", PathFormat::kWindows) == "C:.\\");
-//     CHECK(ensuring_directory_marker(true, "C:\\", PathFormat::kWindows) == "C:\\");
-//     CHECK(ensuring_directory_marker(true, "C:\\mnt", PathFormat::kWindows) == "C:\\mnt\\");
-//     CHECK(ensuring_directory_marker(true, "C:\\mnt\\", PathFormat::kWindows) == "C:\\mnt\\");
-//
-//     CHECK(ensuring_directory_marker(true, "", PathFormat::kPOSIX) == "./");
-//     CHECK(ensuring_directory_marker(true, "/", PathFormat::kPOSIX) == "/");
-//     CHECK(ensuring_directory_marker(true, "/mnt", PathFormat::kPOSIX) == "/mnt/");
-//     CHECK(ensuring_directory_marker(true, "/mnt/", PathFormat::kPOSIX) == "/mnt/");
-//
-//     // Doesn't exist.
-//
-//     CHECK(ensuring_directory_marker(false, "", PathFormat::kWindows) == "");
-//     CHECK(ensuring_directory_marker(false, "\\", PathFormat::kWindows) == "\\");
-//     CHECK(ensuring_directory_marker(false, "C:", PathFormat::kWindows) == "C:");
-//     CHECK(ensuring_directory_marker(false, "C:\\", PathFormat::kWindows) == "C:\\");
-//     CHECK(ensuring_directory_marker(false, "C:\\mnt", PathFormat::kWindows) == "C:\\mnt");
-//     CHECK(ensuring_directory_marker(false, "C:\\mnt\\", PathFormat::kWindows) == "C:\\mnt");
-//
-//     CHECK(ensuring_directory_marker(false, "", PathFormat::kPOSIX) == "");
-//     CHECK(ensuring_directory_marker(false, "/", PathFormat::kPOSIX) == "/");
-//     CHECK(ensuring_directory_marker(false, "/mnt", PathFormat::kPOSIX) == "/mnt");
-//     CHECK(ensuring_directory_marker(false, "/mnt/", PathFormat::kPOSIX) == "/mnt");
-//
-//     // Unsupported path normalization and separator conversion.
-//
-//     CHECK(ensuring_directory_marker(true, "/mnt/", PathFormat::kWindows) == "/mnt/\\");
-//     CHECK(ensuring_directory_marker(true, "C:\\", PathFormat::kPOSIX) == "C:\\/");
-//     CHECK(ensuring_directory_marker(true, "C:\\", PathFormat::kWindows) == "C:\\");
-//     CHECK(ensuring_directory_marker(true, "/mnt//", PathFormat::kPOSIX) == "/mnt/");
-// }
-
 TEST_CASE("pathutils::epoc_basename") {
     CHECK(epoc_basename("C:\\Random") == "Random");
     CHECK(epoc_basename("C:\\Documents\\foo.txt") == "foo.txt");
@@ -183,6 +145,18 @@ TEST_CASE("pathutils::join") {
     CHECK(join({"C:", "hello", "world"}, PathFormat::kWindows) == "C:hello\\world");
     CHECK(join({"C:", "\\", "hello", "world"}, PathFormat::kWindows) == "C:\\hello\\world");
     CHECK(join({"..", ".."}, PathFormat::kWindows) == "..\\..");
+
+    // Trailing directory marker.
+    CHECK(join({""}, PathFormat::kWindows) == ".\\");
+    CHECK(join({"\\", ""}, PathFormat::kWindows) == "\\");
+    CHECK(join({"C:", ""}, PathFormat::kWindows) == "C:.\\");
+    CHECK(join({"C:", "\\", ""}, PathFormat::kWindows) == "C:\\");
+    CHECK(join({"C:", "\\", "mnt\\", ""}, PathFormat::kWindows) == "C:\\mnt\\");
+    CHECK(join({"C:", "\\", "mnt", ""}, PathFormat::kWindows) == "C:\\mnt\\");
+    CHECK(join({""}, PathFormat::kPOSIX) == "./");
+    CHECK(join({"/", ""}, PathFormat::kPOSIX) == "/");
+    CHECK(join({"/", "mnt", ""}, PathFormat::kPOSIX) == "/mnt/");
+    CHECK(join({"/", "mnt/", ""}, PathFormat::kPOSIX) == "/mnt/");
 }
 
 TEST_CASE("pathutils::resolve_path") {
