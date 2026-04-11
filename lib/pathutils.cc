@@ -59,7 +59,7 @@ static bool is_rooted(const std::vector<std::string> &components, const pathutil
     }
 }
 
-static std::string get_windows_drive(const std::vector<std::string> components, const pathutils::PathFormat format) {
+static std::string drive_component(const std::vector<std::string> components, const pathutils::PathFormat format) {
     if (format != pathutils::PathFormat::kWindows || components.empty()) {
         return "";
     }
@@ -272,8 +272,8 @@ std::string pathutils::resolve_path(const std::string &path,
 
     // Windows paths are pretty gnarly as they can cross drive boundaries. If both paths refer to different drives,
     // we perform some special case checks to ensure we can do something meaningful.
-    std::string pathDrive = get_windows_drive(pathComponents, format);
-    std::string basePathDrive = get_windows_drive(basePathComponents, format);
+    std::string pathDrive = drive_component(pathComponents, format);
+    std::string basePathDrive = drive_component(basePathComponents, format);
     if (!pathDrive.empty() && pathDrive != basePathDrive && !is_rooted(pathComponents, format)) {
         return path;
     }
