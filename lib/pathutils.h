@@ -36,19 +36,19 @@
 */
 namespace pathutils {
 
-/**
-* Psion-native path separator.
-*
-* Always backslash.
-*/
-static constexpr char kEPOCSeparator = '\\';
+enum class PathFormat {
+    kPOSIX = 0,
+    kWindows = 1,
 
-/**
-* Host-native path separator.
-*
-* Forward slash on POSIX operating systems; backslash on Windows.
-*/
-static constexpr char kHostSeparator = '/';
+#if defined(_WIN32)
+    kHost = kWindows,
+#else
+    kHost = kPOSIX,
+#endif
+    kEPOC = kWindows,
+};
+
+extern char path_separator(const PathFormat format);
 
 /**
 * Returns the last path component of an EPOC path.
@@ -70,16 +70,70 @@ extern char *epoc_dirname(const char *path);
 extern char *resolve_epoc_path(const char *path, const char *initialPath);
 
 /**
-* Return a new string that represents the path, @p path, with a guaranteed
-* trailing separator, @p separator.
+* Split a path, @p path, into its components, using the path separator, @p separator.
 *
-* This function makes no attempt to normalize paths or convert path separators.
+* If the path is absolute, the first element of the path separator will represent the root component appropriate to
+* the path type (POSIX or Windows) as implied by the path separator (e.g., '/' or 'C:').
+*
+* If the path ends in a trailing separator, the returned vector will contain a last empty string component as an
+* intentional marker.
+*
+* @param path Path to split.
+* @param format Path format.
+*
+* @return Vector containing the path components.
+*/
+extern std::vector<std::string> split(const std::string &path, const PathFormat format);
+
+/**
+* Return a new path by joining the path components, @p components, with path separator, @p separator.
+*
+* For absolute paths, the first path component should be a root component (e.g., '/' or 'C:').
+*
+* Empty strings indicate an intentional directory marker. These are valid anywhere, but have no effect and are therefore
+* ignored unless they occur at the end of the path where they cause the returned path to have a trailing separator. If a
+* path comprises only a single empty string component (directory marker) then the returned path will be the relative
+* path '.' followed by the relevant separator.
+*
+* @param components Path components to join.
+* @param format Path format.
+*
+* @return String containing the resulting path.
+*/
+extern std::string join(const std::vector<std::string> &components, const PathFormat format);
+
+/**
+* Check if a path is absolute.
+*
+* For a Windows path to be absolute, it must be both fully qualified (with a drive), and rooted (with a leading path
+* separator.
 *
 * @param path Path to test.
-* @param separator Path separator to use (should be one of '/' or '\\').
+* @param format Path format.
 *
-* @return @p path + @p separator if path does not end in a separator; @p path, otherwise.
+* @return true if the path, @p path, is absolute; false otherwise.
 */
-extern std::string ensuring_trailing_separator(const std::string &path, const char separator);
+extern bool is_absolute(const std::string &path, const PathFormat format);
+
+/**
+* Convenience wrapper for @ref join that returns a new path resulting from appending path components, @p components,
+* to path, @p path, using separator, @p separator.
+*
+* @param path Base path to append components to.
+* @param components Components to append to @p path.
+* @param format Path format.
+*
+* @return String containing the resulting path.
+*/
+extern std::string appending_components(const std::string &path,
+                                        const std::vector<std::string> &components,
+                                        const PathFormat format);
+
+/**
+* Returns a path by resolving a relative or absolute path against a starting path.
+*
+* @p startingPath may be relative or absolute, but @p path must be contained within that path.
+*/
+extern std::string resolve_path(const std::string &path, const std::string &startingPath, const PathFormat format);
 
 };
