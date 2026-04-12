@@ -119,7 +119,7 @@ RFSV::~RFSV() {
 
 void RFSV::reconnect(void) {
     socket_->reconnect();
-    serNum = 0;
+    operationId_ = 0;
     reset();
 }
 

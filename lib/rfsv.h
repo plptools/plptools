@@ -656,7 +656,7 @@ protected:
 
     TCPSocket *socket_;
     Enum<errs> status_;
-    int32_t serNum;
+    int32_t operationId_;
 };
 
 #endif

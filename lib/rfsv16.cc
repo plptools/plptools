@@ -44,7 +44,7 @@
 using namespace std;
 
 RFSV16::RFSV16(TCPSocket *socket) {
-    serNum = 0;
+    operationId_ = 0;
     status_ = RFSV::E_PSI_FILE_DISC;
     socket_ = socket;
     reset();

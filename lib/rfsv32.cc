@@ -38,7 +38,7 @@ using namespace std;
 
 RFSV32::RFSV32(TCPSocket *socket) {
     socket_ = socket;
-    serNum = 0;
+    operationId_ = 0;
     status_ = RFSV::E_PSI_FILE_DISC;
     reset();
 }
@@ -390,11 +390,11 @@ bool RFSV32::sendCommand(enum commands cc, BufferStore & data) {
     bool result;
     BufferStore a;
     a.addWord(cc);
-    a.addWord(serNum);
-    if (serNum < 0xffff) {
-        serNum++;
+    a.addWord(operationId_);
+    if (operationId_ < 0xffff) {
+        operationId_++;
     } else {
-        serNum = 0;
+        operationId_ = 0;
     }
     a.addBuff(data);
     result = socket_->sendBufferStore(a);
