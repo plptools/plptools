@@ -16,9 +16,7 @@
  *  You should have received a copy of the GNU General Public License along
  *  along with this program; if not, see <https://www.gnu.org/licenses/>.
  */
-
-#ifndef _SISREQRECORD_H
-#define _SISREQRECORD_H
+#pragma once
 
 #include "sistypes.h"
 
@@ -28,8 +26,7 @@ class SISFile;
  * Information about an application that must be installed prior to the
  * current one.
  */
-class SISReqRecord
-{
+class SISReqRecord {
 public:
 
     /**
@@ -50,5 +47,3 @@ public:
     uint32_t* m_nameLengths;
     uint32_t* m_namePtrs;
 };
-
-#endif

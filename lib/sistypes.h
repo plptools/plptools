@@ -16,9 +16,7 @@
  *  You should have received a copy of the GNU General Public License along
  *  along with this program; if not, see <https://www.gnu.org/licenses/>.
  */
-
-#ifndef _SISTYPES_H
-#define _SISTYPES_H
+#pragma once
 
 #include <stdint.h>
 #include <sys/types.h>
@@ -55,13 +53,10 @@ extern int logLevel;
  * Holder of a language entry, translating from language numbers to
  * names.
  */
-struct LangTableEntry
-{
+struct LangTableEntry {
     uint16_t m_no;
     char   m_code[3];
     const char*  m_name;
 };
 
 extern LangTableEntry langTable[];
-
-#endif
