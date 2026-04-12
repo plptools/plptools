@@ -42,90 +42,89 @@ Psion::~Psion() {
 
 bool Psion::connect() {
     int sockNum = cli_utils::lookup_default_port();
-
-#if 0
-    setlocale (LC_ALL, "");
-    textdomain(PACKAGE);
-#endif
-
-#if 0
-    // Command line parameter processing
-    if ((argc > 2) && !strcmp(argv[1], "-p")) {
-        sockNum = atoi(argv[2]);
-        argc -= 2;
-        for (int i = 1; i < argc; i++)
-            argv[i] = argv[i + 2];
-    }
-#endif
-
-    m_skt = new TCPSocket();
-    if (!m_skt->connect(NULL, sockNum)) {
+    rfsvSocket_ = new TCPSocket();
+    if (!rfsvSocket_->connect(NULL, sockNum)) {
         return false;
     }
-    m_skt2 = new TCPSocket();
-    if (!m_skt2->connect(NULL, sockNum)) {
+    rpcsSocket_ = new TCPSocket();
+    if (!rpcsSocket_->connect(NULL, sockNum)) {
         return false;
     }
-    m_rfsvFactory = new RFSVFactory(m_skt);
-    m_rpcsFactory = new RPCSFactory(m_skt2);
-    m_rfsv = m_rfsvFactory->create(true);
-    m_rpcs = m_rpcsFactory->create(true);
-    if ((m_rfsv != NULL) && (m_rpcs != NULL)) {
+    rfsvFactory_ = new RFSVFactory(rfsvSocket_);
+    rpcsFactory_ = new RPCSFactory(rpcsSocket_);
+    rfsv_ = rfsvFactory_->create(true);
+    rpcs_ = rpcsFactory_->create(true);
+    if ((rfsv_ != NULL) && (rpcs_ != NULL)) {
         return true;
     }
     return false;
 }
 
 Enum<RFSV::errs> Psion::copyFromPsion(const char * const from, int fd, cpCallback_t func) {
-    return m_rfsv->copyFromPsion(from, fd, func);
+    return rfsv_->copyFromPsion(from, fd, func);
 }
 
 Enum<RFSV::errs> Psion::copyToPsion(const char * const from, const char * const to, void *, cpCallback_t func) {
-    Enum<RFSV::errs> res;
-    res = m_rfsv->copyToPsion(from, to, NULL, func);
-//    printf("Returned to Psion\n");
-    return res;
+    return rfsv_->copyToPsion(from, to, NULL, func);
 }
 
 Enum<RFSV::errs> Psion::devinfo(const char drive, Drive& plpDrive) {
-    return m_rfsv->devinfo(drive, plpDrive);
+    return rfsv_->devinfo(drive, plpDrive);
 }
 
 Enum<RFSV::errs> Psion::devlist(uint32_t& devbits) {
     Enum<RFSV::errs> res;
-    res = m_rfsv->devlist(devbits);
+    res = rfsv_->devlist(devbits);
     return res;
 }
 
 Enum<RFSV::errs> Psion::dir(const char* dir, PlpDir& files) {
-    return m_rfsv->dir(dir, files);
+    return rfsv_->dir(dir, files);
 }
 
 bool Psion::dirExists(const char* name) {
     RFSVDirHandle handle;
     Enum<RFSV::errs> res;
     bool exists = false;
-    res = m_rfsv->opendir(RFSV::PSI_A_ARCHIVE, name, handle);
-    if (res == RFSV::E_PSI_GEN_NONE)
+    res = rfsv_->opendir(RFSV::PSI_A_ARCHIVE, name, handle);
+    if (res == RFSV::E_PSI_GEN_NONE) {
         exists = true;
-    res = m_rfsv->closedir(handle);
+    }
+    res = rfsv_->closedir(handle);
     return exists;
 }
 
 void Psion::disconnect() {
-    delete m_rfsv;
-    delete m_rpcs;
-    delete m_skt;
-    delete m_skt2;
-    delete m_rfsvFactory;
-    delete m_rpcsFactory;
+    if (rfsv_) {
+        delete rfsv_;
+        rfsv_ = nullptr;
+    }
+    if (rpcs_) {
+        delete rpcs_;
+        rpcs_ = nullptr;
+    }
+    if (rfsvSocket_) {
+        delete rfsvSocket_;
+        rfsvSocket_ = nullptr;
+    }
+    if (rpcsSocket_) {
+        delete rpcsSocket_;
+        rpcsSocket_ = nullptr;
+    }
+    if (rfsvFactory_) {
+        delete rfsvFactory_;
+        rfsvFactory_ = nullptr;
+    }
+    if (rpcsFactory_) {
+        delete rpcsFactory_;
+        rpcsFactory_ = nullptr;
+    }
 }
 
 Enum<RFSV::errs> Psion::mkdir(const char* dir) {
-    return m_rfsv->mkdir(dir);
+    return rfsv_->mkdir(dir);
 }
 
 void Psion::remove(const char* name) {
-    m_rfsv->remove(name);
+    rfsv_->remove(name);
 }
-

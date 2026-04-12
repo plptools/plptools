@@ -43,6 +43,10 @@ RPCSFactory::RPCSFactory(TCPSocket *_skt) {
     skt = _skt;
 }
 
+RPCSFactory::~RPCSFactory() {
+
+}
+
 RPCS *RPCSFactory::create(bool reconnect) {
     // skt is connected to the ncp daemon, which will have (hopefully) seen
     // an INFO exchange, where the protocol version of the remote Psion was
