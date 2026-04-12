@@ -30,6 +30,7 @@
 #include "tcpsocket.h"
 
 #include <algorithm>
+#include <ios>
 #include <iostream>
 #include <fstream>
 
@@ -334,7 +335,7 @@ Enum<RFSV::errs> RFSV16::devlist(uint32_t &devbits) {
     char name[4] = { 'x', ':', '\\', '\0' } ;
     a.discardFirstBytes(6); // Result, fsys, dev, path, file, file, ending, flag
     /* This leaves R E M : : M : \ */
-    name[0] = (char) a.getByte(5); // the M
+    name[0] = static_cast<char>(a.getByte(5)); // the M
     res = fopen(P_FDEVICE, name, fileHandle);
     if (res != E_PSI_GEN_NONE) {
         return status;
@@ -578,7 +579,7 @@ Enum<RFSV::errs> RFSV16::copyFromPsion(const char *from, const char *to, void *p
         unsigned char buf[RFSV_SENDLEN];
         if ((res = fread(handle, buf, sizeof(buf), len)) == E_PSI_GEN_NONE) {
             if (len > 0) {
-                op.write((char *)buf, len);
+                op.write(reinterpret_cast<char *>(buf), static_cast<std::streamsize>(len));
             }
             total += len;
             if (cb && !cb(ptr, total)) {
@@ -643,7 +644,7 @@ Enum<RFSV::errs> RFSV16::copyToPsion(const char *from, const char *to, void *ptr
     }
     unsigned char *buff = new unsigned char[RFSV_SENDLEN];
     while (res == E_PSI_GEN_NONE && ip && !ip.eof()) {
-        ip.read((char *)buff, RFSV_SENDLEN);
+        ip.read(reinterpret_cast<char *>(buff), RFSV_SENDLEN);
         if ((res = fwrite(handle, buff, ip.gcount(), len)) == E_PSI_GEN_NONE) {
             total += len;
             if (cb && !cb(ptr, total)) {
