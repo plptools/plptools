@@ -22,6 +22,9 @@ bin_PROGRAMS = sisinstall
 sisinstall_CPPFLAGS = -I$(top_srcdir)/lib -I$(top_srcdir)/libgnu -I$(top_builddir)/libgnu
 sisinstall_CXXFLAGS = $(WARN_CXXFLAGS)
 sisinstall_LDADD = ../lib/libplp.la $(INTLLIBS) $(SERVENT_LIB)
-sisinstall_SOURCES = psion.cpp sisinstaller.cpp sismain.cpp \
-	fakepsion.cpp sisfilelink.cpp sisfilelink.h \
-	psion.h sisinstaller.h fakepsion.h
+sisinstall_SOURCES = \
+	sisinstaller.cpp \
+	sismain.cpp \
+	sisfilelink.cpp \
+	sisfilelink.h \
+	sisinstaller.h

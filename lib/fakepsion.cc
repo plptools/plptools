@@ -24,64 +24,54 @@
 
 #include <stdio.h>
 
-FakePsion::~FakePsion()
-{
+FakePsion::~FakePsion() {
 }
 
-bool
-FakePsion::connect()
-{
+bool FakePsion::connect() {
     return true;
 }
 
-Enum<RFSV::errs>
-FakePsion::copyToPsion(const char * const from, const char * const to,
-                       void *, cpCallback_t func)
-{
-    if (logLevel >= 1)
+Enum<RFSV::errs> FakePsion::copyToPsion(const char * const from, const char * const to, void *, cpCallback_t func) {
+    (void)func;
+    if (logLevel >= 1) {
         printf(" -- Not really copying %s to %s\n", from, to);
+    }
     return RFSV::E_PSI_GEN_NONE;
 }
 
-Enum<RFSV::errs>
-FakePsion::devinfo(const char drive, Drive& plpDrive)
-{
+Enum<RFSV::errs> FakePsion::devinfo(const char drive, Drive& plpDrive) {
+    (void)drive;
+    (void)plpDrive;
     return RFSV::E_PSI_GEN_NONE;
 }
 
-Enum<RFSV::errs>
-FakePsion::devlist(uint32_t& devbits)
-{
+Enum<RFSV::errs> FakePsion::devlist(uint32_t& devbits) {
+    (void)devbits;
     return RFSV::E_PSI_GEN_FAIL;
 }
 
-Enum<RFSV::errs>
-FakePsion::dir(const char* dir, PlpDir& files)
-{
+Enum<RFSV::errs> FakePsion::dir(const char* dir, PlpDir& files) {
+    (void) dir;
+    (void) files;
     return RFSV::E_PSI_GEN_NONE;
 }
 
-bool
-FakePsion::dirExists(const char* name)
-{
+bool FakePsion::dirExists(const char* name) {
+    (void)name;
     return true;
 }
 
-void
-FakePsion::disconnect()
-{
+void FakePsion::disconnect() {
 }
 
-Enum<RFSV::errs>
-FakePsion::mkdir(const char* dir)
-{
-    if (logLevel >= 1)
+Enum<RFSV::errs> FakePsion::mkdir(const char* dir) {
+    (void)dir;
+    if (logLevel >= 1) {
         printf(" -- Not really creating dir %s\n", dir);
+    }
     return RFSV::E_PSI_GEN_NONE;
 }
 
-void
-FakePsion::remove(const char* name)
-{
+void FakePsion::remove(const char* name) {
+    (void)name;
 }
-
