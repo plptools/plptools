@@ -17,16 +17,14 @@
  *  along with this program; if not, see <https://www.gnu.org/licenses/>.
  *
  */
-#ifndef _FAKEPSION_H
-#define _FAKEPSION_H
+#pragma once
 
 #include "psion.h"
 
 /**
  * A dummy version of the Psion proxy, mainly for testing the installer.
  */
-class FakePsion : public Psion
-{
+class FakePsion : public Psion {
 public:
 
     virtual ~FakePsion();
@@ -52,6 +50,3 @@ public:
     virtual void remove(const char* name);
 
 };
-
-#endif
-
