@@ -62,7 +62,7 @@ Enum<RFSV::errs> RFSV16::fopen(uint32_t attr, const char *name, uint32_t &handle
 
     Enum<RFSV::errs> res = getResponse(a);
     if (res == 0) {
-        handle = (long)a.getWord(0);
+        handle = static_cast<long>(a.getWord(0));
         return E_PSI_GEN_NONE;
     }
     return res;
@@ -144,7 +144,7 @@ Enum<RFSV::errs> RFSV16::readdir(RFSVDirHandle &dH, PlpDirent &e) {
         if (version != 2) {
             return E_PSI_GEN_FAIL;
         }
-        e.attr = attr2std((uint32_t)dH.b.getWord(2));
+        e.attr = attr2std(static_cast<uint32_t>(dH.b.getWord(2)));
         e.size = dH.b.getDWord(4);
         e.time.setSiboTime(dH.b.getDWord(8));
         e.dirname_ = dH.name_;
@@ -262,11 +262,11 @@ Enum<RFSV::errs> RFSV16::fgeteattr(const char *const name, PlpDirent &e) {
         }
 
         // Uppercase the resulting filename as, while EPOC16 is case insensitive, it returns all responses as uppercase.
-        string name = p;
-        std::transform(name.begin(), name.end(), name.begin(), ::toupper);
+        string filename = p;
+        std::transform(filename.begin(), filename.end(), filename.begin(), ::toupper);
 
-        e.name = name;
-        e.attr = attr2std((long)a.getWord(2));
+        e.name = filename;
+        e.attr = attr2std(static_cast<long>(a.getWord(2)));
         e.size = a.getDWord(4);
         e.time.setSiboTime(a.getDWord(8));
         e.UID  = PlpUID(0,0,0);

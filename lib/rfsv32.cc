@@ -36,24 +36,22 @@
 
 using namespace std;
 
-RFSV32::RFSV32(TCPSocket *socket)
-{
+RFSV32::RFSV32(TCPSocket *socket) {
     socket_ = socket;
     serNum = 0;
     status = RFSV::E_PSI_FILE_DISC;
     reset();
 }
 
-Enum<RFSV::errs> RFSV32::
-fopen(uint32_t attr, const char *name, uint32_t &handle)
-{
+Enum<RFSV::errs> RFSV32::fopen(uint32_t attr, const char *name, uint32_t &handle) {
     BufferStore a;
     string n = convertSlash(name);
     a.addDWord(attr);
     a.addWord(n.size());
     a.addString(n.c_str());
-    if (!sendCommand(OPEN_FILE, a))
+    if (!sendCommand(OPEN_FILE, a)) {
         return E_PSI_FILE_DISC;
+    }
     Enum<RFSV::errs> res = getResponse(a);
     if (res == E_PSI_GEN_NONE && a.getLen() == 4) {
         handle = a.getDWord(0);
@@ -62,12 +60,11 @@ fopen(uint32_t attr, const char *name, uint32_t &handle)
     return res;
 }
 
-Enum<RFSV::errs> RFSV32::
-mktemp(uint32_t &handle, string &tmpname)
-{
+Enum<RFSV::errs> RFSV32::mktemp(uint32_t &handle, string &tmpname) {
     BufferStore a;
-    if (!sendCommand(TEMP_FILE, a))
+    if (!sendCommand(TEMP_FILE, a)) {
         return E_PSI_FILE_DISC;
+    }
     Enum<RFSV::errs> res = getResponse(a);
     if (res == E_PSI_GEN_NONE) {
         handle = a.getDWord(0);
@@ -76,66 +73,64 @@ mktemp(uint32_t &handle, string &tmpname)
     return res;
 }
 
-Enum<RFSV::errs> RFSV32::
-fcreatefile(uint32_t attr, const char *name, uint32_t &handle)
-{
+Enum<RFSV::errs> RFSV32::fcreatefile(uint32_t attr, const char *name, uint32_t &handle) {
     BufferStore a;
     string n = convertSlash(name);
     a.addDWord(attr);
     a.addWord(n.size());
     a.addString(n.c_str());
-    if (!sendCommand(CREATE_FILE, a))
+    if (!sendCommand(CREATE_FILE, a)) {
         return E_PSI_FILE_DISC;
+    }
     Enum<RFSV::errs> res = getResponse(a);
-    if (res == E_PSI_GEN_NONE && a.getLen() == 4)
+    if (res == E_PSI_GEN_NONE && a.getLen() == 4) {
         handle = a.getDWord(0);
+    }
     return res;
 }
 
-Enum<RFSV::errs> RFSV32::
-freplacefile(const uint32_t attr, const char * const name, uint32_t &handle)
-{
+Enum<RFSV::errs> RFSV32:: freplacefile(const uint32_t attr, const char *const name, uint32_t &handle) {
     BufferStore a;
     string n = convertSlash(name);
     a.addDWord(attr);
     a.addWord(n.size());
     a.addString(n.c_str());
-    if (!sendCommand(REPLACE_FILE, a))
+    if (!sendCommand(REPLACE_FILE, a)) {
         return E_PSI_FILE_DISC;
+    }
     Enum<RFSV::errs> res = getResponse(a);
-    if (res == E_PSI_GEN_NONE && a.getLen() == 4)
+    if (res == E_PSI_GEN_NONE && a.getLen() == 4) {
         handle = a.getDWord(0);
+    }
     return res;
 }
 
-Enum<RFSV::errs> RFSV32::
-fopendir(const uint32_t attr, const char * const name, uint32_t &handle)
-{
+Enum<RFSV::errs> RFSV32::fopendir(const uint32_t attr, const char * const name, uint32_t &handle) {
     BufferStore a;
     string n = convertSlash(name);
     a.addDWord(attr | EPOC_ATTR_GETUID);
     a.addWord(n.size());
     a.addString(n.c_str());
-    if (!sendCommand(OPEN_DIR, a))
+    if (!sendCommand(OPEN_DIR, a)) {
         return E_PSI_FILE_DISC;
+    }
     Enum<RFSV::errs> res = getResponse(a);
-    if (!res && a.getLen() == 4)
+    if (!res && a.getLen() == 4) {
         handle = a.getDWord(0);
+    }
     return res;
 }
 
-Enum<RFSV::errs> RFSV32::
-fclose(uint32_t handle)
-{
+Enum<RFSV::errs> RFSV32::fclose(uint32_t handle) {
     BufferStore a;
     a.addDWord(handle);
-    if (!sendCommand(CLOSE_HANDLE, a))
+    if (!sendCommand(CLOSE_HANDLE, a)) {
         return E_PSI_FILE_DISC;
+    }
     return getResponse(a);
 }
 
-Enum<RFSV::errs> RFSV32::
-opendir(const uint32_t attr, const char *name, RFSVDirHandle &dH) {
+Enum<RFSV::errs> RFSV32::opendir(const uint32_t attr, const char *name, RFSVDirHandle &dH) {
     uint32_t handle;
     Enum<RFSV::errs> res = fopendir(std2attr(attr), name, handle);
     dH.h = handle;
@@ -144,13 +139,11 @@ opendir(const uint32_t attr, const char *name, RFSVDirHandle &dH) {
     return res;
 }
 
-Enum<RFSV::errs> RFSV32::
-closedir(RFSVDirHandle &dH) {
+Enum<RFSV::errs> RFSV32::closedir(RFSVDirHandle &dH) {
     return fclose(dH.h);
 }
 
-Enum<RFSV::errs> RFSV32::
-readdir(RFSVDirHandle &dH, PlpDirent &e) {
+Enum<RFSV::errs> RFSV32::readdir(RFSVDirHandle &dH, PlpDirent &e) {
     Enum<RFSV::errs> res = E_PSI_GEN_NONE;
 
     if (dH.b.getLen() < 17) {
@@ -189,95 +182,93 @@ readdir(RFSVDirHandle &dH, PlpDirent &e) {
     return res;
 }
 
-Enum<RFSV::errs> RFSV32::
-dir(const char *name, PlpDir &files)
-{
+Enum<RFSV::errs> RFSV32::dir(const char *name, PlpDir &files) {
     RFSVDirHandle h;
     files.clear();
     Enum<RFSV::errs> res = opendir(PSI_A_HIDDEN | PSI_A_SYSTEM | PSI_A_DIR, name, h);
     while (res == E_PSI_GEN_NONE) {
         PlpDirent e;
         res = readdir(h, e);
-        if (res == E_PSI_GEN_NONE)
+        if (res == E_PSI_GEN_NONE) {
             files.push_back(e);
+        }
     }
     closedir(h);
-    if (res == E_PSI_FILE_EOF)
+    if (res == E_PSI_FILE_EOF) {
         res = E_PSI_GEN_NONE;
+    }
     return res;
 }
 
-uint32_t RFSV32::
-opMode(const uint32_t mode)
-{
+uint32_t RFSV32::opMode(const uint32_t mode) {
     uint32_t ret = 0;
 
     ret |= (((mode & 03) == PSI_O_RDONLY) ? 0 : EPOC_OMODE_READ_WRITE);
-    if (!ret)
+    if (!ret) {
         ret |= (mode & PSI_O_EXCL) ? 0 : EPOC_OMODE_SHARE_READERS;
-    if ((!ret) && (mode & PSI_O_SHARE))
+    }
+    if ((!ret) && (mode & PSI_O_SHARE)) {
         ret |= EPOC_OMODE_SHARE_ANY;
+    }
     return ret;
 }
 
-Enum<RFSV::errs> RFSV32::
-fgetmtime(const char * const name, PsiTime &mtime)
-{
+Enum<RFSV::errs> RFSV32::fgetmtime(const char * const name, PsiTime &mtime) {
     BufferStore a;
     string n = convertSlash(name);
     a.addWord(n.size());
     a.addString(n.c_str());
-    if (!sendCommand(MODIFIED, a))
+    if (!sendCommand(MODIFIED, a)) {
         return E_PSI_FILE_DISC;
+    }
     Enum<RFSV::errs> res = getResponse(a);
-    if (res != E_PSI_GEN_NONE)
+    if (res != E_PSI_GEN_NONE) {
         return res;
+    }
     mtime.setPsiTime(a.getDWord(4), a.getDWord(0));
     return res;
 }
 
-Enum<RFSV::errs> RFSV32::
-fsetmtime(const char * const name, PsiTime mtime)
-{
+Enum<RFSV::errs> RFSV32::fsetmtime(const char * const name, PsiTime mtime) {
     BufferStore a;
     string n = convertSlash(name);
     a.addDWord(mtime.getPsiTimeLo());
     a.addDWord(mtime.getPsiTimeHi());
     a.addWord(n.size());
     a.addString(n.c_str());
-    if (!sendCommand(SET_MODIFIED, a))
+    if (!sendCommand(SET_MODIFIED, a)) {
         return E_PSI_FILE_DISC;
+    }
     return getResponse(a);
 }
 
-Enum<RFSV::errs> RFSV32::
-fgetattr(const char * const name, uint32_t &attr)
-{
+Enum<RFSV::errs> RFSV32::fgetattr(const char * const name, uint32_t &attr) {
     BufferStore a;
     string n = convertSlash(name);
     a.addWord(n.size());
     a.addString(n.c_str());
-    if (!sendCommand(ATT, a))
+    if (!sendCommand(ATT, a)) {
         return E_PSI_FILE_DISC;
+    }
     Enum<RFSV::errs> res = getResponse(a);
-    if (res != E_PSI_GEN_NONE)
+    if (res != E_PSI_GEN_NONE) {
         return res;
+    }
     attr = attr2std(a.getDWord(0));
     return res;
 }
 
-Enum<RFSV::errs> RFSV32::
-fgeteattr(const char * const name, PlpDirent &e)
-{
+Enum<RFSV::errs> RFSV32::fgeteattr(const char * const name, PlpDirent &e) {
     BufferStore a;
     string n = convertSlash(name);
     a.addWord(n.size());
     a.addString(n.c_str());
     const char *p = strrchr(n.c_str(), '\\');
-    if (p)
+    if (p) {
         p++;
-    else
+    } else {
         p = n.c_str();
+    }
     e.name = p;
 
     if (!sendCommand(REMOTE_ENTRY, a))
@@ -297,77 +288,78 @@ fgeteattr(const char * const name, PlpDirent &e)
     return res;
 }
 
-Enum<RFSV::errs> RFSV32::
-fsetattr(const char * const name, const uint32_t seta, const uint32_t unseta)
-{
+Enum<RFSV::errs> RFSV32::fsetattr(const char * const name, const uint32_t seta, const uint32_t unseta) {
     BufferStore a;
     string n = convertSlash(name);
     a.addDWord(std2attr(seta));
     a.addDWord(std2attr(unseta));
     a.addWord(n.size());
     a.addString(n.c_str());
-    if (!sendCommand(SET_ATT, a))
+    if (!sendCommand(SET_ATT, a)) {
         return E_PSI_FILE_DISC;
+    }
     return getResponse(a);
 }
 
-Enum<RFSV::errs> RFSV32::
-dircount(const char * const name, uint32_t &count)
-{
+Enum<RFSV::errs> RFSV32::dircount(const char * const name, uint32_t &count) {
     uint32_t handle;
     Enum<RFSV::errs> res = fopendir(EPOC_ATTR_HIDDEN | EPOC_ATTR_SYSTEM | EPOC_ATTR_DIRECTORY, name, handle);
     count = 0;
-    if (res != E_PSI_GEN_NONE)
+    if (res != E_PSI_GEN_NONE) {
         return res;
+    }
 
     while (1) {
         BufferStore a;
         a.addDWord(handle);
-        if (!sendCommand(READ_DIR, a))
+        if (!sendCommand(READ_DIR, a)) {
             return E_PSI_FILE_DISC;
+        }
         res = getResponse(a);
-        if (res != E_PSI_GEN_NONE)
+        if (res != E_PSI_GEN_NONE) {
             break;
+        }
         while (a.getLen() > 16) {
             int d = 36 + a.getDWord(32);
-            while (d % 4)
+            while (d % 4) {
                 d++;
+            }
             d += a.getDWord(0);
-            while (d % 4)
+            while (d % 4) {
                 d++;
+            }
             a.discardFirstBytes(d);
             count++;
         }
     }
     fclose(handle);
-    if (res == E_PSI_FILE_EOF)
+    if (res == E_PSI_FILE_EOF) {
         res = E_PSI_GEN_NONE;
+    }
     return res;
 }
 
-Enum<RFSV::errs> RFSV32::
-devlist(uint32_t &devbits)
-{
+Enum<RFSV::errs> RFSV32::devlist(uint32_t &devbits) {
     BufferStore a;
     Enum<RFSV::errs> res;
 
-    if (!sendCommand(GET_DRIVE_LIST, a))
+    if (!sendCommand(GET_DRIVE_LIST, a)) {
         return E_PSI_FILE_DISC;
+    }
     res = getResponse(a);
     devbits = 0;
     if ((res == E_PSI_GEN_NONE) && (a.getLen() == 26)) {
         for (int i = 25; i >= 0; i--) {
             devbits <<= 1;
-            if (a.getByte(i) != 0)
+            if (a.getByte(i) != 0) {
                 devbits |= 1;
+            }
         }
     }
     return res;
 }
 
-Enum<RFSV::errs> RFSV32::
-devinfo(const char drive, Drive &dinfo)
-{
+Enum<RFSV::errs> RFSV32::devinfo(const char drive, Drive &dinfo) {
     BufferStore a;
     Enum<RFSV::errs> res;
 
@@ -388,49 +380,47 @@ devinfo(const char drive, Drive &dinfo)
     return res;
 }
 
-bool RFSV32::
-sendCommand(enum commands cc, BufferStore & data)
-{
+bool RFSV32::sendCommand(enum commands cc, BufferStore & data) {
     if (status == E_PSI_FILE_DISC) {
         reconnect();
-        if (status == E_PSI_FILE_DISC)
+        if (status == E_PSI_FILE_DISC) {
             return false;
+        }
     }
     bool result;
     BufferStore a;
     a.addWord(cc);
     a.addWord(serNum);
-    if (serNum < 0xffff)
+    if (serNum < 0xffff) {
         serNum++;
-    else
+    } else {
         serNum = 0;
+    }
     a.addBuff(data);
     result = socket_->sendBufferStore(a);
     if (!result) {
         reconnect();
         result = socket_->sendBufferStore(a);
-        if (!result)
+        if (!result) {
             status = E_PSI_FILE_DISC;
+        }
     }
     return result;
 }
 
-Enum<RFSV::errs> RFSV32::
-getResponse(BufferStore & data)
-{
+Enum<RFSV::errs> RFSV32::getResponse(BufferStore & data) {
     if (socket_->getBufferStore(data) == 1 &&
         data.getWord(0) == 0x11) {
         int32_t ret = data.getDWord(4);
         data.discardFirstBytes(8);
         return err2psierr(ret);
-    } else
+    } else {
         status = E_PSI_FILE_DISC;
+    }
     return status;
 }
 
-Enum<RFSV::errs> RFSV32::
-fread(const uint32_t handle, unsigned char * const buf, const uint32_t len, uint32_t &count)
-{
+Enum<RFSV::errs> RFSV32::fread(const uint32_t handle, unsigned char * const buf, const uint32_t len, uint32_t &count) {
     Enum<RFSV::errs> res;
     BufferStore a;
     count = 0;
@@ -440,10 +430,12 @@ fread(const uint32_t handle, unsigned char * const buf, const uint32_t len, uint
     do {
         a.addDWord(handle);
         a.addDWord(((len - count) > RFSV_SENDLEN)?RFSV_SENDLEN:(len - count));
-        if (!sendCommand(READ_FILE, a))
+        if (!sendCommand(READ_FILE, a)) {
             return E_PSI_FILE_DISC;
-        if ((res = getResponse(a)) != E_PSI_GEN_NONE)
+        }
+        if ((res = getResponse(a)) != E_PSI_GEN_NONE) {
             return res;
+        }
         if ((l = a.getLen()) > 0) {
             memcpy(p, a.getString(), l);
             count += l;
@@ -454,9 +446,10 @@ fread(const uint32_t handle, unsigned char * const buf, const uint32_t len, uint
     return res;
 }
 
-Enum<RFSV::errs> RFSV32::
-fwrite(const uint32_t handle, const unsigned char * const buf, const uint32_t len, uint32_t &count)
-{
+Enum<RFSV::errs> RFSV32::fwrite(const uint32_t handle,
+                                const unsigned char *const buf,
+                                const uint32_t len,
+                                uint32_t &count) {
     Enum<RFSV::errs> res;
     const unsigned char *p = buf;
     long l;
@@ -469,10 +462,12 @@ fwrite(const uint32_t handle, const unsigned char * const buf, const uint32_t le
             BufferStore tmp(p, l);
             a.addDWord(handle);
             a.addBuff(tmp);
-            if (!sendCommand(WRITE_FILE, a))
+            if (!sendCommand(WRITE_FILE, a)) {
                 return E_PSI_FILE_DISC;
-            if ((res = getResponse(a)) != E_PSI_GEN_NONE)
+            }
+            if ((res = getResponse(a)) != E_PSI_GEN_NONE) {
                 return res;
+            }
             count += l;
             p += l;
         }
@@ -480,16 +475,15 @@ fwrite(const uint32_t handle, const unsigned char * const buf, const uint32_t le
     return res;
 }
 
-Enum<RFSV::errs> RFSV32::
-copyFromPsion(const char *from, const char *to, void *ptr, cpCallback_t cb)
-{
+Enum<RFSV::errs> RFSV32::copyFromPsion(const char *from, const char *to, void *ptr, cpCallback_t cb) {
     Enum<RFSV::errs> res;
     uint32_t handle;
     uint32_t len;
     uint32_t total = 0;
 
-    if ((res = fopen(EPOC_OMODE_SHARE_READERS | EPOC_OMODE_BINARY, from, handle)) != E_PSI_GEN_NONE)
+    if ((res = fopen(EPOC_OMODE_SHARE_READERS | EPOC_OMODE_BINARY, from, handle)) != E_PSI_GEN_NONE) {
         return res;
+    }
     ofstream op(to);
     if (!op) {
         fclose(handle);
@@ -618,11 +612,8 @@ copyOnPsion(const char *from, const char *to, void *ptr, cpCallback_t cb)
     return res;
 }
 
-Enum<RFSV::errs> RFSV32::
-pathtest(const char * const name)
-{
+Enum<RFSV::errs> RFSV32::pathtest(const char * const name) {
     BufferStore a;
-    uint32_t r;
     string n = convertSlash(name);
     a.addWord(n.size());
     a.addString(n.c_str());
@@ -631,14 +622,13 @@ pathtest(const char * const name)
     return getResponse(a);
 }
 
-Enum<RFSV::errs> RFSV32::
-fsetsize(uint32_t handle, uint32_t size)
-{
+Enum<RFSV::errs> RFSV32::fsetsize(uint32_t handle, uint32_t size) {
     BufferStore a;
     a.addDWord(handle);
     a.addDWord(size);
-    if (!sendCommand(SET_SIZE, a))
+    if (!sendCommand(SET_SIZE, a)) {
         return E_PSI_FILE_DISC;
+    }
     return getResponse(a);
 }
 
@@ -647,9 +637,7 @@ fsetsize(uint32_t handle, uint32_t size)
  * exception: If seeking beyond eof, the gap
  * contains garbage instead of zeroes.
  */
-Enum<RFSV::errs> RFSV32::
-fseek(const uint32_t handle, const int32_t pos, const uint32_t mode, uint32_t &resultpos)
-{
+Enum<RFSV::errs> RFSV32::fseek(const uint32_t handle, const int32_t pos, const uint32_t mode, uint32_t &resultpos) {
     BufferStore a;
     Enum<RFSV::errs> res;
     uint32_t savpos = 0;
@@ -670,8 +658,9 @@ fseek(const uint32_t handle, const int32_t pos, const uint32_t mode, uint32_t &r
    ??no more?? 6 = text-rewind
 */
 
-    if ((mode < PSI_SEEK_SET) || (mode > PSI_SEEK_END))
+    if ((mode < PSI_SEEK_SET) || (mode > PSI_SEEK_END)) {
         return E_PSI_GEN_ARG;
+    }
 
     if ((mode == PSI_SEEK_CUR) && (mypos >= 0)) {
         /* get and save current position */
