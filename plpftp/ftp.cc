@@ -534,7 +534,7 @@ static char *epoc_dir_from(const char *path) {
     return f1;
 }
 
-int FTP::session(RFSV &rfsv, RPCS &r, rclip &rc, TCPSocket &rclipSocket, vector<char *> argv) {
+int FTP::session(RFSV &rfsv, RPCS &rpcs, rclip &rc, TCPSocket &rclipSocket, vector<char *> argv) {
     Enum<RFSV::errs> res;
     bool prompt = true;
     bool hash = false;
@@ -549,8 +549,8 @@ int FTP::session(RFSV &rfsv, RPCS &r, rclip &rc, TCPSocket &rclipSocket, vector<
     {
         Enum<RPCS::machs> machType;
         BufferArray b;
-        if ((res = r.getOwnerInfo(b)) == RFSV::E_PSI_GEN_NONE) {
-            r.getMachineType(machType);
+        if ((res = rpcs.getOwnerInfo(b)) == RFSV::E_PSI_GEN_NONE) {
+            rpcs.getMachineType(machType);
             if (!once) {
                 int speed = rfsv.getSpeed();
                 cout << _("Connected to a ") << machType << _(" at ")
@@ -1031,7 +1031,7 @@ int FTP::session(RFSV &rfsv, RPCS &r, rclip &rc, TCPSocket &rclipSocket, vector<
         }
         // RPCS commands
         if (!strcmp(argv[0], "settime")) {
-            if ((res = r.setTime(time(NULL))) != RFSV::E_PSI_GEN_NONE) {
+            if ((res = rpcs.setTime(time(NULL))) != RFSV::E_PSI_GEN_NONE) {
                 cerr << _("Error: ") << res << endl;
             }
             continue;
@@ -1040,7 +1040,7 @@ int FTP::session(RFSV &rfsv, RPCS &r, rclip &rc, TCPSocket &rclipSocket, vector<
             Enum<RFSV::errs> res;
             BufferStore db;
 
-            if ((res = r.configRead(0, db)) != RFSV::E_PSI_GEN_NONE) {
+            if ((res = rpcs.configRead(0, db)) != RFSV::E_PSI_GEN_NONE) {
                 cerr << _("Error: ") << res << endl;
                 continue;
             }
@@ -1110,14 +1110,14 @@ int FTP::session(RFSV &rfsv, RPCS &r, rclip &rc, TCPSocket &rclipSocket, vector<
             } else {
                 cmd = xstrdup(argv[1]);
             }
-            r.execProgram(cmd, arg);
+            rpcs.execProgram(cmd, arg);
             free(arg);
             free(cmd);
             continue;
         }
         if (!strcmp(argv[0], "ownerinfo")) {
             BufferArray b;
-            if ((res = r.getOwnerInfo(b)) != RFSV::E_PSI_GEN_NONE) {
+            if ((res = rpcs.getOwnerInfo(b)) != RFSV::E_PSI_GEN_NONE) {
                 cerr << _("Error: ") << res << endl;
                 continue;
             }
@@ -1128,7 +1128,7 @@ int FTP::session(RFSV &rfsv, RPCS &r, rclip &rc, TCPSocket &rclipSocket, vector<
         }
         if (!strcmp(argv[0], "machinfo")) {
             RPCS::machineInfo mi;
-            if ((res = r.getMachineInfo(mi)) != RFSV::E_PSI_GEN_NONE) {
+            if ((res = rpcs.getMachineInfo(mi)) != RFSV::E_PSI_GEN_NONE) {
                 cerr << _("Error: ") << res << endl;
                 continue;
             }
@@ -1180,21 +1180,21 @@ int FTP::session(RFSV &rfsv, RPCS &r, rclip &rc, TCPSocket &rclipSocket, vector<
             continue;
         }
         if (!strcmp(argv[0], "runrestore") && (argc == 2)) {
-            startPrograms(r, rfsv, argv[1]);
+            startPrograms(rpcs, rfsv, argv[1]);
             continue;
         }
         if (!strcmp(argv[0], "killsave") && (argc == 2)) {
-            stopPrograms(r, argv[1]);
+            stopPrograms(rpcs, argv[1]);
             continue;
         }
         if (!strcmp(argv[0], "putclip") && (argc == 2)) {
-            if (putClipText(r, rfsv, rc, rclipSocket, argv[1])) {
+            if (putClipText(rpcs, rfsv, rc, rclipSocket, argv[1])) {
                 cerr << _("Error setting clipboard") << endl;
             }
             continue;
         }
         if (!strcmp(argv[0], "getclip") && (argc == 2)) {
-            if (getClipData(r, rfsv, rc, rclipSocket, argv[1])) {
+            if (getClipData(rpcs, rfsv, rc, rclipSocket, argv[1])) {
                 cerr << _("Error getting clipboard") << endl;
             }
             continue;
@@ -1202,7 +1202,7 @@ int FTP::session(RFSV &rfsv, RPCS &r, rclip &rc, TCPSocket &rclipSocket, vector<
         if (!strcmp(argv[0], "kill") && (argc >= 2)) {
             processList tmp;
             bool anykilled = false;
-            if ((res = r.queryPrograms(tmp)) != RFSV::E_PSI_GEN_NONE) {
+            if ((res = rpcs.queryPrograms(tmp)) != RFSV::E_PSI_GEN_NONE) {
                 cerr << _("Error: ") << res << endl;
             } else {
                 for (unsigned int i = 1; i < argc; i++) {
@@ -1215,7 +1215,7 @@ int FTP::session(RFSV &rfsv, RPCS &r, rclip &rc, TCPSocket &rclipSocket, vector<
                     processList::iterator j;
                     for (j = tmp.begin(); j != tmp.end(); j++) {
                         if (kpid == -1 || kpid == j->getPID()) {
-                            r.stopProgram(j->getProcId());
+                            rpcs.stopProgram(j->getProcId());
                             anykilled = true;
                         }
                     }
@@ -1231,7 +1231,7 @@ int FTP::session(RFSV &rfsv, RPCS &r, rclip &rc, TCPSocket &rclipSocket, vector<
         }
         if (!strcmp(argv[0], "ps")) {
             processList tmp;
-            if ((res = r.queryPrograms(tmp)) != RFSV::E_PSI_GEN_NONE) {
+            if ((res = rpcs.queryPrograms(tmp)) != RFSV::E_PSI_GEN_NONE) {
                 cerr << _("Error: ") << res << endl;
             } else {
                 cout << "PID   CMD          ARGS" << endl;
