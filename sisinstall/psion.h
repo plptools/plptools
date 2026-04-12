@@ -61,11 +61,11 @@ public:
 
 private:
 
-    TCPSocket* m_skt;
-    TCPSocket* m_skt2;
-    RFSVFactory* m_rfsvFactory;
-    RPCSFactory* m_rpcsFactory;
-    RPCS* m_rpcs;
-    RFSV* m_rfsv;
+    TCPSocket* rfsvSocket_;
+    TCPSocket* rpcsSocket_;
+    RFSVFactory* rfsvFactory_;
+    RPCSFactory* rpcsFactory_;
+    RPCS* rpcs_;
+    RFSV* rfsv_;
 
 };

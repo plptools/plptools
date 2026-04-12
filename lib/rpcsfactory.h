@@ -52,6 +52,11 @@ class RPCSFactory {
     RPCSFactory(TCPSocket *skt);
 
     /**
+     * Delete the RPCSFactory, cleaning up any resources.
+     */
+    virtual ~RPCSFactory();
+
+    /**
     * Creates a new RPCS instance.
     *
     * @param reconnect Set to true, if automatic reconnect
