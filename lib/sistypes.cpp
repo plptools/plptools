@@ -24,54 +24,45 @@ static unsigned int s_crcTable[256];
 
 int logLevel = 0;
 
-void createCRCTable()
-{
+void createCRCTable() {
     const unsigned int polynomial = 0x1021;
     unsigned int index;
     s_crcTable[0] = 0;
-    for (index = 0; index < 128; index++)
-        {
+    for (index = 0; index < 128; index++) {
         unsigned int carry = s_crcTable[index] & 0x8000;
         unsigned int temp = (s_crcTable[index] << 1) & 0xffff;
         s_crcTable[index * 2 + (carry ? 0 : 1)] = temp ^ polynomial;
         s_crcTable[index * 2 + (carry ? 1 : 0)] = temp;
-        }
+    }
 }
 
-uint16_t updateCrc(uint16_t crc, uint8_t value)
-{
+uint16_t updateCrc(uint16_t crc, uint8_t value) {
     return (crc << 8) ^ s_crcTable[((crc >> 8) ^ value) & 0xff];
 }
 
-uint16_t calcCRC(uint8_t* data, int len)
-{
+uint16_t calcCRC(uint8_t* data, int len) {
     uint16_t crc = 0;
-    for (int i = 0; i < len; ++i)
-        {
+    for (int i = 0; i < len; ++i) {
         uint8_t value = data[i];
         crc = (crc << 8) ^ s_crcTable[((crc >> 8) ^ value) & 0xff];
-        }
+    }
     return crc;
 }
 
-uint16_t read16(uint8_t* p)
-{
+uint16_t read16(uint8_t* p) {
     return p[0] | (p[1] << 8);
 }
 
-uint32_t read32(uint8_t* p)
-{
+uint32_t read32(uint8_t* p) {
     return p[0] | (p[1] << 8) | (p[2] << 16) | (p[3] << 24);
 }
 
-void write16(uint8_t* p, int val)
-{
+void write16(uint8_t* p, int val) {
     p[0] = val & 255;
     p[1] = (val >> 8) & 255;
 }
 
-LangTableEntry langTable[] =
-{
+LangTableEntry langTable[] = {
     { 0, "", "Test" },
     { 1, "EN", "UK English" },
     { 2, "FR", "French" },

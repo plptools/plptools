@@ -16,9 +16,7 @@
  *  You should have received a copy of the GNU General Public License along
  *  along with this program; if not, see <https://www.gnu.org/licenses/>.
  */
-
-#ifndef _SISFILERECORD_H
-#define _SISFILERECORD_H
+#pragma once
 
 #include "sistypes.h"
 
@@ -30,8 +28,7 @@ class SISFile;
  * The file can be for multiple languages, in which case a single
  * instance holds pointers to contents for all languages.
  */
-class SISFileRecord
-{
+class SISFileRecord {
 public:
 
     /**
@@ -45,10 +42,9 @@ public:
      */
     SisRC fillFrom(uint8_t* buf, int* base, off_t len, SISFile* sisFile);
 
-    uint8_t* getDestPtr()
-        {
+    uint8_t* getDestPtr() {
         return m_destPtr < m_len ? &m_buf[m_destPtr] : 0;
-        }
+    }
 
     /**
      * Return a pointer to the file data for the file for the specified
@@ -109,5 +105,3 @@ private:
     int m_len;
 
 };
-
-#endif
