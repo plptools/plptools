@@ -176,7 +176,7 @@ static void sigint_handler2(int) {
     signal(SIGINT, sigint_handler2);
 }
 
-static int stopPrograms(RPCS & r, const char *file) {
+static int stopPrograms(RPCS &rpcs, const char *file) {
     Enum<RFSV::errs> res;
     processList tmp;
     FILE *fp = fopen(file, "w");
@@ -186,7 +186,7 @@ static int stopPrograms(RPCS & r, const char *file) {
         return 1;
     }
     fputs("#plpftp processlist\n", fp);
-    if ((res = r.queryPrograms(tmp)) != RFSV::E_PSI_GEN_NONE) {
+    if ((res = rpcs.queryPrograms(tmp)) != RFSV::E_PSI_GEN_NONE) {
         cerr << _("Could not get process list, Error: ") << res << endl;
         return 1;
     }
@@ -198,7 +198,7 @@ static int stopPrograms(RPCS & r, const char *file) {
     time_t tstart = time(nullptr) + 5;
     while (!tmp.empty()) {
         for (processList::iterator i = tmp.begin(); i != tmp.end(); i++) {
-            r.stopProgram(i->getProcId());
+            rpcs.stopProgram(i->getProcId());
         }
         usleep(100000);
         if (time(nullptr) > tstart) {
@@ -207,7 +207,7 @@ static int stopPrograms(RPCS & r, const char *file) {
             cin.getline((char *)&tstart, 1);
             tstart = time(nullptr) + 5;
         }
-        if ((res = r.queryPrograms(tmp)) != RFSV::E_PSI_GEN_NONE) {
+        if ((res = rpcs.queryPrograms(tmp)) != RFSV::E_PSI_GEN_NONE) {
             cerr << _("Could not get process list, Error: ") << res << endl;
             return 1;
         }
