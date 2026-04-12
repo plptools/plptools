@@ -56,7 +56,7 @@ static RFSV *a;
 static RFSVFactory *rf;
 
 static RPCS *r;
-static rpcsfactory *rp;
+static RPCSFactory *rp;
 static BufferStore owner;
 
 /* Translate EPOC/SIBO error to UNIX error code, leaving positive
@@ -430,7 +430,7 @@ int main(int argc, char**argv) {
     }
 
     rf = new RFSVFactory(skt);
-    rp = new rpcsfactory(skt2);
+    rp = new RPCSFactory(skt2);
     a = rf->create(true);
     r = rp->create(true);
     if (a != NULL && r != NULL)

@@ -146,7 +146,7 @@ main(int argc, char **argv)
         return 1;
     }
     RFSVFactory *rf = new RFSVFactory(skt);
-    rpcsfactory *rp = new rpcsfactory(skt2);
+    RPCSFactory *rp = new RPCSFactory(skt2);
     a = rf->create(false);
     r = rp->create(false);
     rclipSocket = new TCPSocket();
