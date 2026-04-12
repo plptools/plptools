@@ -534,7 +534,7 @@ static char *epoc_dir_from(const char *path) {
     return f1;
 }
 
-int FTP::session(RFSV &a, RPCS &r, rclip &rc, TCPSocket &rclipSocket, vector<char *> argv) {
+int FTP::session(RFSV &rfsv, RPCS &r, rclip &rc, TCPSocket &rclipSocket, vector<char *> argv) {
     Enum<RFSV::errs> res;
     bool prompt = true;
     bool hash = false;
@@ -552,7 +552,7 @@ int FTP::session(RFSV &a, RPCS &r, rclip &rc, TCPSocket &rclipSocket, vector<cha
         if ((res = r.getOwnerInfo(b)) == RFSV::E_PSI_GEN_NONE) {
             r.getMachineType(machType);
             if (!once) {
-                int speed = a.getSpeed();
+                int speed = rfsv.getSpeed();
                 cout << _("Connected to a ") << machType << _(" at ")
                      << speed << _(" baud, OwnerInfo:") << endl;
                 while (!b.empty()) {
@@ -567,13 +567,13 @@ int FTP::session(RFSV &a, RPCS &r, rclip &rc, TCPSocket &rclipSocket, vector<cha
 
     if (!strcmp(DDRIVE, "AUTO")) {
         strcpy(defDrive, "::");
-        defDrive[0] = a.defaultInternalDriveLetter();
+        defDrive[0] = rfsv.defaultInternalDriveLetter();
     } else {
         strcpy(defDrive, DDRIVE);
     }
     free(psionDir);
     psionDir = xasprintf("%s%s", defDrive, DBASEDIR);
-    comp_a = &a;
+    comp_a = &rfsv;
     if (!once) {
         cout << _("Psion dir is: \"") << psionDir << "\"" << endl;
         initReadline();
@@ -610,7 +610,7 @@ int FTP::session(RFSV &a, RPCS &r, rclip &rc, TCPSocket &rclipSocket, vector<cha
             continue;
         }
         if (!strcmp(argv[0], "volname") && (argc == 3) && (strlen(argv[1]) == 1)) {
-            if ((res = a.setVolumeName(toupper(argv[1][0]), argv[2])) != RFSV::E_PSI_GEN_NONE) {
+            if ((res = rfsv.setVolumeName(toupper(argv[1][0]), argv[2])) != RFSV::E_PSI_GEN_NONE) {
                 cerr << _("Error: ") << res << endl;
             }
             continue;
@@ -618,7 +618,7 @@ int FTP::session(RFSV &a, RPCS &r, rclip &rc, TCPSocket &rclipSocket, vector<cha
         if (!strcmp(argv[0], "ren") && (argc == 3)) {
             char *f1 = xasprintf("%s%s", psionDir, argv[1]);
             char *f2 = xasprintf("%s%s", psionDir, argv[2]);
-            if ((res = a.rename(f1, f2)) != RFSV::E_PSI_GEN_NONE) {
+            if ((res = rfsv.rename(f1, f2)) != RFSV::E_PSI_GEN_NONE) {
                 cerr << _("Error: ") << res << endl;
             }
             free(f1);
@@ -628,7 +628,7 @@ int FTP::session(RFSV &a, RPCS &r, rclip &rc, TCPSocket &rclipSocket, vector<cha
         if (!strcmp(argv[0], "cp") && (argc == 3)) {
             char *f1 = xasprintf("%s%s", psionDir, argv[1]);
             char *f2 = xasprintf("%s%s", psionDir, argv[2]);
-            if ((res = a.copyOnPsion(f1, f2, NULL, cab)) != RFSV::E_PSI_GEN_NONE) {
+            if ((res = rfsv.copyOnPsion(f1, f2, NULL, cab)) != RFSV::E_PSI_GEN_NONE) {
                 cerr << _("Error: ") << res << endl;
             }
             free(f1);
@@ -638,7 +638,7 @@ int FTP::session(RFSV &a, RPCS &r, rclip &rc, TCPSocket &rclipSocket, vector<cha
         if (!strcmp(argv[0], "touch") && (argc == 2)) {
             char *f1 = xasprintf("%s%s", psionDir, argv[1]);
             PsiTime pt;
-            if ((res = a.fsetmtime(f1, pt)) != RFSV::E_PSI_GEN_NONE) {
+            if ((res = rfsv.fsetmtime(f1, pt)) != RFSV::E_PSI_GEN_NONE) {
                 cerr << _("Error: ") << res << endl;
             }
             free(f1);
@@ -647,7 +647,7 @@ int FTP::session(RFSV &a, RPCS &r, rclip &rc, TCPSocket &rclipSocket, vector<cha
         if (!strcmp(argv[0], "test") && (argc == 2)) {
             PlpDirent e;
             char *f1 = xasprintf("%s%s", psionDir, argv[1]);
-            if ((res = a.fgeteattr(f1, e)) != RFSV::E_PSI_GEN_NONE) {
+            if ((res = rfsv.fgeteattr(f1, e)) != RFSV::E_PSI_GEN_NONE) {
                 cerr << _("Error: ") << res << endl;
             } else {
                 cout << e << endl;
@@ -658,11 +658,11 @@ int FTP::session(RFSV &a, RPCS &r, rclip &rc, TCPSocket &rclipSocket, vector<cha
         if (!strcmp(argv[0], "gattr") && (argc == 2)) {
             uint32_t attr;
             char *f1 = xasprintf("%s%s", psionDir, argv[1]);
-            if ((res = a.fgetattr(f1, attr)) != RFSV::E_PSI_GEN_NONE) {
+            if ((res = rfsv.fgetattr(f1, attr)) != RFSV::E_PSI_GEN_NONE) {
                 cerr << _("Error: ") << res << endl;
             } else {
                 cout << hex << setw(4) << setfill('0') << attr;
-                cout << " (" << a.attr2String(attr) << ")" << endl;
+                cout << " (" << rfsv.attr2String(attr) << ")" << endl;
             }
             free(f1);
             continue;
@@ -670,7 +670,7 @@ int FTP::session(RFSV &a, RPCS &r, rclip &rc, TCPSocket &rclipSocket, vector<cha
         if (!strcmp(argv[0], "gtime") && (argc == 2)) {
             PsiTime mtime;
             char *f1 = xasprintf("%s%s", psionDir, argv[1]);
-            if ((res = a.fgetmtime(f1, mtime)) != RFSV::E_PSI_GEN_NONE) {
+            if ((res = rfsv.fgetmtime(f1, mtime)) != RFSV::E_PSI_GEN_NONE) {
                 cerr << _("Error: ") << res << endl;
             } else {
                 cout << mtime << "(" << hex
@@ -721,7 +721,7 @@ int FTP::session(RFSV &a, RPCS &r, rclip &rc, TCPSocket &rclipSocket, vector<cha
                 }
                 p++;
             }
-            if ((res = a.fsetattr(f1, attr[0], attr[1])) != RFSV::E_PSI_GEN_NONE) {
+            if ((res = rfsv.fsetattr(f1, attr[0], attr[1])) != RFSV::E_PSI_GEN_NONE) {
                 cerr << _("Error: ") << res << endl;
             }
             free(f1);
@@ -729,7 +729,7 @@ int FTP::session(RFSV &a, RPCS &r, rclip &rc, TCPSocket &rclipSocket, vector<cha
         }
         if (!strcmp(argv[0], "dircnt")) {
             uint32_t cnt;
-            if ((res = a.dircount(psionDir, cnt)) != RFSV::E_PSI_GEN_NONE) {
+            if ((res = rfsv.dircount(psionDir, cnt)) != RFSV::E_PSI_GEN_NONE) {
                 cerr << _("Error: ") << res << endl;
             } else {
                 cout << cnt << _(" Entries") << endl;
@@ -738,13 +738,13 @@ int FTP::session(RFSV &a, RPCS &r, rclip &rc, TCPSocket &rclipSocket, vector<cha
         }
         if (!strcmp(argv[0], "devs")) {
             uint32_t devbits;
-            if ((res = a.devlist(devbits)) == RFSV::E_PSI_GEN_NONE) {
+            if ((res = rfsv.devlist(devbits)) == RFSV::E_PSI_GEN_NONE) {
                 cout << _("Drive Type Volname     Total     Free      UniqueID") << endl;
                 for (int i = 0; i < 26; i++) {
                     Drive drive;
 
                     if ((devbits & 1) != 0) {
-                        if (a.devinfo(i + 'A', drive) == RFSV::E_PSI_GEN_NONE) {
+                        if (rfsv.devinfo(i + 'A', drive) == RFSV::E_PSI_GEN_NONE) {
                             cout << (char) ('A' + i) << "     " << hex
                                  << setw(4) << setfill('0')
                                  << static_cast<uint32_t>(drive.getMediaType()) << " " << setw(12)
@@ -767,7 +767,7 @@ int FTP::session(RFSV &a, RPCS &r, rclip &rc, TCPSocket &rclipSocket, vector<cha
         if (!strcmp(argv[0], "ls") || !strcmp(argv[0], "dir")) {
             PlpDir files;
             char *dname = argc > 1 ? epoc_dir_from(argv[1]) : xstrdup(psionDir);
-            if ((res = a.dir(dname, files)) != RFSV::E_PSI_GEN_NONE) {
+            if ((res = rfsv.dir(dname, files)) != RFSV::E_PSI_GEN_NONE) {
                 cerr << _("Error: ") << res << endl;
             } else {
                 while (!files.empty()) {
@@ -798,7 +798,7 @@ int FTP::session(RFSV &a, RPCS &r, rclip &rc, TCPSocket &rclipSocket, vector<cha
             } else {
                 char *newDir = epoc_dir_from(argv[1]);
                 uint32_t tmp;
-                if ((res = a.dircount(newDir, tmp)) != RFSV::E_PSI_GEN_NONE) {
+                if ((res = rfsv.dircount(newDir, tmp)) != RFSV::E_PSI_GEN_NONE) {
                     cerr << _("Error: ") << res << endl;
                     cerr << _("Keeping original directory \"") << psionDir << "\"" << endl;
                     free(newDir);
@@ -819,7 +819,7 @@ int FTP::session(RFSV &a, RPCS &r, rclip &rc, TCPSocket &rclipSocket, vector<cha
             char *f2 = xasprintf("%s%s%s", localDir, "/", argc == 2 ? basename.c_str() : argv[2]);
 
             gettimeofday(&stime, nullptr);
-            if ((res = a.copyFromPsion(f1, f2, NULL, cab)) != RFSV::E_PSI_GEN_NONE) {
+            if ((res = rfsv.copyFromPsion(f1, f2, NULL, cab)) != RFSV::E_PSI_GEN_NONE) {
                 if (hash) {
                     cout << endl;
                 }
@@ -851,7 +851,7 @@ int FTP::session(RFSV &a, RPCS &r, rclip &rc, TCPSocket &rclipSocket, vector<cha
         } else if ((!strcmp(argv[0], "mget")) && (argc == 2)) {
             char *pattern = argv[1];
             PlpDir files;
-            if ((res = a.dir(psionDir, files)) != RFSV::E_PSI_GEN_NONE) {
+            if ((res = rfsv.dir(psionDir, files)) != RFSV::E_PSI_GEN_NONE) {
                 cerr << _("Error: ") << res << endl;
                 continue;
             }
@@ -878,7 +878,7 @@ int FTP::session(RFSV &a, RPCS &r, rclip &rc, TCPSocket &rclipSocket, vector<cha
                 if (yes) {
                     char *f1 = xasprintf("%s%s", psionDir, e.getName());
                     char *f2 = xasprintf("%s%s%s", localDir, "/", e.getName());
-                    if ((res = a.copyFromPsion(f1, f2, NULL, cab)) != RFSV::E_PSI_GEN_NONE) {
+                    if ((res = rfsv.copyFromPsion(f1, f2, NULL, cab)) != RFSV::E_PSI_GEN_NONE) {
                         if (hash) {
                             cout << endl;
                         }
@@ -905,7 +905,7 @@ int FTP::session(RFSV &a, RPCS &r, rclip &rc, TCPSocket &rclipSocket, vector<cha
             char *f1 = xasprintf("%s%s%s", localDir, "/", argv[1]);
             char *f2 = xasprintf("%s%s", psionDir, argc == 2 ? argv[1] : argv[2]);
             gettimeofday(&stime, nullptr);
-            if ((res = a.copyToPsion(f1, f2, NULL, cab)) != RFSV::E_PSI_GEN_NONE) {
+            if ((res = rfsv.copyToPsion(f1, f2, NULL, cab)) != RFSV::E_PSI_GEN_NONE) {
                 if (hash) {
                     cout << endl;
                 }
@@ -961,7 +961,7 @@ int FTP::session(RFSV &a, RPCS &r, rclip &rc, TCPSocket &rclipSocket, vector<cha
                             }
                             if (yes) {
                                 char *f2 = xasprintf("%s%s", psionDir, de->d_name);
-                                if ((res = a.copyToPsion(f1, f2, NULL, cab)) != RFSV::E_PSI_GEN_NONE) {
+                                if ((res = rfsv.copyToPsion(f1, f2, NULL, cab)) != RFSV::E_PSI_GEN_NONE) {
                                     if (hash) {
                                         cout << endl;
                                     }
@@ -991,7 +991,7 @@ int FTP::session(RFSV &a, RPCS &r, rclip &rc, TCPSocket &rclipSocket, vector<cha
         if ((!strcmp(argv[0], "del") ||
              !strcmp(argv[0], "rm")) && (argc == 2)) {
             char *f1 = xasprintf("%s%s", psionDir, argv[1]);
-            if ((res = a.remove(f1)) != RFSV::E_PSI_GEN_NONE) {
+            if ((res = rfsv.remove(f1)) != RFSV::E_PSI_GEN_NONE) {
                 cerr << _("Error: ") << res << endl;
             }
             free(f1);
@@ -999,7 +999,7 @@ int FTP::session(RFSV &a, RPCS &r, rclip &rc, TCPSocket &rclipSocket, vector<cha
         }
         if (!strcmp(argv[0], "mkdir") && (argc == 2)) {
             char *f1 = xasprintf("%s%s", psionDir, argv[1]);
-            if ((res = a.mkdir(f1)) != RFSV::E_PSI_GEN_NONE) {
+            if ((res = rfsv.mkdir(f1)) != RFSV::E_PSI_GEN_NONE) {
                 cerr << _("Error: ") << res << endl;
             }
             free(f1);
@@ -1007,7 +1007,7 @@ int FTP::session(RFSV &a, RPCS &r, rclip &rc, TCPSocket &rclipSocket, vector<cha
         }
         if (!strcmp(argv[0], "rmdir") && (argc == 2)) {
             char *f1 = xasprintf("%s%s", psionDir, argv[1]);
-            if ((res = a.rmdir(f1)) != RFSV::E_PSI_GEN_NONE) {
+            if ((res = rfsv.rmdir(f1)) != RFSV::E_PSI_GEN_NONE) {
                 cerr << _("Error: ") << res << endl;
             }
             free(f1);
@@ -1180,7 +1180,7 @@ int FTP::session(RFSV &a, RPCS &r, rclip &rc, TCPSocket &rclipSocket, vector<cha
             continue;
         }
         if (!strcmp(argv[0], "runrestore") && (argc == 2)) {
-            startPrograms(r, a, argv[1]);
+            startPrograms(r, rfsv, argv[1]);
             continue;
         }
         if (!strcmp(argv[0], "killsave") && (argc == 2)) {
@@ -1188,13 +1188,13 @@ int FTP::session(RFSV &a, RPCS &r, rclip &rc, TCPSocket &rclipSocket, vector<cha
             continue;
         }
         if (!strcmp(argv[0], "putclip") && (argc == 2)) {
-            if (putClipText(r, a, rc, rclipSocket, argv[1])) {
+            if (putClipText(r, rfsv, rc, rclipSocket, argv[1])) {
                 cerr << _("Error setting clipboard") << endl;
             }
             continue;
         }
         if (!strcmp(argv[0], "getclip") && (argc == 2)) {
-            if (getClipData(r, a, rc, rclipSocket, argv[1])) {
+            if (getClipData(r, rfsv, rc, rclipSocket, argv[1])) {
                 cerr << _("Error getting clipboard") << endl;
             }
             continue;
@@ -1247,7 +1247,7 @@ int FTP::session(RFSV &a, RPCS &r, rclip &rc, TCPSocket &rclipSocket, vector<cha
             cerr << _("syntax error. Try \"help\"") << endl;
         }
     } while (!once && continueRunning);
-    return a.getStatus();
+    return rfsv.getStatus();
 }
 
 #define MATCHFUNCTION rl_completion_matches
