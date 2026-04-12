@@ -36,9 +36,9 @@
 
 using namespace std;
 
-RFSV32::RFSV32(TCPSocket *_skt)
+RFSV32::RFSV32(TCPSocket *socket)
 {
-    skt = _skt;
+    socket_ = socket;
     serNum = 0;
     status = RFSV::E_PSI_FILE_DISC;
     reset();
@@ -405,10 +405,10 @@ sendCommand(enum commands cc, BufferStore & data)
     else
         serNum = 0;
     a.addBuff(data);
-    result = skt->sendBufferStore(a);
+    result = socket_->sendBufferStore(a);
     if (!result) {
         reconnect();
-        result = skt->sendBufferStore(a);
+        result = socket_->sendBufferStore(a);
         if (!result)
             status = E_PSI_FILE_DISC;
     }
@@ -418,7 +418,7 @@ sendCommand(enum commands cc, BufferStore & data)
 Enum<RFSV::errs> RFSV32::
 getResponse(BufferStore & data)
 {
-    if (skt->getBufferStore(data) == 1 &&
+    if (socket_->getBufferStore(data) == 1 &&
         data.getWord(0) == 0x11) {
         int32_t ret = data.getDWord(4);
         data.discardFirstBytes(8);

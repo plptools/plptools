@@ -114,11 +114,11 @@ const char *RFSV::getConnectName(void) {
 }
 
 RFSV::~RFSV() {
-    skt->closeSocket();
+    socket_->closeSocket();
 }
 
 void RFSV::reconnect(void) {
-    skt->reconnect();
+    socket_->reconnect();
     serNum = 0;
     reset();
 }
@@ -127,8 +127,8 @@ void RFSV::reset(void) {
     BufferStore a;
     status = E_PSI_FILE_DISC;
     a.addStringT(getConnectName());
-    if (skt->sendBufferStore(a)) {
-        if (skt->getBufferStore(a) == 1) {
+    if (socket_->sendBufferStore(a)) {
+        if (socket_->getBufferStore(a) == 1) {
             if (!strcmp(a.getString(0), "Ok"))
                 status = E_PSI_GEN_NONE;
         }
@@ -170,9 +170,9 @@ string RFSV::attr2String(const uint32_t attr) {
 int RFSV::getSpeed() {
     BufferStore a;
     a.addStringT("NCP$GSPD");
-    if (!skt->sendBufferStore(a))
+    if (!socket_->sendBufferStore(a))
         return -1;
-    if (skt->getBufferStore(a) != 1)
+    if (socket_->getBufferStore(a) != 1)
         return -1;
     if (a.getLen() != 5)
         return -1;
