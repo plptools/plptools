@@ -18,22 +18,20 @@
  *
  */
 
-#ifndef _PSION_H
-#define _PSION_H
+#pragma once
 
 #include <Enum.h>
 #include "rfsv.h"
 
 class TCPSocket;
 class RFSVFactory;
-class rpcsfactory;
+class RPCSFactory;
 class RPCS;
 
 /**
  * Semi smart proxy for communicating with a Psion.
  */
-class Psion
-{
+class Psion {
 public:
 
     virtual ~Psion();
@@ -66,11 +64,8 @@ private:
     TCPSocket* m_skt;
     TCPSocket* m_skt2;
     RFSVFactory* m_rfsvFactory;
-    rpcsfactory* m_rpcsFactory;
+    RPCSFactory* m_rpcsFactory;
     RPCS* m_rpcs;
     RFSV* m_rfsv;
 
 };
-
-#endif
-

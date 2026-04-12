@@ -44,7 +44,7 @@ typedef std::vector<PsiProcess> processList;
  * variants are implemented in
  * @ref RPCS32 or @ref RPCS16 respectively.
  * These normally are instantiated by using
- * @ref rpcsfactory .
+ * @ref RPCSFactory .
  *
  * @author Fritz Elfert <felfert@to.com>
  */

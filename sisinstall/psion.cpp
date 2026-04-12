@@ -36,14 +36,11 @@
 
 #include <stdio.h>
 
-Psion::~Psion()
-{
+Psion::~Psion() {
     disconnect();
 }
 
-bool
-Psion::connect()
-{
+bool Psion::connect() {
     int sockNum = cli_utils::lookup_default_port();
 
 #if 0
@@ -70,54 +67,41 @@ Psion::connect()
         return false;
     }
     m_rfsvFactory = new RFSVFactory(m_skt);
-    m_rpcsFactory = new rpcsfactory(m_skt2);
+    m_rpcsFactory = new RPCSFactory(m_skt2);
     m_rfsv = m_rfsvFactory->create(true);
     m_rpcs = m_rpcsFactory->create(true);
-    if ((m_rfsv != NULL) && (m_rpcs != NULL))
+    if ((m_rfsv != NULL) && (m_rpcs != NULL)) {
         return true;
+    }
     return false;
 }
 
-Enum<RFSV::errs>
-Psion::copyFromPsion(const char * const from, int fd,
-                     cpCallback_t func)
-{
+Enum<RFSV::errs> Psion::copyFromPsion(const char * const from, int fd, cpCallback_t func) {
     return m_rfsv->copyFromPsion(from, fd, func);
 }
 
-Enum<RFSV::errs>
-Psion::copyToPsion(const char * const from, const char * const to,
-                   void *, cpCallback_t func)
-{
+Enum<RFSV::errs> Psion::copyToPsion(const char * const from, const char * const to, void *, cpCallback_t func) {
     Enum<RFSV::errs> res;
     res = m_rfsv->copyToPsion(from, to, NULL, func);
 //    printf("Returned to Psion\n");
     return res;
 }
 
-Enum<RFSV::errs>
-Psion::devinfo(const char drive, Drive& plpDrive)
-{
+Enum<RFSV::errs> Psion::devinfo(const char drive, Drive& plpDrive) {
     return m_rfsv->devinfo(drive, plpDrive);
 }
 
-Enum<RFSV::errs>
-Psion::devlist(uint32_t& devbits)
-{
+Enum<RFSV::errs> Psion::devlist(uint32_t& devbits) {
     Enum<RFSV::errs> res;
     res = m_rfsv->devlist(devbits);
     return res;
 }
 
-Enum<RFSV::errs>
-Psion::dir(const char* dir, PlpDir& files)
-{
+Enum<RFSV::errs> Psion::dir(const char* dir, PlpDir& files) {
     return m_rfsv->dir(dir, files);
 }
 
-bool
-Psion::dirExists(const char* name)
-{
+bool Psion::dirExists(const char* name) {
     RFSVDirHandle handle;
     Enum<RFSV::errs> res;
     bool exists = false;
@@ -128,9 +112,7 @@ Psion::dirExists(const char* name)
     return exists;
 }
 
-void
-Psion::disconnect()
-{
+void Psion::disconnect() {
     delete m_rfsv;
     delete m_rpcs;
     delete m_skt;
@@ -139,15 +121,11 @@ Psion::disconnect()
     delete m_rpcsFactory;
 }
 
-Enum<RFSV::errs>
-Psion::mkdir(const char* dir)
-{
+Enum<RFSV::errs> Psion::mkdir(const char* dir) {
     return m_rfsv->mkdir(dir);
 }
 
-void
-Psion::remove(const char* name)
-{
+void Psion::remove(const char* name) {
     m_rfsv->remove(name);
 }
 

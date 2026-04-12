@@ -18,8 +18,7 @@
  *  along with this program; if not, see <https://www.gnu.org/licenses/>.
  *
  */
-#ifndef _RPCSFACTORY_H_
-#define _RPCSFACTORY_H_
+#pragma once
 
 #include "rpcs.h"
 
@@ -29,7 +28,7 @@ class TCPSocket;
  * A factory for automatically instantiating the correct protocol
  * variant depending on the connected Psion.
  */
-class rpcsfactory {
+class RPCSFactory {
  public:
 
     /**
@@ -45,12 +44,12 @@ class rpcsfactory {
     };
 
     /**
-    * Constructs a rpcsfactory.
+    * Constructs a RPCSFactory.
     *
     * @param skt The socket to be used for connecting
     * to the ncpd daemon.
     */
-    rpcsfactory(TCPSocket *skt);
+    RPCSFactory(TCPSocket *skt);
 
     /**
     * Creates a new RPCS instance.
@@ -79,5 +78,3 @@ class rpcsfactory {
     TCPSocket *skt;
     Enum<errs> err;
 };
-
-#endif

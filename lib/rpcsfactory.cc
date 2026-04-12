@@ -29,23 +29,21 @@
 #include <stdlib.h>
 #include <time.h>
 
-ENUM_DEFINITION_BEGIN(rpcsfactory::errs, rpcsfactory::FACERR_NONE)
-    stringRep.add(rpcsfactory::FACERR_NONE,           N_("no error"));
-    stringRep.add(rpcsfactory::FACERR_COULD_NOT_SEND, N_("could not send version request"));
-    stringRep.add(rpcsfactory::FACERR_AGAIN,          N_("try again"));
-    stringRep.add(rpcsfactory::FACERR_NOPSION,        N_("no EPOC device connected"));
-    stringRep.add(rpcsfactory::FACERR_PROTVERSION,    N_("wrong protocol version"));
-    stringRep.add(rpcsfactory::FACERR_NORESPONSE,     N_("no response from ncpd"));
-ENUM_DEFINITION_END(rpcsfactory::errs)
+ENUM_DEFINITION_BEGIN(RPCSFactory::errs, RPCSFactory::FACERR_NONE)
+    stringRep.add(RPCSFactory::FACERR_NONE,           N_("no error"));
+    stringRep.add(RPCSFactory::FACERR_COULD_NOT_SEND, N_("could not send version request"));
+    stringRep.add(RPCSFactory::FACERR_AGAIN,          N_("try again"));
+    stringRep.add(RPCSFactory::FACERR_NOPSION,        N_("no EPOC device connected"));
+    stringRep.add(RPCSFactory::FACERR_PROTVERSION,    N_("wrong protocol version"));
+    stringRep.add(RPCSFactory::FACERR_NORESPONSE,     N_("no response from ncpd"));
+ENUM_DEFINITION_END(RPCSFactory::errs)
 
-rpcsfactory::rpcsfactory(TCPSocket *_skt)
-{
+RPCSFactory::RPCSFactory(TCPSocket *_skt) {
     err = FACERR_NONE;
     skt = _skt;
 }
 
-RPCS *rpcsfactory::create(bool reconnect)
-{
+RPCS *RPCSFactory::create(bool reconnect) {
     // skt is connected to the ncp daemon, which will have (hopefully) seen
     // an INFO exchange, where the protocol version of the remote Psion was
     // sent, and noted. We have to ask the ncp daemon which protocol it saw,
