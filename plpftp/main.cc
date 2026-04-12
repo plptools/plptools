@@ -146,8 +146,9 @@ int main(int argc, char **argv) {
     r = rp->create(false);
     rclipSocket = new TCPSocket();
     rclipSocket->connect(NULL, sockNum);
-    if (rclipSocket)
+    if (rclipSocket) {
         rc = new rclip(rclipSocket);
+    }
     f.canClip = rclipSocket && rc ? true : false;
     if ((a != NULL) && (r != NULL)) {
         vector<char *> args(argv + optind, argv + argc);
@@ -158,8 +159,9 @@ int main(int argc, char **argv) {
         delete skt2;
         if (rclipSocket)
             delete rclipSocket;
-        if (rc)
+        if (rc) {
             delete rc;
+        }
     } else {
         cerr << "plpftp: " << rf->getError() << endl;
         status = 1;

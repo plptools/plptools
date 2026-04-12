@@ -555,8 +555,9 @@ int FTP::session(RFSV &a, RPCS &r, rclip &rc, TCPSocket &rclipSocket, vector<cha
                 int speed = a.getSpeed();
                 cout << _("Connected to a ") << machType << _(" at ")
                      << speed << _(" baud, OwnerInfo:") << endl;
-                while (!b.empty())
+                while (!b.empty()) {
                     cout << "  " << b.pop().getString() << endl;
+                }
                 cout << endl;
             }
         } else {
