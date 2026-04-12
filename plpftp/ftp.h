@@ -19,8 +19,7 @@
  *  along with this program; if not, see <https://www.gnu.org/licenses/>.
  *
  */
-#ifndef _ftp_h_
-#define _ftp_h_
+#pragma once
 
 #include "config.h"
 
@@ -33,19 +32,19 @@ class RPCS;
 class BufferStore;
 class BufferArray;
 
-class ftp {
-    public:
-    ftp();
-    ~ftp();
-    int session(RFSV &a, RPCS & r, rclip & rc, TCPSocket & rclipSocket, std::vector<char *> argv);
+class FTP {
+public:
+    FTP();
+    ~FTP();
+    int session(RFSV &a, RPCS &r, rclip &rc, TCPSocket &rclipSocket, std::vector<char *> argv);
     bool canClip;
 
-    private:
+private:
     std::vector<char *> getCommand();
     void initReadline(void);
-    int putClipText(RPCS & r, RFSV &a, rclip & rc, TCPSocket & rclipSocket, const char *data);
-    int getClipData(RPCS & r, RFSV &a, rclip & rc, TCPSocket & rclipSocket, const char *file);
-    bool checkClipConnection(RFSV &a, rclip & rc, TCPSocket & rclipSocket);
+    int putClipText(RPCS &r, RFSV &a, rclip &rc, TCPSocket &rclipSocket, const char *data);
+    int getClipData(RPCS &r, RFSV &a, rclip &rc, TCPSocket &rclipSocket, const char *file);
+    bool checkClipConnection(RFSV &a, rclip &rc, TCPSocket &rclipSocket);
 
     // utilities
     void resetUnixWd();
@@ -54,5 +53,3 @@ class ftp {
     char defDrive[9];
     char *localDir;
 };
-
-#endif

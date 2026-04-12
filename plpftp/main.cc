@@ -66,8 +66,7 @@ help()
         ) << DPORT << "\n\n";
 }
 
-static void
-usage() {
+static void usage() {
     cerr << _("Try `plpftp --help' for more information") << endl;
 }
 
@@ -78,9 +77,7 @@ static struct option opts[] = {
     {NULL,       0,                 nullptr,  0 }
 };
 
-void
-ftpHeader()
-{
+void ftpHeader() {
     cout << _("PLPFTP Version ") << VERSION;
     cout << _(" Copyright (C) 1999 Philip Proudman") << endl;
     cout << _(" Additions Copyright (C) 1999-2002 Fritz Elfert <felfert@to.com>") << endl;
@@ -93,16 +90,14 @@ ftpHeader()
     cout << _("FTP like interface started. Type \"?\" for help.") << endl;
 }
 
-int
-main(int argc, char **argv)
-{
+int main(int argc, char **argv) {
     TCPSocket *skt;
     TCPSocket *skt2;
     RFSV *a;
     RPCS *r;
     TCPSocket *rclipSocket;
     rclip *rc;
-    ftp f;
+    FTP f;
     string host = "127.0.0.1";
     int status = 0;
     int sockNum = cli_utils::lookup_default_port();
