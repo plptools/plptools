@@ -125,18 +125,18 @@ void RFSV::reconnect(void) {
 
 void RFSV::reset(void) {
     BufferStore a;
-    status = E_PSI_FILE_DISC;
+    status_ = E_PSI_FILE_DISC;
     a.addStringT(getConnectName());
     if (socket_->sendBufferStore(a)) {
         if (socket_->getBufferStore(a) == 1) {
             if (!strcmp(a.getString(0), "Ok"))
-                status = E_PSI_GEN_NONE;
+                status_ = E_PSI_GEN_NONE;
         }
     }
 }
 
 Enum<RFSV::errs> RFSV::getStatus(void) {
-    return status;
+    return status_;
 }
 
 string RFSV::convertSlash(const string &name) {

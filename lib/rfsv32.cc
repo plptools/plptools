@@ -39,7 +39,7 @@ using namespace std;
 RFSV32::RFSV32(TCPSocket *socket) {
     socket_ = socket;
     serNum = 0;
-    status = RFSV::E_PSI_FILE_DISC;
+    status_ = RFSV::E_PSI_FILE_DISC;
     reset();
 }
 
@@ -381,9 +381,9 @@ Enum<RFSV::errs> RFSV32::devinfo(const char drive, Drive &dinfo) {
 }
 
 bool RFSV32::sendCommand(enum commands cc, BufferStore & data) {
-    if (status == E_PSI_FILE_DISC) {
+    if (status_ == E_PSI_FILE_DISC) {
         reconnect();
-        if (status == E_PSI_FILE_DISC) {
+        if (status_ == E_PSI_FILE_DISC) {
             return false;
         }
     }
@@ -402,7 +402,7 @@ bool RFSV32::sendCommand(enum commands cc, BufferStore & data) {
         reconnect();
         result = socket_->sendBufferStore(a);
         if (!result) {
-            status = E_PSI_FILE_DISC;
+            status_ = E_PSI_FILE_DISC;
         }
     }
     return result;
@@ -415,9 +415,9 @@ Enum<RFSV::errs> RFSV32::getResponse(BufferStore & data) {
         data.discardFirstBytes(8);
         return err2psierr(ret);
     } else {
-        status = E_PSI_FILE_DISC;
+        status_ = E_PSI_FILE_DISC;
     }
-    return status;
+    return status_;
 }
 
 Enum<RFSV::errs> RFSV32::fread(const uint32_t handle, unsigned char * const buf, const uint32_t len, uint32_t &count) {

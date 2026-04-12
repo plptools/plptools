@@ -45,7 +45,7 @@ using namespace std;
 
 RFSV16::RFSV16(TCPSocket *socket) {
     serNum = 0;
-    status = RFSV::E_PSI_FILE_DISC;
+    status_ = RFSV::E_PSI_FILE_DISC;
     socket_ = socket;
     reset();
 }
@@ -338,7 +338,7 @@ Enum<RFSV::errs> RFSV16::devlist(uint32_t &devbits) {
     name[0] = static_cast<char>(a.getByte(5)); // the M
     res = fopen(P_FDEVICE, name, fileHandle);
     if (res != E_PSI_GEN_NONE) {
-        return status;
+        return status_;
     }
 
     while (1) {
@@ -442,9 +442,9 @@ Enum<RFSV::errs> RFSV16::devinfo(const char drive, Drive &dinfo) {
 }
 
 bool RFSV16::sendCommand(enum commands cc, BufferStore & data) {
-    if (status == E_PSI_FILE_DISC) {
+    if (status_ == E_PSI_FILE_DISC) {
         reconnect();
-        if (status == E_PSI_FILE_DISC) {
+        if (status_ == E_PSI_FILE_DISC) {
             return false;
         }
     }
@@ -459,7 +459,7 @@ bool RFSV16::sendCommand(enum commands cc, BufferStore & data) {
         reconnect();
         result = socket_->sendBufferStore(a);
         if (!result) {
-            status = E_PSI_FILE_DISC;
+            status_ = E_PSI_FILE_DISC;
         }
     }
     return result;
@@ -484,8 +484,8 @@ Enum<RFSV::errs> RFSV16::getResponse(BufferStore & data) {
             data.getLen()-4 << " Result field:" <<
             data.getWord(4) << endl;
     }
-    status = E_PSI_FILE_DISC;
-    return status;
+    status_ = E_PSI_FILE_DISC;
+    return status_;
 }
 
 Enum<RFSV::errs> RFSV16::fread(const uint32_t handle, unsigned char * const buf, const uint32_t len, uint32_t &count) {
