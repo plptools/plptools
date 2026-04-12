@@ -654,9 +654,9 @@ protected:
     */
     const char *getConnectName();
 
-    TCPSocket *skt;
-    Enum<errs> status;
-    int32_t serNum;
+    TCPSocket *socket_;
+    Enum<errs> status_;
+    int32_t operationId_;
 };
 
 #endif

@@ -30,6 +30,7 @@
 #include "tcpsocket.h"
 
 #include <algorithm>
+#include <ios>
 #include <iostream>
 #include <fstream>
 
@@ -42,43 +43,40 @@
 
 using namespace std;
 
-RFSV16::RFSV16(TCPSocket *_skt)
-{
-    serNum = 0;
-    status = RFSV::E_PSI_FILE_DISC;
-    skt = _skt;
+RFSV16::RFSV16(TCPSocket *socket) {
+    operationId_ = 0;
+    status_ = RFSV::E_PSI_FILE_DISC;
+    socket_ = socket;
     reset();
 }
 
-Enum<RFSV::errs> RFSV16::
-fopen(uint32_t attr, const char *name, uint32_t &handle)
-{
+Enum<RFSV::errs> RFSV16::fopen(uint32_t attr, const char *name, uint32_t &handle) {
     BufferStore a;
     string realName = convertSlash(name);
 
     // Allow random access, rather than forcing the caller to ask for it
     a.addWord((P_FRANDOM | attr) & 0xFFFF);
     a.addStringT(realName.c_str());
-    if (!sendCommand(SIBO_FOPEN, a))
+    if (!sendCommand(SIBO_FOPEN, a)) {
         return E_PSI_FILE_DISC;
+    }
 
     Enum<RFSV::errs> res = getResponse(a);
     if (res == 0) {
-        handle = (long)a.getWord(0);
+        handle = static_cast<long>(a.getWord(0));
         return E_PSI_GEN_NONE;
     }
     return res;
 }
 
-Enum<RFSV::errs> RFSV16::
-mktemp(uint32_t &handle, string &tmpname)
-{
+Enum<RFSV::errs> RFSV16::mktemp(uint32_t &handle, string &tmpname) {
     BufferStore a;
 
     a.addWord(P_FUNIQUE);
     a.addStringT("TMP");
-    if (!sendCommand(SIBO_OPENUNIQUE, a))
+    if (!sendCommand(SIBO_OPENUNIQUE, a)) {
         return E_PSI_FILE_DISC;
+    }
 
     Enum<RFSV::errs> res = getResponse(a);
     if (res == E_PSI_GEN_NONE) {
@@ -89,36 +87,29 @@ mktemp(uint32_t &handle, string &tmpname)
     return res;
 }
 
-Enum<RFSV::errs> RFSV16::
-fcreatefile(uint32_t attr, const char *name, uint32_t &handle)
-{
+Enum<RFSV::errs> RFSV16::fcreatefile(uint32_t attr, const char *name, uint32_t &handle) {
     return fopen(attr | P_FCREATE, name, handle);
 }
 
-Enum<RFSV::errs> RFSV16::
-freplacefile(uint32_t attr, const char *name, uint32_t &handle)
-{
+Enum<RFSV::errs> RFSV16::freplacefile(uint32_t attr, const char *name, uint32_t &handle) {
     return fopen(attr | P_FREPLACE, name, handle);
 }
 
-Enum<RFSV::errs> RFSV16::
-fopendir(const char * const name, uint32_t &handle)
-{
+Enum<RFSV::errs> RFSV16::fopendir(const char * const name, uint32_t &handle) {
     return fopen(P_FDIR, name, handle);
 }
 
-Enum<RFSV::errs> RFSV16::
-fclose(uint32_t fileHandle)
-{
+Enum<RFSV::errs> RFSV16::fclose(uint32_t fileHandle) {
     BufferStore a;
     a.addWord(fileHandle & 0xFFFF);
-    if (!sendCommand(SIBO_FCLOSE, a))
+    if (!sendCommand(SIBO_FCLOSE, a)) {
         return E_PSI_FILE_DISC;
+    }
     return getResponse(a);
 }
 
-Enum<RFSV::errs> RFSV16::
-opendir(const uint32_t attr, const char *name, RFSVDirHandle &dH) {
+Enum<RFSV::errs> RFSV16::opendir(const uint32_t attr, const char *name, RFSVDirHandle &dH) {
+    (void)attr;
     uint32_t handle;
     Enum<RFSV::errs> res = fopendir(name, handle);
     dH.h = handle;
@@ -127,26 +118,26 @@ opendir(const uint32_t attr, const char *name, RFSVDirHandle &dH) {
     return res;
 }
 
-Enum<RFSV::errs> RFSV16::
-closedir(RFSVDirHandle &dH) {
+Enum<RFSV::errs> RFSV16::closedir(RFSVDirHandle &dH) {
     return fclose(dH.h);
 }
 
-Enum<RFSV::errs> RFSV16::
-readdir(RFSVDirHandle &dH, PlpDirent &e) {
+Enum<RFSV::errs> RFSV16::readdir(RFSVDirHandle &dH, PlpDirent &e) {
     Enum<RFSV::errs> res = E_PSI_GEN_NONE;
 
     if (dH.b.getLen() < 17) {
         dH.b.init();
         dH.b.addWord(dH.h & 0xFFFF);
-        if (!sendCommand(SIBO_FDIRREAD, dH.b))
+        if (!sendCommand(SIBO_FDIRREAD, dH.b)) {
             return E_PSI_FILE_DISC;
+        }
         res = getResponse(dH.b);
         if (res == E_PSI_GEN_NONE) {
             uint16_t bufferLen = dH.b.getWord(0);
             dH.b.discardFirstBytes(2);
-            if (dH.b.getLen() != bufferLen)
+            if (dH.b.getLen() != bufferLen) {
                 return E_PSI_GEN_FAIL;
+            }
         }
     }
     if ((res == E_PSI_GEN_NONE) && (dH.b.getLen() > 16)) {
@@ -154,7 +145,7 @@ readdir(RFSVDirHandle &dH, PlpDirent &e) {
         if (version != 2) {
             return E_PSI_GEN_FAIL;
         }
-        e.attr = attr2std((uint32_t)dH.b.getWord(2));
+        e.attr = attr2std(static_cast<uint32_t>(dH.b.getWord(2)));
         e.size = dH.b.getDWord(4);
         e.time.setSiboTime(dH.b.getDWord(8));
         e.dirname_ = dH.name_;
@@ -167,51 +158,49 @@ readdir(RFSVDirHandle &dH, PlpDirent &e) {
     return res;
 }
 
-Enum<RFSV::errs> RFSV16::
-dir(const char *name, PlpDir &files)
-{
+Enum<RFSV::errs> RFSV16::dir(const char *name, PlpDir &files) {
     RFSVDirHandle h;
     files.clear();
     Enum<RFSV::errs> res = opendir(PSI_A_HIDDEN|PSI_A_SYSTEM|PSI_A_DIR, name, h);
     while (res == E_PSI_GEN_NONE) {
         PlpDirent e;
         res = readdir(h, e);
-        if (res == E_PSI_GEN_NONE)
+        if (res == E_PSI_GEN_NONE) {
             files.push_back(e);
+        }
     }
     closedir(h);
-    if (res == E_PSI_FILE_EOF)
+    if (res == E_PSI_FILE_EOF) {
         res = E_PSI_GEN_NONE;
+    }
     return res;
 }
 
-uint32_t RFSV16::
-opMode(uint32_t mode)
-{
+uint32_t RFSV16::opMode(uint32_t mode) {
     uint32_t ret = 0;
 
     ret |= ((mode & 03) == PSI_O_RDONLY) ? 0 : P_FUPDATE;
     ret |= (mode & PSI_O_TRUNC) ? P_FREPLACE : 0;
     ret |= (mode & PSI_O_CREAT) ? P_FCREATE : 0;
     ret |= (mode & PSI_O_APPEND) ? P_FAPPEND : 0;
-    if ((mode & 03) == PSI_O_RDONLY)
+    if ((mode & 03) == PSI_O_RDONLY) {
         ret |= (mode & PSI_O_EXCL) ? 0 : P_FSHARE;
+    }
     return ret;
 }
 
-Enum<RFSV::errs> RFSV16::
-fgetmtime(const char * const name, PsiTime &mtime)
-{
+Enum<RFSV::errs> RFSV16::fgetmtime(const char * const name, PsiTime &mtime) {
     BufferStore a;
     string realName = convertSlash(name);
     a.addStringT(realName.c_str());
-    if (!sendCommand(SIBO_FINFO, a))
+    if (!sendCommand(SIBO_FINFO, a)) {
         return E_PSI_FILE_DISC;
+    }
 
     Enum<RFSV::errs> res = getResponse(a);
-    if (res != E_PSI_GEN_NONE)
+    if (res != E_PSI_GEN_NONE) {
         return res;
-    else if (a.getLen() == 16) {
+    } else if (a.getLen() == 16) {
         // According to Alex's docs, Psion's file times are in
         // seconds since 13:00!!, 1.1.1970
         mtime.setSiboTime(a.getDWord(8));
@@ -220,9 +209,7 @@ fgetmtime(const char * const name, PsiTime &mtime)
     return E_PSI_GEN_FAIL;
 }
 
-Enum<RFSV::errs> RFSV16::
-fsetmtime(const char *name, PsiTime mtime)
-{
+Enum<RFSV::errs> RFSV16::fsetmtime(const char *name, PsiTime mtime) {
     // According to Alexander's protocol doc, SIBO_SFDATE sets the modification
     // time - and as far as I can see SIBO only keeps a modification
     // time. So call SIBO_SFDATE here.
@@ -232,33 +219,31 @@ fsetmtime(const char *name, PsiTime mtime)
     // seconds since 13:00!!, 1.1.1970
     a.addDWord(mtime.getSiboTime());
     a.addStringT(realName.c_str());
-    if (!sendCommand(SIBO_SFDATE, a))
+    if (!sendCommand(SIBO_SFDATE, a)) {
         return E_PSI_FILE_DISC;
+    }
     return getResponse(a);
 }
 
-Enum<RFSV::errs> RFSV16::
-fgetattr(const char * const name, uint32_t &attr)
-{
+Enum<RFSV::errs> RFSV16::fgetattr(const char * const name, uint32_t &attr) {
     BufferStore a;
     string realName = convertSlash(name);
     a.addStringT(realName.c_str());
-    if (!sendCommand(SIBO_FINFO, a))
+    if (!sendCommand(SIBO_FINFO, a)) {
         return E_PSI_FILE_DISC;
+    }
 
     Enum<RFSV::errs> res = getResponse(a);
-    if (res != E_PSI_GEN_NONE)
+    if (res != E_PSI_GEN_NONE) {
         return res;
-    else if (a.getLen() == 16) {
-        attr = attr2std((long)a.getWord(2));
+    } else if (a.getLen() == 16) {
+        attr = attr2std(static_cast<long>(a.getWord(2)));
         return res;
     }
     return E_PSI_GEN_FAIL;
 }
 
-Enum<RFSV::errs> RFSV16::
-fgeteattr(const char * const name, PlpDirent &e)
-{
+Enum<RFSV::errs> RFSV16::fgeteattr(const char *const name, PlpDirent &e) {
     BufferStore a;
     string realName = convertSlash(name);
     a.addStringT(realName.c_str());
@@ -278,11 +263,11 @@ fgeteattr(const char * const name, PlpDirent &e)
         }
 
         // Uppercase the resulting filename as, while EPOC16 is case insensitive, it returns all responses as uppercase.
-        string name = p;
-        std::transform(name.begin(), name.end(), name.begin(), ::toupper);
+        string filename = p;
+        std::transform(filename.begin(), filename.end(), filename.begin(), ::toupper);
 
-        e.name = name;
-        e.attr = attr2std((long)a.getWord(2));
+        e.name = filename;
+        e.attr = attr2std(static_cast<long>(a.getWord(2)));
         e.size = a.getDWord(4);
         e.time.setSiboTime(a.getDWord(8));
         e.UID  = PlpUID(0,0,0);
@@ -292,9 +277,7 @@ fgeteattr(const char * const name, PlpDirent &e)
     return E_PSI_GEN_FAIL;
 }
 
-Enum<RFSV::errs> RFSV16::
-fsetattr(const char *name, uint32_t seta, uint32_t unseta)
-{
+Enum<RFSV::errs> RFSV16::fsetattr(const char *name, uint32_t seta, uint32_t unseta) {
     uint32_t statusword = std2attr(seta) & (~ std2attr(unseta));
     statusword ^= 0x0000001; // r bit is inverted
     uint32_t bitmask = std2attr(seta) | std2attr(unseta);
@@ -302,31 +285,30 @@ fsetattr(const char *name, uint32_t seta, uint32_t unseta)
     a.addWord(statusword & 0xFFFF);
     a.addWord(bitmask & 0xFFFF);
     a.addStringT(name);
-    if (!sendCommand(SIBO_SFSTAT, a))
+    if (!sendCommand(SIBO_SFSTAT, a)) {
         return E_PSI_FILE_DISC;
+    }
     return getResponse(a);
 }
 
-Enum<RFSV::errs> RFSV16::
-dircount(const char * const name, uint32_t &count)
-{
+Enum<RFSV::errs> RFSV16::dircount(const char * const name, uint32_t &count) {
     RFSVDirHandle h;
     Enum<RFSV::errs> res = opendir(PSI_A_HIDDEN|PSI_A_SYSTEM|PSI_A_DIR, name, h);
     while (res == E_PSI_GEN_NONE) {
         PlpDirent e;
         res = readdir(h, e);
-        if (res == E_PSI_GEN_NONE)
+        if (res == E_PSI_GEN_NONE) {
             count++;
+        }
     }
     closedir(h);
-    if (res == E_PSI_FILE_EOF)
+    if (res == E_PSI_FILE_EOF) {
         res = E_PSI_GEN_NONE;
+    }
     return res;
 }
 
-Enum<RFSV::errs> RFSV16::
-devlist(uint32_t &devbits)
-{
+Enum<RFSV::errs> RFSV16::devlist(uint32_t &devbits) {
     Enum<RFSV::errs> res;
     uint32_t fileHandle;
     devbits = 0;
@@ -341,20 +323,23 @@ devlist(uint32_t &devbits)
     a.addByte(0x00); // no Name 1
     a.addByte(0x00); // no Name 2
     a.addByte(0x00); // no Name 3
-    if (!sendCommand(SIBO_PARSE, a))
+    if (!sendCommand(SIBO_PARSE, a)) {
         return E_PSI_FILE_DISC;
+    }
     res = getResponse(a);
-    if (res != E_PSI_GEN_NONE)
+    if (res != E_PSI_GEN_NONE) {
         return res;
+    }
 
     // Find the drive to FOPEN
     char name[4] = { 'x', ':', '\\', '\0' } ;
     a.discardFirstBytes(6); // Result, fsys, dev, path, file, file, ending, flag
     /* This leaves R E M : : M : \ */
-    name[0] = (char) a.getByte(5); // the M
+    name[0] = static_cast<char>(a.getByte(5)); // the M
     res = fopen(P_FDEVICE, name, fileHandle);
-    if (res != E_PSI_GEN_NONE)
-        return status;
+    if (res != E_PSI_GEN_NONE) {
+        return status_;
+    }
 
     while (1) {
         a.init();
@@ -373,15 +358,15 @@ devlist(uint32_t &devbits)
         char drive = a.getByte(64);
         if (drive >= 'A' && drive <= 'Z') {
             int shift = (drive - 'A');
-            devbits |= (long) ( 1 << shift );
-        }
-        else {
+            devbits |= static_cast<long>(1 << shift);
+        } else {
             cerr << "devlist: non-alphabetic drive letter ("
                  << drive << ")" << endl;
         }
     }
-    if (res == E_PSI_FILE_EOF)
+    if (res == E_PSI_FILE_EOF) {
         res = E_PSI_GEN_NONE;
+    }
     fclose(fileHandle);
     return res;
 }
@@ -396,9 +381,7 @@ static int sibo_dattr[] = {
     7, // write-protected == ROM ?
 };
 
-Enum<RFSV::errs> RFSV16::
-devinfo(const char drive, Drive &dinfo)
-{
+Enum<RFSV::errs> RFSV16::devinfo(const char drive, Drive &dinfo) {
     BufferStore a;
     Enum<RFSV::errs> res;
 
@@ -413,20 +396,24 @@ devinfo(const char drive, Drive &dinfo)
 
     a.addByte(0x00); // No name 2
     a.addByte(0x00); // No name 3
-    if (!sendCommand(SIBO_PARSE, a))
+    if (!sendCommand(SIBO_PARSE, a)) {
         return E_PSI_FILE_DISC;
-    if ((res = getResponse(a)) != E_PSI_GEN_NONE)
+    }
+    if ((res = getResponse(a)) != E_PSI_GEN_NONE) {
         return res;
+    }
 
     a.init();
     a.addByte(toupper(drive)); // Name 1
     a.addByte(':');
     a.addByte('\\');
     a.addByte(0x00);
-    if (!sendCommand(SIBO_STATUSDEVICE, a))
+    if (!sendCommand(SIBO_STATUSDEVICE, a)) {
         return E_PSI_FILE_DISC;
-    if ((res = getResponse(a)) != E_PSI_GEN_NONE)
+    }
+    if ((res = getResponse(a)) != E_PSI_GEN_NONE) {
         return res;
+    }
 
     int attr = a.getWord(2);
     attr = sibo_dattr[a.getWord(2) & 0xff];
@@ -454,13 +441,12 @@ devinfo(const char drive, Drive &dinfo)
     return res;
 }
 
-bool RFSV16::
-sendCommand(enum commands cc, BufferStore & data)
-{
-    if (status == E_PSI_FILE_DISC) {
+bool RFSV16::sendCommand(enum commands cc, BufferStore & data) {
+    if (status_ == E_PSI_FILE_DISC) {
         reconnect();
-        if (status == E_PSI_FILE_DISC)
+        if (status_ == E_PSI_FILE_DISC) {
             return false;
+        }
     }
 
     bool result;
@@ -468,29 +454,28 @@ sendCommand(enum commands cc, BufferStore & data)
     a.addWord(cc);
     a.addWord(data.getLen());
     a.addBuff(data);
-    result = skt->sendBufferStore(a);
+    result = socket_->sendBufferStore(a);
     if (!result) {
         reconnect();
-        result = skt->sendBufferStore(a);
-        if (!result)
-            status = E_PSI_FILE_DISC;
+        result = socket_->sendBufferStore(a);
+        if (!result) {
+            status_ = E_PSI_FILE_DISC;
+        }
     }
     return result;
 }
 
 
-Enum<RFSV::errs> RFSV16::
-getResponse(BufferStore & data)
-{
+Enum<RFSV::errs> RFSV16::getResponse(BufferStore & data) {
     // getWord(2) is the size field
     // which is the body of the response not counting the command (002a) and
     // the size word.
-    if (skt->getBufferStore(data) != 1) {
+    if (socket_->getBufferStore(data) != 1) {
         cerr << "RFSV16::getResponse: duff response. "
             "getBufferStore failed." << endl;
     } else if (data.getWord(0) == 0x2a &&
                data.getWord(2) == data.getLen()-4) {
-        Enum<RFSV::errs> ret = (enum errs)(int16_t)data.getWord(4);
+        Enum<RFSV::errs> ret = static_cast<enum errs>(static_cast<int16_t>(data.getWord(4)));
         data.discardFirstBytes(6);
         return ret;
     } else {
@@ -499,13 +484,11 @@ getResponse(BufferStore & data)
             data.getLen()-4 << " Result field:" <<
             data.getWord(4) << endl;
     }
-    status = E_PSI_FILE_DISC;
-    return status;
+    status_ = E_PSI_FILE_DISC;
+    return status_;
 }
 
-Enum<RFSV::errs> RFSV16::
-fread(const uint32_t handle, unsigned char * const buf, const uint32_t len, uint32_t &count)
-{
+Enum<RFSV::errs> RFSV16::fread(const uint32_t handle, unsigned char * const buf, const uint32_t len, uint32_t &count) {
     Enum<RFSV::errs> res;
     unsigned char *p = buf;
     long l;
@@ -525,11 +508,13 @@ fread(const uint32_t handle, unsigned char * const buf, const uint32_t len, uint
         a.addWord((len - count) > RFSV16_MAXDATALEN
                   ? RFSV16_MAXDATALEN
                   : (len - count));
-        if (!sendCommand(SIBO_FREAD, a))
+        if (!sendCommand(SIBO_FREAD, a)) {
             return E_PSI_FILE_DISC;
+        }
         if ((res = getResponse(a)) != E_PSI_GEN_NONE) {
-            if (res == E_PSI_FILE_EOF)
+            if (res == E_PSI_FILE_EOF) {
                 return E_PSI_GEN_NONE;
+            }
             return res;
         }
         if ((l = a.getLen()) > 0) {
@@ -541,9 +526,10 @@ fread(const uint32_t handle, unsigned char * const buf, const uint32_t len, uint
     return res;
 }
 
-Enum<RFSV::errs> RFSV16::
-fwrite(const uint32_t handle, const unsigned char * const buf, const uint32_t len, uint32_t &count)
-{
+Enum<RFSV::errs> RFSV16::fwrite(const uint32_t handle,
+                                const unsigned char *const buf,
+                                const uint32_t len,
+                                uint32_t &count) {
     Enum<RFSV::errs> res;
     const unsigned char *p = buf;
 
@@ -563,10 +549,12 @@ fwrite(const uint32_t handle, const unsigned char * const buf, const uint32_t le
             : (len - count);
         a.addWord(handle);
         a.addBytes(p, nbytes);
-        if (!sendCommand(SIBO_FWRITE, a))
+        if (!sendCommand(SIBO_FWRITE, a)) {
             return E_PSI_FILE_DISC;
-        if ((res = getResponse(a)) != E_PSI_GEN_NONE)
+        }
+        if ((res = getResponse(a)) != E_PSI_GEN_NONE) {
             return res;
+        }
 
         count += nbytes;
         p += nbytes;
@@ -574,9 +562,7 @@ fwrite(const uint32_t handle, const unsigned char * const buf, const uint32_t le
     return res;
 }
 
-Enum<RFSV::errs> RFSV16::
-copyFromPsion(const char *from, const char *to, void *ptr, cpCallback_t cb)
-{
+Enum<RFSV::errs> RFSV16::copyFromPsion(const char *from, const char *to, void *ptr, cpCallback_t cb) {
     Enum<RFSV::errs> res;
     uint32_t handle;
     uint32_t len;
@@ -592,31 +578,33 @@ copyFromPsion(const char *from, const char *to, void *ptr, cpCallback_t cb)
     do {
         unsigned char buf[RFSV_SENDLEN];
         if ((res = fread(handle, buf, sizeof(buf), len)) == E_PSI_GEN_NONE) {
-            if (len > 0)
-                op.write((char *)buf, len);
+            if (len > 0) {
+                op.write(reinterpret_cast<char *>(buf), static_cast<std::streamsize>(len));
+            }
             total += len;
-            if (cb && !cb(ptr, total))
+            if (cb && !cb(ptr, total)) {
                 res = E_PSI_FILE_CANCEL;
+            }
         }
     } while (len > 0 && (res == E_PSI_GEN_NONE));
 
     fclose(handle);
     op.close();
-    if (res == E_PSI_FILE_EOF)
+    if (res == E_PSI_FILE_EOF) {
         res = E_PSI_GEN_NONE;
+    }
     return res;
 }
 
-Enum<RFSV::errs> RFSV16::
-copyFromPsion(const char *from, int fd, cpCallback_t cb)
-{
+Enum<RFSV::errs> RFSV16::copyFromPsion(const char *from, int fd, cpCallback_t cb) {
     Enum<RFSV::errs> res;
     uint32_t handle;
     uint32_t len;
     uint32_t total = 0;
 
-    if ((res = fopen(P_FSHARE | P_FSTREAM, from, handle)) != E_PSI_GEN_NONE)
+    if ((res = fopen(P_FSHARE | P_FSTREAM, from, handle)) != E_PSI_GEN_NONE) {
         return res;
+    }
     do {
         unsigned char buf[RFSV_SENDLEN];
         if ((res = fread(handle, buf, sizeof(buf), len)) == E_PSI_GEN_NONE) {
@@ -624,41 +612,44 @@ copyFromPsion(const char *from, int fd, cpCallback_t cb)
                 // FIXME: return UNIX errors from this method.
                 ignore_value(write(fd, buf, len));
             total += len;
-            if (cb && !cb(NULL, total))
+            if (cb && !cb(NULL, total)) {
                 res = E_PSI_FILE_CANCEL;
+            }
         }
     } while (len > 0 && (res == E_PSI_GEN_NONE));
 
     fclose(handle);
-    if (res == E_PSI_FILE_EOF)
+    if (res == E_PSI_FILE_EOF) {
         res = E_PSI_GEN_NONE;
+    }
     return res;
 }
 
-Enum<RFSV::errs> RFSV16::
-copyToPsion(const char *from, const char *to, void *ptr, cpCallback_t cb)
-{
+Enum<RFSV::errs> RFSV16::copyToPsion(const char *from, const char *to, void *ptr, cpCallback_t cb) {
     uint32_t handle;
     uint32_t len = 0;
     uint32_t total = 0;
     Enum<RFSV::errs> res;
 
     ifstream ip(from);
-    if (!ip)
+    if (!ip) {
         return E_PSI_FILE_NXIST;
+    }
     res = fcreatefile(P_FSTREAM | P_FUPDATE, to, handle);
     if (res != E_PSI_GEN_NONE) {
         res = freplacefile(P_FSTREAM | P_FUPDATE, to, handle);
-        if (res != E_PSI_GEN_NONE)
+        if (res != E_PSI_GEN_NONE) {
             return res;
+        }
     }
     unsigned char *buff = new unsigned char[RFSV_SENDLEN];
     while (res == E_PSI_GEN_NONE && ip && !ip.eof()) {
-        ip.read((char *)buff, RFSV_SENDLEN);
+        ip.read(reinterpret_cast<char *>(buff), RFSV_SENDLEN);
         if ((res = fwrite(handle, buff, ip.gcount(), len)) == E_PSI_GEN_NONE) {
             total += len;
-            if (cb && !cb(ptr, total))
+            if (cb && !cb(ptr, total)) {
                 res = E_PSI_FILE_CANCEL;
+            }
         }
     }
     delete[]buff;
@@ -667,9 +658,7 @@ copyToPsion(const char *from, const char *to, void *ptr, cpCallback_t cb)
     return res;
 }
 
-Enum<RFSV::errs> RFSV16::
-copyOnPsion(const char *from, const char *to, void *ptr, cpCallback_t cb)
-{
+Enum<RFSV::errs> RFSV16::copyOnPsion(const char *from, const char *to, void *ptr, cpCallback_t cb) {
     uint32_t handle_from;
     uint32_t handle_to;
     uint32_t len;
@@ -677,13 +666,15 @@ copyOnPsion(const char *from, const char *to, void *ptr, cpCallback_t cb)
     uint32_t total = 0;
     Enum<RFSV::errs> res;
 
-    if ((res = fopen(P_FSHARE | P_FSTREAM, from, handle_from)) != E_PSI_GEN_NONE)
+    if ((res = fopen(P_FSHARE | P_FSTREAM, from, handle_from)) != E_PSI_GEN_NONE) {
         return res;
+    }
     res = fcreatefile(P_FSTREAM | P_FUPDATE, to, handle_to);
     if (res != E_PSI_GEN_NONE) {
         res = freplacefile(P_FSTREAM | P_FUPDATE, to, handle_to);
-        if (res != E_PSI_GEN_NONE)
+        if (res != E_PSI_GEN_NONE) {
             return res;
+        }
     }
     do {
         unsigned char buf[RFSV_SENDLEN];
@@ -691,22 +682,22 @@ copyOnPsion(const char *from, const char *to, void *ptr, cpCallback_t cb)
             if (len > 0) {
                 if ((res = fwrite(handle_to, buf, len, wlen)) == E_PSI_GEN_NONE) {
                     total += wlen;
-                    if (cb && !cb(ptr, total))
+                    if (cb && !cb(ptr, total)) {
                         res = E_PSI_FILE_CANCEL;
+                    }
                 }
             }
         }
     } while (len > 0 && wlen > 0 && (res == E_PSI_GEN_NONE));
     fclose(handle_from);
     fclose(handle_to);
-    if (res == E_PSI_FILE_EOF)
+    if (res == E_PSI_FILE_EOF) {
         res = E_PSI_GEN_NONE;
+    }
     return res;
 }
 
-Enum<RFSV::errs> RFSV16::
-pathtest(const char * const path)
-{
+Enum<RFSV::errs> RFSV16::pathtest(const char * const path) {
     string realName = convertSlash(path);
     BufferStore a;
     a.addStringT(realName.c_str());
@@ -714,14 +705,13 @@ pathtest(const char * const path)
     return getResponse(a);
 }
 
-Enum<RFSV::errs> RFSV16::
-fsetsize(uint32_t handle, uint32_t size)
-{
+Enum<RFSV::errs> RFSV16::fsetsize(uint32_t handle, uint32_t size) {
     BufferStore a;
     a.addWord(handle & 0xffff);
     a.addDWord(size);
-    if (!sendCommand(SIBO_FSETEOF, a))
+    if (!sendCommand(SIBO_FSETEOF, a)) {
         return E_PSI_FILE_DISC;
+    }
     return getResponse(a);
 }
 
@@ -730,9 +720,7 @@ fsetsize(uint32_t handle, uint32_t size)
  * exception: If seeking beyond eof, the gap
  * contains garbage instead of zeroes.
  */
-Enum<RFSV::errs> RFSV16::
-fseek(const uint32_t handle, const int32_t pos, const uint32_t mode, uint32_t &resultpos)
-{
+Enum<RFSV::errs> RFSV16::fseek(const uint32_t handle, const int32_t pos, const uint32_t mode, uint32_t &resultpos) {
     BufferStore a;
     Enum<RFSV::errs> res;
     uint32_t savpos = 0;
@@ -752,8 +740,9 @@ fseek(const uint32_t handle, const int32_t pos, const uint32_t mode, uint32_t &r
    ??no more?? 6 = text-rewind
 */
 
-    if ((mode < PSI_SEEK_SET) || (mode > PSI_SEEK_END))
+    if ((mode < PSI_SEEK_SET) || (mode > PSI_SEEK_END)) {
         return E_PSI_GEN_ARG;
+    }
 
     if ((mode == PSI_SEEK_CUR) && (pos >= 0)) {
         /* get and save current position */
@@ -761,10 +750,12 @@ fseek(const uint32_t handle, const int32_t pos, const uint32_t mode, uint32_t &r
         a.addWord(handle);
         a.addDWord(0);
         a.addWord(PSI_SEEK_CUR);
-        if (!sendCommand(SIBO_FSEEK, a))
+        if (!sendCommand(SIBO_FSEEK, a)) {
             return E_PSI_FILE_DISC;
-        if ((res = getResponse(a)) != E_PSI_GEN_NONE)
+        }
+        if ((res = getResponse(a)) != E_PSI_GEN_NONE) {
             return res;
+        }
         savpos = a.getDWord(0);
         if (pos == 0) {
             resultpos = savpos;
@@ -777,10 +768,12 @@ fseek(const uint32_t handle, const int32_t pos, const uint32_t mode, uint32_t &r
         a.addWord(handle);
         a.addDWord(0);
         a.addWord(PSI_SEEK_END);
-        if (!sendCommand(SIBO_FSEEK, a))
+        if (!sendCommand(SIBO_FSEEK, a)) {
             return E_PSI_FILE_DISC;
-        if ((res = getResponse(a)) != E_PSI_GEN_NONE)
+        }
+        if ((res = getResponse(a)) != E_PSI_GEN_NONE) {
             return res;
+        }
         savpos = a.getDWord(0);
         if (pos == 0) {
             resultpos = savpos;
@@ -791,10 +784,12 @@ fseek(const uint32_t handle, const int32_t pos, const uint32_t mode, uint32_t &r
     a.addWord(handle);
     a.addDWord(pos);
     a.addWord(mode);
-    if (!sendCommand(SIBO_FSEEK, a))
+    if (!sendCommand(SIBO_FSEEK, a)) {
         return E_PSI_FILE_DISC;
-    if ((res = getResponse(a)) != 0)
+    }
+    if ((res = getResponse(a)) != 0) {
         return res;
+    }
     realpos = a.getDWord(0);
     switch (mode) {
         case PSI_SEEK_SET:
@@ -811,25 +806,26 @@ fseek(const uint32_t handle, const int32_t pos, const uint32_t mode, uint32_t &r
     if (calcpos > realpos) {
         /* Beyond end of file */
         res = fsetsize(handle, calcpos);
-        if (res != E_PSI_GEN_NONE)
+        if (res != E_PSI_GEN_NONE) {
             return res;
+        }
         a.init();
         a.addWord(handle);
         a.addDWord(calcpos);
         a.addWord(PSI_SEEK_SET);
-        if (!sendCommand(SIBO_FSEEK, a))
+        if (!sendCommand(SIBO_FSEEK, a)) {
             return E_PSI_FILE_DISC;
-        if ((res = getResponse(a)) != 0)
+        }
+        if ((res = getResponse(a)) != 0) {
             return res;
+        }
         realpos = a.getDWord(0);
     }
     resultpos = realpos;
     return res;
 }
 
-Enum<RFSV::errs> RFSV16::
-mkdir(const char* dirName)
-{
+Enum<RFSV::errs> RFSV16::mkdir(const char* dirName) {
     string realName = convertSlash(dirName);
     BufferStore a;
     a.addStringT(realName.c_str());
@@ -837,9 +833,7 @@ mkdir(const char* dirName)
     return getResponse(a);
 }
 
-Enum<RFSV::errs> RFSV16::
-rmdir(const char *dirName)
-{
+Enum<RFSV::errs> RFSV16::rmdir(const char *dirName) {
     // EPOC16 doesn't provide an RMDIR command, so we fake it using DELETE (and a few little tweaks).
 
     // Rudimentary argument checking.
@@ -868,9 +862,7 @@ rmdir(const char *dirName)
     return remove(path.c_str());
 }
 
-Enum<RFSV::errs> RFSV16::
-rename(const char *oldName, const char *newName)
-{
+Enum<RFSV::errs> RFSV16::rename(const char *oldName, const char *newName) {
     string realOldName = convertSlash(oldName);
     string realNewName = convertSlash(newName);
     BufferStore a;
@@ -880,9 +872,7 @@ rename(const char *oldName, const char *newName)
     return getResponse(a);
 }
 
-Enum<RFSV::errs> RFSV16::
-remove(const char* psionName)
-{
+Enum<RFSV::errs> RFSV16::remove(const char* psionName) {
     string realName = convertSlash(psionName);
     BufferStore a;
     a.addStringT(realName.c_str());
@@ -891,44 +881,52 @@ remove(const char* psionName)
     return getResponse(a);
 }
 
-Enum<RFSV::errs> RFSV16::
-setVolumeName(const char drive , const char * const name)
-{
-// Not yet ...
+Enum<RFSV::errs> RFSV16::setVolumeName(const char drive , const char * const name) {
+    (void)drive;
+    (void)name;
+    // Not yet ...
     return E_PSI_GEN_FAIL;
 }
 
 /*
  * Translate SIBO attributes to standard attributes.
  */
-uint32_t RFSV16::
-attr2std(uint32_t attr)
-{
+uint32_t RFSV16::attr2std(uint32_t attr) {
     uint32_t res = 0;
 
     // Common attributes
-    if (!(attr & P_FAWRITE))
+    if (!(attr & P_FAWRITE)) {
         res |= PSI_A_RDONLY;
-    if (attr & P_FAHIDDEN)
+    }
+    if (attr & P_FAHIDDEN) {
         res |= PSI_A_HIDDEN;
-    if (attr & P_FASYSTEM)
+    }
+    if (attr & P_FASYSTEM) {
         res |= PSI_A_SYSTEM;
-    if (attr & P_FADIR)
+    }
+    if (attr & P_FADIR) {
         res |= PSI_A_DIR;
-    if (attr & P_FAMOD)
+    }
+    if (attr & P_FAMOD) {
         res |= PSI_A_ARCHIVE;
-    if (attr & P_FAVOLUME)
+    }
+    if (attr & P_FAVOLUME) {
         res |= PSI_A_VOLUME;
+    }
 
     // SIBO-specific
-    if (attr & P_FAREAD)
+    if (attr & P_FAREAD) {
         res |= PSI_A_READ;
-    if (attr & P_FAEXEC)
+    }
+    if (attr & P_FAEXEC) {
         res |= PSI_A_EXEC;
-    if (attr & P_FASTREAM)
+    }
+    if (attr & P_FASTREAM) {
         res |= PSI_A_STREAM;
-    if (attr & P_FATEXT)
+    }
+    if (attr & P_FATEXT) {
         res |= PSI_A_TEXT;
+    }
 
     // Do what we can for EPOC
     res |= PSI_A_NORMAL;
@@ -939,34 +937,42 @@ attr2std(uint32_t attr)
 /*
  * Translate standard attributes to SIBO attributes.
  */
-uint32_t RFSV16::
-std2attr(const uint32_t attr)
-{
+uint32_t RFSV16::std2attr(const uint32_t attr) {
     uint32_t res = 0;
 
     // Common attributes
-    if (!(attr & PSI_A_RDONLY))
+    if (!(attr & PSI_A_RDONLY)) {
         res |= P_FAWRITE;
-    if (attr & PSI_A_HIDDEN)
+    }
+    if (attr & PSI_A_HIDDEN) {
         res |= P_FAHIDDEN;
-    if (attr & PSI_A_SYSTEM)
+    }
+    if (attr & PSI_A_SYSTEM) {
         res |= P_FASYSTEM;
-    if (attr & PSI_A_DIR)
+    }
+    if (attr & PSI_A_DIR) {
         res |= P_FADIR;
-    if (attr & PSI_A_ARCHIVE)
+    }
+    if (attr & PSI_A_ARCHIVE) {
         res |= P_FAMOD;
-    if (attr & PSI_A_VOLUME)
+    }
+    if (attr & PSI_A_VOLUME) {
         res |= P_FAVOLUME;
+    }
 
     // SIBO-specific
-    if (attr & PSI_A_READ)
+    if (attr & PSI_A_READ) {
         res |= P_FAREAD;
-    if (attr & PSI_A_EXEC)
+    }
+    if (attr & PSI_A_EXEC) {
         res |= P_FAEXEC;
-    if (attr & PSI_A_STREAM)
+    }
+    if (attr & PSI_A_STREAM) {
         res |= P_FASTREAM;
-    if (attr & PSI_A_TEXT)
+    }
+    if (attr & PSI_A_TEXT) {
         res |= P_FATEXT;
+    }
 
     return res;
 }
