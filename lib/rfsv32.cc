@@ -494,8 +494,9 @@ Enum<RFSV::errs> RFSV32::copyFromPsion(const char *from, const char *to, void *p
         if ((res = fread(handle, buff, RFSV_SENDLEN, len)) == E_PSI_GEN_NONE) {
             op.write((char *)buff, len);
             total += len;
-            if (cb && !cb(ptr, total))
+            if (cb && !cb(ptr, total)) {
                 res = E_PSI_FILE_CANCEL;
+            }
         }
     } while ((len > 0) && (res == E_PSI_GEN_NONE));
     delete [] buff;
@@ -504,24 +505,24 @@ Enum<RFSV::errs> RFSV32::copyFromPsion(const char *from, const char *to, void *p
     return res;
 }
 
-Enum<RFSV::errs> RFSV32::
-copyFromPsion(const char *from, int fd, cpCallback_t cb)
-{
+Enum<RFSV::errs> RFSV32::copyFromPsion(const char *from, int fd, cpCallback_t cb) {
     Enum<RFSV::errs> res;
     uint32_t handle;
     uint32_t len;
     uint32_t total = 0;
 
-    if ((res = fopen(EPOC_OMODE_SHARE_READERS | EPOC_OMODE_BINARY, from, handle)) != E_PSI_GEN_NONE)
+    if ((res = fopen(EPOC_OMODE_SHARE_READERS | EPOC_OMODE_BINARY, from, handle)) != E_PSI_GEN_NONE) {
         return res;
+    }
     unsigned char *buff = new unsigned char[RFSV_SENDLEN];
     do {
         if ((res = fread(handle, buff, RFSV_SENDLEN, len)) == E_PSI_GEN_NONE) {
             // FIXME: return UNIX errors from this method.
             ignore_value(write(fd, buff, len));
             total += len;
-            if (cb && !cb(NULL, total))
+            if (cb && !cb(NULL, total)) {
                 res = E_PSI_FILE_CANCEL;
+            }
         }
     } while ((len > 0) && (res == E_PSI_GEN_NONE));
     delete [] buff;
@@ -529,20 +530,20 @@ copyFromPsion(const char *from, int fd, cpCallback_t cb)
     return res;
 }
 
-Enum<RFSV::errs> RFSV32::
-copyToPsion(const char *from, const char *to, void *ptr, cpCallback_t cb)
-{
+Enum<RFSV::errs> RFSV32::copyToPsion(const char *from, const char *to, void *ptr, cpCallback_t cb) {
     uint32_t handle;
     Enum<RFSV::errs> res;
 
     ifstream ip(from);
-    if (!ip)
+    if (!ip) {
         return E_PSI_FILE_NXIST;
+    }
     res = fcreatefile(EPOC_OMODE_BINARY | EPOC_OMODE_SHARE_EXCLUSIVE | EPOC_OMODE_READ_WRITE, to, handle);
     if (res != E_PSI_GEN_NONE) {
         res = freplacefile(EPOC_OMODE_BINARY | EPOC_OMODE_SHARE_EXCLUSIVE | EPOC_OMODE_READ_WRITE, to, handle);
-        if (res != E_PSI_GEN_NONE)
+        if (res != E_PSI_GEN_NONE) {
             return res;
+        }
     }
     unsigned char *buff = new unsigned char[RFSV_SENDLEN];
     uint32_t total = 0;
@@ -551,8 +552,9 @@ copyToPsion(const char *from, const char *to, void *ptr, cpCallback_t cb)
         ip.read((char *)buff, RFSV_SENDLEN);
         if ((res = fwrite(handle, buff, ip.gcount(), len)) == E_PSI_GEN_NONE) {
             total += len;
-            if (cb && !cb(ptr, total))
+            if (cb && !cb(ptr, total)) {
                 res = E_PSI_FILE_CANCEL;
+            }
         }
     }
     fclose(handle);
@@ -561,19 +563,18 @@ copyToPsion(const char *from, const char *to, void *ptr, cpCallback_t cb)
     return res;
 }
 
-Enum<RFSV::errs> RFSV32::
-copyOnPsion(const char *from, const char *to, void *ptr, cpCallback_t cb)
-{
+Enum<RFSV::errs> RFSV32::copyOnPsion(const char *from, const char *to, void *ptr, cpCallback_t cb) {
     uint32_t handle_from;
     uint32_t handle_to;
     PlpDirent from_e;
     Enum<RFSV::errs> res;
 
-    if ((res = fgeteattr(from, from_e)) != E_PSI_GEN_NONE)
+    if ((res = fgeteattr(from, from_e)) != E_PSI_GEN_NONE) {
         return res;
-    if ((res = fopen(EPOC_OMODE_SHARE_READERS | EPOC_OMODE_BINARY, from, handle_from))
-        != E_PSI_GEN_NONE)
+    }
+    if ((res = fopen(EPOC_OMODE_SHARE_READERS | EPOC_OMODE_BINARY, from, handle_from)) != E_PSI_GEN_NONE) {
         return res;
+    }
     res = fcreatefile(EPOC_OMODE_BINARY | EPOC_OMODE_SHARE_EXCLUSIVE | EPOC_OMODE_READ_WRITE, to, handle_to);
     if (res != E_PSI_GEN_NONE) {
         res = freplacefile(EPOC_OMODE_BINARY | EPOC_OMODE_SHARE_EXCLUSIVE | EPOC_OMODE_READ_WRITE, to, handle_to);
@@ -589,26 +590,31 @@ copyOnPsion(const char *from, const char *to, void *ptr, cpCallback_t cb)
         b.addDWord(RFSV_SENDLEN * 10);
         b.addDWord(handle_to);
         b.addDWord(handle_from);
-        if (!sendCommand(READ_WRITE_FILE, b))
+        if (!sendCommand(READ_WRITE_FILE, b)) {
             return E_PSI_FILE_DISC;
+        }
         res = getResponse(b);
-        if (res != E_PSI_GEN_NONE)
+        if (res != E_PSI_GEN_NONE) {
             break;
+        }
         if (b.getLen() != 4) {
             res = E_PSI_GEN_FAIL;
             break;
         }
         uint32_t len = b.getDWord(0);
         total += len;
-        if (cb && !cb(ptr, total))
+        if (cb && !cb(ptr, total)) {
             res = E_PSI_FILE_CANCEL;
-        if (len != (RFSV_SENDLEN * 10))
+        }
+        if (len != (RFSV_SENDLEN * 10)) {
             break;
+        }
     }
     fclose(handle_from);
     fclose(handle_to);
-    if (res != E_PSI_GEN_NONE)
+    if (res != E_PSI_GEN_NONE) {
         remove(to);
+    }
     return res;
 }
 
@@ -617,8 +623,9 @@ Enum<RFSV::errs> RFSV32::pathtest(const char * const name) {
     string n = convertSlash(name);
     a.addWord(n.size());
     a.addString(n.c_str());
-    if (!sendCommand(PATH_TEST, a))
+    if (!sendCommand(PATH_TEST, a)) {
         return E_PSI_FILE_DISC;
+    }
     return getResponse(a);
 }
 
@@ -667,10 +674,12 @@ Enum<RFSV::errs> RFSV32::fseek(const uint32_t handle, const int32_t pos, const u
         a.addDWord(0);
         a.addDWord(handle);
         a.addDWord(PSI_SEEK_CUR);
-        if (!sendCommand(SEEK_FILE, a))
+        if (!sendCommand(SEEK_FILE, a)) {
             return E_PSI_FILE_DISC;
-        if ((res = getResponse(a)) != E_PSI_GEN_NONE)
+        }
+        if ((res = getResponse(a)) != E_PSI_GEN_NONE) {
             return res;
+        }
         savpos = a.getDWord(0);
         if (mypos == 0) {
             resultpos = savpos;
@@ -683,10 +692,12 @@ Enum<RFSV::errs> RFSV32::fseek(const uint32_t handle, const int32_t pos, const u
         a.addDWord(0);
         a.addDWord(handle);
         a.addDWord(PSI_SEEK_END);
-        if (!sendCommand(SEEK_FILE, a))
+        if (!sendCommand(SEEK_FILE, a)) {
             return E_PSI_FILE_DISC;
-        if ((res = getResponse(a)) != E_PSI_GEN_NONE)
+        }
+        if ((res = getResponse(a)) != E_PSI_GEN_NONE) {
             return res;
+        }
         savpos = a.getDWord(0);
         if (mypos == 0) {
             resultpos = savpos;
@@ -696,10 +707,12 @@ Enum<RFSV::errs> RFSV32::fseek(const uint32_t handle, const int32_t pos, const u
         a.init();
         a.addDWord(handle);
         a.addDWord(savpos + mypos);
-        if (!sendCommand(SET_SIZE, a))
+        if (!sendCommand(SET_SIZE, a)) {
             return E_PSI_FILE_DISC;
-        if ((res = getResponse(a)) != E_PSI_GEN_NONE)
+        }
+        if ((res = getResponse(a)) != E_PSI_GEN_NONE) {
             return res;
+        }
         mypos = 0;
         a.init();
     }
@@ -707,10 +720,12 @@ Enum<RFSV::errs> RFSV32::fseek(const uint32_t handle, const int32_t pos, const u
     a.addDWord(mypos);
     a.addDWord(handle);
     a.addDWord(mode);
-    if (!sendCommand(SEEK_FILE, a))
+    if (!sendCommand(SEEK_FILE, a)) {
         return E_PSI_FILE_DISC;
-    if ((res = getResponse(a)) != E_PSI_GEN_NONE)
+    }
+    if ((res = getResponse(a)) != E_PSI_GEN_NONE) {
         return res;
+    }
     realpos = a.getDWord(0);
     switch (mode) {
         case PSI_SEEK_SET:
@@ -729,54 +744,56 @@ Enum<RFSV::errs> RFSV32::fseek(const uint32_t handle, const int32_t pos, const u
         a.init();
         a.addDWord(handle);
         a.addDWord(calcpos);
-        if (!sendCommand(SET_SIZE, a))
+        if (!sendCommand(SET_SIZE, a)) {
             return E_PSI_FILE_DISC;
-        if ((res = getResponse(a)) != E_PSI_GEN_NONE)
+        }
+        if ((res = getResponse(a)) != E_PSI_GEN_NONE) {
             return res;
+        }
         a.addDWord(calcpos);
         a.addDWord(handle);
         a.addDWord(PSI_SEEK_SET);
-        if (!sendCommand(SEEK_FILE, a))
+        if (!sendCommand(SEEK_FILE, a)) {
             return E_PSI_FILE_DISC;
-        if ((res = getResponse(a)) != E_PSI_GEN_NONE)
+        }
+        if ((res = getResponse(a)) != E_PSI_GEN_NONE) {
             return res;
+        }
         realpos = a.getDWord(0);
     }
     resultpos = realpos;
     return res;
 }
 
-Enum<RFSV::errs> RFSV32::
-mkdir(const char *name)
-{
+Enum<RFSV::errs> RFSV32::mkdir(const char *name) {
     BufferStore a;
     string n = convertSlash(name);
-    if (n.find_last_of('\\') != (n.size() - 1))
+    if (n.find_last_of('\\') != (n.size() - 1)) {
         n += '\\';
+    }
     a.addWord(n.size());
     a.addString(n.c_str());
-    if (!sendCommand(MK_DIR_ALL, a))
+    if (!sendCommand(MK_DIR_ALL, a)) {
         return E_PSI_FILE_DISC;
+    }
     return getResponse(a);
 }
 
-Enum<RFSV::errs> RFSV32::
-rmdir(const char *name)
-{
+Enum<RFSV::errs> RFSV32::rmdir(const char *name) {
     BufferStore a;
     string n = convertSlash(name);
-    if (n.find_last_of('\\') != (n.size() - 1))
+    if (n.find_last_of('\\') != (n.size() - 1)) {
         n += '\\';
+    }
     a.addWord(n.size());
     a.addString(n.c_str());
-    if (!sendCommand(RM_DIR, a))
+    if (!sendCommand(RM_DIR, a)) {
         return E_PSI_FILE_DISC;
+    }
     return getResponse(a);
 }
 
-Enum<RFSV::errs> RFSV32::
-rename(const char *oldname, const char *newname)
-{
+Enum<RFSV::errs> RFSV32::rename(const char *oldname, const char *newname) {
     BufferStore a;
     string on = convertSlash(oldname);
     string nn = convertSlash(newname);
@@ -784,32 +801,31 @@ rename(const char *oldname, const char *newname)
     a.addString(on.c_str());
     a.addWord(nn.size());
     a.addString(nn.c_str());
-    if (!sendCommand(RENAME, a))
+    if (!sendCommand(RENAME, a)) {
         return E_PSI_FILE_DISC;
+    }
     return getResponse(a);
 }
 
-Enum<RFSV::errs> RFSV32::
-remove(const char *name)
-{
+Enum<RFSV::errs> RFSV32::remove(const char *name) {
     BufferStore a;
     string n = convertSlash(name);
     a.addWord(n.size());
     a.addString(n.c_str());
-    if (!sendCommand(DELETE, a))
+    if (!sendCommand(DELETE, a)) {
         return E_PSI_FILE_DISC;
+    }
     return getResponse(a);
 }
 
-Enum<RFSV::errs> RFSV32::
-setVolumeName(const char drive , const char * const name)
-{
+Enum<RFSV::errs> RFSV32::setVolumeName(const char drive , const char * const name) {
     BufferStore a;
     a.addDWord(toupper(drive) - 'A');
     a.addWord(strlen(name));
     a.addStringT(name);
-    if (!sendCommand(SET_VOLUME_LABEL, a))
+    if (!sendCommand(SET_VOLUME_LABEL, a)) {
         return E_PSI_FILE_DISC;
+    }
     return getResponse(a);
 }
 
@@ -860,9 +876,7 @@ static enum RFSV::errs e2psi[] = {
     RFSV::E_PSI_GEN_NONE
 };
 
-Enum<RFSV::errs> RFSV32::
-err2psierr(int32_t istatus)
-{
+Enum<RFSV::errs> RFSV32::err2psierr(int32_t istatus) {
     if ((istatus > E_EPOC_NONE) || (istatus < E_EPOC_DIR_FULL)) {
         cerr << "FATAL: invalid error-code" << endl;
         cerr << "status: " << istatus << " " << hex << istatus << endl;
@@ -875,32 +889,39 @@ err2psierr(int32_t istatus)
 /*
  * Translate EPOC attributes to standard attributes.
  */
-uint32_t RFSV32::
-attr2std(const uint32_t attr)
-{
+uint32_t RFSV32::attr2std(const uint32_t attr) {
     long res = 0;
 
     // Common attributes
-    if (attr & EPOC_ATTR_RONLY)
+    if (attr & EPOC_ATTR_RONLY) {
         res |= PSI_A_RDONLY;
-    if (attr & EPOC_ATTR_HIDDEN)
+    }
+    if (attr & EPOC_ATTR_HIDDEN) {
         res |= PSI_A_HIDDEN;
-    if (attr & EPOC_ATTR_SYSTEM)
+    }
+    if (attr & EPOC_ATTR_SYSTEM) {
         res |= PSI_A_SYSTEM;
-    if (attr & EPOC_ATTR_DIRECTORY)
+    }
+    if (attr & EPOC_ATTR_DIRECTORY) {
         res |= PSI_A_DIR;
-    if (attr & EPOC_ATTR_ARCHIVE)
+    }
+    if (attr & EPOC_ATTR_ARCHIVE) {
         res |= PSI_A_ARCHIVE;
-    if (attr & EPOC_ATTR_VOLUME)
+    }
+    if (attr & EPOC_ATTR_VOLUME) {
         res |= PSI_A_VOLUME;
+    }
 
     // EPOC-specific
-    if (attr & EPOC_ATTR_NORMAL)
+    if (attr & EPOC_ATTR_NORMAL) {
         res |= PSI_A_NORMAL;
-    if (attr & EPOC_ATTR_TEMPORARY)
+    }
+    if (attr & EPOC_ATTR_TEMPORARY) {
         res |= PSI_A_TEMP;
-    if (attr & EPOC_ATTR_COMPRESSED)
+    }
+    if (attr & EPOC_ATTR_COMPRESSED) {
         res |= PSI_A_COMPRESSED;
+    }
 
     // Do what we can for SIBO
     res |= PSI_A_READ;
@@ -911,31 +932,38 @@ attr2std(const uint32_t attr)
 /*
  * Translate standard attributes to EPOC attributes.
  */
-uint32_t RFSV32::
-std2attr(const uint32_t attr)
-{
+uint32_t RFSV32::std2attr(const uint32_t attr) {
     long res = 0;
     // Common attributes
-    if (attr & PSI_A_RDONLY)
+    if (attr & PSI_A_RDONLY) {
         res |= EPOC_ATTR_RONLY;
-    if (attr & PSI_A_HIDDEN)
+    }
+    if (attr & PSI_A_HIDDEN) {
         res |= EPOC_ATTR_HIDDEN;
-    if (attr & PSI_A_SYSTEM)
+    }
+    if (attr & PSI_A_SYSTEM) {
         res |= EPOC_ATTR_SYSTEM;
-    if (attr & PSI_A_DIR)
+    }
+    if (attr & PSI_A_DIR) {
         res |= EPOC_ATTR_DIRECTORY;
-    if (attr & PSI_A_ARCHIVE)
+    }
+    if (attr & PSI_A_ARCHIVE) {
         res |= EPOC_ATTR_ARCHIVE;
-    if (attr & PSI_A_VOLUME)
+    }
+    if (attr & PSI_A_VOLUME) {
         res |= EPOC_ATTR_VOLUME;
+    }
 
     // EPOC-specific
-    if (attr & PSI_A_NORMAL)
+    if (attr & PSI_A_NORMAL) {
         res |= EPOC_ATTR_NORMAL;
-    if (attr & PSI_A_TEMP)
+    }
+    if (attr & PSI_A_TEMP) {
         res |= EPOC_ATTR_TEMPORARY;
-    if (attr & PSI_A_COMPRESSED)
+    }
+    if (attr & PSI_A_COMPRESSED) {
         res |= EPOC_ATTR_COMPRESSED;
+    }
 
     return res;
 }
