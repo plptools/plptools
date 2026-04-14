@@ -25,4 +25,4 @@ namespace uuid {
 
 extern std::string uuid4();
 
-};
+}

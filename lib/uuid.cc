@@ -23,6 +23,7 @@
 
 #include <array>
 #include <cstdint>
+#include <cstdio>
 
 constexpr size_t kUUID4Size = 16;
 
