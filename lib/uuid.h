@@ -21,4 +21,8 @@
 
 #include <string>
 
-extern std::string generate_uuid4();
+namespace uuid {
+
+extern std::string uuid4();
+
+};

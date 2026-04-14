@@ -40,7 +40,7 @@ std::unique_ptr<DeviceConfiguration> DeviceConfiguration::deserialize(const std:
 }
 
 DeviceConfiguration::DeviceConfiguration()
-: id_(generate_uuid4())
+: id_(uuid::uuid4())
 , name_(_("My Psion")) {
 }
 

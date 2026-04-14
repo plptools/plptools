@@ -22,10 +22,11 @@
 #include "uuid.h"
 
 #include <array>
+#include <cstdint>
 
 constexpr size_t kUUID4Size = 16;
 
-std::string generate_uuid4() {
+std::string uuid::uuid4() {
     std::array<uint8_t, kUUID4Size> b;
 
     FILE* f = fopen("/dev/urandom", "rb");

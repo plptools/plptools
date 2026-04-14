@@ -30,7 +30,7 @@
 #include "uuid.h"
 
 TEST_CASE("DeviceConfiguration accessors") {
-    std::string id = generate_uuid4();
+    std::string id = uuid::uuid4();
     DeviceConfiguration configuration(id, "My Psion");
     CHECK(configuration.id() == id);
     CHECK(configuration.name() == "My Psion");
