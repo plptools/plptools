@@ -48,7 +48,11 @@
 #endif
 #include <getopt.h>
 
+#if FUSE_USE_VERSION >= 30
 #include <fuse3/fuse_lowlevel.h>
+#else
+#include <fuse/fuse_lowlevel.h>
+#endif
 
 using namespace std;
 
@@ -362,10 +366,15 @@ static struct option opts[] = {
 int fuse(int argc, char *argv[])
 {
     struct fuse_args args = FUSE_ARGS_INIT(argc, argv);
+#if FUSE_USE_VERSION >= 30
     struct fuse_cmdline_opts opts;
     struct fuse *fp;
+#else
+    struct fuse_chan *ch;
+    char *mountpoint;
+#endif
     int err = -1, foreground;
-
+#if FUSE_USE_VERSION >= 30
     if (fuse_parse_cmdline(&args, &opts) != -1) {
         if (opts.show_help) {
             printf("usage: %s [options] <mountpoint>\n\n", argv[0]);
@@ -396,8 +405,19 @@ int fuse(int argc, char *argv[])
             fuse_unmount(fp);
         }
     }
-    fuse_opt_free_args(&args);
     err_out:
+#else  // fuse 2
+    if (fuse_parse_cmdline(&args, &mountpoint, NULL, &foreground) != -1 &&
+        (ch = fuse_mount(mountpoint, &args)) != NULL) {
+        if (fuse_daemonize(foreground) != -1) {
+            struct fuse *fp = fuse_new(ch, &args, &plp_oper, sizeof(plp_oper), NULL);
+            if (fp != NULL)
+                err = fuse_loop(fp);
+        }
+        fuse_unmount(mountpoint, ch);
+    }
+#endif
+    fuse_opt_free_args(&args);
     return err ? 1 : 0;
 }
 
