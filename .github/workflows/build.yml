@@ -36,6 +36,7 @@ jobs:
             env:
               ASAN: "yes"
             setup: |
+              apt-get update -y
               apt-get -y install libreadline-dev pkg-config gettext autopoint libfuse-dev libattr1-dev
 
           - name: ubuntu-26.04-arm64
@@ -44,6 +45,7 @@ jobs:
             env:
               ASAN: "yes"
             setup: |
+              apt-get update -y
               apt-get -y install libreadline-dev pkg-config gettext autopoint libfuse-dev libattr1-dev
 
           - name: debian-bookworm
