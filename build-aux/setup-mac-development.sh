@@ -43,7 +43,7 @@ export PATH="$(brew --prefix m4)/bin:$PATH"
 
 # Configure.
 export CPPFLAGS="-I$(brew --prefix gettext)/include -I$(brew --prefix readline)/include"
-export LDFLAGS="-L$(brew --prefix gettext)/lib -L$(brew --prefix readline)/lib"
+export LDFLAGS="-L$(brew --prefix gettext)/lib -L$(brew --prefix readline)/lib -F/Library/Filesystems/macfuse.fs/Contents/Frameworks"
 ./configure \
     --prefix="$BUILD_DIRECTORY" \
     CFLAGS="-g -O0" \
