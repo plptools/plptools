@@ -59,7 +59,7 @@ std::unique_ptr<std::unordered_map<std::string, std::string>> ini::deserialize(c
         kValueStart,
         kValue,
         kValueWhitespace,
-        kNewline,
+        kValueEnd,
     };
 
     ParserState state = ParserState::kKeyStart;
@@ -95,7 +95,7 @@ std::unique_ptr<std::unordered_map<std::string, std::string>> ini::deserialize(c
             break;
         case ParserState::kValue:
             if (c == '\r') {
-                state = ParserState::kNewline;
+                state = ParserState::kValueEnd;
             } else if (c == '\n') {
                 result[currentKey] = currentValue;
                 currentKey = "";
@@ -112,7 +112,7 @@ std::unique_ptr<std::unordered_map<std::string, std::string>> ini::deserialize(c
         case ParserState::kValueWhitespace:
             if (c == '\r') {
                 currentValueWhitespace = "";
-                state = ParserState::kNewline;
+                state = ParserState::kValueEnd;
             } else if (c == '\n') {
                 result[currentKey] = currentValue;
                 currentKey = "";
@@ -128,7 +128,7 @@ std::unique_ptr<std::unordered_map<std::string, std::string>> ini::deserialize(c
                 state = ParserState::kValue;
             }
             break;
-        case ParserState::kNewline:
+        case ParserState::kValueEnd:
             if (c == '\n') {
                 result[currentKey] = currentValue;
                 currentKey = "";
