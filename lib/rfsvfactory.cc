@@ -33,28 +33,34 @@
 using namespace std;
 
 ENUM_DEFINITION_BEGIN(RFSVFactory::errs, RFSVFactory::FACERR_NONE)
-    stringRep.add(RFSVFactory::FACERR_NONE,           N_("no error"));
-    stringRep.add(RFSVFactory::FACERR_COULD_NOT_SEND, N_("could not send version request"));
-    stringRep.add(RFSVFactory::FACERR_AGAIN,          N_("try again"));
-    stringRep.add(RFSVFactory::FACERR_NOPSION,        N_("no EPOC device connected"));
-    stringRep.add(RFSVFactory::FACERR_PROTVERSION,    N_("wrong protocol version"));
-    stringRep.add(RFSVFactory::FACERR_NORESPONSE,     N_("no response from ncpd"));
+    stringRep.add(RFSVFactory::FACERR_NONE,               N_("no error"));
+    stringRep.add(RFSVFactory::FACERR_COULD_NOT_SEND,     N_("could not send version request"));
+    stringRep.add(RFSVFactory::FACERR_AGAIN,              N_("try again"));
+    stringRep.add(RFSVFactory::FACERR_NOPSION,            N_("no EPOC device connected"));
+    stringRep.add(RFSVFactory::FACERR_PROTVERSION,        N_("wrong protocol version"));
+    stringRep.add(RFSVFactory::FACERR_NORESPONSE,         N_("no response from ncpd"));
+    stringRep.add(RFSVFactory::FACERR_CONNECTION_FAILURE, N_("could not connect to ncpd"));
 ENUM_DEFINITION_END(RFSVFactory::errs)
 
 RFSVFactory::RFSVFactory(const std::string &host, int port)
 : host_(host)
 , port_(port)
-, serNum_(0)
-, error_(FACERR_NONE) {}
+, serNum_(0) {}
 
 RFSVFactory::~RFSVFactory() {
 }
 
-RFSV* RFSVFactory::create(bool reconnect) {
+RFSV* RFSVFactory::create(bool reconnect, Enum<errs> *error) {
+
+    if (error) {
+        *error = FACERR_NONE;
+    }
 
     auto socket = std::make_unique<TCPSocket>();
     if (!socket->connect(host_.c_str(), port_)) {
-        cout << _("could not connect to ncpd") << endl;
+        if (error) {
+            *error = FACERR_CONNECTION_FAILURE;
+        }
         return nullptr;
     }
 
@@ -64,16 +70,19 @@ RFSV* RFSVFactory::create(bool reconnect) {
     // daemon, and the relevant RFSV module will also announce itself.
 
     BufferStore a;
-    error_ = FACERR_NONE;
     a.addStringT("NCP$INFO");
     if (!socket->sendBufferStore(a)) {
-        if (!reconnect)
-            error_ = FACERR_COULD_NOT_SEND;
-        else {
+        if (!reconnect) {
+            if (error) {
+                *error = FACERR_COULD_NOT_SEND;
+            }
+        } else {
             socket->closeSocket();
             serNum_ = 0;
             socket->reconnect();
-            error_ = FACERR_AGAIN;
+            if (error) {
+                *error = FACERR_AGAIN;
+            }
         }
         return NULL;
     }
@@ -88,13 +97,19 @@ RFSV* RFSVFactory::create(bool reconnect) {
             socket->closeSocket();
             serNum_ = 0;
             socket->reconnect();
-            error_ = FACERR_NOPSION;
+            if (error) {
+                *error = FACERR_NOPSION;
+            }
             return NULL;
         }
         // Invalid protocol version
-        error_ = FACERR_PROTVERSION;
+        if (error) {
+            *error = FACERR_PROTVERSION;
+        }
     } else
-        error_ = FACERR_NORESPONSE;
+        if (error) {
+            *error = FACERR_NORESPONSE;
+        }
 
     return NULL;
 }

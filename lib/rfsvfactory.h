@@ -22,6 +22,7 @@
 #pragma once
 
 #include "rfsv.h"
+#include <cstddef>
 
 class TCPSocket;
 
@@ -41,7 +42,8 @@ public:
         FACERR_AGAIN = 2,
         FACERR_NOPSION = 3,
         FACERR_PROTVERSION = 4,
-        FACERR_NORESPONSE = 5
+        FACERR_NORESPONSE = 5,
+        FACERR_CONNECTION_FAILURE = 6,
     };
 
     /**
@@ -60,25 +62,15 @@ public:
     /**
     * Creates a new @ref RFSV instance.
     *
-    * @param reconnect Set to true, if automatic reconnect
-    * should be performed on failure.
+    * @param reconnect Set to true, if automatic reconnect should be performed on failure.
+    * @param error Out parameter; set to the error on failure if non-NULL.
     *
-    * @returns A pointer to a newly created rfsv instance or
-    * NULL on failure.
+    * @returns A pointer to a newly created @ref RFSV instance or NULL on failure.
     */
-    virtual RFSV* create(bool);
-
-    /**
-    * Retrieve an error code.
-    *
-    * @returns The error code, in case @ref create has
-    * failed, 0 otherwise.
-    */
-    virtual Enum<errs> getError() { return error_; }
+    virtual RFSV* create(bool, Enum<errs> *error = nullptr);
 
 private:
     std::string host_;
     int port_;
     int serNum_;
-    Enum<errs> error_;
 };

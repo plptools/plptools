@@ -127,8 +127,9 @@ int main(int argc, char **argv) {
                 break;
         }
     }
-    if (optind == argc)
+    if (optind == argc) {
         ftpHeader();
+    }
 
     skt2 = new TCPSocket();
     if (!skt2->connect(host.c_str(), sockNum)) {
@@ -137,7 +138,9 @@ int main(int argc, char **argv) {
     }
     auto rf = std::make_unique<RFSVFactory>(host, sockNum);
     auto rp = std::make_unique<RPCSFactory>(skt2);
-    a = rf->create(false);
+
+    Enum<RFSVFactory::errs> error;
+    a = rf->create(false, &error);
     r = rp->create(false);
     rclipSocket = new TCPSocket();
     rclipSocket->connect(NULL, sockNum);
@@ -157,7 +160,7 @@ int main(int argc, char **argv) {
             delete rc;
         }
     } else {
-        cerr << "plpftp: " << rf->getError() << endl;
+        cerr << "plpftp: " << error << endl;
         status = 1;
     }
     return status;
