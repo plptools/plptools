@@ -47,8 +47,6 @@ public:
     /**
     * Constructs a RFSVFactory.
     *
-    * Does not take ownership of the socket.
-    *
     * @param host The host be used for connecting to the ncpd daemon.
     * @param port The port be used for connecting to the ncpd daemon.
     */
