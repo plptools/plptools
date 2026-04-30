@@ -72,5 +72,4 @@ public:
 private:
     std::string host_;
     int port_;
-    int serNum_;
 };

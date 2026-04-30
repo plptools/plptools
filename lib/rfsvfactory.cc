@@ -44,8 +44,7 @@ ENUM_DEFINITION_END(RFSVFactory::errs)
 
 RFSVFactory::RFSVFactory(const std::string &host, int port)
 : host_(host)
-, port_(port)
-, serNum_(0) {}
+, port_(port) {}
 
 RFSVFactory::~RFSVFactory() {
 }
@@ -78,7 +77,6 @@ RFSV* RFSVFactory::create(bool reconnect, Enum<errs> *error) {
             }
         } else {
             socket->closeSocket();
-            serNum_ = 0;
             socket->reconnect();
             if (error) {
                 *error = FACERR_AGAIN;
@@ -95,7 +93,6 @@ RFSV* RFSVFactory::create(bool reconnect, Enum<errs> *error) {
         }
         if ((a.getLen() > 8) && !strncmp(a.getString(), "No Psion", 8)) {
             socket->closeSocket();
-            serNum_ = 0;
             socket->reconnect();
             if (error) {
                 *error = FACERR_NOPSION;
