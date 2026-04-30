@@ -49,8 +49,8 @@ public:
     *
     * Does not take ownership of the socket.
     *
-    * @param skt The socket to be used for connecting
-    * to the ncpd daemon.
+    * @param host The host be used for connecting to the ncpd daemon.
+    * @param port The port be used for connecting to the ncpd daemon.
     */
     RFSVFactory(const std::string &host, int port);
 
