@@ -44,9 +44,17 @@ TEST_CASE("parse_ini") {
         CHECK(contents->empty());
     }
 
-    SUBCASE("corrupt") {
+    SUBCASE("corrupt fails") {
         REQUIRE(ini::deserialize("broken") == nullptr);
         REQUIRE(ini::deserialize("a=b\nbroken") == nullptr);
+    }
+
+    SUBCASE("missing key fails") {
+        REQUIRE(ini::deserialize("=value\n") == nullptr);
+    }
+
+    SUBCASE("non-alpha key fails") {
+        REQUIRE(ini::deserialize("some2=value\n") == nullptr);
     }
 
     SUBCASE("single value") {

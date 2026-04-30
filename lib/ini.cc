@@ -66,9 +66,14 @@ std::unique_ptr<std::unordered_map<std::string, std::string>> ini::deserialize(c
     for (char c : contents) {
         switch (state) {
         case ParserState::kKeyStart:
-            if (!std::isspace(c)) {
+            if (std::isspace(c)) {
+                // Ignore leading whitespace.
+                continue;
+            } else if (std::isalpha(static_cast<unsigned char>(c))) {
                 currentKey += c;
                 state = ParserState::kKey;
+            } else {
+                return nullptr;
             }
             break;
         case ParserState::kKey:
@@ -76,8 +81,10 @@ std::unique_ptr<std::unordered_map<std::string, std::string>> ini::deserialize(c
                 state = ParserState::kValueStart;
             } else if (std::isspace(c)) {
                 state = ParserState::kKeyEnd;
-            } else {
+            } else if (std::isalpha(static_cast<unsigned char>(c))) {
                 currentKey += c;
+            } else {
+                return nullptr;
             }
             break;
         case ParserState::kKeyEnd:
