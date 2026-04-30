@@ -21,6 +21,7 @@
 #include "config.h"
 
 #include <cli_utils.h>
+#include <memory>
 #include <rfsv.h>
 #include <rfsvfactory.h>
 #include <rpcs.h>
@@ -91,7 +92,6 @@ void ftpHeader() {
 }
 
 int main(int argc, char **argv) {
-    TCPSocket *skt;
     TCPSocket *skt2;
     RFSV *a;
     RPCS *r;
@@ -130,18 +130,13 @@ int main(int argc, char **argv) {
     if (optind == argc)
         ftpHeader();
 
-    skt = new TCPSocket();
-    if (!skt->connect(host.c_str(), sockNum)) {
-        cout << _("plpftp: could not connect to ncpd") << endl;
-        return 1;
-    }
     skt2 = new TCPSocket();
     if (!skt2->connect(host.c_str(), sockNum)) {
         cout << _("plpftp: could not connect to ncpd") << endl;
         return 1;
     }
-    RFSVFactory *rf = new RFSVFactory(skt);
-    RPCSFactory *rp = new RPCSFactory(skt2);
+    auto rf = std::make_unique<RFSVFactory>(host, sockNum);
+    auto rp = std::make_unique<RPCSFactory>(skt2);
     a = rf->create(false);
     r = rp->create(false);
     rclipSocket = new TCPSocket();
@@ -155,7 +150,6 @@ int main(int argc, char **argv) {
         status = f.session(*a, *r, *rc, *rclipSocket, args);
         delete r;
         delete a;
-        delete skt;
         delete skt2;
         if (rclipSocket)
             delete rclipSocket;
@@ -166,7 +160,5 @@ int main(int argc, char **argv) {
         cerr << "plpftp: " << rf->getError() << endl;
         status = 1;
     }
-    delete rf;
-    delete rp;
     return status;
 }

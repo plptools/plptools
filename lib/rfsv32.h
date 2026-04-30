@@ -192,13 +192,12 @@ private:
     * Private constructor. Shall be called by
     * RFSVFactory only.
     */
-    RFSV32(TCPSocket *);
+    RFSV32(std::unique_ptr<TCPSocket> socket);
 
     Enum<RFSV::errs> err2psierr(int32_t);
     Enum<RFSV::errs> fopendir(const uint32_t, const char *, uint32_t &);
     uint32_t attr2std(const uint32_t);
     uint32_t std2attr(const uint32_t);
-
 
     // Communication
     bool sendCommand(enum commands, BufferStore &);

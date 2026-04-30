@@ -41,56 +41,60 @@ ENUM_DEFINITION_BEGIN(RFSVFactory::errs, RFSVFactory::FACERR_NONE)
     stringRep.add(RFSVFactory::FACERR_NORESPONSE,     N_("no response from ncpd"));
 ENUM_DEFINITION_END(RFSVFactory::errs)
 
-RFSVFactory::RFSVFactory(TCPSocket *_skt)
-: serNum(0) {
-    err = FACERR_NONE;
-    skt = _skt;
-}
+RFSVFactory::RFSVFactory(const std::string &host, int port)
+: host_(host)
+, port_(port)
+, serNum_(0)
+, error_(FACERR_NONE) {}
 
 RFSVFactory::~RFSVFactory() {
 }
 
 RFSV* RFSVFactory::create(bool reconnect) {
-    // skt is connected to the ncp daemon, which will have (hopefully) seen
-    // an INFO exchange, where the protocol version of the remote Psion was
-    // sent, and noted. We have to ask the ncp daemon which protocol it saw,
-    // so we can instantiate the correct RFSV protocol handler for the
-    // caller. We announce ourselves to the NCP daemon, and the relevant
-    // RFSV module will also announce itself.
+
+    auto socket = std::make_unique<TCPSocket>();
+    if (!socket->connect(host_.c_str(), port_)) {
+        cout << _("could not connect to ncpd") << endl;
+        return nullptr;
+    }
+
+    // At this point the socket is connected to the ncp daemon, which will have (hopefully) seen an INFO exchange, where
+    // the protocol version of the remote Psion was sent, and noted. We have to ask the ncp daemon which protocol it
+    // saw, so we can instantiate the correct RFSV protocol handler for the caller. We announce ourselves to the NCP
+    // daemon, and the relevant RFSV module will also announce itself.
 
     BufferStore a;
-
-    err = FACERR_NONE;
+    error_ = FACERR_NONE;
     a.addStringT("NCP$INFO");
-    if (!skt->sendBufferStore(a)) {
+    if (!socket->sendBufferStore(a)) {
         if (!reconnect)
-            err = FACERR_COULD_NOT_SEND;
+            error_ = FACERR_COULD_NOT_SEND;
         else {
-            skt->closeSocket();
-            serNum = 0;
-            skt->reconnect();
-            err = FACERR_AGAIN;
+            socket->closeSocket();
+            serNum_ = 0;
+            socket->reconnect();
+            error_ = FACERR_AGAIN;
         }
         return NULL;
     }
-    if (skt->getBufferStore(a) == 1) {
+    if (socket->getBufferStore(a) == 1) {
         if (a.getLen() > 8 && !strncmp(a.getString(), "Series 3", 8)) {
-            return new RFSV16(skt);
+            return new RFSV16(std::move(socket));
         }
         else if (a.getLen() > 8 && !strncmp(a.getString(), "Series 5", 8)) {
-            return new RFSV32(skt);
+            return new RFSV32(std::move(socket));
         }
         if ((a.getLen() > 8) && !strncmp(a.getString(), "No Psion", 8)) {
-            skt->closeSocket();
-            serNum = 0;
-            skt->reconnect();
-            err = FACERR_NOPSION;
+            socket->closeSocket();
+            serNum_ = 0;
+            socket->reconnect();
+            error_ = FACERR_NOPSION;
             return NULL;
         }
         // Invalid protocol version
-        err = FACERR_PROTVERSION;
+        error_ = FACERR_PROTVERSION;
     } else
-        err = FACERR_NORESPONSE;
+        error_ = FACERR_NORESPONSE;
 
     return NULL;
 }

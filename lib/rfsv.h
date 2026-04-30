@@ -654,7 +654,7 @@ protected:
     */
     const char *getConnectName();
 
-    TCPSocket *socket_;
+    std::unique_ptr<TCPSocket> socket_;
     Enum<errs> status_;
     int32_t operationId_;
 };

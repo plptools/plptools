@@ -52,7 +52,7 @@ public:
     * @param skt The socket to be used for connecting
     * to the ncpd daemon.
     */
-    RFSVFactory(TCPSocket *skt);
+    RFSVFactory(const std::string &host, int port);
 
     /**
      * Delete the RFSVFactory, cleaning up any resources.
@@ -76,14 +76,11 @@ public:
     * @returns The error code, in case @ref create has
     * failed, 0 otherwise.
     */
-    virtual Enum<errs> getError() { return err; }
+    virtual Enum<errs> getError() { return error_; }
 
 private:
-    /**
-    * The socket to be used for connecting to the
-    * ncpd daemon.
-    */
-    TCPSocket *skt;
-    int serNum;
-    Enum<errs> err;
+    std::string host_;
+    int port_;
+    int serNum_;
+    Enum<errs> error_;
 };

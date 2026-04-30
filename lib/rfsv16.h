@@ -22,6 +22,7 @@
 #define _RFSV16_H_
 
 #include "rfsv.h"
+#include <memory>
 
 class RFSVFactory;
 
@@ -135,10 +136,9 @@ private:
     };
 
     /**
-    * Private constructor. Shall be called by
-    * RFSVFactory only.
+    * Private constructor. Shall be called by RFSVFactory only.
     */
-    RFSV16(TCPSocket *);
+    RFSV16(std::unique_ptr<TCPSocket> socket);
 
     // Miscellaneous
     Enum<RFSV::errs> fopendir(const char * const, uint32_t &);
