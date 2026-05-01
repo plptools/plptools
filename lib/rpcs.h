@@ -348,7 +348,10 @@ public:
     *
     * @returns Psion error code. 0 = Ok.
     */
-    virtual Enum<RFSV::errs> getMachineInfo(machineInfo &machineInfo) { return RFSV::E_PSI_NOT_SIBO;}
+    virtual Enum<RFSV::errs> getMachineInfo(machineInfo &machineInfo) {
+        (void)machineInfo;
+        return RFSV::E_PSI_NOT_SIBO;
+    }
 
     /**
      * Release an RPCS handle.
@@ -362,21 +365,35 @@ public:
      *
      * @returns A psion error code. 0 = Ok.
      */
-    virtual Enum<RFSV::errs> closeHandle(uint32_t handle)
-        { return RFSV::E_PSI_NOT_SIBO; }
+    virtual Enum<RFSV::errs> closeHandle(uint32_t handle) {
+        (void)handle;
+        return RFSV::E_PSI_NOT_SIBO;
+    }
 
-    virtual Enum<RFSV::errs> regOpenIter(uint32_t, char *, uint16_t &)
-        { return RFSV::E_PSI_NOT_SIBO;}
-    virtual Enum<RFSV::errs> regReadIter(uint16_t)
-        { return RFSV::E_PSI_NOT_SIBO;}
-    virtual Enum<RFSV::errs> regWrite(void)
-        { return RFSV::E_PSI_NOT_SIBO;}
-    virtual Enum<RFSV::errs> regRead(void)
-        { return RFSV::E_PSI_NOT_SIBO;}
-    virtual Enum<RFSV::errs> regDelete(void)
-        { return RFSV::E_PSI_NOT_SIBO;}
-    virtual Enum<RFSV::errs> setTime(time_t time)
-        { return RFSV::E_PSI_NOT_SIBO;}
+    virtual Enum<RFSV::errs> regOpenIter(uint32_t, char *, uint16_t &) {
+        return RFSV::E_PSI_NOT_SIBO;
+    }
+
+    virtual Enum<RFSV::errs> regReadIter(uint16_t) {
+        return RFSV::E_PSI_NOT_SIBO;
+    }
+
+    virtual Enum<RFSV::errs> regWrite(void) {
+        return RFSV::E_PSI_NOT_SIBO;
+    }
+
+    virtual Enum<RFSV::errs> regRead(void) {
+        return RFSV::E_PSI_NOT_SIBO;
+    }
+
+    virtual Enum<RFSV::errs> regDelete(void) {
+        return RFSV::E_PSI_NOT_SIBO;
+    }
+
+    virtual Enum<RFSV::errs> setTime(time_t time) {
+        (void)time;
+        return RFSV::E_PSI_NOT_SIBO;
+    }
 
     /**
      * Read from Series 5 scratch RAM
@@ -390,8 +407,11 @@ public:
      *
      * @returns A psion error code. 0 = Ok.
      */
-    virtual Enum<RFSV::errs> configRead(uint32_t size, BufferStore &data)
-        { return RFSV::E_PSI_NOT_SIBO; }
+    virtual Enum<RFSV::errs> configRead(uint32_t size, BufferStore &data) {
+        (void)size;
+        (void)data;
+        return RFSV::E_PSI_NOT_SIBO;
+    }
 
     /**
      * Write to Series 5 scratch RAM
@@ -404,13 +424,18 @@ public:
      *
      * @returns A psion error code. 0 = Ok.
      */
-    virtual Enum<RFSV::errs> configWrite(BufferStore data)
-        { return RFSV::E_PSI_NOT_SIBO;}
+    virtual Enum<RFSV::errs> configWrite(BufferStore data) {
+        (void)data;
+        return RFSV::E_PSI_NOT_SIBO;
+    }
 
-    virtual Enum<RFSV::errs> queryOpen(void)
-        { return RFSV::E_PSI_NOT_SIBO;}
-    virtual Enum<RFSV::errs> queryRead(void)
-        { return RFSV::E_PSI_NOT_SIBO;}
+    virtual Enum<RFSV::errs> queryOpen() {
+        return RFSV::E_PSI_NOT_SIBO;
+    }
+
+    virtual Enum<RFSV::errs> queryRead() {
+        return RFSV::E_PSI_NOT_SIBO;
+    }
 
 protected:
     /**
@@ -480,8 +505,11 @@ protected:
      *
      * @returns A psion error code. 0 = Ok.
      */
-    virtual Enum<RFSV::errs> configOpen(uint16_t &handle, uint32_t size)
-        { return RFSV::E_PSI_NOT_SIBO; }
+    virtual Enum<RFSV::errs> configOpen(uint16_t &handle, uint32_t size) {
+        (void)handle;
+        (void)size;
+        return RFSV::E_PSI_NOT_SIBO;
+    }
 
    /**
     * Sends a command to the remote side.
