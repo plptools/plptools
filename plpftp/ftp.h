@@ -42,8 +42,8 @@ public:
 private:
     std::vector<char *> getCommand();
     void initReadline(void);
-    int putClipText(RPCS &r, RFSV &a, rclip &rc, const char *data);
-    int getClipData(RPCS &r, RFSV &a, rclip &rc, const char *file);
+    int putClipText(RFSV &a, rclip &rc, const char *data);
+    int getClipData(RFSV &a, rclip &rc, const char *file);
     bool checkClipConnection(RFSV &a, rclip &rc);
 
     // utilities

@@ -310,7 +310,7 @@ static int startPrograms(RPCS & r, RFSV &a, const char *file) {
     return 0;
 }
 
-bool FTP::checkClipConnection(RFSV &a, rclip & rc) {
+bool FTP::checkClipConnection(RFSV &a, rclip &rc) {
     if (a.getProtocolVersion() == 3) {
         cerr << _("Clipboard protocol not supported by Psion Series 3.") << endl;
         return false;
@@ -380,7 +380,7 @@ static char *slurp(FILE *fp, size_t *final_len) {
     return get_upto(fp, "", final_len);
 }
 
-int FTP::putClipText(RPCS &, RFSV &a, rclip & rc, const char *file) {
+int FTP::putClipText(RFSV &a, rclip & rc, const char *file) {
     Enum<RFSV::errs> res;
     uint32_t fh;
     uint32_t l;
@@ -430,11 +430,15 @@ int FTP::putClipText(RPCS &, RFSV &a, rclip & rc, const char *file) {
     return 0;
 }
 
-int FTP::getClipData(RPCS &, RFSV &a, rclip &, const char *file) {
+int FTP::getClipData(RFSV &a, rclip &rc, const char *file) {
     Enum<RFSV::errs> res;
     PlpDirent de;
     uint32_t fh;
     string clipText;
+
+    if (!checkClipConnection(a, rc)) {
+        return 1;
+    }
 
     res = a.fgeteattr(CLIPFILE, de);
     if (res == RFSV::E_PSI_GEN_NONE) {
@@ -1185,13 +1189,13 @@ int FTP::session(RFSV &rfsv, RPCS &rpcs, rclip &clipboard, vector<char *> argv) 
             continue;
         }
         if (!strcmp(argv[0], "putclip") && (argc == 2)) {
-            if (putClipText(rpcs, rfsv, clipboard, argv[1])) {
+            if (putClipText(rfsv, clipboard, argv[1])) {
                 cerr << _("Error setting clipboard") << endl;
             }
             continue;
         }
         if (!strcmp(argv[0], "getclip") && (argc == 2)) {
-            if (getClipData(rpcs, rfsv, clipboard, argv[1])) {
+            if (getClipData(rfsv, clipboard, argv[1])) {
                 cerr << _("Error getting clipboard") << endl;
             }
             continue;
