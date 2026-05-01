@@ -21,8 +21,10 @@
  */
 #pragma once
 
-#include "rfsv.h"
 #include <cstddef>
+
+#include "connectionerror.h"
+#include "rfsv.h"
 
 class TCPSocket;
 
@@ -33,18 +35,6 @@ class TCPSocket;
 class RFSVFactory final {
 
 public:
-    /**
-    * The known errors which can happen during @ref create .
-    */
-    enum errs {
-        FACERR_NONE = 0,
-        FACERR_COULD_NOT_SEND = 1,
-        FACERR_AGAIN = 2,
-        FACERR_NOPSION = 3,
-        FACERR_PROTVERSION = 4,
-        FACERR_NORESPONSE = 5,
-        FACERR_CONNECTION_FAILURE = 6,
-    };
 
     /**
     * Constructs a RFSVFactory.
@@ -67,7 +57,7 @@ public:
     *
     * @returns A pointer to a newly created @ref RFSV instance or NULL on failure.
     */
-    RFSV* create(bool, Enum<errs> *error = nullptr);
+    RFSV* create(bool, Enum<ConnectionError> *error = nullptr);
 
 private:
     std::string host_;

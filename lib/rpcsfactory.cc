@@ -29,22 +29,13 @@
 #include <stdlib.h>
 #include <time.h>
 
-ENUM_DEFINITION_BEGIN(RPCSFactory::errs, RPCSFactory::FACERR_NONE)
-    stringRep.add(RPCSFactory::FACERR_NONE,           N_("no error"));
-    stringRep.add(RPCSFactory::FACERR_COULD_NOT_SEND, N_("could not send version request"));
-    stringRep.add(RPCSFactory::FACERR_AGAIN,          N_("try again"));
-    stringRep.add(RPCSFactory::FACERR_NOPSION,        N_("no EPOC device connected"));
-    stringRep.add(RPCSFactory::FACERR_PROTVERSION,    N_("wrong protocol version"));
-    stringRep.add(RPCSFactory::FACERR_NORESPONSE,     N_("no response from ncpd"));
-ENUM_DEFINITION_END(RPCSFactory::errs)
-
 RPCSFactory::RPCSFactory(const std::string &host, int port)
 : host_(host)
 , port_(port) {}
 
 RPCSFactory::~RPCSFactory() {}
 
-RPCS *RPCSFactory::create(bool reconnect, Enum<errs> *error) {
+RPCS *RPCSFactory::create(bool reconnect, Enum<ConnectionError> *error) {
 
     if (error) {
         *error = FACERR_NONE;

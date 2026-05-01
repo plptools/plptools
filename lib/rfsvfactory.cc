@@ -32,23 +32,13 @@
 
 using namespace std;
 
-ENUM_DEFINITION_BEGIN(RFSVFactory::errs, RFSVFactory::FACERR_NONE)
-    stringRep.add(RFSVFactory::FACERR_NONE,               N_("no error"));
-    stringRep.add(RFSVFactory::FACERR_COULD_NOT_SEND,     N_("could not send version request"));
-    stringRep.add(RFSVFactory::FACERR_AGAIN,              N_("try again"));
-    stringRep.add(RFSVFactory::FACERR_NOPSION,            N_("no EPOC device connected"));
-    stringRep.add(RFSVFactory::FACERR_PROTVERSION,        N_("wrong protocol version"));
-    stringRep.add(RFSVFactory::FACERR_NORESPONSE,         N_("no response from ncpd"));
-    stringRep.add(RFSVFactory::FACERR_CONNECTION_FAILURE, N_("could not connect to ncpd"));
-ENUM_DEFINITION_END(RFSVFactory::errs)
-
 RFSVFactory::RFSVFactory(const std::string &host, int port)
 : host_(host)
 , port_(port) {}
 
 RFSVFactory::~RFSVFactory() {}
 
-RFSV* RFSVFactory::create(bool reconnect, Enum<errs> *error) {
+RFSV* RFSVFactory::create(bool reconnect, Enum<ConnectionError> *error) {
 
     if (error) {
         *error = FACERR_NONE;

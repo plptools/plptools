@@ -92,7 +92,7 @@ void ftpHeader() {
 }
 
 int main(int argc, char **argv) {
-    FTP f;
+    FTP ftp;
     string host = "127.0.0.1";
     int status = 0;
     int sockNum = cli_utils::lookup_default_port();
@@ -129,30 +129,29 @@ int main(int argc, char **argv) {
     auto rfsvFactory = std::make_unique<RFSVFactory>(host, sockNum);
     auto rpcsFactory = std::make_unique<RPCSFactory>(host, sockNum);
 
-    Enum<RFSVFactory::errs> error;
+    Enum<ConnectionError> error;
     auto rfsv = std::unique_ptr<RFSV>(rfsvFactory->create(false, &error));
-    auto rpcs = std::unique_ptr<RPCS>(rpcsFactory->create(false));
+    auto rpcs = std::unique_ptr<RPCS>(rpcsFactory->create(false, &error));
+    if (!rfsv || !rpcs) {
+        cerr << "plpftp: " << error << endl;
+        return EXIT_FAILURE;
+    }
 
-    rclip *rc;
+    rclip *rc = nullptr;
     auto rclipSocket = new TCPSocket();
     rclipSocket->connect(host.c_str(), sockNum);
     if (rclipSocket) {
         rc = new rclip(rclipSocket);
     }
-    f.canClip = rclipSocket && rc ? true : false;
+    ftp.canClip = rclipSocket && rc ? true : false;
 
-    if ((rfsv != NULL) && (rpcs != NULL)) {
-        vector<char *> args(argv + optind, argv + argc);
-        status = f.session(*rfsv, *rpcs, *rc, *rclipSocket, args);
-        if (rclipSocket) {
-            delete rclipSocket;
-        }
-        if (rc) {
-            delete rc;
-        }
-    } else {
-        cerr << "plpftp: " << error << endl;
-        status = 1;
+    vector<char *> args(argv + optind, argv + argc);
+    status = ftp.session(*rfsv, *rpcs, *rc, *rclipSocket, args);
+    if (rclipSocket) {
+        delete rclipSocket;
+    }
+    if (rc) {
+        delete rc;
     }
     return status;
 }

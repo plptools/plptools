@@ -20,6 +20,7 @@
  */
 #pragma once
 
+#include "connectionerror.h"
 #include "rpcs.h"
 
 class TCPSocket;
@@ -30,19 +31,6 @@ class TCPSocket;
  */
 class RPCSFactory final {
  public:
-
-    /**
-    * The known errors which can happen during @ref create .
-    */
-    enum errs {
-        FACERR_NONE = 0,
-        FACERR_COULD_NOT_SEND = 1,
-        FACERR_AGAIN = 2,
-        FACERR_NOPSION = 3,
-        FACERR_PROTVERSION = 4,
-        FACERR_NORESPONSE = 5,
-        FACERR_CONNECTION_FAILURE = 6,
-    };
 
     /**
     * Constructs a RPCSFactory.
@@ -65,7 +53,7 @@ class RPCSFactory final {
     *
     * @returns A pointer to a newly created @ref RPCS instance or NULL on failure.
     */
-    RPCS* create(bool, Enum<errs> *error = nullptr);
+    RPCS* create(bool, Enum<ConnectionError> *error = nullptr);
 
  private:
     std::string host_;
