@@ -140,22 +140,11 @@ int main(int argc, char **argv) {
         cerr << "plpftp: " << error << endl;
         return EXIT_FAILURE;
     }
-
-    rclip *rc = nullptr;
-    auto rclipSocket = new TCPSocket();
-    rclipSocket->connect(host.c_str(), sockNum);
-    if (rclipSocket) {
-        rc = new rclip(rclipSocket);
+    auto clipboard = std::unique_ptr<rclip>(rclip::connect(host, sockNum, &error));
+    if (!clipboard) {
+        cerr << "plpftp: " << error << endl;
+        return EXIT_FAILURE;
     }
-    ftp.canClip = rclipSocket && rc ? true : false;
-
     vector<char *> args(argv + optind, argv + argc);
-    status = ftp.session(*rfsv, *rpcs, *rc, *rclipSocket, args);
-    if (rclipSocket) {
-        delete rclipSocket;
-    }
-    if (rc) {
-        delete rc;
-    }
-    return status;
+    return ftp.session(*rfsv, *rpcs, *clipboard, args);
 }
