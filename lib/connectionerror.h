@@ -2,7 +2,9 @@
  * This file is part of plptools.
  *
  *  Copyright (C) 1999 Philip Proudman <philip.proudman@btinternet.com>
- *  Copyright (C) 1999-2002 Fritz Elfert <felfert@to.com>
+ *  Copyright (C) 1999 Matt J. Gumbley <matt@gumbley.demon.co.uk>
+ *  Copyright (C) 1999-2001 Fritz Elfert <felfert@to.com>
+ *  Copyright (C) 2026 Jason Morley <hello@jbmorley.co.uk>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -20,28 +22,15 @@
  */
 #pragma once
 
-#include "rpcs.h"
-#include <memory>
-
-class TCPSocket;
-class BufferStore;
-class RPCSFactory;
-
 /**
- * This is the implementation of the @ref RPCS protocol for
- * Psion series 3 (SIBO) variant.  You normally never create
- * objects of this class directly. Thus the constructor is
- * private. Use @ref RPCSFactory for creating an instance of
- * @ref RPCS . For a complete documentation, see @ref RPCS .
- */
-class RPCS16 : public RPCS {
-    friend class RPCSFactory;
-
- public:
-    Enum<RFSV::errs> getCmdLine(const char *, std::string &);
-    Enum<RFSV::errs> getOwnerInfo(BufferArray &owner);
-
-
- private:
-    RPCS16(std::unique_ptr<TCPSocket> socket);
+* Errors that can occur when connecting to a PLP server.
+*/
+enum ConnectionError {
+    FACERR_NONE = 0,
+    FACERR_COULD_NOT_SEND = 1,
+    FACERR_AGAIN = 2,
+    FACERR_NOPSION = 3,
+    FACERR_PROTVERSION = 4,
+    FACERR_NORESPONSE = 5,
+    FACERR_CONNECTION_FAILURE = 6,
 };

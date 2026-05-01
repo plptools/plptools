@@ -4,6 +4,7 @@
  *  Copyright (C) 1999 Philip Proudman <philip.proudman@btinternet.com>
  *  Copyright (C) 1999 Matt J. Gumbley <matt@gumbley.demon.co.uk>
  *  Copyright (C) 1999-2001 Fritz Elfert <felfert@to.com>
+ *  Copyright (C) 2026 Jason Morley <hello@jbmorley.co.uk>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -21,8 +22,10 @@
  */
 #pragma once
 
-#include "rfsv.h"
 #include <cstddef>
+
+#include "connectionerror.h"
+#include "rfsv.h"
 
 class TCPSocket;
 
@@ -30,21 +33,9 @@ class TCPSocket;
  * A factory for automatically instantiating the correct
  * @ref RFSV protocol variant depending on the connected Psion.
  */
-class RFSVFactory {
+class RFSVFactory final {
 
 public:
-    /**
-    * The known errors which can happen during @ref create .
-    */
-    enum errs {
-        FACERR_NONE = 0,
-        FACERR_COULD_NOT_SEND = 1,
-        FACERR_AGAIN = 2,
-        FACERR_NOPSION = 3,
-        FACERR_PROTVERSION = 4,
-        FACERR_NORESPONSE = 5,
-        FACERR_CONNECTION_FAILURE = 6,
-    };
 
     /**
     * Constructs a RFSVFactory.
@@ -57,7 +48,7 @@ public:
     /**
      * Delete the RFSVFactory, cleaning up any resources.
      */
-    virtual ~RFSVFactory();
+    ~RFSVFactory();
 
     /**
     * Creates a new @ref RFSV instance.
@@ -67,7 +58,7 @@ public:
     *
     * @returns A pointer to a newly created @ref RFSV instance or NULL on failure.
     */
-    virtual RFSV* create(bool, Enum<errs> *error = nullptr);
+    RFSV* create(bool, Enum<ConnectionError> *error = nullptr);
 
 private:
     std::string host_;

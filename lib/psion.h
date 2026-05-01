@@ -61,7 +61,6 @@ public:
 
 private:
 
-    TCPSocket* rpcsSocket_;
     RPCS* rpcs_;
     RFSV* rfsv_;
 

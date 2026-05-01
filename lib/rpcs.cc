@@ -87,14 +87,14 @@ ENUM_DEFINITION_BEGIN(RPCS::languages, RPCS::PSI_LANG_TEST)
 ENUM_DEFINITION_END(RPCS::languages)
 
 RPCS::~RPCS() {
-    skt->closeSocket();
+    socket_->closeSocket();
 }
 
 //
 // public common API
 //
 void RPCS::reconnect(void) {
-    skt->reconnect();
+    socket_->reconnect();
     reset();
 }
 
@@ -103,8 +103,8 @@ void RPCS::reset(void) {
     mtCacheS5mx = 0;
     status = RFSV::E_PSI_FILE_DISC;
     a.addStringT(getConnectName());
-    if (skt->sendBufferStore(a)) {
-        if (skt->getBufferStore(a) == 1) {
+    if (socket_->sendBufferStore(a)) {
+        if (socket_->getBufferStore(a) == 1) {
             if (!strcmp(a.getString(0), "Ok")) {
                 status = RFSV::E_PSI_GEN_NONE;
             }
@@ -134,10 +134,10 @@ bool RPCS::sendCommand(enum commands cc, BufferStore & data) {
     BufferStore a;
     a.addByte(cc);
     a.addBuff(data);
-    result = skt->sendBufferStore(a);
+    result = socket_->sendBufferStore(a);
     if (!result) {
         reconnect();
-        result = skt->sendBufferStore(a);
+        result = socket_->sendBufferStore(a);
         if (!result) {
             status = RFSV::E_PSI_FILE_DISC;
         }
@@ -147,7 +147,7 @@ bool RPCS::sendCommand(enum commands cc, BufferStore & data) {
 
 Enum<RFSV::errs> RPCS::getResponse(BufferStore & data, bool statusIsFirstByte) {
     Enum<RFSV::errs> ret;
-    if (skt->getBufferStore(data) == 1) {
+    if (socket_->getBufferStore(data) == 1) {
         if (statusIsFirstByte) {
             ret = (enum RFSV::errs)((char)data.getByte(0));
             data.discardFirstBytes(1);

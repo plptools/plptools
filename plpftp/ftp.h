@@ -23,6 +23,7 @@
 
 #include "config.h"
 
+#include <memory>
 #include <vector>
 
 #include "rfsv.h"
@@ -36,15 +37,14 @@ class FTP {
 public:
     FTP();
     ~FTP();
-    int session(RFSV &a, RPCS &r, rclip &rc, TCPSocket &rclipSocket, std::vector<char *> argv);
-    bool canClip;
+    int session(RFSV &rfsv, RPCS &rpcs, rclip &clipboard, std::vector<char *> argv);
 
 private:
     std::vector<char *> getCommand();
     void initReadline(void);
-    int putClipText(RPCS &r, RFSV &a, rclip &rc, TCPSocket &rclipSocket, const char *data);
-    int getClipData(RPCS &r, RFSV &a, rclip &rc, TCPSocket &rclipSocket, const char *file);
-    bool checkClipConnection(RFSV &a, rclip &rc, TCPSocket &rclipSocket);
+    int putClipText(RFSV &a, rclip &rc, const char *data);
+    int getClipData(RFSV &a, rclip &rc, const char *file);
+    bool checkClipConnection(RFSV &a, rclip &rc);
 
     // utilities
     void resetUnixWd();

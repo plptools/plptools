@@ -92,12 +92,7 @@ void ftpHeader() {
 }
 
 int main(int argc, char **argv) {
-    TCPSocket *skt2;
-    RFSV *a;
-    RPCS *r;
-    TCPSocket *rclipSocket;
-    rclip *rc;
-    FTP f;
+    FTP ftp;
     string host = "127.0.0.1";
     int status = 0;
     int sockNum = cli_utils::lookup_default_port();
@@ -131,37 +126,25 @@ int main(int argc, char **argv) {
         ftpHeader();
     }
 
-    skt2 = new TCPSocket();
-    if (!skt2->connect(host.c_str(), sockNum)) {
-        cout << _("plpftp: could not connect to ncpd") << endl;
-        return 1;
-    }
-    auto rf = std::make_unique<RFSVFactory>(host, sockNum);
-    auto rp = std::make_unique<RPCSFactory>(skt2);
+    auto rfsvFactory = std::make_unique<RFSVFactory>(host, sockNum);
+    auto rpcsFactory = std::make_unique<RPCSFactory>(host, sockNum);
 
-    Enum<RFSVFactory::errs> error;
-    a = rf->create(false, &error);
-    r = rp->create(false);
-    rclipSocket = new TCPSocket();
-    rclipSocket->connect(NULL, sockNum);
-    if (rclipSocket) {
-        rc = new rclip(rclipSocket);
-    }
-    f.canClip = rclipSocket && rc ? true : false;
-    if ((a != NULL) && (r != NULL)) {
-        vector<char *> args(argv + optind, argv + argc);
-        status = f.session(*a, *r, *rc, *rclipSocket, args);
-        delete r;
-        delete a;
-        delete skt2;
-        if (rclipSocket)
-            delete rclipSocket;
-        if (rc) {
-            delete rc;
-        }
-    } else {
+    Enum<ConnectionError> error;
+    auto rfsv = std::unique_ptr<RFSV>(rfsvFactory->create(false, &error));
+    if (!rfsv) {
         cerr << "plpftp: " << error << endl;
-        status = 1;
+        return EXIT_FAILURE;
     }
-    return status;
+    auto rpcs = std::unique_ptr<RPCS>(rpcsFactory->create(false, &error));
+    if (!rpcs) {
+        cerr << "plpftp: " << error << endl;
+        return EXIT_FAILURE;
+    }
+    auto clipboard = std::unique_ptr<rclip>(rclip::connect(host, sockNum, &error));
+    if (!clipboard) {
+        cerr << "plpftp: " << error << endl;
+        return EXIT_FAILURE;
+    }
+    vector<char *> args(argv + optind, argv + argc);
+    return ftp.session(*rfsv, *rpcs, *clipboard, args);
 }

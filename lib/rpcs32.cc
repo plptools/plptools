@@ -26,14 +26,15 @@
 
 #include <iostream>
 
+#include <memory>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 
 using namespace std;
 
-RPCS32::RPCS32(TCPSocket * _skt) {
-    skt = _skt;
+RPCS32::RPCS32(std::unique_ptr<TCPSocket> socket) {
+    socket_ = std::move(socket);
     mtCacheS5mx = 0;
     reset();
 }

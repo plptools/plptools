@@ -21,6 +21,7 @@
 #pragma once
 
 #include "rpcs.h"
+#include <memory>
 
 class TCPSocket;
 class RPCSFactory;
@@ -58,5 +59,5 @@ protected:
     Enum<RFSV::errs> configOpen(uint16_t &, uint32_t);
 
  private:
-    RPCS32(TCPSocket *);
+    RPCS32(std::unique_ptr<TCPSocket> socket);
 };

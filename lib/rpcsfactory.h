@@ -3,6 +3,7 @@
  *
  *  Copyright (C) 1999 Philip Proudman <philip.proudman@btinternet.com>
  *  Copyright (C) 1999-2001 Fritz Elfert <felfert@to.com>
+ *  Copyright (C) 2026 Jason Morley <hello@jbmorley.co.uk>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -20,6 +21,7 @@
  */
 #pragma once
 
+#include "connectionerror.h"
 #include "rpcs.h"
 
 class TCPSocket;
@@ -28,58 +30,33 @@ class TCPSocket;
  * A factory for automatically instantiating the correct protocol
  * variant depending on the connected Psion.
  */
-class RPCSFactory {
+class RPCSFactory final {
  public:
-
-    /**
-    * The known errors which can happen during @ref create .
-    */
-    enum errs {
-        FACERR_NONE = 0,
-        FACERR_COULD_NOT_SEND = 1,
-        FACERR_AGAIN = 2,
-        FACERR_NOPSION = 3,
-        FACERR_PROTVERSION = 4,
-        FACERR_NORESPONSE = 5
-    };
 
     /**
     * Constructs a RPCSFactory.
     *
-    * @param skt The socket to be used for connecting
-    * to the ncpd daemon.
+    * @param host The host be used for connecting to the ncpd daemon.
+    * @param port The port be used for connecting to the ncpd daemon.
     */
-    RPCSFactory(TCPSocket *skt);
+    RPCSFactory(const std::string &host, int port);
 
     /**
      * Delete the RPCSFactory, cleaning up any resources.
      */
-    virtual ~RPCSFactory();
+    ~RPCSFactory();
 
     /**
     * Creates a new RPCS instance.
     *
-    * @param reconnect Set to true, if automatic reconnect
-    * should be performed on failure.
+    * @param reconnect Set to true, if automatic reconnect should be performed on failure.
+    * @param error Out parameter; set to the error on failure if non-NULL.
     *
-    * @returns A pointer to a newly created RPCS instance or
-    * NULL on failure.
+    * @returns A pointer to a newly created @ref RPCS instance or NULL on failure.
     */
-    virtual RPCS *create(bool reconnect);
-
-    /**
-    * Retrieve an error code.
-    *
-    * @returns The error code, in case @ref create has
-    * failed, 0 otherwise.
-    */
-    virtual Enum<errs> getError() { return err; }
+    RPCS* create(bool, Enum<ConnectionError> *error = nullptr);
 
  private:
-    /**
-    * The socket to be used for connecting to the
-    * ncpd daemon.
-    */
-    TCPSocket *skt;
-    Enum<errs> err;
+    std::string host_;
+    int port_;
 };

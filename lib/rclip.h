@@ -20,8 +20,10 @@
 #ifndef _RCLIP_H_
 #define _RCLIP_H_
 
+#include "connectionerror.h"
 #include "rfsv.h"
 #include "Enum.h"
+#include <memory>
 
 class TCPSocket;
 class BufferStore;
@@ -42,12 +44,15 @@ class BufferArray;
  */
 class rclip {
 public:
+
+    static rclip *connect(const std::string &host, int port, Enum<ConnectionError> *error = nullptr);
+
     /**
     * Constructs a new rclip object.
     *
-    * @param skt The socket to be used by this object.
+    * @param socket The socket to be used by this object.
     */
-    rclip(TCPSocket *skt);
+    rclip(std::unique_ptr<TCPSocket> socket);
 
     /**
     * Destructor.
@@ -147,7 +152,7 @@ protected:
     * The socket, used for communication
     * with ncpd.
     */
-    TCPSocket *skt;
+    std::unique_ptr<TCPSocket> socket_;
 
     /**
     * The current status of the connection.
