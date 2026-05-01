@@ -30,7 +30,7 @@ class TCPSocket;
  * A factory for automatically instantiating the correct
  * @ref RFSV protocol variant depending on the connected Psion.
  */
-class RFSVFactory {
+class RFSVFactory final {
 
 public:
     /**

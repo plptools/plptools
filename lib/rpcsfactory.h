@@ -28,7 +28,7 @@ class TCPSocket;
  * A factory for automatically instantiating the correct protocol
  * variant depending on the connected Psion.
  */
-class RPCSFactory {
+class RPCSFactory final {
  public:
 
     /**
