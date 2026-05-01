@@ -55,7 +55,7 @@ class RPCSFactory {
     /**
      * Delete the RPCSFactory, cleaning up any resources.
      */
-    virtual ~RPCSFactory();
+    ~RPCSFactory();
 
     /**
     * Creates a new RPCS instance.
@@ -65,7 +65,7 @@ class RPCSFactory {
     *
     * @returns A pointer to a newly created @ref RPCS instance or NULL on failure.
     */
-    virtual RPCS* create(bool, Enum<errs> *error = nullptr);
+    RPCS* create(bool, Enum<errs> *error = nullptr);
 
  private:
     std::string host_;

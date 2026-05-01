@@ -57,7 +57,7 @@ public:
     /**
      * Delete the RFSVFactory, cleaning up any resources.
      */
-    virtual ~RFSVFactory();
+    ~RFSVFactory();
 
     /**
     * Creates a new @ref RFSV instance.
@@ -67,7 +67,7 @@ public:
     *
     * @returns A pointer to a newly created @ref RFSV instance or NULL on failure.
     */
-    virtual RFSV* create(bool, Enum<errs> *error = nullptr);
+    RFSV* create(bool, Enum<errs> *error = nullptr);
 
 private:
     std::string host_;
