@@ -130,12 +130,12 @@ int main(int argc, char **argv) {
     auto rpcsFactory = std::make_unique<RPCSFactory>(host, sockNum);
 
     Enum<RFSVFactory::errs> error;
-    auto rfsv = rfsvFactory->create(false, &error);
-    auto rpcs = rpcsFactory->create(false);
+    auto rfsv = std::unique_ptr<RFSV>(rfsvFactory->create(false, &error));
+    auto rpcs = std::unique_ptr<RPCS>(rpcsFactory->create(false));
 
     rclip *rc;
     auto rclipSocket = new TCPSocket();
-    rclipSocket->connect(NULL, sockNum);
+    rclipSocket->connect(host.c_str(), sockNum);
     if (rclipSocket) {
         rc = new rclip(rclipSocket);
     }
@@ -144,8 +144,6 @@ int main(int argc, char **argv) {
     if ((rfsv != NULL) && (rpcs != NULL)) {
         vector<char *> args(argv + optind, argv + argc);
         status = f.session(*rfsv, *rpcs, *rc, *rclipSocket, args);
-        delete rpcs;
-        delete rfsv;
         if (rclipSocket) {
             delete rclipSocket;
         }
