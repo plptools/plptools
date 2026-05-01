@@ -21,6 +21,7 @@
 #pragma once
 
 #include "rpcs.h"
+#include <memory>
 
 class TCPSocket;
 class BufferStore;
@@ -42,5 +43,5 @@ class RPCS16 : public RPCS {
 
 
  private:
-    RPCS16(TCPSocket *);
+    RPCS16(std::unique_ptr<TCPSocket> socket);
 };

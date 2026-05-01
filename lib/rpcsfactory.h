@@ -40,16 +40,17 @@ class RPCSFactory {
         FACERR_AGAIN = 2,
         FACERR_NOPSION = 3,
         FACERR_PROTVERSION = 4,
-        FACERR_NORESPONSE = 5
+        FACERR_NORESPONSE = 5,
+        FACERR_CONNECTION_FAILURE = 6,
     };
 
     /**
     * Constructs a RPCSFactory.
     *
-    * @param skt The socket to be used for connecting
-    * to the ncpd daemon.
+    * @param host The host be used for connecting to the ncpd daemon.
+    * @param port The port be used for connecting to the ncpd daemon.
     */
-    RPCSFactory(TCPSocket *skt);
+    RPCSFactory(const std::string &host, int port);
 
     /**
      * Delete the RPCSFactory, cleaning up any resources.
@@ -59,27 +60,14 @@ class RPCSFactory {
     /**
     * Creates a new RPCS instance.
     *
-    * @param reconnect Set to true, if automatic reconnect
-    * should be performed on failure.
+    * @param reconnect Set to true, if automatic reconnect should be performed on failure.
+    * @param error Out parameter; set to the error on failure if non-NULL.
     *
-    * @returns A pointer to a newly created RPCS instance or
-    * NULL on failure.
+    * @returns A pointer to a newly created @ref RPCS instance or NULL on failure.
     */
-    virtual RPCS *create(bool reconnect);
-
-    /**
-    * Retrieve an error code.
-    *
-    * @returns The error code, in case @ref create has
-    * failed, 0 otherwise.
-    */
-    virtual Enum<errs> getError() { return err; }
+    virtual RPCS* create(bool, Enum<errs> *error = nullptr);
 
  private:
-    /**
-    * The socket to be used for connecting to the
-    * ncpd daemon.
-    */
-    TCPSocket *skt;
-    Enum<errs> err;
+    std::string host_;
+    int port_;
 };

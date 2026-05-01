@@ -25,6 +25,7 @@
 #include "rfsv.h"
 #include "Enum.h"
 
+#include <memory>
 #include <vector>
 
 class TCPSocket;
@@ -414,10 +415,9 @@ public:
 
 protected:
     /**
-    * The socket, used for communication
-    * with ncpd.
+    * The socket, used for communication with ncpd.
     */
-    TCPSocket *skt;
+    std::unique_ptr<TCPSocket> socket_;
 
     /**
     * The current status of the connection.

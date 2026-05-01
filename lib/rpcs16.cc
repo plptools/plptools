@@ -25,14 +25,15 @@
 #include "bufferarray.h"
 #include "tcpsocket.h"
 
+#include <memory>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 
 using namespace std;
 
-RPCS16::RPCS16(TCPSocket *_skt) {
-    skt = _skt;
+RPCS16::RPCS16(std::unique_ptr<TCPSocket> socket) {
+    socket_ = std::move(socket);
     mtCacheS5mx = 0;
     reset();
 }

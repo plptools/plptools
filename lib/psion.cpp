@@ -43,13 +43,9 @@ Psion::~Psion() {
 
 bool Psion::connect() {
     int sockNum = cli_utils::lookup_default_port();
-    rpcsSocket_ = new TCPSocket();
-    if (!rpcsSocket_->connect(NULL, sockNum)) {
-        return false;
-    }
-
-    auto rfsvFactory = std::make_unique<RFSVFactory>("127.0.0.1", sockNum);
-    auto rpcsFactory = std::make_unique<RPCSFactory>(rpcsSocket_);
+    std::string host = "127.0.0.1";
+    auto rfsvFactory = std::make_unique<RFSVFactory>(host, sockNum);
+    auto rpcsFactory = std::make_unique<RPCSFactory>(host, sockNum);
     rfsv_ = rfsvFactory->create(true);
     rpcs_ = rpcsFactory->create(true);
     if ((rfsv_ != NULL) && (rpcs_ != NULL)) {
@@ -100,10 +96,6 @@ void Psion::disconnect() {
     if (rpcs_) {
         delete rpcs_;
         rpcs_ = nullptr;
-    }
-    if (rpcsSocket_) {
-        delete rpcsSocket_;
-        rpcsSocket_ = nullptr;
     }
 }
 

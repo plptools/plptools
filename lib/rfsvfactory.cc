@@ -46,8 +46,7 @@ RFSVFactory::RFSVFactory(const std::string &host, int port)
 : host_(host)
 , port_(port) {}
 
-RFSVFactory::~RFSVFactory() {
-}
+RFSVFactory::~RFSVFactory() {}
 
 RFSV* RFSVFactory::create(bool reconnect, Enum<errs> *error) {
 
@@ -68,9 +67,9 @@ RFSV* RFSVFactory::create(bool reconnect, Enum<errs> *error) {
     // saw, so we can instantiate the correct RFSV protocol handler for the caller. We announce ourselves to the NCP
     // daemon, and the relevant RFSV module will also announce itself.
 
-    BufferStore a;
-    a.addStringT("NCP$INFO");
-    if (!socket->sendBufferStore(a)) {
+    BufferStore bufferStore;
+    bufferStore.addStringT("NCP$INFO");
+    if (!socket->sendBufferStore(bufferStore)) {
         if (!reconnect) {
             if (error) {
                 *error = FACERR_COULD_NOT_SEND;
@@ -84,14 +83,14 @@ RFSV* RFSVFactory::create(bool reconnect, Enum<errs> *error) {
         }
         return NULL;
     }
-    if (socket->getBufferStore(a) == 1) {
-        if (a.getLen() > 8 && !strncmp(a.getString(), "Series 3", 8)) {
+    if (socket->getBufferStore(bufferStore) == 1) {
+        if (bufferStore.getLen() > 8 && !strncmp(bufferStore.getString(), "Series 3", 8)) {
             return new RFSV16(std::move(socket));
         }
-        else if (a.getLen() > 8 && !strncmp(a.getString(), "Series 5", 8)) {
+        else if (bufferStore.getLen() > 8 && !strncmp(bufferStore.getString(), "Series 5", 8)) {
             return new RFSV32(std::move(socket));
         }
-        if ((a.getLen() > 8) && !strncmp(a.getString(), "No Psion", 8)) {
+        if ((bufferStore.getLen() > 8) && !strncmp(bufferStore.getString(), "No Psion", 8)) {
             socket->closeSocket();
             socket->reconnect();
             if (error) {
@@ -103,10 +102,11 @@ RFSV* RFSVFactory::create(bool reconnect, Enum<errs> *error) {
         if (error) {
             *error = FACERR_PROTVERSION;
         }
-    } else
+    } else {
         if (error) {
             *error = FACERR_NORESPONSE;
         }
+    }
 
     return NULL;
 }
