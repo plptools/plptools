@@ -33,64 +33,80 @@
 using namespace std;
 
 ENUM_DEFINITION_BEGIN(RFSVFactory::errs, RFSVFactory::FACERR_NONE)
-    stringRep.add(RFSVFactory::FACERR_NONE,           N_("no error"));
-    stringRep.add(RFSVFactory::FACERR_COULD_NOT_SEND, N_("could not send version request"));
-    stringRep.add(RFSVFactory::FACERR_AGAIN,          N_("try again"));
-    stringRep.add(RFSVFactory::FACERR_NOPSION,        N_("no EPOC device connected"));
-    stringRep.add(RFSVFactory::FACERR_PROTVERSION,    N_("wrong protocol version"));
-    stringRep.add(RFSVFactory::FACERR_NORESPONSE,     N_("no response from ncpd"));
+    stringRep.add(RFSVFactory::FACERR_NONE,               N_("no error"));
+    stringRep.add(RFSVFactory::FACERR_COULD_NOT_SEND,     N_("could not send version request"));
+    stringRep.add(RFSVFactory::FACERR_AGAIN,              N_("try again"));
+    stringRep.add(RFSVFactory::FACERR_NOPSION,            N_("no EPOC device connected"));
+    stringRep.add(RFSVFactory::FACERR_PROTVERSION,        N_("wrong protocol version"));
+    stringRep.add(RFSVFactory::FACERR_NORESPONSE,         N_("no response from ncpd"));
+    stringRep.add(RFSVFactory::FACERR_CONNECTION_FAILURE, N_("could not connect to ncpd"));
 ENUM_DEFINITION_END(RFSVFactory::errs)
 
-RFSVFactory::RFSVFactory(TCPSocket *_skt)
-: serNum(0) {
-    err = FACERR_NONE;
-    skt = _skt;
-}
+RFSVFactory::RFSVFactory(const std::string &host, int port)
+: host_(host)
+, port_(port) {}
 
 RFSVFactory::~RFSVFactory() {
 }
 
-RFSV* RFSVFactory::create(bool reconnect) {
-    // skt is connected to the ncp daemon, which will have (hopefully) seen
-    // an INFO exchange, where the protocol version of the remote Psion was
-    // sent, and noted. We have to ask the ncp daemon which protocol it saw,
-    // so we can instantiate the correct RFSV protocol handler for the
-    // caller. We announce ourselves to the NCP daemon, and the relevant
-    // RFSV module will also announce itself.
+RFSV* RFSVFactory::create(bool reconnect, Enum<errs> *error) {
+
+    if (error) {
+        *error = FACERR_NONE;
+    }
+
+    auto socket = std::make_unique<TCPSocket>();
+    if (!socket->connect(host_.c_str(), port_)) {
+        if (error) {
+            *error = FACERR_CONNECTION_FAILURE;
+        }
+        return nullptr;
+    }
+
+    // At this point the socket is connected to the ncp daemon, which will have (hopefully) seen an INFO exchange, where
+    // the protocol version of the remote Psion was sent, and noted. We have to ask the ncp daemon which protocol it
+    // saw, so we can instantiate the correct RFSV protocol handler for the caller. We announce ourselves to the NCP
+    // daemon, and the relevant RFSV module will also announce itself.
 
     BufferStore a;
-
-    err = FACERR_NONE;
     a.addStringT("NCP$INFO");
-    if (!skt->sendBufferStore(a)) {
-        if (!reconnect)
-            err = FACERR_COULD_NOT_SEND;
-        else {
-            skt->closeSocket();
-            serNum = 0;
-            skt->reconnect();
-            err = FACERR_AGAIN;
+    if (!socket->sendBufferStore(a)) {
+        if (!reconnect) {
+            if (error) {
+                *error = FACERR_COULD_NOT_SEND;
+            }
+        } else {
+            socket->closeSocket();
+            socket->reconnect();
+            if (error) {
+                *error = FACERR_AGAIN;
+            }
         }
         return NULL;
     }
-    if (skt->getBufferStore(a) == 1) {
+    if (socket->getBufferStore(a) == 1) {
         if (a.getLen() > 8 && !strncmp(a.getString(), "Series 3", 8)) {
-            return new RFSV16(skt);
+            return new RFSV16(std::move(socket));
         }
         else if (a.getLen() > 8 && !strncmp(a.getString(), "Series 5", 8)) {
-            return new RFSV32(skt);
+            return new RFSV32(std::move(socket));
         }
         if ((a.getLen() > 8) && !strncmp(a.getString(), "No Psion", 8)) {
-            skt->closeSocket();
-            serNum = 0;
-            skt->reconnect();
-            err = FACERR_NOPSION;
+            socket->closeSocket();
+            socket->reconnect();
+            if (error) {
+                *error = FACERR_NOPSION;
+            }
             return NULL;
         }
         // Invalid protocol version
-        err = FACERR_PROTVERSION;
+        if (error) {
+            *error = FACERR_PROTVERSION;
+        }
     } else
-        err = FACERR_NORESPONSE;
+        if (error) {
+            *error = FACERR_NORESPONSE;
+        }
 
     return NULL;
 }

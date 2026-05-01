@@ -36,8 +36,8 @@
 
 using namespace std;
 
-RFSV32::RFSV32(TCPSocket *socket) {
-    socket_ = socket;
+RFSV32::RFSV32(std::unique_ptr<TCPSocket> socket) {
+    socket_ = std::move(socket);
     operationId_ = 0;
     status_ = RFSV::E_PSI_FILE_DISC;
     reset();

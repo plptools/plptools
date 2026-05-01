@@ -381,7 +381,7 @@ int fuse(int argc, char *argv[])
 }
 
 int main(int argc, char**argv) {
-    TCPSocket *skt, *skt2;
+    TCPSocket *skt2;
     string host = "127.0.0.1";
     int sockNum = DPORT, i, c, oldoptind = 1;
 
@@ -418,18 +418,13 @@ int main(int argc, char**argv) {
             break;
     }
 
-    skt = new TCPSocket();
-    if (!skt->connect(host.c_str(), sockNum)) {
-        cerr << _("plpfuse: could not connect to ncpd") << endl;
-        return 1;
-    }
     skt2 = new TCPSocket();
     if (!skt2->connect(host.c_str(), sockNum)) {
         cerr << _("plpfuse: could not connect to ncpd") << endl;
         return 1;
     }
 
-    rf = new RFSVFactory(skt);
+    rf = new RFSVFactory(host.c_str(), sockNum);
     rp = new RPCSFactory(skt2);
     a = rf->create(true);
     r = rp->create(true);

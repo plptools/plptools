@@ -22,6 +22,7 @@
 #include "psion.h"
 
 #include <cli_utils.h>
+#include <memory>
 #include <plpintl.h>
 #include <rfsv.h>
 #include <rpcs.h>
@@ -42,18 +43,15 @@ Psion::~Psion() {
 
 bool Psion::connect() {
     int sockNum = cli_utils::lookup_default_port();
-    rfsvSocket_ = new TCPSocket();
-    if (!rfsvSocket_->connect(NULL, sockNum)) {
-        return false;
-    }
     rpcsSocket_ = new TCPSocket();
     if (!rpcsSocket_->connect(NULL, sockNum)) {
         return false;
     }
-    rfsvFactory_ = new RFSVFactory(rfsvSocket_);
-    rpcsFactory_ = new RPCSFactory(rpcsSocket_);
-    rfsv_ = rfsvFactory_->create(true);
-    rpcs_ = rpcsFactory_->create(true);
+
+    auto rfsvFactory = std::make_unique<RFSVFactory>("127.0.0.1", sockNum);
+    auto rpcsFactory = std::make_unique<RPCSFactory>(rpcsSocket_);
+    rfsv_ = rfsvFactory->create(true);
+    rpcs_ = rpcsFactory->create(true);
     if ((rfsv_ != NULL) && (rpcs_ != NULL)) {
         return true;
     }
@@ -103,21 +101,9 @@ void Psion::disconnect() {
         delete rpcs_;
         rpcs_ = nullptr;
     }
-    if (rfsvSocket_) {
-        delete rfsvSocket_;
-        rfsvSocket_ = nullptr;
-    }
     if (rpcsSocket_) {
         delete rpcsSocket_;
         rpcsSocket_ = nullptr;
-    }
-    if (rfsvFactory_) {
-        delete rfsvFactory_;
-        rfsvFactory_ = nullptr;
-    }
-    if (rpcsFactory_) {
-        delete rpcsFactory_;
-        rpcsFactory_ = nullptr;
     }
 }
 

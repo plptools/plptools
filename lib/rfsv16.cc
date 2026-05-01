@@ -43,10 +43,10 @@
 
 using namespace std;
 
-RFSV16::RFSV16(TCPSocket *socket) {
+RFSV16::RFSV16(std::unique_ptr<TCPSocket> socket) {
     operationId_ = 0;
     status_ = RFSV::E_PSI_FILE_DISC;
-    socket_ = socket;
+    socket_ = std::move(socket);
     reset();
 }
 

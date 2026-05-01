@@ -22,6 +22,7 @@
 #pragma once
 
 #include "rfsv.h"
+#include <cstddef>
 
 class TCPSocket;
 
@@ -41,18 +42,17 @@ public:
         FACERR_AGAIN = 2,
         FACERR_NOPSION = 3,
         FACERR_PROTVERSION = 4,
-        FACERR_NORESPONSE = 5
+        FACERR_NORESPONSE = 5,
+        FACERR_CONNECTION_FAILURE = 6,
     };
 
     /**
     * Constructs a RFSVFactory.
     *
-    * Does not take ownership of the socket.
-    *
-    * @param skt The socket to be used for connecting
-    * to the ncpd daemon.
+    * @param host The host be used for connecting to the ncpd daemon.
+    * @param port The port be used for connecting to the ncpd daemon.
     */
-    RFSVFactory(TCPSocket *skt);
+    RFSVFactory(const std::string &host, int port);
 
     /**
      * Delete the RFSVFactory, cleaning up any resources.
@@ -62,28 +62,14 @@ public:
     /**
     * Creates a new @ref RFSV instance.
     *
-    * @param reconnect Set to true, if automatic reconnect
-    * should be performed on failure.
+    * @param reconnect Set to true, if automatic reconnect should be performed on failure.
+    * @param error Out parameter; set to the error on failure if non-NULL.
     *
-    * @returns A pointer to a newly created rfsv instance or
-    * NULL on failure.
+    * @returns A pointer to a newly created @ref RFSV instance or NULL on failure.
     */
-    virtual RFSV* create(bool);
-
-    /**
-    * Retrieve an error code.
-    *
-    * @returns The error code, in case @ref create has
-    * failed, 0 otherwise.
-    */
-    virtual Enum<errs> getError() { return err; }
+    virtual RFSV* create(bool, Enum<errs> *error = nullptr);
 
 private:
-    /**
-    * The socket to be used for connecting to the
-    * ncpd daemon.
-    */
-    TCPSocket *skt;
-    int serNum;
-    Enum<errs> err;
+    std::string host_;
+    int port_;
 };
