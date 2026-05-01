@@ -131,8 +131,12 @@ int main(int argc, char **argv) {
 
     Enum<ConnectionError> error;
     auto rfsv = std::unique_ptr<RFSV>(rfsvFactory->create(false, &error));
+    if (!rfsv) {
+        cerr << "plpftp: " << error << endl;
+        return EXIT_FAILURE;
+    }
     auto rpcs = std::unique_ptr<RPCS>(rpcsFactory->create(false, &error));
-    if (!rfsv || !rpcs) {
+    if (!rpcs) {
         cerr << "plpftp: " << error << endl;
         return EXIT_FAILURE;
     }
