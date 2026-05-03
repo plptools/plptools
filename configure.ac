@@ -97,10 +97,11 @@ if test "$ax_cv_lib_readline_version_ok" != "yes"; then
 fi
 
 # FUSE and libattr for plpfuse
-PKG_CHECK_MODULES([FUSE], [fuse >= 2.6], [enable_fuse=yes], [enable_fuse=no])
+PKG_CHECK_MODULES([FUSE3], [fuse3 >= 3.1.1], [enable_fuse3=yes], [PKG_CHECK_MODULES([FUSE], [fuse >= 2.6 fuse < 3.0], [enable_fuse2=yes], [enable_fuse=no])])
+AS_IF([test "x$enable_fuse3" = xyes], AC_DEFINE_UNQUOTED([FUSE_USE_VERSION], [31], [Set the FUSE API version]), AC_DEFINE_UNQUOTED([FUSE_USE_VERSION], [26], [Set the FUSE API version]))
 AC_CHECK_HEADER(attr/attributes.h)
 AC_CHECK_HEADERS(attr/xattr.h)
-AM_CONDITIONAL(BUILD_PLPFUSE, test x$enable_fuse = xyes)
+AM_CONDITIONAL(BUILD_PLPFUSE, test x$enable_fuse != xno)
 
 dnl special options for customization
 
@@ -182,12 +183,6 @@ AC_SUBST(initdir)
 
 LIB_PLP='$(top_builddir)/lib/libplp.la'
 AC_SUBST(LIB_PLP)
-
-dnl Extra definitions for config.h
-AH_BOTTOM([
-/* Select version of FUSE API */
-#define FUSE_USE_VERSION 26
-])
 
 dnl Create files
 AC_CONFIG_FILES(
