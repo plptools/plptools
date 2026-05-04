@@ -22,11 +22,15 @@
  */
 #include "config.h"
 
+#include "rfsv.h"
+
 #include "bufferstore.h"
 #include "drive.h"
 #include "Enum.h"
+#include "ncpclient.h"
 #include "plpdirent.h"
-#include "rfsv.h"
+#include "rfsv16.h"
+#include "rfsv32.h"
 #include "tcpsocket.h"
 
 using namespace std;
@@ -108,6 +112,9 @@ ENUM_DEFINITION_BEGIN(RFSV::errs, RFSV::E_PSI_GEN_NONE)
     stringRep.add(RFSV::E_PSI_INTERNAL,        N_("libplp internal error"));
 ENUM_DEFINITION_END(RFSV::errs)
 
+RFSV *RFSV::connect(const std::string &host, int port, Enum<ConnectionError> *error) {
+    return ncp_client::connect<RFSV, RFSV16, RFSV32>(host, port, false, error);
+}
 
 const char *RFSV::getConnectName(void) {
     return "SYS$RFSV";

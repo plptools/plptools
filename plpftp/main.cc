@@ -126,16 +126,13 @@ int main(int argc, char **argv) {
         ftpHeader();
     }
 
-    auto rfsvFactory = std::make_unique<RFSVFactory>(host, sockNum);
-    auto rpcsFactory = std::make_unique<RPCSFactory>(host, sockNum);
-
     Enum<ConnectionError> error;
-    auto rfsv = std::unique_ptr<RFSV>(rfsvFactory->create(false, &error));
+    auto rfsv = std::unique_ptr<RFSV>(RFSV::connect(host, sockNum, &error));
     if (!rfsv) {
         cerr << "plpftp: " << error << endl;
         return EXIT_FAILURE;
     }
-    auto rpcs = std::unique_ptr<RPCS>(rpcsFactory->create(false, &error));
+    auto rpcs = std::unique_ptr<RPCS>(RPCS::connect(host, sockNum, &error));
     if (!rpcs) {
         cerr << "plpftp: " << error << endl;
         return EXIT_FAILURE;
