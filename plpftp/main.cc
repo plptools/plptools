@@ -94,8 +94,7 @@ void ftpHeader() {
 int main(int argc, char **argv) {
     FTP ftp;
     string host = "127.0.0.1";
-    int status = 0;
-    int sockNum = cli_utils::lookup_default_port();
+    int port = cli_utils::lookup_default_port();
 
     setlocale (LC_ALL, "");
     textdomain(PACKAGE);
@@ -115,7 +114,7 @@ int main(int argc, char **argv) {
                 help();
                 return 0;
             case 'p':
-                if (!cli_utils::parse_port(optarg, &host, &sockNum)) {
+                if (!cli_utils::parse_port(optarg, &host, &port)) {
                     cout << _("Invalid port definition.") << endl;
                     return 1;
                 }
@@ -127,17 +126,17 @@ int main(int argc, char **argv) {
     }
 
     Enum<ConnectionError> error;
-    auto rfsv = std::unique_ptr<RFSV>(RFSV::connect(host, sockNum, &error));
+    auto rfsv = std::unique_ptr<RFSV>(RFSV::connect(host, port, &error));
     if (!rfsv) {
         cerr << "plpftp: " << error << endl;
         return EXIT_FAILURE;
     }
-    auto rpcs = std::unique_ptr<RPCS>(RPCS::connect(host, sockNum, &error));
+    auto rpcs = std::unique_ptr<RPCS>(RPCS::connect(host, port, &error));
     if (!rpcs) {
         cerr << "plpftp: " << error << endl;
         return EXIT_FAILURE;
     }
-    auto clipboard = std::unique_ptr<rclip>(rclip::connect(host, sockNum, &error));
+    auto clipboard = std::unique_ptr<rclip>(rclip::connect(host, port, &error));
     if (!clipboard) {
         cerr << "plpftp: " << error << endl;
         return EXIT_FAILURE;
