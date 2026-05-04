@@ -19,7 +19,7 @@
  */
 #include "config.h"
 
-#include <cli_utils.h>
+#include <cliutils.h>
 #include <tcpsocket.h>
 #include <wprt.h>
 #include <psibitmap.h>

@@ -20,7 +20,7 @@
  */
 #include "config.h"
 
-#include <cli_utils.h>
+#include <cliutils.h>
 #include <memory>
 #include <rfsv.h>
 #include <rfsvfactory.h>
