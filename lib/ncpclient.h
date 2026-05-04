@@ -49,7 +49,7 @@ namespace ncp_client {
 * @return A newly instantiated ncpd client corresponding with the device type (EPOC16 or EPOC32); nullptr on failure.
 */
 template<typename Client, typename Client16, typename Client32>
-Client *connect(const std::string &host, int port, bool waitForServer, Enum<ConnectionError> *error) {
+Client *connect(const std::string &host, int port, bool waitForDevice, Enum<ConnectionError> *error) {
 
     if (error) {
         *error = FACERR_NONE;
@@ -72,7 +72,7 @@ Client *connect(const std::string &host, int port, bool waitForServer, Enum<Conn
 
     bufferStore.addStringT("NCP$INFO");
     if (!socket->sendBufferStore(bufferStore)) {
-        if (!waitForServer) {
+        if (!waitForDevice) {
             if (error) {
                 *error = FACERR_COULD_NOT_SEND;
             }
