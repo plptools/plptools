@@ -35,13 +35,8 @@ class RPCSFactory;
  * @ref RPCS . For a complete documentation, see @ref RPCS .
  */
 class RPCS16 : public RPCS {
-    friend class RPCSFactory;
-
  public:
+    RPCS16(std::unique_ptr<TCPSocket> socket);
     Enum<RFSV::errs> getCmdLine(const char *, std::string &);
     Enum<RFSV::errs> getOwnerInfo(BufferArray &owner);
-
-
- private:
-    RPCS16(std::unique_ptr<TCPSocket> socket);
 };

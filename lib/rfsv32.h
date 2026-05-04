@@ -37,13 +37,9 @@ class RFSVFactory;
  * @ref RFSV . For a complete documentation, see @ref RFSV .
  */
 class RFSV32 : public RFSV {
-
-    /**
-     * RFSVFactory may call our constructor.
-     */
-    friend class RFSVFactory;
-
 public:
+    RFSV32(std::unique_ptr<TCPSocket> socket);
+
     Enum<RFSV::errs> dir(const char * const, PlpDir &);
     Enum<RFSV::errs> dircount(const char * const, uint32_t &);
     Enum<RFSV::errs> copyFromPsion(const char * const, const char * const, void *, cpCallback_t);
@@ -187,12 +183,6 @@ private:
         SET_DRIVE_NAME   = 0x31,
         REPLACE          = 0x32
     };
-
-    /**
-    * Private constructor. Shall be called by
-    * RFSVFactory only.
-    */
-    RFSV32(std::unique_ptr<TCPSocket> socket);
 
     Enum<RFSV::errs> err2psierr(int32_t);
     Enum<RFSV::errs> fopendir(const uint32_t, const char *, uint32_t &);
