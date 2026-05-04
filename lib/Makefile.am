@@ -32,7 +32,7 @@ libplp_la_SOURCES = \
 	bufferstore.cc \
 	connectionerror.cc \
 	channel.cc \
-	cli_utils.cc \
+	cliutils.cc \
 	datalink.cc \
 	deviceconfiguration.cc \
 	drive.cc \
@@ -79,7 +79,7 @@ noinst_HEADERS = \
 	bufferstore.h \
 	connectionerror.h \
 	channel.h \
-	cli_utils.h \
+	cliutils.h \
 	datalink.h \
 	deviceconfiguration.h \
 	drive.h \

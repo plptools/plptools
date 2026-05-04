@@ -21,7 +21,7 @@
 
 #include "psion.h"
 
-#include <cli_utils.h>
+#include <cliutils.h>
 #include <memory>
 #include <plpintl.h>
 #include <rfsv.h>
