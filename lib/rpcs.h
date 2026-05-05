@@ -20,6 +20,7 @@
 #ifndef _RPCS_H_
 #define _RPCS_H_
 
+#include "connectionerror.h"
 #include "psitime.h"
 #include "psiprocess.h"
 #include "rfsv.h"
@@ -158,6 +159,8 @@ public:
         psi_timeval externalPowerUsedTime;
         bool externalPower;
     } machineInfo;
+
+    static RPCS *connect(const std::string &host, int port, Enum<ConnectionError> *error);
 
     /**
     * Virtual destructor.

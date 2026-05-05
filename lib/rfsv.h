@@ -19,8 +19,7 @@
  *  along with this program; if not, see <https://www.gnu.org/licenses/>.
  *
  */
-#ifndef _RFSV_H_
-#define _RFSV_H_
+#pragma once
 
 #include <deque>
 #include <memory>
@@ -28,6 +27,7 @@
 #include <vector>
 
 #include "Enum.h"
+#include "connectionerror.h"
 #include "plpdirent.h"
 #include "bufferstore.h"
 
@@ -214,6 +214,8 @@ public:
         PSI_A_STREAM     = 0x0800,
         PSI_A_TEXT       = 0x1000
     };
+
+    static RFSV *connect(const std::string &host, int port, Enum<ConnectionError> *error);
 
     virtual ~RFSV();
     void reset();
@@ -659,5 +661,3 @@ protected:
     Enum<errs> status_;
     int32_t operationId_;
 };
-
-#endif

@@ -20,11 +20,11 @@
  */
 #include "config.h"
 
+#include "ncpclient.h"
+#include "rpcs.h"
 #include "rpcs16.h"
 #include "rpcs32.h"
 #include "rpcsfactory.h"
-#include "bufferstore.h"
-#include "tcpsocket.h"
 #include "Enum.h"
 
 #include <stdlib.h>
@@ -37,66 +37,5 @@ RPCSFactory::RPCSFactory(const std::string &host, int port)
 RPCSFactory::~RPCSFactory() {}
 
 RPCS *RPCSFactory::create(bool reconnect, Enum<ConnectionError> *error) {
-
-    if (error) {
-        *error = FACERR_NONE;
-    }
-
-    auto socket = std::make_unique<TCPSocket>();
-    if (!socket->connect(host_.c_str(), port_)) {
-        if (error) {
-            *error = FACERR_CONNECTION_FAILURE;
-        }
-        return nullptr;
-    }
-
-    // At this point the socket is connected to the ncp daemon, which will have (hopefully) seen an INFO exchange, where
-    // the protocol version of the remote Psion was sent, and noted. We have to ask the ncp daemon which protocol it
-    // saw, so we can instantiate the correct RPCS protocol handler for the caller. We announce ourselves to the NCP
-    // daemon, and the relevant RPCS module will also announce itself.
-
-    BufferStore bufferStore;
-
-    bufferStore.addStringT("NCP$INFO");
-    if (!socket->sendBufferStore(bufferStore)) {
-        if (!reconnect) {
-            if (error) {
-                *error = FACERR_COULD_NOT_SEND;
-            }
-        } else {
-            socket->closeSocket();
-            socket->reconnect();
-            if (error) {
-                *error = FACERR_AGAIN;
-            }
-        }
-        return nullptr;
-    }
-    if (socket->getBufferStore(bufferStore) == 1) {
-        if (bufferStore.getLen() > 8 && !strncmp(bufferStore.getString(), "Series 3", 8)) {
-            return new RPCS16(std::move(socket));
-        }
-        else if (bufferStore.getLen() > 8 && !strncmp(bufferStore.getString(), "Series 5", 8)) {
-            return new RPCS32(std::move(socket));
-        }
-        if ((bufferStore.getLen() > 8) && !strncmp(bufferStore.getString(), "No Psion", 8)) {
-            socket->closeSocket();
-            socket->reconnect();
-            if (error) {
-                *error = FACERR_NOPSION;
-            }
-            return nullptr;
-        }
-        // Invalid protocol version
-        if (error) {
-            *error = FACERR_PROTVERSION;
-        }
-    } else {
-        if (error) {
-            *error = FACERR_NORESPONSE;
-        }
-    }
-
-    // No message returned.
-    return nullptr;
+    return ncp_client::connect<RPCS, RPCS16, RPCS32>(host_, port_, reconnect, error);
 }

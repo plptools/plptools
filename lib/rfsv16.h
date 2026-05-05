@@ -34,13 +34,9 @@ class RFSVFactory;
  * @ref RFSV . For a complete documentation, see @ref RFSV .
  */
 class RFSV16 : public RFSV {
-
-    /**
-     * RFSVFactory may call our constructor.
-     */
-    friend class RFSVFactory;
-
 public:
+    RFSV16(std::unique_ptr<TCPSocket> socket);
+
     Enum<RFSV::errs> fopen(const uint32_t, const char * const, uint32_t &);
     Enum<RFSV::errs> mktemp(uint32_t &, std::string &);
     Enum<RFSV::errs> fcreatefile(const uint32_t, const char * const, uint32_t &);
@@ -134,11 +130,6 @@ private:
         P_FATEXT   = 0x0800, /* is it a text file? */
         P_FAMASK   = 0x0f3f  /* All of the above */
     };
-
-    /**
-    * Private constructor. Shall be called by RFSVFactory only.
-    */
-    RFSV16(std::unique_ptr<TCPSocket> socket);
 
     // Miscellaneous
     Enum<RFSV::errs> fopendir(const char * const, uint32_t &);

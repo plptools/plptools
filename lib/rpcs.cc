@@ -20,15 +20,19 @@
 #include "config.h"
 
 #include "rpcs.h"
-#include "bufferstore.h"
-#include "tcpsocket.h"
-#include "bufferarray.h"
-#include "psiprocess.h"
-#include "Enum.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+
+#include "bufferarray.h"
+#include "bufferstore.h"
+#include "Enum.h"
+#include "ncpclient.h"
+#include "psiprocess.h"
+#include "rpcs16.h"
+#include "rpcs32.h"
+#include "tcpsocket.h"
 
 using namespace std;
 
@@ -85,6 +89,10 @@ ENUM_DEFINITION_BEGIN(RPCS::languages, RPCS::PSI_LANG_TEST)
     stringRep.add(RPCS::PSI_LANG_pl_PL, N_("Polish"));
     stringRep.add(RPCS::PSI_LANG_sl_SI, N_("Slovenian"));
 ENUM_DEFINITION_END(RPCS::languages)
+
+RPCS *RPCS::connect(const std::string &host, int port, Enum<ConnectionError> *error) {
+    return ncp_client::connect<RPCS, RPCS16, RPCS32>(host, port, false, error);
+}
 
 RPCS::~RPCS() {
     socket_->closeSocket();

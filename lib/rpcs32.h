@@ -34,8 +34,6 @@ class RPCSFactory;
  * @ref RPCS . For a complete documentation, see @ref RPCS .
  */
 class RPCS32 : public RPCS {
-    friend class RPCSFactory;
-
  public:
     Enum<RFSV::errs> getCmdLine(const char *, std::string &);
     Enum<RFSV::errs> getMachineInfo(machineInfo &);
@@ -55,9 +53,8 @@ class RPCS32 : public RPCS {
     Enum<RFSV::errs> quitServer(void);
 #endif
 
+    RPCS32(std::unique_ptr<TCPSocket> socket);
+
 protected:
     Enum<RFSV::errs> configOpen(uint16_t &, uint32_t);
-
- private:
-    RPCS32(std::unique_ptr<TCPSocket> socket);
 };
