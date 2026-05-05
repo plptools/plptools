@@ -1,5 +1,7 @@
 # plptools
 
+[![build](https://github.com/plptools/plptools/actions/workflows/build.yml/badge.svg)](https://github.com/plptools/plptools/actions/workflows/build.yml)
+
 https://github.com/plptools/plptools/
 
 plptools is a suite of programs for transferring files to and from EPOC
