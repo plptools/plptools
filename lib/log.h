@@ -19,8 +19,7 @@
  *  along with this program; if not, see <https://www.gnu.org/licenses/>.
  *
  */
-#ifndef _LOG_H_
-#define _LOG_H_
+#pragma once
 
 #include <cstdio>
 #include <iostream>
@@ -126,5 +125,3 @@ private:
     */
     char buf[1024];
 };
-
-#endif

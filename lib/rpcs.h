@@ -17,8 +17,7 @@
  *  along with this program; if not, see <https://www.gnu.org/licenses/>.
  *
  */
-#ifndef _RPCS_H_
-#define _RPCS_H_
+#pragma once
 
 #include "connectionerror.h"
 #include "psitime.h"
@@ -532,5 +531,3 @@ protected:
     Enum<RFSV::errs> getResponse(BufferStore &data, bool statusIsFirstByte);
     const char *getConnectName();
 };
-
-#endif

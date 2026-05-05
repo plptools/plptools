@@ -17,8 +17,7 @@
  *  along with this program; if not, see <https://www.gnu.org/licenses/>.
  *
  */
-#ifndef _WPRT_H_
-#define _WPRT_H_
+#pragma once
 
 #include "rfsv.h"
 #include "Enum.h"
@@ -124,5 +123,3 @@ protected:
     const char *getConnectName();
 
 };
-
-#endif

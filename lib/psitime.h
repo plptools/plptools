@@ -17,8 +17,7 @@
  *  along with this program; if not, see <https://www.gnu.org/licenses/>.
  *
  */
-#ifndef _PSITIME_H_
-#define _PSITIME_H_
+#pragma once
 
 #include "config.h"
 
@@ -359,4 +358,3 @@ private:
     bool _ptzValid;
     psi_timezone _ptz;
 };
-#endif

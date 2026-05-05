@@ -18,8 +18,7 @@
  *  along with this program; if not, see <https://www.gnu.org/licenses/>.
  *
  */
-#ifndef _BUFFERARRAY_H_
-#define _BUFFERARRAY_H_
+#pragma once
 
 #include "config.h"
 
@@ -163,5 +162,3 @@ private:
 };
 
 inline bool BufferArray::empty() const { return len == 0; }
-
-#endif

@@ -17,8 +17,7 @@
  *  along with this program; if not, see <https://www.gnu.org/licenses/>.
  *
  */
-#ifndef _ENUM_H_
-#define _ENUM_H_
+#pragma once
 
 #include "config.h"
 
@@ -314,5 +313,3 @@ template <typename E>
 inline std::ostream& operator << (std::ostream& out, const Enum<E> &e) {
     return out << e.toString().c_str();
 }
-
-#endif /* _ENUM_H_ */

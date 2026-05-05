@@ -17,8 +17,7 @@
  *  along with this program; if not, see <https://www.gnu.org/licenses/>.
  *
  */
-#ifndef _PSIPROCESS_H_
-#define _PSIPROCESS_H_
+#pragma once
 
 #include <string>
 #include <iostream>
@@ -114,5 +113,3 @@ private:
     std::string  args;
     bool s5mx;
 };
-
-#endif

@@ -17,8 +17,7 @@
  *  along with this program; if not, see <https://www.gnu.org/licenses/>.
  *
  */
-#ifndef _RCLIP_H_
-#define _RCLIP_H_
+#pragma once
 
 #include "connectionerror.h"
 #include "rfsv.h"
@@ -177,5 +176,3 @@ protected:
     const char *getConnectName();
 
 };
-
-#endif
