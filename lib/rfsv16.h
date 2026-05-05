@@ -18,8 +18,7 @@
  *  along with this program; if not, see <https://www.gnu.org/licenses/>.
  *
  */
-#ifndef _RFSV16_H_
-#define _RFSV16_H_
+#pragma once
 
 #include "rfsv.h"
 #include <memory>
@@ -140,5 +139,3 @@ private:
     bool sendCommand(enum commands, BufferStore &);
     Enum<RFSV::errs> getResponse(BufferStore &);
 };
-
-#endif

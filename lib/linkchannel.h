@@ -18,8 +18,7 @@
  *  along with this program; if not, see <https://www.gnu.org/licenses/>.
  *
  */
-#ifndef _linkchan_h_
-#define _linkchan_h_
+#pragma once
 
 #include "channel.h"
 #include "bufferarray.h"
@@ -42,4 +41,3 @@ private:
     int registerSer;
     BufferArray registerStack;
 };
-#endif

@@ -20,7 +20,6 @@
  *  along with this program; if not, see <https://www.gnu.org/licenses/>.
  *
  */
-
 #pragma once
 
 #include "config.h"

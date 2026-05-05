@@ -18,8 +18,7 @@
  *  along with this program; if not, see <https://www.gnu.org/licenses/>.
  *
  */
-#ifndef _mp_serial_h
-#define _mp_serial_h
+#pragma once
 
 #ifdef __cplusplus
 extern "C" {
@@ -28,6 +27,4 @@ int init_serial(const char *dev, int speed, int debug);
 void ser_exit(int fd);
 #ifdef __cplusplus
 }
-#endif
-
 #endif

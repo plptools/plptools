@@ -16,9 +16,7 @@
  *  You should have received a copy of the GNU General Public License along
  *  along with this program; if not, see <https://www.gnu.org/licenses/>.
  */
-
-#ifndef _SISFILE_H
-#define _SISFILE_H
+#pragma once
 
 #include "sistypes.h"
 #include "sisfileheader.h"
@@ -123,5 +121,3 @@ private:
     void updateEnd(uint32_t pos);
 
 };
-
-#endif

@@ -17,8 +17,7 @@
  *  along with this program; if not, see <https://www.gnu.org/licenses/>.
  *
  */
-#ifndef _PLPINTL_H_
-#define _PLPINTL_H_
+#pragma once
 
 #include "config.h"
 
@@ -37,5 +36,3 @@
 #  define textdomain(Domain)
 #  define bindtextdomain(Package, Directory)
 #endif
-
-#endif /* _PLPINTL_H_ */

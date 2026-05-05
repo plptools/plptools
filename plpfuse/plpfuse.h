@@ -17,8 +17,7 @@
  *  along with this program; if not, see <https://www.gnu.org/licenses/>.
  *
  */
-#ifndef _plpfuse_h_
-#define _plpfuse_h_
+#pragma once
 
 #include <fuse.h>
 
@@ -59,7 +58,5 @@ extern void debuglog(const char *fmt, ...);
 
 #define BLOCKSIZE      512
 #define FID            7 /* File system id */
-
-#endif
 
 extern struct fuse_operations plp_oper;
