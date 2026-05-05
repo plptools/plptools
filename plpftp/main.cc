@@ -80,7 +80,8 @@ static struct option opts[] = {
 
 void ftpHeader() {
     cout << _("PLPFTP Version ") << VERSION << endl;
-    cout << _("FTP like interface started. Type \"?\" for help.") << endl << endl;
+    cout << _("FTP like interface started. Type \"?\" for help.") << endl;
+    cout << endl;
 }
 
 int main(int argc, char **argv) {
