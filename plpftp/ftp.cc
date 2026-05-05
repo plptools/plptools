@@ -549,20 +549,12 @@ int FTP::session(RFSV &rfsv, RPCS &rpcs, rclip &clipboard, vector<char *> argv) 
 
     {
         Enum<RPCS::machs> machType;
-        BufferArray b;
-        if ((res = rpcs.getOwnerInfo(b)) == RFSV::E_PSI_GEN_NONE) {
-            rpcs.getMachineType(machType);
-            if (!once) {
-                int speed = rfsv.getSpeed();
-                cout << _("Connected to a ") << machType << _(" at ")
-                     << speed << _(" baud, OwnerInfo:") << endl;
-                while (!b.empty()) {
-                    cout << "  " << b.pop().getString() << endl;
-                }
-                cout << endl;
-            }
-        } else {
-            cerr << _("OwnerInfo returned error ") << res << endl;
+        rpcs.getMachineType(machType);
+        if (!once) {
+            int speed = rfsv.getSpeed();
+            cout << _("Connected to a ") << machType << _(" at ")
+                 << speed << _(" baud.") << endl;
+            cout << endl;
         }
     }
 
