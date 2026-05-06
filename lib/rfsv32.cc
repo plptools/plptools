@@ -549,7 +549,7 @@ Enum<RFSV::errs> RFSV32::copyToPsion(const char *from, const char *to, void *ptr
     uint32_t total = 0;
     while (ip && !ip.eof() && (res == E_PSI_GEN_NONE)) {
         uint32_t len;
-        ip.read((char *)buff, RFSV_SENDLEN);
+        ip.read(reinterpret_cast<char *>(buff), RFSV_SENDLEN);
         if ((res = fwrite(handle, buff, ip.gcount(), len)) == E_PSI_GEN_NONE) {
             total += len;
             if (cb && !cb(ptr, total)) {

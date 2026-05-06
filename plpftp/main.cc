@@ -20,19 +20,21 @@
  */
 #include "config.h"
 
-#include <cliutils.h>
+#include <iostream>
 #include <memory>
+#include <vector>
+
+#include <bufferstore.h>
+#include <cliutils.h>
+#include <device.h>
+#include <deviceconfiguration.h>
+#include <plpintl.h>
+#include <rclip.h>
 #include <rfsv.h>
 #include <rfsvfactory.h>
 #include <rpcs.h>
 #include <rpcsfactory.h>
-#include <rclip.h>
-#include <plpintl.h>
 #include <tcpsocket.h>
-#include <bufferstore.h>
-
-#include <iostream>
-#include <vector>
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -119,21 +121,11 @@ int main(int argc, char **argv) {
     }
 
     Enum<ConnectionError> error;
-    auto rfsv = std::unique_ptr<RFSV>(RFSV::connect(host, port, &error));
-    if (!rfsv) {
-        cerr << "plpftp: " << error << endl;
-        return EXIT_FAILURE;
-    }
-    auto rpcs = std::unique_ptr<RPCS>(RPCS::connect(host, port, &error));
-    if (!rpcs) {
-        cerr << "plpftp: " << error << endl;
-        return EXIT_FAILURE;
-    }
-    auto clipboard = std::unique_ptr<rclip>(rclip::connect(host, port, &error));
-    if (!clipboard) {
-        cerr << "plpftp: " << error << endl;
+    auto deviceEndpoint = device::connect(host, port, &error);
+    if (!deviceEndpoint) {
+        std::cerr << "plpftp: " << error << std::endl;
         return EXIT_FAILURE;
     }
     vector<char *> args(argv + optind, argv + argc);
-    return ftp.session(*rfsv, *rpcs, *clipboard, args);
+    return ftp.session(*deviceEndpoint->rfsv_, *deviceEndpoint->rpcs_, *deviceEndpoint->clip_, args);
 }

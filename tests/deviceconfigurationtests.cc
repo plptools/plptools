@@ -58,4 +58,13 @@ TEST_CASE("DeviceConfiguration::deserialize") {
         CHECK(result->id() == "123456");
         CHECK(result->name() == "");
     }
+
+    SUBCASE("Reconnect configuration") {
+        std::string configuration =R"(id = C35B9D58-9865-462F-BC39-52A5DFAB3E4D
+        name = Series 3a
+)";
+        auto result = DeviceConfiguration::deserialize(configuration);
+        CHECK(result->id() == "C35B9D58-9865-462F-BC39-52A5DFAB3E4D");
+        CHECK(result->name() == "Series 3a");
+    }
 }

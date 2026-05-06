@@ -34,6 +34,7 @@ libplp_la_SOURCES = \
 	channel.cc \
 	cliutils.cc \
 	datalink.cc \
+	device.cc \
 	deviceconfiguration.cc \
 	drive.cc \
 	Enum.cc \
@@ -81,6 +82,7 @@ noinst_HEADERS = \
 	channel.h \
 	cliutils.h \
 	datalink.h \
+	device.h \
 	deviceconfiguration.h \
 	drive.h \
 	Enum.h \

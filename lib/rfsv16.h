@@ -69,8 +69,18 @@ public:
     Enum<RFSV::errs> setVolumeName(const char, const char * const);
 
     uint32_t opMode(const uint32_t);
-    int getProtocolVersion() { return 3; }
-    char defaultInternalDriveLetter() { return 'M'; };
+
+    int getProtocolVersion() {
+        return 3;
+    }
+
+    char defaultInternalDriveLetter() {
+        return 'M';
+    };
+
+    std::string deviceConfigurationPath() {
+        return "M:\\sync\\config.ini";
+    };
 
 private:
     enum commands {

@@ -649,6 +649,8 @@ public:
 
     virtual char defaultInternalDriveLetter() = 0;
 
+    virtual std::string deviceConfigurationPath() = 0;
+
 protected:
     /**
     * Retrieves the PLP protocol name. Mainly internal use.

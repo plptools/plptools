@@ -26,6 +26,7 @@
 #include <bufferarray.h>
 #include <bufferstore.h>
 #include <cstdint>
+#include <cstdlib>
 #include <drive.h>
 #include <Enum.h>
 #include <memory>
@@ -52,6 +53,8 @@
 #include <signal.h>
 #include <netdb.h>
 #include <fnmatch.h>
+#include <device.h>
+#include <deviceconfiguration.h>
 
 #include "ignore-value.h"
 #include "string-buffer.h"
@@ -102,7 +105,7 @@ FTP::~FTP() {
 }
 
 void FTP::usage() {
-    cout << _("Known FTP commands:") << endl << endl;
+    cout << _("FTP commands:") << endl << endl;
     cout << "  pwd" << endl;
     cout << "  ren <oldname> <newname>" << endl;
     cout << "  touch <psionfile>" << endl;
@@ -128,7 +131,7 @@ void FTP::usage() {
     cout << "  prompt" << endl;
     cout << "  hash" << endl;
     cout << "  bye" << endl;
-    cout << endl << _("Known RPC commands:") << endl << endl;
+    cout << endl << _("RPC commands:") << endl << endl;
     cout << "  ps" << endl;
     cout << "  kill <pid|'all'>" << endl;
     cout << "  getclip <unixfile>" << endl;
@@ -140,6 +143,11 @@ void FTP::usage() {
     cout << "  ownerinfo" << endl;
     cout << "  settime" << endl;
     cout << "  setupinfo" << endl;
+    cout << endl << _("Device commands:") << endl << endl;
+    cout << "  deviceid - get the device id used for backup and sync" << endl;
+    cout << "  devicename - get the device name used for backup and sync" << endl;
+    cout << "  setdevicename <name> - set the device name used for backup and sync" << endl;
+    cout << endl;
 }
 
 static char *join_string_vector(vector<char *> argv, const char *sep) {
@@ -548,12 +556,19 @@ int FTP::session(RFSV &rfsv, RPCS &rpcs, rclip &clipboard, vector<char *> argv) 
     }
 
     {
+        Enum<RFSV::errs> error;
+        auto deviceConfiguration = device::read_configuration(rfsv, error);
+        if (error != RFSV::E_PSI_GEN_NONE) {
+            cerr << _("Error: ") << error << endl;
+            return EXIT_FAILURE;
+        }
+
         Enum<RPCS::machs> machType;
         rpcs.getMachineType(machType);
         if (!once) {
             int speed = rfsv.getSpeed();
-            cout << _("Connected to a ") << machType << _(" at ")
-                 << speed << _(" baud.") << endl;
+            cout << _("Connected to '") << deviceConfiguration->name() << _("', a ") << machType << _(", at ")
+                     << speed << _(" baud.") << endl;
             cout << endl;
         }
     }
@@ -718,6 +733,42 @@ int FTP::session(RFSV &rfsv, RPCS &rpcs, rclip &clipboard, vector<char *> argv) 
                 cerr << _("Error: ") << res << endl;
             }
             free(f1);
+            continue;
+        }
+        if (!strcmp(argv[0], "deviceid") && (argc == 1)) {
+            Enum<RFSV::errs> error = RFSV::E_PSI_GEN_NONE;
+            auto deviceConfiguration = device::read_configuration(rfsv, error);
+            if (!deviceConfiguration) {
+                cerr << _("Error: ") << error << endl;
+                continue;
+            }
+            cout << deviceConfiguration->id() << endl;
+            continue;
+        }
+        if (!strcmp(argv[0], "devicename") && (argc == 1)) {
+            Enum<RFSV::errs> error = RFSV::E_PSI_GEN_NONE;
+            auto deviceConfiguration = device::read_configuration(rfsv, error);
+            if (!deviceConfiguration) {
+                cerr << _("Error: ") << error << endl;
+                continue;
+            }
+            cout << deviceConfiguration->name() << endl;
+            continue;
+        }
+        if (!strcmp(argv[0], "setdevicename") && (argc == 2)) {
+            std::string name = argv[1];
+            Enum<RFSV::errs> error = RFSV::E_PSI_GEN_NONE;
+            auto deviceConfiguration = device::read_configuration(rfsv, error);
+            if (!deviceConfiguration) {
+                cerr << _("Error: ") << error << endl;
+                continue;
+            }
+            deviceConfiguration->setName(argv[1]);
+            error = device::write_configuration(rfsv, *deviceConfiguration);
+            if (error != RFSV::E_PSI_GEN_NONE) {
+                cerr << _("Error: ") << error << endl;
+                continue;
+            }
             continue;
         }
         if (!strcmp(argv[0], "dircnt")) {
@@ -1250,7 +1301,7 @@ static const char *all_commands[] = {
     "dir", "ls", "dircnt", "cd", "lcd", "get", "put", "mget", "mput",
     "del", "rm", "mkdir", "rmdir", "prompt", "bye", "cp", "volname",
     "ps", "kill", "killsave", "runrestore", "run", "machinfo",
-    "ownerinfo", "help", "settime", "setupinfo", NULL
+    "ownerinfo", "help", "settime", "setupinfo", "devicename", "setdevicename", NULL
 };
 
 static const char *localfile_commands[] = {

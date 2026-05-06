@@ -70,8 +70,18 @@ public:
     Enum<RFSV::errs> closedir(RFSVDirHandle &);
     Enum<RFSV::errs> setVolumeName(const char, const char * const);
     uint32_t opMode(const uint32_t);
-    int getProtocolVersion() { return 5; }
-    char defaultInternalDriveLetter() { return 'C'; };
+
+    int getProtocolVersion() {
+        return 5;
+    }
+
+    char defaultInternalDriveLetter() {
+        return 'C';
+    };
+
+    std::string deviceConfigurationPath() {
+        return "C:\\System\\Sync\\config.ini";
+    };
 
 private:
 
