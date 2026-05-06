@@ -558,17 +558,20 @@ int FTP::session(RFSV &rfsv, RPCS &rpcs, rclip &clipboard, vector<char *> argv) 
     {
         Enum<RFSV::errs> error;
         auto deviceConfiguration = device::read_configuration(rfsv, error);
-        if (error != RFSV::E_PSI_GEN_NONE) {
+        if (!deviceConfiguration) {
             cerr << _("Error: ") << error << endl;
-            return EXIT_FAILURE;
         }
 
         Enum<RPCS::machs> machType;
         rpcs.getMachineType(machType);
         if (!once) {
             int speed = rfsv.getSpeed();
-            cout << _("Connected to '") << deviceConfiguration->name() << _("', a ") << machType << _(", at ")
+            if (deviceConfiguration) {
+                cout << _("Connected to '") << deviceConfiguration->name() << _("', a ") << machType << _(", at ")
                      << speed << _(" baud.") << endl;
+            } else {
+                cout << _("Connected to a ") << machType << _(", at ") << speed << _(" baud.") << endl;
+            }
             cout << endl;
         }
     }

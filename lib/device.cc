@@ -60,14 +60,11 @@ std::unique_ptr<device::DeviceEndpoint> device::connect(const std::string host,
     Enum<RFSV::errs> result;
     auto deviceConfiguration = device::read_configuration(*rfsv, result);
     if (!deviceConfiguration) {
-        std::cout << "Unable to read configuration; creating new..." << std::endl;
+        // Create and write a new device configuration if it doesn't exist.
+        // We ignore errors here as we want failures to write the device configuration to be non-fatal. For example., if
+        // the device is out of memory, it's acceptable for it to appear as a new device on each connection.
         deviceConfiguration = std::make_unique<DeviceConfiguration>();
-        // TODO: Write device configuration.
-    }
-
-    auto r = device::write_configuration(*rfsv, *deviceConfiguration);
-    if (r != RFSV::E_PSI_GEN_NONE) {
-        std::cout << "Failed to write configuration with error '" << r << "'" << std::endl;
+        device::write_configuration(*rfsv, *deviceConfiguration);
     }
 
     auto rpcs = std::unique_ptr<RPCS>(RPCS::connect(host, port, &internalError));
