@@ -1301,7 +1301,8 @@ static const char *all_commands[] = {
     "dir", "ls", "dircnt", "cd", "lcd", "get", "put", "mget", "mput",
     "del", "rm", "mkdir", "rmdir", "prompt", "bye", "cp", "volname",
     "ps", "kill", "killsave", "runrestore", "run", "machinfo",
-    "ownerinfo", "help", "settime", "setupinfo", "devicename", "setdevicename", NULL
+    "ownerinfo", "help", "settime", "setupinfo", "deviceid", "devicename",
+    "setdevicename", NULL
 };
 
 static const char *localfile_commands[] = {
