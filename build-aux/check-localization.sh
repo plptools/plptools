@@ -22,6 +22,20 @@ set -o pipefail
 set -x
 set -u
 
+# Per-platform environment setup.
+case `uname` in
+    Linux)
+    ;;
+    Darwin)
+        export PATH="$(brew --prefix coreutils)/libexec/gnubin:$PATH"
+        export PATH="$(brew --prefix m4)/bin:$PATH"
+
+        export CPPFLAGS="-I$(brew --prefix gettext)/include -I$(brew --prefix readline)/include"
+        export LDFLAGS="-L$(brew --prefix gettext)/lib -L$(brew --prefix readline)/lib -F/Library/Filesystems/macfuse.fs/Contents/Frameworks"
+    ;;
+esac
+
+# Configure.
 ./bootstrap --skip-po
 ./configure
 
@@ -29,5 +43,5 @@ set -u
 make -C po update-po
 
 # Check the localizations.
-msgcmp -v po/de.po po/plptools.pot
-msgcmp -v po/sv.po po/plptools.pot
+msgcmp po/de.po po/plptools.pot
+msgcmp po/sv.po po/plptools.pot
