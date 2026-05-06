@@ -27,7 +27,6 @@
 
 #include <cstdint>
 #include <memory>
-#include <sys/dirent.h>
 
 #include "connectionerror.h"
 #include "deviceconfiguration.h"
