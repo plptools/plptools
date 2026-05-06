@@ -18,7 +18,7 @@ jobs:
 
     steps:
 
-    - name: Install dependencies and configure environment
+    - name: Install dependencies
       run: |
         sudo apt-get -y install libreadline-dev pkg-config gettext autopoint libfuse-dev libattr1-dev
 
