@@ -34,6 +34,7 @@
 #include "rclip.h"
 #include "rfsv.h"
 #include "rpcs.h"
+#include "uuid.h"
 
 device::DeviceEndpoint::DeviceEndpoint(const std::string &id,
                                        std::unique_ptr<RFSV> rfsv,
@@ -63,7 +64,7 @@ std::unique_ptr<device::DeviceEndpoint> device::connect(const std::string host,
         // Create and write a new device configuration if it doesn't exist.
         // We ignore errors here as we want failures to write the device configuration to be non-fatal. For example., if
         // the device is out of memory, it's acceptable for it to appear as a new device on each connection.
-        deviceConfiguration = std::make_unique<DeviceConfiguration>();
+        deviceConfiguration = std::make_unique<DeviceConfiguration>(uuid::uuid4(), _("My Psion"));
         device::write_configuration(*rfsv, *deviceConfiguration);
     }
 
