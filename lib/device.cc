@@ -28,64 +28,9 @@
 #include <cstdint>
 #include <memory>
 
-#include "connectionerror.h"
 #include "deviceconfiguration.h"
 #include "pathutils.h"
-#include "rclip.h"
 #include "rfsv.h"
-#include "rpcs.h"
-#include "uuid.h"
-
-device::DeviceEndpoint::DeviceEndpoint(const std::string &id,
-                                       std::unique_ptr<RFSV> rfsv,
-                                       std::unique_ptr<RPCS> rpcs,
-                                       std::unique_ptr<rclip> clip)
-: id_(id)
-, rfsv_(std::move(rfsv))
-, rpcs_(std::move(rpcs))
-, clip_(std::move(clip)) {}
-
-std::unique_ptr<device::DeviceEndpoint> device::connect(const std::string host,
-                                                        int port,
-                                                        Enum<ConnectionError> *error) {
-    Enum<ConnectionError> internalError = ConnectionError::FACERR_NONE;
-    auto rfsv = std::unique_ptr<RFSV>(RFSV::connect(host, port, &internalError));
-    if (!rfsv) {
-        if (error) {
-            *error = internalError;
-        }
-        return nullptr;
-    }
-
-    // Get the device configuration.
-    Enum<RFSV::errs> result;
-    auto deviceConfiguration = device::read_configuration(*rfsv, result);
-    if (!deviceConfiguration) {
-        // Create and write a new device configuration if it doesn't exist.
-        // We ignore errors here as we want failures to write the device configuration to be non-fatal. For example., if
-        // the device is out of memory, it's acceptable for it to appear as a new device on each connection.
-        deviceConfiguration = std::make_unique<DeviceConfiguration>(uuid::uuid4(), _("My Psion"));
-        device::write_configuration(*rfsv, *deviceConfiguration);
-    }
-
-    auto rpcs = std::unique_ptr<RPCS>(RPCS::connect(host, port, &internalError));
-    if (!rpcs) {
-        if (error) {
-            *error = internalError;
-        }
-        return nullptr;
-    }
-
-    auto clip = std::unique_ptr<rclip>(rclip::connect(host, port, &internalError));
-    if (!clip) {
-        if (error) {
-            *error = internalError;
-        }
-        return nullptr;
-    }
-
-    return std::make_unique<device::DeviceEndpoint>(deviceConfiguration->id(), std::move(rfsv), std::move(rpcs), std::move(clip));
-}
 
 Enum<RFSV::errs> device::write_configuration(RFSV &rfsv, const DeviceConfiguration &deviceConfiguration) {
     std::string configurationPath = rfsv.deviceConfigurationPath();

@@ -36,6 +36,7 @@ libplp_la_SOURCES = \
 	datalink.cc \
 	device.cc \
 	deviceconfiguration.cc \
+	deviceendpoint.cc \
 	drive.cc \
 	Enum.cc \
 	fakepsion.cc \
@@ -84,6 +85,7 @@ noinst_HEADERS = \
 	datalink.h \
 	device.h \
 	deviceconfiguration.h \
+	deviceendpoint.h \
 	drive.h \
 	Enum.h \
 	fakepsion.h \

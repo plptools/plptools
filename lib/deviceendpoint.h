@@ -1,10 +1,7 @@
 /*
  * This file is part of plptools.
  *
- *  Copyright (C) 1999 Philip Proudman <philip.proudman@btinternet.com>
- *  Copyright (C) 1999-2002 Fritz Elfert <felfert@to.com>
- *  Copyright (C) 2006-2025 Reuben Thomas <rrt@sc3d.org>
- *  Copyright (C) 2026 Jason Morley <hello@jbmorley.co.uk>
+ *  Copyright (c) 2026 Jason Morley <hello@jbmorley.co.uk>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -22,22 +19,29 @@
  */
 #pragma once
 
-#include "config.h"
-
 #include <memory>
+#include <string>
 
-#include "rfsv.h"
+#include "connectionerror.h"
+#include "Enum.h"
 
-class DeviceConfiguration;
-class DeviceEndpoint;
 class rclip;
 class RFSV;
 class RPCS;
 
-namespace device {
+class DeviceEndpoint {
+public:
 
-extern Enum<RFSV::errs> write_configuration(RFSV &rfsv, const DeviceConfiguration &deviceConfiguration);
+    static std::unique_ptr<DeviceEndpoint> connect(const std::string host, int port, Enum<ConnectionError> *error);
 
-extern std::unique_ptr<DeviceConfiguration> read_configuration(RFSV &rfsv, Enum<RFSV::errs> &error);
+    DeviceEndpoint(const std::string &id,
+                   std::unique_ptr<RFSV> rfsv,
+                   std::unique_ptr<RPCS> rpcs,
+                   std::unique_ptr<rclip> clip);
+
+    const std::string id_;
+    const std::unique_ptr<RFSV> rfsv_;
+    const std::unique_ptr<RPCS> rpcs_;
+    const std::unique_ptr<rclip> clip_;
 
 };

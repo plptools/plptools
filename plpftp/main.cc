@@ -27,6 +27,7 @@
 #include <bufferstore.h>
 #include <cliutils.h>
 #include <device.h>
+#include <deviceendpoint.h>
 #include <deviceconfiguration.h>
 #include <plpintl.h>
 #include <rclip.h>
@@ -121,7 +122,7 @@ int main(int argc, char **argv) {
     }
 
     Enum<ConnectionError> error;
-    auto deviceEndpoint = device::connect(host, port, &error);
+    auto deviceEndpoint = DeviceEndpoint::connect(host, port, &error);
     if (!deviceEndpoint) {
         std::cerr << "plpftp: " << error << std::endl;
         return EXIT_FAILURE;
