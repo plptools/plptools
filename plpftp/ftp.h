@@ -23,15 +23,15 @@
 
 #include "config.h"
 
-#include <memory>
 #include <vector>
 
 #include "rfsv.h"
-#include "Enum.h"
 
-class RPCS;
-class BufferStore;
 class BufferArray;
+class BufferStore;
+class DeviceEndpoint;
+class RPCS;
+class rclip;
 
 class FTP {
 public:

@@ -19,6 +19,8 @@
  */
 #pragma once
 
+#include "config.h"
+
 #include <memory>
 #include <string>
 
@@ -53,6 +55,8 @@ public:
     *
     * @param name Out-param for the device name.
     *
+    * A return value of @ref RFSV::E_PSI_FILE_RECORD indicates that the device name has not been set.
+    *
     * @result @ref RFSV::E_PSI_GEN_NONE on success; error otherwise.
     */
     Enum<RFSV::errs> getName(std::string &name) const;
@@ -73,11 +77,11 @@ public:
 private:
 
     DeviceEndpoint(const std::string &id,
-                   bool persistentId,
+                   bool hasPersistentConfiguration,
                    std::unique_ptr<RFSV> rfsv,
                    std::unique_ptr<RPCS> rpcs,
                    std::unique_ptr<rclip> clip);
 
     const std::string id_;
-    bool hasPersistentId_;
+    bool hasPersistentConfiguration_;
 };
