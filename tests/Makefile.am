@@ -29,6 +29,7 @@ tests_SOURCES = \
     drivetests.cc \
     initests.cc \
     main.cc \
+    optionaltests.cc \
     pathutilstests.cc \
     plpdirenttests.cc
 

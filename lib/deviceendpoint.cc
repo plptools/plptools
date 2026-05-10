@@ -47,6 +47,7 @@ std::unique_ptr<DeviceEndpoint> DeviceEndpoint::connect(const std::string host,
     Enum<RFSV::errs> result;
     auto deviceConfiguration = device::read_configuration(*rfsv, result);
     std::string id = deviceConfiguration ? deviceConfiguration->id() : uuid::uuid4();
+    Optional<std::string> name = deviceConfiguration ? deviceConfiguration->name() : Optional<std::string>();
     bool hasPersistentConfiguration = static_cast<bool>(deviceConfiguration);
 
     auto rpcs = std::unique_ptr<RPCS>(RPCS::connect(host, port, &internalError));
@@ -66,10 +67,16 @@ std::unique_ptr<DeviceEndpoint> DeviceEndpoint::connect(const std::string host,
     }
 
     return std::unique_ptr<DeviceEndpoint>(
-        new DeviceEndpoint(id, hasPersistentConfiguration, std::move(rfsv), std::move(rpcs), std::move(clip)));
+        new DeviceEndpoint(id,
+                           name,
+                           hasPersistentConfiguration,
+                           std::move(rfsv),
+                           std::move(rpcs),
+                           std::move(clip)));
 }
 
 DeviceEndpoint::DeviceEndpoint(const std::string &id,
+                               const Optional<std::string> &name,
                                bool hasPersistentConfiguration,
                                std::unique_ptr<RFSV> rfsv,
                                std::unique_ptr<RPCS> rpcs,
@@ -78,7 +85,9 @@ DeviceEndpoint::DeviceEndpoint(const std::string &id,
 , rpcs_(std::move(rpcs))
 , clip_(std::move(clip))
 , id_(id)
-, hasPersistentConfiguration_(hasPersistentConfiguration) {}
+, name_(name)
+, hasPersistentConfiguration_(hasPersistentConfiguration) {
+}
 
 std::string DeviceEndpoint::id() const {
     return id_;
@@ -88,36 +97,15 @@ bool DeviceEndpoint::hasPersistentId() const {
     return hasPersistentConfiguration_;
 }
 
-Enum<RFSV::errs> DeviceEndpoint::getName(std::string &name) const {
-
-    // Don't bother to fetch the configuration if we know it does't exist.
-    if (!hasPersistentConfiguration_) {
-        return RFSV::E_PSI_FILE_RECORD;
-    }
-
-    // Read the configuration.
-    Enum<RFSV::errs> error = RFSV::E_PSI_GEN_NONE;
-    auto deviceConfiguration = device::read_configuration(*rfsv_, error);
-
-    // Check for E_PSI_FILE_NXIST and return it as E_PSI_FILE_RECORD which seems more logical.
-    if (error == RFSV::E_PSI_FILE_NXIST) {
-        return RFSV::E_PSI_FILE_RECORD;
-    }
-
-    // Return any errors.
-    if (error != RFSV::E_PSI_GEN_NONE) {
-        return error;
-    }
-
-    // Update the name and indicate success.
-    name = deviceConfiguration->name();
-    return RFSV::E_PSI_GEN_NONE;
+Optional<std::string> DeviceEndpoint::name() const {
+    return name_;
 }
 
 Enum<RFSV::errs> DeviceEndpoint::setName(const std::string &name) {
     auto deviceConfiguration = std::make_unique<DeviceConfiguration>(id_, name);
     auto result = device::write_configuration(*rfsv_, *deviceConfiguration);
     if (result == RFSV::E_PSI_GEN_NONE) {
+        name_ = name;
         hasPersistentConfiguration_ = true;
     }
     return result;
