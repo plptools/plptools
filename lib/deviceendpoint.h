@@ -54,6 +54,9 @@ public:
     /**
     * Device name.
     *
+    * This value is read in @ref DeviceEndpoint::connect and cached in-memory during the lifetime
+    * of the @ref DeviceEndpoint instance.
+    *
     * @return @ref Optional containing device name if set; empty otherwise.
     */
     Optional<std::string> name() const;
