@@ -35,12 +35,12 @@ public:
 
     Optional(const T& value)
     : hasValue_(true) {
-        *ptr() = value;
+        new(ptr()) T(value);
     }
 
     Optional(T&& value)
     : hasValue_(true) {
-        *ptr() = std::move(value);
+        new(ptr()) T(std::move(value));
     }
 
     ~Optional() {
