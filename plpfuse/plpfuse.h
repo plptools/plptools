@@ -19,7 +19,11 @@
  */
 #pragma once
 
+#if FUSE_USE_VERSION >= 30
+#include <fuse3/fuse.h>
+#else
 #include <fuse.h>
+#endif
 
 typedef struct p_inode {
     int inode;
