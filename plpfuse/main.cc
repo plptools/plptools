@@ -376,36 +376,15 @@ int fuse(int argc, char *argv[])
     int err = -1, foreground;
 #if FUSE_USE_VERSION >= 30
     if (fuse_parse_cmdline(&args, &opts) != -1) {
-        if (opts.show_help) {
-            printf("usage: %s [options] <mountpoint>\n\n", argv[0]);
-            printf("File-system specific options:\n"
-                    "    -o opt,[opt...]        mount options\n"
-                    "    -h   --help            print help\n"
-                    "\n");
-            fuse_cmdline_help();
-            fuse_lowlevel_help();
-            err = 1;
-            goto err_out;
-            } else if (opts.show_version) {
-                printf("FUSE library version %s\n", fuse_pkgversion());
-                fuse_lowlevel_version();
-                err = 1;
-                goto err_out;
-            }
         if (opts.mountpoint == NULL) {
-            printf("usage: %s [options] <mountpoint>\n", argv[0]);
-            printf("       %s --help\n", argv[0]);
-            err = 1;
-            goto err_out;
-        }
-        if (fuse_daemonize(opts.foreground) != -1) {
+            help();
+        } else if (fuse_daemonize(opts.foreground) != -1) {
             fp = fuse_new(&args, &plp_oper, sizeof(plp_oper), NULL);
             if (fp != NULL && (fuse_mount(fp, opts.mountpoint)) == 0)
                 err = fuse_loop(fp);
             fuse_unmount(fp);
         }
     }
-    err_out:
 #else  // fuse 2
     if (fuse_parse_cmdline(&args, &mountpoint, NULL, &foreground) != -1 &&
         (ch = fuse_mount(mountpoint, &args)) != NULL) {
