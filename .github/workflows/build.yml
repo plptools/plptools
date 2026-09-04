@@ -92,7 +92,7 @@ jobs:
       run: ${{ matrix.setup }}
 
     - name: Checkout source
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
         submodules: true
 
@@ -107,15 +107,15 @@ jobs:
     steps:
 
     - name: Checkout repository
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
         submodules: true
 
     - name: Build documentation
-      uses: mattnotmitt/doxygen-action@v1.9.5
+      uses: mattnotmitt/doxygen-action@1.12.0
 
     - name: Upload artifact
-      uses: actions/upload-pages-artifact@v4
+      uses: actions/upload-pages-artifact@v5
       with:
         path: ./html
 
@@ -136,4 +136,4 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
