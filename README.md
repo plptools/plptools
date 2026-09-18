@@ -94,7 +94,7 @@ git clone https://github.com/plptools/plptools.git
 
 We welcome and encourage contributions. We require that all code, pull requests, and issues are human-authored (not AI-generated) and that contributors have undertaken due diligence to ensure they are legally able to assert copyright and grant usage rights. Please endeavor to keep changes small and reviewable. We will close pull requests and issues that violate this policy. This is intended to ensure the quality, sustainability and on-going security and longevity of the plptools project.
 
-We recognize the benefit of LLMs and other tools in investigative work, research, and analysis, and do not wish to restrict the appropriate usage of such tools. We encourage careful consideration of the environmental impact of such usage and local models where possible.
+We have serious concerns about the copyright, societal, and environmental implications of LLMs and generative AI as implemented today. However, we recognize these tools are good for some investigative work. We do not wish to blindly reject learnings resulting from the use of these tools, but require disclosure of such usage and request careful consideration of the environmental impact.
 
 ## Code of Conduct
 
