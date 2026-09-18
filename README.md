@@ -90,6 +90,16 @@ The git repository can be cloned with:
 git clone https://github.com/plptools/plptools.git
 ```
 
+## Contributing
+
+We welcome and encourage contributions. We require that all code, pull requests, and issues are human-authored (not AI-generated) and that contributors have undertaken due diligence to ensure they are legally able to assert copyright and grant usage rights. Please endeavor to keep changes small and reviewable. We will close pull requests and issues that violate this policy. This is intended to ensure the quality, sustainability and on-going security and longevity of the plptools project.
+
+We have serious concerns about the copyright, societal, and environmental implications of LLMs and generative AI as implemented today. However, we recognize these tools can provide utility when applied to certain investigative and reverse engineering tasks. We do not wish to blindly reject learnings resulting from the use of these tools, but require disclosure of such usage and request careful consideration of the environmental impact.
+
+## Code of Conduct
+
+This is an inclusive project. We will not accept any form of racism, sexism, or any other discrimination in our community. Please acknowledge that plptools is developed and supported by volunteers and be respectful in all communication.
+
 ## License
 
 plptools is free software; you can redistribute it and/or modify it under
