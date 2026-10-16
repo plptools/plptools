@@ -50,7 +50,7 @@ jobs:
 
           - name: ubuntu-26.10-amd64
             os: ubuntu-26.04
-            container: ubuntu:resolute
+            container: ubuntu:stonking
             env:
               ASAN: "yes"
             setup: |
@@ -59,7 +59,7 @@ jobs:
 
           - name: ubuntu-26.10-arm64
             os: ubuntu-26.04-arm
-            container: ubuntu:resolute
+            container: ubuntu:stonking
             env:
               ASAN: "yes"
             setup: |
