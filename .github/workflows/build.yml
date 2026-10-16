@@ -33,7 +33,23 @@ jobs:
               sudo apt-get -y install libreadline-dev pkg-config gettext autopoint libfuse-dev libattr1-dev
 
           - name: ubuntu-26.04-amd64
-            os: ubuntu-24.04
+            os: ubuntu-26.04
+            env:
+              ASAN: "yes"
+            setup: |
+              sudo apt-get update -y
+              sudo apt-get -y install build-essential m4 libtool git libreadline-dev pkg-config gettext autopoint libfuse-dev libattr1-dev
+
+          - name: ubuntu-26.04-arm64
+            os: ubuntu-26.04-arm
+            env:
+              ASAN: "yes"
+            setup: |
+              sudo apt-get update -y
+              sudo apt-get -y install build-essential m4 libtool git libreadline-dev pkg-config gettext autopoint libfuse-dev libattr1-dev
+
+          - name: ubuntu-26.10-amd64
+            os: ubuntu-26.04
             container: ubuntu:resolute
             env:
               ASAN: "yes"
@@ -41,8 +57,8 @@ jobs:
               apt-get update -y
               apt-get -y install build-essential m4 libtool git libreadline-dev pkg-config gettext autopoint libfuse-dev libattr1-dev
 
-          - name: ubuntu-26.04-arm64
-            os: ubuntu-24.04-arm
+          - name: ubuntu-26.10-arm64
+            os: ubuntu-26.04-arm
             container: ubuntu:resolute
             env:
               ASAN: "yes"
