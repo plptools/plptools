@@ -90,6 +90,53 @@ The git repository can be cloned with:
 git clone https://github.com/plptools/plptools.git
 ```
 
+### Tests
+
+Tests are implemented using [doctest.h](https://github.com/doctest/doctest). Configure the project then run the tests as follows:
+
+```sh
+make check
+```
+
+The tests are compiled into their own target (`tests/tests`) which provides additional command line options when run directly.
+
+For example, you can list all the test cases as follows:
+
+```plaintext
+$ tests/tests --list-test-cases
+[doctest] listing all test case names
+===============================================================================
+DeviceConfiguration accessors
+DeviceConfiguration::serialize
+DeviceConfiguration::deserialize
+Drive::getPath
+parse_ini
+cli_utils::is_number
+cli_utils::lookup_default_port
+cli_utils::parse_port
+pathutils::epoc_basename
+pathutils::epoc_dirname
+pathutils::is_absolute
+pathutils::appending_components
+pathutils::split
+pathutils::join
+pathutils::resolve_path
+PlpDirent::getPath
+===============================================================================
+```
+
+Or run a specific one:
+
+```plaintext
+$ tests/tests --test-case=cli_utils::is_number
+[doctest] doctest version is "2.4.12"
+[doctest] run with "--help" for options
+===============================================================================
+[doctest] test cases: 1 | 1 passed | 0 failed | 15 skipped
+[doctest] assertions: 6 | 6 passed | 0 failed |
+[doctest] Status: SUCCESS!
+```
+
 ## Contributing
 
 We welcome and encourage contributions. We require that all code, pull requests, and issues are human-authored (not AI-generated) and that contributors have undertaken due diligence to ensure they are legally able to assert copyright and grant usage rights. Please endeavor to keep changes small and reviewable. We will close pull requests and issues that violate this policy. This is intended to ensure the quality, sustainability and on-going security and longevity of the plptools project.
