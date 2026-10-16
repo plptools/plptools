@@ -50,6 +50,24 @@ jobs:
               apt-get update -y
               apt-get -y install build-essential m4 libtool git libreadline-dev pkg-config gettext autopoint libfuse-dev libattr1-dev
 
+          - name: ubuntu-26.10-amd64
+            os: ubuntu-26.04
+            container: ubuntu:stonking
+            env:
+              ASAN: "yes"
+            setup: |
+              apt-get update -y
+              apt-get -y install build-essential m4 libtool git libreadline-dev pkg-config gettext autopoint libfuse-dev libattr1-dev
+
+          - name: ubuntu-26.10-arm64
+            os: ubuntu-26.04-arm
+            container: ubuntu:stonking
+            env:
+              ASAN: "yes"
+            setup: |
+              apt-get update -y
+              apt-get -y install build-essential m4 libtool git libreadline-dev pkg-config gettext autopoint libfuse-dev libattr1-dev
+
           - name: debian-bookworm
             os: ubuntu-latest
             container: debian:bookworm
