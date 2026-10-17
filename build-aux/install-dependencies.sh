@@ -58,7 +58,7 @@ case "$PLATFORM" in
         ;;
     Haiku)
         echo "Installing dependencies for Haiku..."
-        pkgman install -y libtool gnupg gettext readline_devel
+        become pkgman install -y libtool gnupg gettext readline_devel
         ;;
     Darwin)
         echo "Installing dependencies for Darwin..."
