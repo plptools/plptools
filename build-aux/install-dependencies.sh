@@ -55,7 +55,6 @@ case "$PLATFORM" in
                 exit_unsupported "Unsupported Linux distribution ($ID)."
                 ;;
         esac
-
         ;;
     Haiku)
         echo "Installing dependencies for Haiku..."
@@ -64,6 +63,10 @@ case "$PLATFORM" in
     Darwin)
         echo "Installing dependencies for Darwin..."
         brew install coreutils readline pkg-config libtool automake gettext macfuse
+        ;;
+    FreeBSD)
+        echo "Installing dependencies for FreeBSD..."
+        pkg install -y m4 libtool gnupg pkgconf automake autoconf gettext gmake
         ;;
     *)
         exit_unsupported "Unsupported platform ($PLATFORM)."
