@@ -67,6 +67,12 @@ case "$PLATFORM" in
         export LDFLAGS="-L/usr/pkg/lib -Wl,--rpath=/usr/pkg/lib"
         MAKE="gmake"
         ;;
+    OpenBSD)
+        echo "Building for OpenBSD..."
+        export CPPFLAGS="-I/usr/local/include/ereadline/"
+        export AUTOCONF_VERSION="2.72"
+        export AUTOMAKE_VERSION="1.18"
+        MAKE="gmake"
     *)
         echo "Unsupported platform ($PLATFORM)."
         echo ""
