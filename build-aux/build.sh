@@ -42,6 +42,8 @@ do
     esac
 done
 
+MAKE=make
+
 PLATFORM=$(uname -s)
 case "$PLATFORM" in
     Linux)
@@ -63,6 +65,10 @@ case "$PLATFORM" in
         export LDFLAGS="-L$GETTEXT_PREFIX/lib -L$READLINE_PREFIX/lib -F/Library/Filesystems/macfuse.fs/Contents/Frameworks"
         export CPPFLAGS="-I$GETTEXT_PREFIX/include -I$READLINE_PREFIX/include"
         ;;
+    FreeBSD)
+        echo "Building for FreeBSD..."
+        export LDFLAGS="-L/usr/local/lib/"
+        MAKE="gmake"
     *)
         echo "Unsupported platform ($PLATFORM)."
         echo ""
@@ -80,8 +86,8 @@ else
     ./configure
 fi
 
-make V=1
+$MAKE V=1
 
 if $DISTCHECK ; then
-    make distcheck || ( cat ./plptools-*/_build/sub/tests/test-suite.log; exit 1 )
+    $MAKE distcheck || ( cat ./plptools-*/_build/sub/tests/test-suite.log; exit 1 )
 fi
