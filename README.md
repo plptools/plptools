@@ -27,7 +27,7 @@ If you are building from source, you’ll need the following packages installed:
 
 You will need additional libraries to enable the following functionality:
 
-- plpfuse – requires readline 4.3 or later (or compatible library) for command-line editing and history support
+- plpftp – requires readline 4.3 or later (or compatible library) for command-line editing and history support
 - plpfuse – requires [FUSE 2](https://github.com/libfuse/libfuse) (MacFUSE on macOS) and [libattr](https://savannah.nongnu.org/projects/attr) (not required on macOS or *BSD)
 
 ### Standard Builds
