@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # This file is part of plptools.
 #
@@ -19,18 +19,16 @@
 #  along with this program; if not, see <https://www.gnu.org/licenses/>.
 
 set -e
-set -o pipefail
 set -u
 
-POSITIONAL=()
-ASAN=false
+SANITIZE_ADDRESS=false
 DISTCHECK=false
-while [[ $# -gt 0 ]]
+while [ $# -gt 0 ]
 do
     key="$1"
     case $key in
         --sanitize-address)
-            ASAN=true
+            SANITIZE_ADDRESS=true
             shift
             ;;
         --distcheck)
@@ -44,11 +42,6 @@ do
     esac
 done
 
-BOOTSTRAP_ARGS=()
-BOOTSTRAP_ARGS+=(--skip-po)
-
-CONFIGURE_ARGS=()
-
 PLATFORM=$(uname -s)
 case "$PLATFORM" in
     Linux)
@@ -56,16 +49,19 @@ case "$PLATFORM" in
         ;;
     Haiku)
         echo "Building for Haiku..."
-        if $ASAN ; then
+        if $SANITIZE_ADDRESS ; then
             >&2 echo "Warning: Skipping address sanitize..."
-            ASAN=false
+            SANITIZE_ADDRESS=false
         fi
         ;;
     Darwin)
         echo "Building for Darwin..."
-        export PATH="$(brew --prefix m4)/bin:/usr/local/opt/gettext/bin:$PATH"
-        export LDFLAGS="-L$(brew --prefix gettext)/lib -L$(brew --prefix readline)/lib -F/Library/Filesystems/macfuse.fs/Contents/Frameworks"
-        export CPPFLAGS="-I$(brew --prefix gettext)/include -I$(brew --prefix readline)/include"
+        GETTEXT_PREFIX=$(brew --prefix --installed gettext)
+        M4_PREFIX=$(brew --prefix --installed m4)
+        READLINE_PREFIX=$(brew --prefix --installed readline)
+        export PATH="$M4_PREFIX/bin:/usr/local/opt/gettext/bin:$PATH"
+        export LDFLAGS="-L$GETTEXT_PREFIX/lib -L$READLINE_PREFIX/lib -F/Library/Filesystems/macfuse.fs/Contents/Frameworks"
+        export CPPFLAGS="-I$GETTEXT_PREFIX/include -I$READLINE_PREFIX/include"
         ;;
     *)
         echo "Unsupported platform ($PLATFORM)."
@@ -75,14 +71,14 @@ case "$PLATFORM" in
         ;;
 esac
 
-if $ASAN ; then
-    CONFIGURE_ARGS+=(CFLAGS="-g3 -fsanitize=address -fsanitize=undefined" CXXFLAGS="-g3 -fsanitize=address -fsanitize=undefined" LDFLAGS="${LDFLAGS:-} -fsanitize=address -fsanitize=undefined")
-fi
+./bootstrap --skip-po
 
-# Unfortunately we have to use a pretty grim form of the array expansion here to ensure it's safe with `set -u` on macOS
-# as macOS still ships an out-of-date buggy bash.
-./bootstrap ${BOOTSTRAP_ARGS[@]+"${BOOTSTRAP_ARGS[@]}"}
-./configure ${CONFIGURE_ARGS[@]+"${CONFIGURE_ARGS[@]}"}
+if $SANITIZE_ADDRESS ; then
+    SANITIZE_FLAGS="-fsanitize=address -fsanitize=undefined"
+    ./configure CFLAGS="-g3 $SANITIZE_FLAGS" CXXFLAGS="-g3 $SANITIZE_FLAGS" LDFLAGS="${LDFLAGS:-} $SANITIZE_FLAGS"
+else
+    ./configure
+fi
 
 make V=1
 
