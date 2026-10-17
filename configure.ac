@@ -29,9 +29,13 @@ m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 dnl checks for programs
 AC_PROG_INSTALL
 AC_PROG_CXX
+CXX="$CXX -std=gnu++14"
 AC_PROG_CC
 gl_EARLY
 AX_CHECK_GNU_MAKE(,[AC_MSG_ERROR([GNU make is required])])
+case $host_os in
+  haiku*) : ${with_included_regex=yes} ;;
+esac
 gl_INIT
 
 dnl Basic settings

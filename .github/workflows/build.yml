@@ -9,115 +9,144 @@ on:
     - cron:  '0 9 * * *'
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   build:
+
+    # We use a matrix strategy to allow us to target a wide range of systems. Instead of a classic matrix which
+    # auto-expands, we're very deliberately providing a list of targets and fully specifying each.
+    #
+    # Parameters:
+    # - name -- fully qualified operating system name including version and architecture
+    # - os -- GitHub Actions runner operating system (typically the most-recent Ubuntu LTS)
+    # - container -- Docker container to use (optional)
+    #   - image -- Docker container image
+    #   - setup -- setup script to run inside the Docker container; runs before source code checkout
+    # - vm -- QEMU virtual machine to use (optional)
+    #   - name -- virtual machine guest operating system (e.g., 'haiku')
+    #   - architecture -- virtual machine guest architecture (e.g., 'x86-64')
+    #   - version -- virtual machine guest operating system version (e.g., 'r1beta6')
+    #   - setup -- setup script to run inside the virtual machine before building; runs after source code checkout
+    #
+    # Important:
+    # - `container` and `vm` are mutually exclusive.
+    # - `container.setup` is run prior to source checkout; `vm.setup` is run after source checkout (which occurs on the
+    #   host runner)
 
     strategy:
       matrix:
         include:
 
+          - name: haiku-r1-beta6-x64-64
+            os: ubuntu-26.04
+            vm:
+              name: haiku
+              architecture: x86-64
+              version: 'r1beta6'
+
+          - name: freebsd-15.1-x64-64
+            os: ubuntu-26.04
+            vm:
+              name: freebsd
+              architecture: x86-64
+              version: '15.1'
+
           - name: ubuntu-24.04-amd64
             os: ubuntu-24.04
-            env:
-              ASAN: "yes"
-            setup: |
-              sudo apt-get update -y
-              sudo apt-get -y install libreadline-dev pkg-config gettext autopoint libfuse-dev libattr1-dev
 
           - name: ubuntu-24.04-arm64
             os: ubuntu-24.04-arm
-            env:
-              ASAN: "yes"
-            setup: |
-              sudo apt-get update -y
-              sudo apt-get -y install libreadline-dev pkg-config gettext autopoint libfuse-dev libattr1-dev
 
           - name: ubuntu-26.04-amd64
             os: ubuntu-24.04
-            container: ubuntu:resolute
-            env:
-              ASAN: "yes"
-            setup: |
-              apt-get update -y
-              apt-get -y install build-essential m4 libtool git libreadline-dev pkg-config gettext autopoint libfuse-dev libattr1-dev
+            container:
+              image: ubuntu:resolute
+              setup: apt-get update -y && apt-get -y install git
 
           - name: ubuntu-26.04-arm64
             os: ubuntu-24.04-arm
-            container: ubuntu:resolute
-            env:
-              ASAN: "yes"
-            setup: |
-              apt-get update -y
-              apt-get -y install build-essential m4 libtool git libreadline-dev pkg-config gettext autopoint libfuse-dev libattr1-dev
+            container:
+              image: ubuntu:resolute
+              setup: apt-get update -y && apt-get -y install git
 
           - name: ubuntu-26.10-amd64
             os: ubuntu-26.04
-            container: ubuntu:stonking
-            env:
-              ASAN: "yes"
-            setup: |
-              apt-get update -y
-              apt-get -y install build-essential m4 libtool git libreadline-dev pkg-config gettext autopoint libfuse-dev libattr1-dev
+            container:
+              image: ubuntu:stonking
+              setup: apt-get update -y && apt-get -y install git
 
           - name: ubuntu-26.10-arm64
             os: ubuntu-26.04-arm
-            container: ubuntu:stonking
-            env:
-              ASAN: "yes"
-            setup: |
-              apt-get update -y
-              apt-get -y install build-essential m4 libtool git libreadline-dev pkg-config gettext autopoint libfuse-dev libattr1-dev
+            container:
+              image: ubuntu:stonking
+              setup: apt-get update -y && apt-get -y install git
 
           - name: debian-bookworm
             os: ubuntu-latest
-            container: debian:bookworm
-            setup: |
-              apt-get update -y
-              apt-get install -y build-essential git libtool gpg pkg-config gettext autopoint libreadline-dev
+            container:
+              image: debian:bookworm
+              setup: apt-get update -y && apt-get -y install git
 
           - name: debian-trixie
             os: ubuntu-latest
-            container: debian:trixie
-            setup: |
-              apt-get update -y
-              apt-get install -y build-essential git libtool gpg pkg-config gettext autopoint libreadline-dev
+            container:
+              image: debian:trixie
+              setup: apt-get update -y && apt-get -y install git
 
           - name: macos-26
             os: macos-26
-            setup: |
-              brew install coreutils readline pkg-config libtool automake gettext macfuse
-              echo "$(brew --prefix m4)/bin:/usr/local/opt/gettext/bin" >> $GITHUB_PATH
-              echo "LDFLAGS=-L$(brew --prefix readline)/lib -F/Library/Filesystems/macfuse.fs/Contents/Frameworks" >> "$GITHUB_ENV"
-              echo "CPPFLAGS=-I$(brew --prefix readline)/include" >> "$GITHUB_ENV"
 
           - name: macos-15
             os: macos-15
-            setup: |
-              brew install coreutils readline pkg-config libtool automake gettext macfuse
-              echo "$(brew --prefix m4)/bin:/usr/local/opt/gettext/bin" >> $GITHUB_PATH
-              echo "LDFLAGS=-L$(brew --prefix readline)/lib -F/Library/Filesystems/macfuse.fs/Contents/Frameworks" >> "$GITHUB_ENV"
-              echo "CPPFLAGS=-I$(brew --prefix readline)/include" >> "$GITHUB_ENV"
 
     name: ${{ matrix.name }}
     runs-on: ${{ matrix.os }}
-    container: ${{ matrix.container || '' }}
+    container: ${{ matrix.container.image || '' }}
 
     defaults:
       run:
-        shell: bash
+        shell: ${{ matrix.vm && 'cpa.sh {0}' || 'bash' }}
 
     steps:
 
-    - name: Install dependencies and configure environment
-      run: ${{ matrix.setup }}
+    - name: Check matrix configuration
+      if: matrix.container && matrix.vm
+      run:
+        echo "Matrix entries must not specify both a 'vm' and 'container'."
+        exit 1
+
+    - name: Configure the container (if required)
+      if: matrix.container.setup
+      run: ${{ matrix.container.setup }}
 
     - name: Checkout source
       uses: actions/checkout@v7
       with:
         submodules: true
 
+    - name: Create the virtual machine (if required)
+      if: matrix.vm
+      uses: cross-platform-actions/action@v1.6.0
+      with:
+        operating_system: ${{ matrix.vm.name }}
+        architecture: ${{ matrix.vm.architecture }}
+        version: ${{ matrix.vm.version }}
+        shell: bash
+        memory: 5G
+        cpu_count: 4
+
+    - name: Configure the virtual machine (if required)
+      if: matrix.vm.setup
+      run: ${{ matrix.vm.setup }}
+
+    - name: Install dependencies
+      run: ./build-aux/install-dependencies.sh
+
     - name: Build
-      run: ./build-aux/build.sh
+      run: ./build-aux/build.sh --distcheck
 
     - name: Run smoke tests
       run: ./build-aux/smoke-tests.sh

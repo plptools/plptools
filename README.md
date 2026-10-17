@@ -12,17 +12,11 @@ history.
 See the man pages for documentation: ncpd(8), plpftp(1), sisinstall(1),
 plpprintd(8), and, where installed, plpfuse(8).
 
+## Building
 
-## Building From Source
+Where possible, plptools leans on autotools to handle per-platform variations and ensure builds can be performed consistently on all supported operating systems. Differences that cannot be handled this way (or haven't yet been migrated) are variously documented here, on the [Builds wiki page](https://github.com/plptools/plptools/wiki/Builds), or handled in `build-aux/build.sh`—we are in the process of formalizing our supported platforms and things are likely to evolve over time.
 
-Providing detailed instructions on how to build plptools for different operating systems is beyond the scope of this README. For specific information on Linux distros and other OSes, please read the following sources:
-
-- The [Builds page in the wiki](https://github.com/plptools/plptools/wiki/Builds)
-- The [GitHub CI workflow](.github/workflows/c-cpp.yml) for the necessary install and configuration steps for Ubuntu/Debian and macOS.
-
-What follows are general notes on building plptools from source.
-
-### Getting started
+### Dependencies
 
 If you are building from source, you’ll need the following packages installed:
 
@@ -31,21 +25,43 @@ If you are building from source, you’ll need the following packages installed:
 - autoconf
 - pkg-config
 
-Then run:
+You will need additional libraries to enable the following functionality:
 
-```shell
-./bootstrap --skip-po
+- plpftp – requires readline 4.3 or later (or compatible library) for command-line editing and history support
+- plpfuse – requires [FUSE 2](https://github.com/libfuse/libfuse) (MacFUSE on macOS) and [libattr](https://savannah.nongnu.org/projects/attr) (not required on macOS or *BSD)
+
+### Standard Builds
+
+Builds using the default configuration on Linux, macOS, and Haiku can be performed using the `build-aux/build.sh` wrapper script. This matches exactly how builds are performed in CI:
+
+```sh
+build-aux/build.sh
 ```
 
-Some extra packages are needed; `bootstrap` will tell you what you need to install if anything is missing from your system.
+_Attempting this on other platforms will direct you to the [Builds wiki page](https://github.com/plptools/plptools/wiki/Builds)._
 
-plptools uses GNU autotools, so the usual sequence of commands works:
+### Custom Builds
 
-```shell
-./configure
-make
-make install
-```
+1. Bootstrap the project:
+
+   ```sh
+   ./bootstrap --skip-po
+   ```
+
+   _If additional packages are required; `bootstrap` will tell you what you need to install if anything is missing from your system._
+
+2. Configure the project:
+
+   ```sh
+   ./configure
+   ```
+
+3. Compile:
+
+   ```sh
+   make
+   make install
+   ```
 
 In addition to the usual options, `configure` understands the following:
 
@@ -70,17 +86,6 @@ In addition to the usual options, `configure` understands the following:
   Overrides the default directory for plpftp. The default is `\`,  which means the root directory.
 
   **Note:** since backslashes need to be doubled once for C escaping and once for shell escaping, this value is actually supplied as `\\\\`.
-
-### plpftp
-
-For command-line editing and history support in plpftp, Readline 4.3 or later (or a compatible library) is required.
-
-### plpfuse
-
-To build plpfuse, the following packages are required:
-
-- FUSE 2: https://github.com/libfuse/libfuse (MacFUSE on macOS)
-- libattr: https://savannah.nongnu.org/projects/attr (not required on macOS or *BSD)
 
 ## Development
 
