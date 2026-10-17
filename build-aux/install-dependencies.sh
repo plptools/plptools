@@ -58,7 +58,7 @@ case "$PLATFORM" in
         ;;
     Haiku)
         echo "Installing dependencies for Haiku..."
-        become pkgman install -y libtool gnupg gettext readline_devel
+        pkgman install -y libtool gnupg gettext readline_devel
         ;;
     Darwin)
         echo "Installing dependencies for Darwin..."
@@ -66,7 +66,7 @@ case "$PLATFORM" in
         ;;
     FreeBSD)
         echo "Installing dependencies for FreeBSD..."
-        pkg install -y m4 libtool gnupg pkgconf automake autoconf gettext gmake
+        become pkg install -y m4 libtool gnupg pkgconf automake autoconf gettext gmake
         ;;
     *)
         exit_unsupported "Unsupported platform ($PLATFORM)."
