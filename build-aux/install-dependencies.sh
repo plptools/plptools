@@ -62,7 +62,7 @@ case "$PLATFORM" in
         ;;
     Darwin)
         echo "Installing dependencies for Darwin..."
-        brew install coreutils readline pkg-config libtool automake gettext macfuse
+        brew install coreutils m4 readline pkg-config libtool automake gettext macfuse
         ;;
     FreeBSD)
         echo "Installing dependencies for FreeBSD..."
