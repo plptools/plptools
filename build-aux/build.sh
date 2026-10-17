@@ -69,6 +69,7 @@ case "$PLATFORM" in
         echo "Building for FreeBSD..."
         export LDFLAGS="-L/usr/local/lib/"
         MAKE="gmake"
+        ;;
     *)
         echo "Unsupported platform ($PLATFORM)."
         echo ""
