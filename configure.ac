@@ -29,7 +29,7 @@ m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 dnl checks for programs
 AC_PROG_INSTALL
 AC_PROG_CXX
-CXX="$CXX -std=gnu++14"
+AX_CXX_COMPILE_STDCXX([17], [ext], [mandatory])
 AC_PROG_CC
 gl_EARLY
 AX_CHECK_GNU_MAKE(,[AC_MSG_ERROR([GNU make is required])])
