@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # This file is part of plptools.
 #
@@ -24,19 +24,21 @@
 # This script is intended to be run after CI builds to help us catch basic dependency related and high-level failures
 # when targeting a wide range of platforms.
 
-set -exuo pipefail
+set -e
+set -x
+set -u
 
-ROOT_DIRECTORY="$( cd "$( dirname "$( dirname "${BASH_SOURCE[0]}" )" )" &> /dev/null && pwd )"
+ROOT_DIRECTORY="$( cd "$( dirname "$0" )/.." > /dev/null 2>&1 && pwd )"
 
-function fatal {
-    echo $1 >&2
+fatal() {
+    echo "$1" >&2
     exit 1
 }
 
 cd "$ROOT_DIRECTORY"
 
 # Check the binaries exist.
-[ -f "ncpd/ncpd" ] || fatal "npd missing"
+[ -f "ncpd/ncpd" ] || fatal "ncpd missing"
 [ -f "plpftp/plpftp" ] || fatal "plpftp missing"
 # TODO: Exercise and smoke test conditional plpfuse builds in CI #58
 #       https://github.com/plptools/plptools/issues/58
