@@ -73,6 +73,7 @@ case "$PLATFORM" in
         export AUTOCONF_VERSION="2.72"
         export AUTOMAKE_VERSION="1.18"
         MAKE="gmake"
+        ;;
     *)
         echo "Unsupported platform ($PLATFORM)."
         echo ""

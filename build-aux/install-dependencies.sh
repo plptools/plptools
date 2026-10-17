@@ -71,6 +71,7 @@ case "$PLATFORM" in
     NetBSD)
         echo "Installing dependencies for NetBSD..."
         sudo pkgin -y install m4 libtool gnupg2 pkgconf autoconf automake gettext coreutils gmake git
+        ;;
     OpenBSD)
         echo "Installing dependencies for OpenBSD..."
         doas pkg_add -v m4 libtool gnupg autoconf automake gettext-tools readline gmake git
