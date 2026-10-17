@@ -47,6 +47,13 @@ jobs:
               architecture: x86-64
               version: 'r1beta6'
 
+          - name: freebsd-15.1-x64-64
+            os: ubuntu-26.04
+            vm:
+              name: freebsd
+              architecture: x86-64
+              version: '15.1'
+
           - name: ubuntu-24.04-amd64
             os: ubuntu-24.04
 
