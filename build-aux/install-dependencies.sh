@@ -66,7 +66,7 @@ case "$PLATFORM" in
         ;;
     FreeBSD)
         echo "Installing dependencies for FreeBSD..."
-        become pkg install -y m4 libtool gnupg pkgconf automake autoconf gettext gmake
+        become pkg install -y m4 libtool git gnupg pkgconf automake autoconf gettext gmake
         ;;
     *)
         exit_unsupported "Unsupported platform ($PLATFORM)."
