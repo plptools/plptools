@@ -66,15 +66,15 @@ case "$PLATFORM" in
         ;;
     FreeBSD)
         echo "Installing dependencies for FreeBSD..."
-        sudo pkg install -y m4 libtool git gnupg pkgconf automake autoconf gettext gmake
+        become pkg install -y m4 libtool git gnupg pkgconf automake autoconf gettext gmake
         ;;
     NetBSD)
         echo "Installing dependencies for NetBSD..."
-        sudo pkgin -y install m4 libtool gnupg2 pkgconf autoconf automake gettext coreutils gmake git
+        become pkgin -y install m4 libtool gnupg2 pkgconf autoconf automake gettext coreutils gmake git
         ;;
     OpenBSD)
         echo "Installing dependencies for OpenBSD..."
-        doas pkg_add -v m4 libtool gnupg autoconf automake gettext-tools readline gmake git
+        become pkg_add -v m4 libtool gnupg autoconf automake gettext-tools readline gmake git
         ;;
     *)
         exit_unsupported "Unsupported platform ($PLATFORM)."
