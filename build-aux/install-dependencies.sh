@@ -20,14 +20,14 @@
 set -e
 set -u
 
-function exit_unsupported {
+exit_unsupported() {
     echo "$1"
     echo ""
     echo "See https://github.com/plptools/plptools/wiki/Builds for instructions on building on other platforms."
     exit 1
 }
 
-function become {
+become() {
     # $USER is unbound in GitHub Actions containers; use this to infer whether we should use sudo.
     if [ -z ${USER+x} ]; then
         SUDO=""
@@ -41,7 +41,7 @@ PLATFORM=$(uname -s)
 case "$PLATFORM" in
     Linux)
         echo "Installing dependencies for Linux..."
-        source /etc/os-release
+        . /etc/os-release
         case "$ID" in
             ubuntu)
                 become apt-get update -y
