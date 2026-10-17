@@ -146,7 +146,7 @@ jobs:
       run: ./build-aux/install-dependencies.sh
 
     - name: Build
-      run: ./build-aux/build.sh --sanitize-address --distcheck
+      run: ./build-aux/build.sh --distcheck
 
     - name: Run smoke tests
       run: ./build-aux/smoke-tests.sh

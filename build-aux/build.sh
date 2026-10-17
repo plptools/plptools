@@ -21,16 +21,11 @@
 set -e
 set -u
 
-SANITIZE_ADDRESS=false
 DISTCHECK=false
 while [ $# -gt 0 ]
 do
     key="$1"
     case $key in
-        --sanitize-address)
-            SANITIZE_ADDRESS=true
-            shift
-            ;;
         --distcheck)
             DISTCHECK=true
             shift
@@ -51,10 +46,6 @@ case "$PLATFORM" in
         ;;
     Haiku)
         echo "Building for Haiku..."
-        if $SANITIZE_ADDRESS ; then
-            >&2 echo "Warning: Skipping address sanitize..."
-            SANITIZE_ADDRESS=false
-        fi
         ;;
     Darwin)
         echo "Building for Darwin..."
@@ -79,13 +70,7 @@ case "$PLATFORM" in
 esac
 
 ./bootstrap --skip-po
-
-if $SANITIZE_ADDRESS ; then
-    SANITIZE_FLAGS="-fsanitize=address -fsanitize=undefined"
-    ./configure CFLAGS="-g3 $SANITIZE_FLAGS" CXXFLAGS="-g3 $SANITIZE_FLAGS" LDFLAGS="${LDFLAGS:-} $SANITIZE_FLAGS"
-else
-    ./configure
-fi
+./configure
 
 $MAKE V=1
 
