@@ -18,7 +18,6 @@
 #  along with this program; if not, see <https://www.gnu.org/licenses/>.
 
 set -e
-set -o pipefail
 set -u
 
 function exit_unsupported() {
