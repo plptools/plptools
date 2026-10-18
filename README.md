@@ -12,17 +12,11 @@ history.
 See the man pages for documentation: ncpd(8), plpftp(1), sisinstall(1),
 plpprintd(8), and, where installed, plpfuse(8).
 
+## Building
 
-## Building From Source
+Where possible, plptools leans on autotools to handle per-platform variations and ensure builds can be performed consistently on all supported operating systems. Differences that cannot be handled this way (or haven't yet been migrated) are variously documented here, on the [Builds wiki page](https://github.com/plptools/plptools/wiki/Builds), or handled in `build-aux/build.sh`—we are in the process of formalizing our supported platforms and things are likely to evolve over time.
 
-Providing detailed instructions on how to build plptools for different operating systems is beyond the scope of this README. For specific information on Linux distros and other OSes, please read the following sources:
-
-- The [Builds page in the wiki](https://github.com/plptools/plptools/wiki/Builds)
-- The [GitHub CI workflow](.github/workflows/c-cpp.yml) for the necessary install and configuration steps for Ubuntu/Debian and macOS.
-
-What follows are general notes on building plptools from source.
-
-### Getting started
+### Dependencies
 
 If you are building from source, you’ll need the following packages installed:
 
@@ -31,21 +25,43 @@ If you are building from source, you’ll need the following packages installed:
 - autoconf
 - pkg-config
 
-Then run:
+You will need additional libraries to enable the following functionality:
 
-```shell
-./bootstrap --skip-po
+- plpftp – requires readline 4.3 or later (or compatible library) for command-line editing and history support
+- plpfuse – requires [FUSE 2](https://github.com/libfuse/libfuse) (MacFUSE on macOS) and [libattr](https://savannah.nongnu.org/projects/attr) (not required on macOS or *BSD)
+
+### Standard Builds
+
+Builds using the default configuration on Linux, macOS, and Haiku can be performed using the `build-aux/build.sh` wrapper script. This matches exactly how builds are performed in CI:
+
+```sh
+build-aux/build.sh
 ```
 
-Some extra packages are needed; `bootstrap` will tell you what you need to install if anything is missing from your system.
+_Attempting this on other platforms will direct you to the [Builds wiki page](https://github.com/plptools/plptools/wiki/Builds)._
 
-plptools uses GNU autotools, so the usual sequence of commands works:
+### Custom Builds
 
-```shell
-./configure
-make
-make install
-```
+1. Bootstrap the project:
+
+   ```sh
+   ./bootstrap --skip-po
+   ```
+
+   _If additional packages are required; `bootstrap` will tell you what you need to install if anything is missing from your system._
+
+2. Configure the project:
+
+   ```sh
+   ./configure
+   ```
+
+3. Compile:
+
+   ```sh
+   make
+   make install
+   ```
 
 In addition to the usual options, `configure` understands the following:
 
@@ -71,17 +87,6 @@ In addition to the usual options, `configure` understands the following:
 
   **Note:** since backslashes need to be doubled once for C escaping and once for shell escaping, this value is actually supplied as `\\\\`.
 
-### plpftp
-
-For command-line editing and history support in plpftp, Readline 4.3 or later (or a compatible library) is required.
-
-### plpfuse
-
-To build plpfuse, the following packages are required:
-
-- FUSE 2: https://github.com/libfuse/libfuse (MacFUSE on macOS)
-- libattr: https://savannah.nongnu.org/projects/attr (not required on macOS or *BSD)
-
 ## Development
 
 The git repository can be cloned with:
@@ -89,6 +94,63 @@ The git repository can be cloned with:
 ```shell
 git clone https://github.com/plptools/plptools.git
 ```
+
+### Tests
+
+Tests are implemented using [doctest.h](https://github.com/doctest/doctest). Configure the project then run the tests as follows:
+
+```sh
+make check
+```
+
+The tests are compiled into their own target (`tests/tests`) which provides additional command line options when run directly.
+
+For example, you can list all the test cases as follows:
+
+```plaintext
+$ tests/tests --list-test-cases
+[doctest] listing all test case names
+===============================================================================
+DeviceConfiguration accessors
+DeviceConfiguration::serialize
+DeviceConfiguration::deserialize
+Drive::getPath
+parse_ini
+cli_utils::is_number
+cli_utils::lookup_default_port
+cli_utils::parse_port
+pathutils::epoc_basename
+pathutils::epoc_dirname
+pathutils::is_absolute
+pathutils::appending_components
+pathutils::split
+pathutils::join
+pathutils::resolve_path
+PlpDirent::getPath
+===============================================================================
+```
+
+Or run a specific one:
+
+```plaintext
+$ tests/tests --test-case=cli_utils::is_number
+[doctest] doctest version is "2.4.12"
+[doctest] run with "--help" for options
+===============================================================================
+[doctest] test cases: 1 | 1 passed | 0 failed | 15 skipped
+[doctest] assertions: 6 | 6 passed | 0 failed |
+[doctest] Status: SUCCESS!
+```
+
+## Contributing
+
+We welcome and encourage contributions. We require that all code, pull requests, and issues are human-authored (not AI-generated) and that contributors have undertaken due diligence to ensure they are legally able to assert copyright and grant usage rights. Please endeavor to keep changes small and reviewable. We will close pull requests and issues that violate this policy. This is intended to ensure the quality, sustainability and on-going security and longevity of the plptools project.
+
+We have serious concerns about the copyright, societal, and environmental implications of LLMs and generative AI as implemented today. However, we recognize these tools can provide utility when applied to certain investigative and reverse engineering tasks. We do not wish to blindly reject learnings resulting from the use of these tools, but require disclosure of such usage and request careful consideration of the environmental impact.
+
+## Code of Conduct
+
+This is an inclusive project. We will not accept any form of racism, sexism, or any other discrimination in our community. Please acknowledge that plptools is developed and supported by volunteers and be respectful in all communication.
 
 ## License
 
