@@ -20,6 +20,7 @@
 
 set -e
 set -u
+set -x
 
 DISTCHECK=false
 while [ $# -gt 0 ]
@@ -59,6 +60,18 @@ case "$PLATFORM" in
     FreeBSD)
         echo "Building for FreeBSD..."
         export LDFLAGS="-L/usr/local/lib/"
+        MAKE="gmake"
+        ;;
+    NetBSD)
+        echo "Building for NetBSD..."
+        export LDFLAGS="-L/usr/pkg/lib -Wl,--rpath=/usr/pkg/lib"
+        MAKE="gmake"
+        ;;
+    OpenBSD)
+        echo "Building for OpenBSD..."
+        export CPPFLAGS="-I/usr/local/include/ereadline/"
+        export AUTOCONF_VERSION="2.72"
+        export AUTOMAKE_VERSION="1.18"
         MAKE="gmake"
         ;;
     *)
