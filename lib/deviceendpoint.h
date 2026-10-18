@@ -22,12 +22,12 @@
 #include "config.h"
 
 #include <memory>
+#include <optional>
 #include <string>
 
 #include "connectionerror.h"
 #include "Enum.h"
 #include "device.h"
-#include "optional.h"
 
 class rclip;
 class RFSV;
@@ -57,9 +57,9 @@ public:
     * This value is read in @ref DeviceEndpoint::connect and cached in-memory during the lifetime
     * of the @ref DeviceEndpoint instance.
     *
-    * @return @ref Optional containing device name if set; empty otherwise.
+    * @return optional containing device name if set; null otherwise.
     */
-    Optional<std::string> name() const;
+    std::optional<std::string> name() const;
 
     /**
     * Set the device name.
@@ -77,13 +77,13 @@ public:
 private:
 
     DeviceEndpoint(const std::string &id,
-                   const Optional<std::string> &name,
+                   const std::optional<std::string> &name,
                    bool hasPersistentConfiguration,
                    std::unique_ptr<RFSV> rfsv,
                    std::unique_ptr<RPCS> rpcs,
                    std::unique_ptr<rclip> clip);
 
     const std::string id_;
-    Optional<std::string> name_;
+    std::optional<std::string> name_;
     bool hasPersistentConfiguration_;
 };

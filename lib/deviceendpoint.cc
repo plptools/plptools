@@ -20,6 +20,7 @@
 #include "config.h"
 
 #include <memory>
+#include <optional>
 #include <string>
 
 #include "deviceendpoint.h"
@@ -47,7 +48,7 @@ std::unique_ptr<DeviceEndpoint> DeviceEndpoint::connect(const std::string host,
     Enum<RFSV::errs> result;
     auto deviceConfiguration = device::read_configuration(*rfsv, result);
     std::string id = deviceConfiguration ? deviceConfiguration->id() : uuid::uuid4();
-    Optional<std::string> name = deviceConfiguration ? deviceConfiguration->name() : Optional<std::string>();
+    auto name = deviceConfiguration ? std::optional<std::string>(deviceConfiguration->name()) : std::nullopt;
     bool hasPersistentConfiguration = static_cast<bool>(deviceConfiguration);
 
     auto rpcs = std::unique_ptr<RPCS>(RPCS::connect(host, port, &internalError));
@@ -76,7 +77,7 @@ std::unique_ptr<DeviceEndpoint> DeviceEndpoint::connect(const std::string host,
 }
 
 DeviceEndpoint::DeviceEndpoint(const std::string &id,
-                               const Optional<std::string> &name,
+                               const std::optional<std::string> &name,
                                bool hasPersistentConfiguration,
                                std::unique_ptr<RFSV> rfsv,
                                std::unique_ptr<RPCS> rpcs,
@@ -97,7 +98,7 @@ bool DeviceEndpoint::hasPersistentId() const {
     return hasPersistentConfiguration_;
 }
 
-Optional<std::string> DeviceEndpoint::name() const {
+std::optional<std::string> DeviceEndpoint::name() const {
     return name_;
 }
 

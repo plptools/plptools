@@ -100,7 +100,6 @@ noinst_HEADERS = \
 	ncpclient.h \
 	ncpsession.h \
 	ncpstatuscallback.h \
-	optional.h \
 	pathutils.h \
 	plpdirent.h \
 	plpintl.h \
