@@ -555,18 +555,17 @@ int FTP::session(DeviceEndpoint &deviceEndpoint, RFSV &rfsv, RPCS &rpcs, rclip &
     }
 
     {
-        std::string name;
-        auto nameError = deviceEndpoint.getName(name);
+        auto name = deviceEndpoint.name();
 
         Enum<RPCS::machs> machType;
         rpcs.getMachineType(machType);
         if (!once) {
             int speed = rfsv.getSpeed();
-            if (nameError != RFSV::E_PSI_GEN_NONE) {
-                cout << _("Connected to a ") << machType << _(", at ") << speed << _(" baud.") << endl;
-            } else {
-                cout << _("Connected to '") << name << _("', a ") << machType << _(", at ")
+            if (name) {
+                cout << _("Connected to '") << *name << _("', a ") << machType << _(", at ")
                      << speed << _(" baud.") << endl;
+            } else {
+                cout << _("Connected to a ") << machType << _(", at ") << speed << _(" baud.") << endl;
             }
             cout << endl;
         }
@@ -742,14 +741,11 @@ int FTP::session(DeviceEndpoint &deviceEndpoint, RFSV &rfsv, RPCS &rpcs, rclip &
             continue;
         }
         if (!strcmp(argv[0], "devicename") && (argc == 1)) {
-            std::string name;
-            auto error = deviceEndpoint.getName(name);
-            if (error == RFSV::E_PSI_GEN_NONE) {
-                cout << name << endl;
-            } else if (error == RFSV::E_PSI_FILE_RECORD) {
-                cout << _("Error: ") << "not set; use setdevicename to set a name and persist the device id" << endl;
+            auto name = deviceEndpoint.name();
+            if (name) {
+                cout << *name << endl;
             } else {
-                cerr << _("Error: ") << error << endl;
+                cout << _("Error: ") << "not set; use setdevicename to set a name and persist the device id" << endl;
             }
             continue;
         }

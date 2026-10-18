@@ -22,6 +22,7 @@
 #include "config.h"
 
 #include <memory>
+#include <optional>
 #include <string>
 
 #include "connectionerror.h"
@@ -51,15 +52,14 @@ public:
     bool hasPersistentId() const;
 
     /**
-    * Get the device name.
+    * Device name.
     *
-    * @param name Out-param for the device name.
+    * This value is read in @ref DeviceEndpoint::connect and cached in-memory during the lifetime
+    * of the @ref DeviceEndpoint instance.
     *
-    * A return value of @ref RFSV::E_PSI_FILE_RECORD indicates that the device name has not been set.
-    *
-    * @result @ref RFSV::E_PSI_GEN_NONE on success; error otherwise.
+    * @return optional containing device name if set; null otherwise.
     */
-    Enum<RFSV::errs> getName(std::string &name) const;
+    std::optional<std::string> name() const;
 
     /**
     * Set the device name.
@@ -77,11 +77,13 @@ public:
 private:
 
     DeviceEndpoint(const std::string &id,
+                   const std::optional<std::string> &name,
                    bool hasPersistentConfiguration,
                    std::unique_ptr<RFSV> rfsv,
                    std::unique_ptr<RPCS> rpcs,
                    std::unique_ptr<rclip> clip);
 
     const std::string id_;
+    std::optional<std::string> name_;
     bool hasPersistentConfiguration_;
 };
