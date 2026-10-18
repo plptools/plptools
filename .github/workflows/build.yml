@@ -54,6 +54,20 @@ jobs:
               architecture: x86-64
               version: '15.1'
 
+          - name: netbsd-11.0-x86-64
+            os: ubuntu-26.04
+            vm:
+              name: netbsd
+              architecture: x86-64
+              version: '11.0'
+
+          - name: openbsd-7.9-x86-64
+            os: ubuntu-26.04
+            vm:
+              name: openbsd
+              architecture: x86-64
+              version: '7.9'
+
           - name: ubuntu-24.04-amd64
             os: ubuntu-24.04
 
