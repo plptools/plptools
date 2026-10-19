@@ -123,7 +123,7 @@ init_serial(const char *dev, int speed, int debug)
     }
 
     int options = O_RDWR | O_NOCTTY;
-#if defined(__APPLE__)
+#if defined(__APPLE__) && defined(__MACH__)
     // On macOS 27, open seems to hang indefinitely when opened 'blocking' so we always open in non-blocking mode on
     // macOS. The Reconnect branch of plptools has opened the serial port non-blocking since its inception, so this
     // is well tested. Since DataLink is entirely select-based and does not rely on blocking reads, non-blocking should
