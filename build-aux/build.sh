@@ -85,7 +85,7 @@ esac
 ./bootstrap --skip-po
 ./configure
 
-$MAKE V=1
+$MAKE V=1 -j8
 
 if $DISTCHECK ; then
     $MAKE distcheck || ( cat ./plptools-*/_build/sub/tests/test-suite.log; exit 1 )
