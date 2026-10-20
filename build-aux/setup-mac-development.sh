@@ -31,8 +31,10 @@ set -o pipefail
 set -x
 set -u
 
-ROOT_DIRECTORY="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+ROOT_DIRECTORY="$( cd "$( dirname "$( dirname "${BASH_SOURCE[0]}" )" )" &> /dev/null && pwd )"
 BUILD_DIRECTORY="$ROOT_DIRECTORY/build"
+
+cd "$ROOT_DIRECTORY"
 
 # Bootstrap.
 export PATH="$(brew --prefix coreutils)/libexec/gnubin:$PATH"
@@ -41,7 +43,7 @@ export PATH="$(brew --prefix m4)/bin:$PATH"
 
 # Configure.
 export CPPFLAGS="-I$(brew --prefix gettext)/include -I$(brew --prefix readline)/include"
-export LDFLAGS="-L$(brew --prefix gettext)/lib -L$(brew --prefix readline)/lib"
+export LDFLAGS="-L$(brew --prefix gettext)/lib -L$(brew --prefix readline)/lib -F/Library/Filesystems/macfuse.fs/Contents/Frameworks"
 ./configure \
     --prefix="$BUILD_DIRECTORY" \
     CFLAGS="-g -O0" \

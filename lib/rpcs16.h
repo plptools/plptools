@@ -18,32 +18,25 @@
  *  along with this program; if not, see <https://www.gnu.org/licenses/>.
  *
  */
-#ifndef _RPCS16_H_
-#define _RPCS16_H_
+#pragma once
 
 #include "rpcs.h"
+#include <memory>
 
 class TCPSocket;
 class BufferStore;
-class rpcsfactory;
+class RPCSFactory;
 
 /**
- * This is the implementation of the @ref rpcs protocol for
+ * This is the implementation of the @ref RPCS protocol for
  * Psion series 3 (SIBO) variant.  You normally never create
  * objects of this class directly. Thus the constructor is
- * private. Use @ref rpcsfactory for creating an instance of
- * @ref rpcs . For a complete documentation, see @ref rpcs .
+ * private. Use @ref RPCSFactory for creating an instance of
+ * @ref RPCS . For a complete documentation, see @ref RPCS .
  */
-class rpcs16 : public rpcs {
-    friend class rpcsfactory;
-
+class RPCS16 : public RPCS {
  public:
-    Enum<rfsv::errs> getCmdLine(const char *, std::string &);
-    Enum<rfsv::errs> getOwnerInfo(BufferArray &owner);
-
-
- private:
-    rpcs16(TCPSocket *);
+    RPCS16(std::unique_ptr<TCPSocket> socket);
+    Enum<RFSV::errs> getCmdLine(const char *, std::string &);
+    Enum<RFSV::errs> getOwnerInfo(BufferArray &owner);
 };
-
-#endif

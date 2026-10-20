@@ -17,9 +17,7 @@
  *  along with this program; if not, see <https://www.gnu.org/licenses/>.
  *
  */
-
-#ifndef _SISINSTALLER_H
-#define _SISINSTALLER_H
+#pragma once
 
 #include "sistypes.h"
 
@@ -115,6 +113,3 @@ private:
     void uninstallFile(SISFileRecord* fileRecord);
 
 };
-
-#endif
-

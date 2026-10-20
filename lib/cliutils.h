@@ -19,32 +19,17 @@
  *  along with this program; if not, see <https://www.gnu.org/licenses/>.
  *
  */
-#ifndef _ncp_log_h_
-#define _ncp_log_h_
+#pragma once
 
 #include "config.h"
 
-#include <log.h>
+#include <string>
 
-#define NCP_DEBUG_LOG 1
-#define NCP_DEBUG_DUMP 2
-#define LNK_DEBUG_LOG 4
-#define LNK_DEBUG_DUMP 8
-#define PKT_DEBUG_LOG 16
-#define PKT_DEBUG_DUMP 32
-#define PKT_DEBUG_HANDSHAKE 64
-#define NCP_SESSION_LOG 128
+namespace cli_utils {
 
-// Note that these logs are not thread-safe and there's nothing to ensure that log messages from different threads
-// aren't interlaced. Since these are ultimately written to using `write` logging shouldn't crash, but it's important to
-// understand the limitations.
+    extern bool is_number(const std::string &s);
+    extern int lookup_default_port();
+    extern bool parse_port(const std::string &arg, std::string *host, int *port);
+    extern bool parse_port(std::nullptr_t, std::string*, int*) = delete;
 
-extern logbuf ilog;
-extern logbuf dlog;
-extern logbuf elog;
-
-extern std::ostream lout;
-extern std::ostream lerr;
-extern std::ostream linf;
-
-#endif
+};

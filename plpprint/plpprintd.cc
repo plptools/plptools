@@ -20,7 +20,7 @@
  */
 #include "config.h"
 
-#include <cli_utils.h>
+#include <cliutils.h>
 #include <tcpsocket.h>
 #include <wprt.h>
 #include <psibitmap.h>
@@ -1035,11 +1035,11 @@ static void service_loop() {
             /* Job loop */
             buffer.init();
             switch (wPrt->getData(buffer)) {
-                case rfsv::E_PSI_FILE_DISC: {
+                case RFSV::E_PSI_FILE_DISC: {
                     jobLoop = false;
                     break;
                 }
-                case rfsv::E_PSI_GEN_NONE: {
+                case RFSV::E_PSI_GEN_NONE: {
                     if ((buffer.getLen() == 15) && (!memcmp(buffer.getString(0), fakePage, 6))) {
                         buffer.discardFirstBytes(6);
                         if (spoolOpen) {
@@ -1265,9 +1265,9 @@ int main(int argc, char **argv) {
             while (serviceLoop) {
                 wPrt = new wprt(skt);
                 if (wPrt) {
-                    Enum<rfsv::errs> status;
+                    Enum<RFSV::errs> status;
                     status = wPrt->initPrinter();
-                    if (status == rfsv::E_PSI_GEN_NONE) {
+                    if (status == RFSV::E_PSI_GEN_NONE) {
                         service_loop();
                     } else {
                         if (debug) {

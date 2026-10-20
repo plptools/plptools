@@ -17,8 +17,7 @@
  *  along with this program; if not, see <https://www.gnu.org/licenses/>.
  *
  */
-#ifndef _rfsv_api_h_
-#define _rfsv_api_h_
+#pragma once
 
 #ifdef __cplusplus
 extern "C" {
@@ -62,6 +61,4 @@ extern int rfsv_isalive(void);
 
 #ifdef __cplusplus
 }
-#endif
-
 #endif

@@ -19,33 +19,32 @@
  *  along with this program; if not, see <https://www.gnu.org/licenses/>.
  *
  */
-#ifndef _ftp_h_
-#define _ftp_h_
+#pragma once
 
 #include "config.h"
 
 #include <vector>
 
 #include "rfsv.h"
-#include "Enum.h"
 
-class rpcs;
-class BufferStore;
 class BufferArray;
+class BufferStore;
+class DeviceEndpoint;
+class RPCS;
+class rclip;
 
-class ftp {
-    public:
-    ftp();
-    ~ftp();
-    int session(rfsv & a, rpcs & r, rclip & rc, TCPSocket & rclipSocket, std::vector<char *> argv);
-    bool canClip;
+class FTP {
+public:
+    FTP();
+    ~FTP();
+    int session(DeviceEndpoint &deviceEndpoint, RFSV &rfsv, RPCS &rpcs, rclip &clipboard, std::vector<char *> argv);
 
-    private:
+private:
     std::vector<char *> getCommand();
     void initReadline(void);
-    int putClipText(rpcs & r, rfsv & a, rclip & rc, TCPSocket & rclipSocket, const char *data);
-    int getClipData(rpcs & r, rfsv & a, rclip & rc, TCPSocket & rclipSocket, const char *file);
-    bool checkClipConnection(rfsv &a, rclip & rc, TCPSocket & rclipSocket);
+    int putClipText(RFSV &a, rclip &rc, const char *data);
+    int getClipData(RFSV &a, rclip &rc, const char *file);
+    bool checkClipConnection(RFSV &a, rclip &rc);
 
     // utilities
     void resetUnixWd();
@@ -54,5 +53,3 @@ class ftp {
     char defDrive[9];
     char *localDir;
 };
-
-#endif

@@ -17,60 +17,36 @@
  *  along with this program; if not, see <https://www.gnu.org/licenses/>.
  *
  */
+#pragma once
 
-#ifndef _PSION_H
-#define _PSION_H
-
-#include <Enum.h>
-#include "rfsv.h"
-
-class TCPSocket;
-class rfsvfactory;
-class rpcsfactory;
-class rpcs;
+#include "psion.h"
 
 /**
- * Semi smart proxy for communicating with a Psion.
+ * A dummy version of the Psion proxy, mainly for testing the installer.
  */
-class Psion
-{
+class FakePsion : public Psion {
 public:
 
-    virtual ~Psion();
+    virtual ~FakePsion();
 
     virtual bool connect();
 
-    virtual Enum<rfsv::errs> copyFromPsion(const char * const from, int fd,
-                                           cpCallback_t func);
-
-    virtual Enum<rfsv::errs> copyToPsion(const char * const from,
+    virtual Enum<RFSV::errs> copyToPsion(const char * const from,
                                          const char * const to,
                                          void *, cpCallback_t func);
 
-    virtual Enum<rfsv::errs> devinfo(const char drive, PlpDrive& plpDrive);
+    virtual Enum<RFSV::errs> devinfo(const char drive, Drive& plpDrive);
 
-    virtual Enum<rfsv::errs> devlist(uint32_t& devbits);
+    virtual Enum<RFSV::errs> devlist(uint32_t& devbits);
 
-    virtual Enum<rfsv::errs> dir(const char* dir, PlpDir& files);
+    virtual Enum<RFSV::errs> dir(const char* dir, PlpDir& files);
 
     virtual bool dirExists(const char* name);
 
     virtual void disconnect();
 
-    virtual Enum<rfsv::errs> mkdir(const char* dir);
+    virtual Enum<RFSV::errs> mkdir(const char* dir);
 
     virtual void remove(const char* name);
 
-private:
-
-    TCPSocket* m_skt;
-    TCPSocket* m_skt2;
-    rfsvfactory* m_rfsvFactory;
-    rpcsfactory* m_rpcsFactory;
-    rpcs* m_rpcs;
-    rfsv* m_rfsv;
-
 };
-
-#endif
-

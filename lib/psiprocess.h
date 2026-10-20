@@ -17,17 +17,16 @@
  *  along with this program; if not, see <https://www.gnu.org/licenses/>.
  *
  */
-#ifndef _PSIPROCESS_H_
-#define _PSIPROCESS_H_
+#pragma once
 
 #include <string>
 #include <iostream>
 
-class rpcs;
+class RPCS;
 
 /**
  * A class, describing a Process on the Psion.
- * Objects of this type are used by @ref rpcs::queryPrograms
+ * Objects of this type are used by @ref RPCS::queryPrograms
  * for returning the currently running processes.
  *
  * @author Fritz Elfert <felfert@to.com>
@@ -105,7 +104,7 @@ public:
     friend std::ostream &operator<<(std::ostream &o, const PsiProcess &p);
 
 private:
-    friend class rpcs;
+    friend class RPCS;
 
     void setArgs(std::string _args);
 
@@ -114,5 +113,3 @@ private:
     std::string  args;
     bool s5mx;
 };
-
-#endif

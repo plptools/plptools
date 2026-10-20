@@ -25,16 +25,34 @@ LDADD = $(HOSTENT_LIB) $(LIBSOCKET)
 
 pkglib_LTLIBRARIES = libplp.la
 
+libplp_la_LIBADD = $(INTLLIBS) $(LIBPMULTITHREAD) $(LIBTHREAD) $(NANOSLEEP_LIB) $(PTHREAD_SIGMASK_LIB) $(SELECT_LIB) $(top_builddir)/libgnu/libgnu.la
+
 libplp_la_SOURCES = \
 	bufferarray.cc \
 	bufferstore.cc \
-	cli_utils.cc \
+	connectionerror.cc \
+	channel.cc \
+	cliutils.cc \
+	datalink.cc \
+	device.cc \
+	deviceconfiguration.cc \
+	deviceendpoint.cc \
+	drive.cc \
 	Enum.cc \
+	fakepsion.cc \
+	ini.cc \
 	iowatch.cc \
+	link.cc \
+	linkchannel.cc \
 	log.cc \
-	path.cc \
+	mp_serial.c \
+	ncp_log.cc \
+	ncp.cc \
+	ncpsession.cc \
+	pathutils.cc \
 	plpdirent.cc \
 	psibitmap.cpp \
+	psion.cpp \
 	psiprocess.cc \
 	psitime.cc \
 	rclip.cc \
@@ -53,20 +71,40 @@ libplp_la_SOURCES = \
 	sislangrecord.cpp \
 	sisreqrecord.cpp \
 	sistypes.cpp \
+	socketchannel.cc \
 	tcpsocket.cc \
+	uuid.cc \
 	wprt.cc
 
 noinst_HEADERS = \
 	bufferarray.h \
 	bufferstore.h \
-	cli_utils.h \
+	connectionerror.h \
+	channel.h \
+	cliutils.h \
+	datalink.h \
+	device.h \
+	deviceconfiguration.h \
+	deviceendpoint.h \
+	drive.h \
 	Enum.h \
+	fakepsion.h \
+	ini.h \
 	iowatch.h \
+	link.h  \
+	linkchannel.h \
 	log.h \
-	path.h \
+	mp_serial.h \
+	ncp_log.h \
+	ncp.h \
+	ncpclient.h \
+	ncpsession.h \
+	ncpstatuscallback.h \
+	pathutils.h \
 	plpdirent.h \
 	plpintl.h \
 	psibitmap.h \
+	psion.h \
 	psiprocess.h \
 	psitime.h \
 	rclip.h \
@@ -85,5 +123,7 @@ noinst_HEADERS = \
 	sislangrecord.h \
 	sisreqrecord.h \
 	sistypes.h \
+	socketchannel.h \
 	tcpsocket.h \
+	uuid.h \
 	wprt.h

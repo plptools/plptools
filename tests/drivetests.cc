@@ -1,8 +1,7 @@
 /*
  * This file is part of plptools.
  *
- *  Copyright (C) 1999 Philip Proudman <philip.proudman@btinternet.com>
- *  Copyright (C) 1999-2001 Fritz Elfert <felfert@to.com>
+ *  Copyright (c) 2026 Jason Morley <hello@jbmorley.co.uk>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -18,16 +17,25 @@
  *  along with this program; if not, see <https://www.gnu.org/licenses/>.
  *
  */
-#ifndef _mp_serial_h
-#define _mp_serial_h
+#include "config.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-int init_serial(const char *dev, int speed, int debug);
-void ser_exit(int fd);
-#ifdef __cplusplus
+#include <stdlib.h>
+#include <stdio.h>
+
+#include "doctest.h"
+#include "drive.h"
+#include "rfsv.h"
+
+TEST_CASE("Drive::getPath") {
+
+    SUBCASE("M") {
+        Drive drive(MediaType::kRAM, 0, 0, 0, 0, 0, 'M', "Drive");
+        CHECK(drive.getPath() == "M:\\");
+    }
+
+    SUBCASE("C") {
+        Drive drive(MediaType::kRAM, 0, 0, 0, 0, 0, 'C', "Drive");
+        CHECK(drive.getPath() == "C:\\");
+    }
+
 }
-#endif
-
-#endif

@@ -17,11 +17,12 @@
  *  along with this program; if not, see <https://www.gnu.org/licenses/>.
  *
  */
-#ifndef _RCLIP_H_
-#define _RCLIP_H_
+#pragma once
 
+#include "connectionerror.h"
 #include "rfsv.h"
 #include "Enum.h"
+#include <memory>
 
 class TCPSocket;
 class BufferStore;
@@ -33,7 +34,7 @@ class BufferArray;
  * This class implements access to the remote clipboard notification
  * feature of the Psion. The Psion uses the file 'C:\\System\\Data\\Clpboard.cbd'
  * for storing the content of its clipboard. This file can be accessed like
- * any other regular file on the Psion using the @ref rfsv implementation.
+ * any other regular file on the Psion using the @ref RFSV implementation.
  * This class handles notification about changes of this file.
  * There are two methods of notification implemented. Using @ref waitNotify ,
  * a blocking method can be used and using @ref sendListen followed by
@@ -42,12 +43,15 @@ class BufferArray;
  */
 class rclip {
 public:
+
+    static rclip *connect(const std::string &host, int port, Enum<ConnectionError> *error = nullptr);
+
     /**
     * Constructs a new rclip object.
     *
-    * @param skt The socket to be used by this object.
+    * @param socket The socket to be used by this object.
     */
-    rclip(TCPSocket *skt);
+    rclip(std::unique_ptr<TCPSocket> socket);
 
     /**
     * Destructor.
@@ -74,7 +78,7 @@ public:
     *
     * @returns The connection status.
     */
-    Enum<rfsv::errs> getStatus();
+    Enum<RFSV::errs> getStatus();
 
     /**
     * Send initialization frame.
@@ -85,7 +89,7 @@ public:
     *
     * @returns The connection status.
     */
-    Enum<rfsv::errs> initClipbd();
+    Enum<RFSV::errs> initClipbd();
 
     /**
     * Send listen request.
@@ -97,19 +101,19 @@ public:
     *
     * @returns The connection status.
     */
-    Enum<rfsv::errs> sendListen();
+    Enum<RFSV::errs> sendListen();
 
     /**
     * Check for clipboard notification.
     *
     * If the Psion has sent a notification, this method returns
-    * @ref rfsv::E_PSI_GEN_NONE . If there is no notification
-    * pending, this method returns @ref rfsv::E_PSI_FILE_EOF
+    * @ref RFSV::E_PSI_GEN_NONE . If there is no notification
+    * pending, this method returns @ref RFSV::E_PSI_FILE_EOF
     * All other return values are to be treated as errors
     *
     * @returns The connection status.
     */
-    Enum<rfsv::errs> checkNotify();
+    Enum<RFSV::errs> checkNotify();
 
     /**
     * Send listen request and wait for notification.
@@ -118,10 +122,10 @@ public:
     * It first sends a listen request and then blocks until a
     * notification has sent by the Psion or an error occured.
     *
-    * @returns The connection status, rfsv::E_PSI_GEN_NONE if a
+    * @returns The connection status, RFSV::E_PSI_GEN_NONE if a
     *          notification has been received.
     */
-    Enum<rfsv::errs> waitNotify();
+    Enum<RFSV::errs> waitNotify();
 
     /**
     * Send a notification to the Psion.
@@ -131,7 +135,7 @@ public:
     *
     * @returns The connection status.
     */
-    Enum<rfsv::errs> notify();
+    Enum<RFSV::errs> notify();
 
 protected:
     /**
@@ -147,12 +151,12 @@ protected:
     * The socket, used for communication
     * with ncpd.
     */
-    TCPSocket *skt;
+    std::unique_ptr<TCPSocket> socket_;
 
     /**
     * The current status of the connection.
     */
-    Enum<rfsv::errs> status;
+    Enum<RFSV::errs> status;
 
    /**
     * Sends a command to the remote side.
@@ -160,7 +164,7 @@ protected:
     * If communication fails, a reconnect is triggered
     * and a second attempt to transmit the request
     * is attempted. If that second attempt fails,
-    * the function returns an error an sets rpcs::status
+    * the function returns an error an sets RPCS::status
     * to E_PSI_FILE_DISC.
     *
     * @param cc The command to execute on the remote side.
@@ -168,9 +172,7 @@ protected:
     * @returns true on success, false on failure.
     */
     bool sendCommand(enum commands cc);
-    Enum<rfsv::errs> getResponse(BufferStore &data);
+    Enum<RFSV::errs> getResponse(BufferStore &data);
     const char *getConnectName();
 
 };
-
-#endif

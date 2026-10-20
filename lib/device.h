@@ -20,39 +20,24 @@
  *  along with this program; if not, see <https://www.gnu.org/licenses/>.
  *
  */
-
 #pragma once
 
 #include "config.h"
 
-#include <string>
+#include <memory>
 
-/**
-* Conveniences for working with paths.
-*
-* These methods currently have a mishmash of C and C++ as they're a collection of various utilities from around
-* plptools. Hopefully they can be unified in the future.
-*/
-class Path {
-public:
+#include "rfsv.h"
 
-    /**
-    * Returns the last path component of an EPOC path.
-    *
-    * If the path doesn't contain any EPOC path separators (`\`), the returned string matches the path.
-    */
-    static std::string getEPOCBasename(std::string path);
+class DeviceConfiguration;
+class DeviceEndpoint;
+class rclip;
+class RFSV;
+class RPCS;
 
-    /**
-    * Compute parent directory of an EPOC directory.
-    */
-    static char *getEPOCDirname(const char *path);
+namespace device {
 
-    /**
-    * Returns a new absolute EPOC path, determined by resolving `path` relative to `initialPath`.
-    *
-    * If `path` is already an absolute path, this returns `path`.
-    */
-    static char *resolveEPOCPath(const char *path, const char *initialPath);
+extern Enum<RFSV::errs> write_configuration(RFSV &rfsv, const DeviceConfiguration &deviceConfiguration);
+
+extern std::unique_ptr<DeviceConfiguration> read_configuration(RFSV &rfsv, Enum<RFSV::errs> &error);
 
 };

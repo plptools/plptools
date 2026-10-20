@@ -1,0 +1,202 @@
+name: build
+
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [ main ]
+  schedule:
+    - cron:  '0 9 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  build:
+
+    # We use a matrix strategy to allow us to target a wide range of systems. Instead of a classic matrix which
+    # auto-expands, we're very deliberately providing a list of targets and fully specifying each.
+    #
+    # Parameters:
+    # - name -- fully qualified operating system name including version and architecture
+    # - os -- GitHub Actions runner operating system (typically the most-recent Ubuntu LTS)
+    # - container -- Docker container to use (optional)
+    #   - image -- Docker container image
+    #   - setup -- setup script to run inside the Docker container; runs before source code checkout
+    # - vm -- QEMU virtual machine to use (optional)
+    #   - name -- virtual machine guest operating system (e.g., 'haiku')
+    #   - architecture -- virtual machine guest architecture (e.g., 'x86-64')
+    #   - version -- virtual machine guest operating system version (e.g., 'r1beta6')
+    #   - setup -- setup script to run inside the virtual machine before building; runs after source code checkout
+    #
+    # Important:
+    # - `container` and `vm` are mutually exclusive.
+    # - `container.setup` is run prior to source checkout; `vm.setup` is run after source checkout (which occurs on the
+    #   host runner)
+
+    strategy:
+      matrix:
+        include:
+
+          - name: haiku-r1-beta6-x64-64
+            os: ubuntu-26.04
+            vm:
+              name: haiku
+              architecture: x86-64
+              version: 'r1beta6'
+
+          - name: freebsd-15.1-x64-64
+            os: ubuntu-26.04
+            vm:
+              name: freebsd
+              architecture: x86-64
+              version: '15.1'
+
+          - name: netbsd-11.0-x86-64
+            os: ubuntu-26.04
+            vm:
+              name: netbsd
+              architecture: x86-64
+              version: '11.0'
+
+          - name: openbsd-7.9-x86-64
+            os: ubuntu-26.04
+            vm:
+              name: openbsd
+              architecture: x86-64
+              version: '7.9'
+
+          - name: ubuntu-24.04-amd64
+            os: ubuntu-24.04
+
+          - name: ubuntu-24.04-arm64
+            os: ubuntu-24.04-arm
+
+          - name: ubuntu-26.04-amd64
+            os: ubuntu-24.04
+            container:
+              image: ubuntu:resolute
+              setup: apt-get update -y && apt-get -y install git
+
+          - name: ubuntu-26.04-arm64
+            os: ubuntu-24.04-arm
+            container:
+              image: ubuntu:resolute
+              setup: apt-get update -y && apt-get -y install git
+
+          - name: ubuntu-26.10-amd64
+            os: ubuntu-26.04
+            container:
+              image: ubuntu:stonking
+              setup: apt-get update -y && apt-get -y install git
+
+          - name: ubuntu-26.10-arm64
+            os: ubuntu-26.04-arm
+            container:
+              image: ubuntu:stonking
+              setup: apt-get update -y && apt-get -y install git
+
+          - name: debian-bookworm
+            os: ubuntu-latest
+            container:
+              image: debian:bookworm
+              setup: apt-get update -y && apt-get -y install git
+
+          - name: debian-trixie
+            os: ubuntu-latest
+            container:
+              image: debian:trixie
+              setup: apt-get update -y && apt-get -y install git
+
+          - name: macos-26
+            os: macos-26
+
+          - name: macos-15
+            os: macos-15
+
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    container: ${{ matrix.container.image || '' }}
+
+    defaults:
+      run:
+        shell: ${{ matrix.vm && 'cpa.sh {0}' || 'bash' }}
+
+    steps:
+
+    - name: Check matrix configuration
+      if: matrix.container && matrix.vm
+      run:
+        echo "Matrix entries must not specify both a 'vm' and 'container'."
+        exit 1
+
+    - name: Configure the container (if required)
+      if: matrix.container.setup
+      run: ${{ matrix.container.setup }}
+
+    - name: Checkout source
+      uses: actions/checkout@v7
+      with:
+        submodules: true
+
+    - name: Create the virtual machine (if required)
+      if: matrix.vm
+      uses: cross-platform-actions/action@v1.6.0
+      with:
+        operating_system: ${{ matrix.vm.name }}
+        architecture: ${{ matrix.vm.architecture }}
+        version: ${{ matrix.vm.version }}
+        shell: bash
+        memory: 5G
+        cpu_count: 4
+
+    - name: Configure the virtual machine (if required)
+      if: matrix.vm.setup
+      run: ${{ matrix.vm.setup }}
+
+    - name: Install dependencies
+      run: ./build-aux/install-dependencies.sh
+
+    - name: Build
+      run: ./build-aux/build.sh --distcheck
+
+    - name: Run smoke tests
+      run: ./build-aux/smoke-tests.sh
+
+  documentation-build:
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Checkout repository
+      uses: actions/checkout@v7
+      with:
+        submodules: true
+
+    - name: Build documentation
+      uses: mattnotmitt/doxygen-action@1.12.0
+
+    - name: Upload artifact
+      uses: actions/upload-pages-artifact@v5
+      with:
+        path: ./html
+
+  documentation-deploy:
+    runs-on: ubuntu-latest
+
+    needs: documentation-build
+    if: ${{ github.ref == 'refs/heads/main' }}
+
+    permissions:
+      pages: write
+      id-token: write
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5

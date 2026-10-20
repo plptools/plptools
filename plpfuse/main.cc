@@ -21,13 +21,15 @@
 
 #include "config.h"
 
-#include <cli_utils.h>
-#include <rfsv.h>
-#include <rpcs.h>
-#include <rfsvfactory.h>
-#include <rpcsfactory.h>
-#include <bufferstore.h>
 #include <bufferarray.h>
+#include <bufferstore.h>
+#include <cliutils.h>
+#include <cstdint>
+#include <drive.h>
+#include <rfsv.h>
+#include <rfsvfactory.h>
+#include <rpcs.h>
+#include <rpcsfactory.h>
 #include <tcpsocket.h>
 
 #include <iostream>
@@ -50,11 +52,11 @@
 
 using namespace std;
 
-static rfsv *a;
-static rfsvfactory *rf;
+static RFSV *a;
+static RFSVFactory *rf;
 
-static rpcs *r;
-static rpcsfactory *rp;
+static RPCS *r;
+static RPCSFactory *rp;
 static BufferStore owner;
 
 /* Translate EPOC/SIBO error to UNIX error code, leaving positive
@@ -64,72 +66,72 @@ int epocerr_to_errno(long epocerr) {
 
     if (epocerr < 0) {
         switch (epocerr) {
-        case rfsv::E_PSI_GEN_NONE:
+        case RFSV::E_PSI_GEN_NONE:
             unixerr = 0;
             break;
-        case rfsv::E_PSI_FILE_EXIST:
+        case RFSV::E_PSI_FILE_EXIST:
             unixerr = -EEXIST;
             break;
-        case rfsv::E_PSI_FILE_NXIST:
-        case rfsv::E_PSI_FILE_DIR:
+        case RFSV::E_PSI_FILE_NXIST:
+        case RFSV::E_PSI_FILE_DIR:
             unixerr = -ENOENT;
             break;
-        case rfsv::E_PSI_FILE_WRITE:
-        case rfsv::E_PSI_FILE_READ:
-        case rfsv::E_PSI_FILE_EOF: // Can't err = EOF as it's not an error code
-        case rfsv::E_PSI_FILE_ALLOC: // FIXME: No idea what this is
-        case rfsv::E_PSI_FILE_UNKNOWN:
-        case rfsv::E_PSI_FILE_DIRFULL:
+        case RFSV::E_PSI_FILE_WRITE:
+        case RFSV::E_PSI_FILE_READ:
+        case RFSV::E_PSI_FILE_EOF: // Can't err = EOF as it's not an error code
+        case RFSV::E_PSI_FILE_ALLOC: // FIXME: No idea what this is
+        case RFSV::E_PSI_FILE_UNKNOWN:
+        case RFSV::E_PSI_FILE_DIRFULL:
             unixerr = -EPERM;
             break;
-        case rfsv::E_PSI_FILE_FULL:
+        case RFSV::E_PSI_FILE_FULL:
             unixerr = -ENOSPC;
             break;
-        case rfsv::E_PSI_FILE_NAME:
-        case rfsv::E_PSI_FILE_RECORD:
-        case rfsv::E_PSI_FILE_VOLUME:
+        case RFSV::E_PSI_FILE_NAME:
+        case RFSV::E_PSI_FILE_RECORD:
+        case RFSV::E_PSI_FILE_VOLUME:
             unixerr = -EINVAL;
             break;
-        case rfsv::E_PSI_FILE_ACCESS:
-        case rfsv::E_PSI_FILE_LOCKED:
-        case rfsv::E_PSI_FILE_RDONLY:
-        case rfsv::E_PSI_FILE_PROTECT:
+        case RFSV::E_PSI_FILE_ACCESS:
+        case RFSV::E_PSI_FILE_LOCKED:
+        case RFSV::E_PSI_FILE_RDONLY:
+        case RFSV::E_PSI_FILE_PROTECT:
             unixerr = -EACCES;
             break;
-        case rfsv::E_PSI_GEN_INUSE:
-        case rfsv::E_PSI_FILE_DEVICE:
-        case rfsv::E_PSI_FILE_PENDING:
-        case rfsv::E_PSI_FILE_NOTREADY:
+        case RFSV::E_PSI_GEN_INUSE:
+        case RFSV::E_PSI_FILE_DEVICE:
+        case RFSV::E_PSI_FILE_PENDING:
+        case RFSV::E_PSI_FILE_NOTREADY:
             unixerr = -EBUSY;
             break;
-        case rfsv::E_PSI_FILE_INV:
-        case rfsv::E_PSI_FILE_RETRAN:
-        case rfsv::E_PSI_FILE_LINE:
-        case rfsv::E_PSI_FILE_INACT:
-        case rfsv::E_PSI_FILE_PARITY:
-        case rfsv::E_PSI_FILE_FRAME:
-        case rfsv::E_PSI_FILE_OVERRUN:
-        case rfsv::E_PSI_FILE_CORRUPT:
-        case rfsv::E_PSI_FILE_INVALID:
-        case rfsv::E_PSI_FILE_ABORT:
-        case rfsv::E_PSI_FILE_ERASE:
-        case rfsv::E_PSI_FILE_NDISC:
-        case rfsv::E_PSI_FILE_DRIVER:
-        case rfsv::E_PSI_FILE_COMPLETION:
+        case RFSV::E_PSI_FILE_INV:
+        case RFSV::E_PSI_FILE_RETRAN:
+        case RFSV::E_PSI_FILE_LINE:
+        case RFSV::E_PSI_FILE_INACT:
+        case RFSV::E_PSI_FILE_PARITY:
+        case RFSV::E_PSI_FILE_FRAME:
+        case RFSV::E_PSI_FILE_OVERRUN:
+        case RFSV::E_PSI_FILE_CORRUPT:
+        case RFSV::E_PSI_FILE_INVALID:
+        case RFSV::E_PSI_FILE_ABORT:
+        case RFSV::E_PSI_FILE_ERASE:
+        case RFSV::E_PSI_FILE_NDISC:
+        case RFSV::E_PSI_FILE_DRIVER:
+        case RFSV::E_PSI_FILE_COMPLETION:
         default:
             unixerr = -EIO;
             break;
-        case rfsv::E_PSI_FILE_CANCEL:
+        case RFSV::E_PSI_FILE_CANCEL:
             unixerr = -EINTR;
             break;
-        case rfsv::E_PSI_FILE_DISC:
-        case rfsv::E_PSI_FILE_CONNECT:
+        case RFSV::E_PSI_FILE_DISC:
+        case RFSV::E_PSI_FILE_CONNECT:
             unixerr = -ENODEV;
             break;
-        case rfsv::E_PSI_FILE_TOOBIG:
+        case RFSV::E_PSI_FILE_TOOBIG:
             unixerr = -EFBIG;
             break;
-        case rfsv::E_PSI_FILE_HANDLE:
+        case RFSV::E_PSI_FILE_HANDLE:
             unixerr = -EBADF;
             break;
         }
@@ -144,7 +146,7 @@ int rfsv_isalive(void) {
         if (!(a = rf->create(true)))
             return 0;
     }
-    return a->getStatus() == rfsv::E_PSI_GEN_NONE;
+    return a->getStatus() == RFSV::E_PSI_GEN_NONE;
 }
 
 int rfsv_dir(const char *file, dentry **e) {
@@ -218,10 +220,10 @@ int rfsv_open(const char *name, long mode, uint32_t *handle) {
     if (!a)
         return -ENODEV;
     if (mode == O_RDONLY)
-        mode = rfsv::PSI_O_RDONLY;
+        mode = RFSV::PSI_O_RDONLY;
     else
-        mode = rfsv::PSI_O_RDWR;
-    for (retry = 100; retry > 0 && (ret = a->fopen(a->opMode(mode), name, *handle)) != rfsv::E_PSI_GEN_NONE; retry--)
+        mode = RFSV::PSI_O_RDWR;
+    for (retry = 100; retry > 0 && (ret = a->fopen(a->opMode(mode), name, *handle)) != RFSV::E_PSI_GEN_NONE; retry--)
         usleep(20000);
     return epocerr_to_errno(ret);
 }
@@ -233,9 +235,9 @@ int rfsv_read(char *buf, long offset, long len, const char *name) {
         return -ENODEV;
     if ((ret = rfsv_open(name, O_RDONLY, &handle)))
         return ret;
-    if (a->fseek(handle, offset, rfsv::PSI_SEEK_SET, r_offset) != rfsv::E_PSI_GEN_NONE ||
+    if (a->fseek(handle, offset, RFSV::PSI_SEEK_SET, r_offset) != RFSV::E_PSI_GEN_NONE ||
         offset != r_offset ||
-        a->fread(handle, (unsigned char *)buf, len, ret) != rfsv::E_PSI_GEN_NONE)
+        a->fread(handle, (unsigned char *)buf, len, ret) != RFSV::E_PSI_GEN_NONE)
         ret = -1;
     rfsv_fclose(handle);
     return epocerr_to_errno(ret);
@@ -248,9 +250,9 @@ int rfsv_write(const char *buf, long offset, long len, const char *name) {
         return -ENODEV;
     if ((ret = rfsv_open(name, O_RDWR, &handle)))
         return ret;
-    if (a->fseek(handle, offset, rfsv::PSI_SEEK_SET, r_offset) != rfsv::E_PSI_GEN_NONE ||
+    if (a->fseek(handle, offset, RFSV::PSI_SEEK_SET, r_offset) != RFSV::E_PSI_GEN_NONE ||
         offset != r_offset ||
-        a->fwrite(handle, (unsigned char *)buf, len, ret) != rfsv::E_PSI_GEN_NONE)
+        a->fwrite(handle, (unsigned char *)buf, len, ret) != RFSV::E_PSI_GEN_NONE)
         ret = -1;
     rfsv_fclose(handle);
     return epocerr_to_errno(ret);
@@ -268,7 +270,7 @@ int rfsv_setsize(const char *name, long size) {
 
     if (!a)
         return -ENODEV;
-    ret = a->fopen(a->opMode(rfsv::PSI_O_RDWR), name, ph);
+    ret = a->fopen(a->opMode(RFSV::PSI_O_RDWR), name, ph);
     if (!ret) {
         ret = a->fsetsize(ph, size);
         a->fclose(ph);
@@ -312,10 +314,10 @@ int rfsv_drivelist(int *cnt, device **dlist) {
     ret = a->devlist(devbits);
     if (ret == 0)
         for (i = 0; i < 26; i++) {
-            PlpDrive drive;
+            Drive drive;
 
             if ((devbits & 1) &&
-                ((a->devinfo(i + 'A', drive) == rfsv::E_PSI_GEN_NONE))) {
+                ((a->devinfo(i + 'A', drive) == RFSV::E_PSI_GEN_NONE))) {
 
                 device *next = *dlist;
                 *dlist = (device *)malloc(sizeof(device));
@@ -324,7 +326,7 @@ int rfsv_drivelist(int *cnt, device **dlist) {
                 (*dlist)->total = drive.getSize();
                 (*dlist)->free = drive.getSpace();
                 (*dlist)->letter = 'A' + i;
-                (*dlist)->attrib = drive.getMediaType();
+                (*dlist)->attrib = static_cast<uint32_t>(drive.getMediaType());
                 (*cnt)++;
             }
             devbits >>= 1;
@@ -379,7 +381,6 @@ int fuse(int argc, char *argv[])
 }
 
 int main(int argc, char**argv) {
-    TCPSocket *skt, *skt2;
     string host = "127.0.0.1";
     int sockNum = DPORT, i, c, oldoptind = 1;
 
@@ -416,24 +417,13 @@ int main(int argc, char**argv) {
             break;
     }
 
-    skt = new TCPSocket();
-    if (!skt->connect(host.c_str(), sockNum)) {
-        cerr << _("plpfuse: could not connect to ncpd") << endl;
-        return 1;
-    }
-    skt2 = new TCPSocket();
-    if (!skt2->connect(host.c_str(), sockNum)) {
-        cerr << _("plpfuse: could not connect to ncpd") << endl;
-        return 1;
-    }
-
-    rf = new rfsvfactory(skt);
-    rp = new rpcsfactory(skt2);
+    rf = new RFSVFactory(host.c_str(), sockNum);
+    rp = new RPCSFactory(host.c_str(), sockNum);
     a = rf->create(true);
     r = rp->create(true);
     if (a != NULL && r != NULL)
         debuglog("plpfuse: connected");
     else
-        debuglog("plpfuse: could not create rfsv or rpcs object, connect delayed");
+        debuglog("plpfuse: could not create rfsv or RPCS object, connect delayed");
     return fuse(argc, argv);
 }

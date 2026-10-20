@@ -25,7 +25,7 @@
 #include <cstring>
 #include <iostream>
 
-#include <cli_utils.h>
+#include <cliutils.h>
 #include <bufferstore.h>
 #include <tcpsocket.h>
 #include <iowatch.h>
@@ -45,7 +45,7 @@
 #include "ignore-value.h"
 
 #include "ncp_log.h"
-#include "ncp_session.h"
+#include "ncpsession.h"
 #include "datalink.h"
 
 #ifndef _GNU_SOURCE

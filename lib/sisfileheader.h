@@ -16,9 +16,7 @@
  *  You should have received a copy of the GNU General Public License along
  *  along with this program; if not, see <https://www.gnu.org/licenses/>.
  */
-
-#ifndef _SISFILEHEADER_H
-#define _SISFILEHEADER_H
+#pragma once
 
 #include "sistypes.h"
 
@@ -107,5 +105,3 @@ private:
     uint8_t* m_buf;
 
 };
-
-#endif

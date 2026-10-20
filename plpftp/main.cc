@@ -20,18 +20,22 @@
  */
 #include "config.h"
 
-#include <cli_utils.h>
+#include <iostream>
+#include <memory>
+#include <vector>
+
+#include <bufferstore.h>
+#include <cliutils.h>
+#include <device.h>
+#include <deviceendpoint.h>
+#include <deviceconfiguration.h>
+#include <plpintl.h>
+#include <rclip.h>
 #include <rfsv.h>
 #include <rfsvfactory.h>
 #include <rpcs.h>
 #include <rpcsfactory.h>
-#include <rclip.h>
-#include <plpintl.h>
 #include <tcpsocket.h>
-#include <bufferstore.h>
-
-#include <iostream>
-#include <vector>
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -66,8 +70,7 @@ help()
         ) << DPORT << "\n\n";
 }
 
-static void
-usage() {
+static void usage() {
     cerr << _("Try `plpftp --help' for more information") << endl;
 }
 
@@ -78,34 +81,16 @@ static struct option opts[] = {
     {NULL,       0,                 nullptr,  0 }
 };
 
-void
-ftpHeader()
-{
-    cout << _("PLPFTP Version ") << VERSION;
-    cout << _(" Copyright (C) 1999 Philip Proudman") << endl;
-    cout << _(" Additions Copyright (C) 1999-2002 Fritz Elfert <felfert@to.com>") << endl;
-    cout << _("                   & (C) 1999 Matt Gumbley <matt@gumbley.demon.co.uk>") << endl;
-    cout << _("                   & (C) 2006-2025 Reuben Thomas <rrt@sc3d.org>") << endl;
-    cout << _("PLPFTP comes with ABSOLUTELY NO WARRANTY.") << endl;
-    cout << _("This is free software, and you are welcome to redistribute it") << endl;
-    cout << _("under GPL conditions; see the COPYING file in the distribution.") << endl;
-    cout << endl;
+void ftpHeader() {
+    cout << _("PLPFTP Version ") << VERSION << endl;
     cout << _("FTP like interface started. Type \"?\" for help.") << endl;
+    cout << endl;
 }
 
-int
-main(int argc, char **argv)
-{
-    TCPSocket *skt;
-    TCPSocket *skt2;
-    rfsv *a;
-    rpcs *r;
-    TCPSocket *rclipSocket;
-    rclip *rc;
-    ftp f;
+int main(int argc, char **argv) {
+    FTP ftp;
     string host = "127.0.0.1";
-    int status = 0;
-    int sockNum = cli_utils::lookup_default_port();
+    int port = cli_utils::lookup_default_port();
 
     setlocale (LC_ALL, "");
     textdomain(PACKAGE);
@@ -125,51 +110,23 @@ main(int argc, char **argv)
                 help();
                 return 0;
             case 'p':
-                if (!cli_utils::parse_port(optarg, &host, &sockNum)) {
+                if (!cli_utils::parse_port(optarg, &host, &port)) {
                     cout << _("Invalid port definition.") << endl;
                     return 1;
                 }
                 break;
         }
     }
-    if (optind == argc)
+    if (optind == argc) {
         ftpHeader();
+    }
 
-    skt = new TCPSocket();
-    if (!skt->connect(host.c_str(), sockNum)) {
-        cout << _("plpftp: could not connect to ncpd") << endl;
-        return 1;
+    Enum<ConnectionError> error;
+    auto deviceEndpoint = DeviceEndpoint::connect(host, port, &error);
+    if (!deviceEndpoint) {
+        std::cerr << "plpftp: " << error << std::endl;
+        return EXIT_FAILURE;
     }
-    skt2 = new TCPSocket();
-    if (!skt2->connect(host.c_str(), sockNum)) {
-        cout << _("plpftp: could not connect to ncpd") << endl;
-        return 1;
-    }
-    rfsvfactory *rf = new rfsvfactory(skt);
-    rpcsfactory *rp = new rpcsfactory(skt2);
-    a = rf->create(false);
-    r = rp->create(false);
-    rclipSocket = new TCPSocket();
-    rclipSocket->connect(NULL, sockNum);
-    if (rclipSocket)
-        rc = new rclip(rclipSocket);
-    f.canClip = rclipSocket && rc ? true : false;
-    if ((a != NULL) && (r != NULL)) {
-        vector<char *> args(argv + optind, argv + argc);
-        status = f.session(*a, *r, *rc, *rclipSocket, args);
-        delete r;
-        delete a;
-        delete skt;
-        delete skt2;
-        if (rclipSocket)
-            delete rclipSocket;
-        if (rc)
-            delete rc;
-    } else {
-        cerr << "plpftp: " << rf->getError() << endl;
-        status = 1;
-    }
-    delete rf;
-    delete rp;
-    return status;
+    vector<char *> args(argv + optind, argv + argc);
+    return ftp.session(*deviceEndpoint, *deviceEndpoint->rfsv_, *deviceEndpoint->rpcs_, *deviceEndpoint->clip_, args);
 }

@@ -3,6 +3,7 @@
  *
  *  Copyright (C) 1999 Philip Proudman <philip.proudman@btinternet.com>
  *  Copyright (C) 1999-2002 Fritz Elfert <felfert@to.com>
+ *  Copyright (c) 2026 Jason Morley <hello@jbmorley.co.uk>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -18,20 +19,22 @@
  *  along with this program; if not, see <https://www.gnu.org/licenses/>.
  *
  */
-#ifndef _RFSV_H_
-#define _RFSV_H_
+#pragma once
 
 #include <deque>
+#include <memory>
 #include <string>
+#include <vector>
 
 #include "Enum.h"
+#include "connectionerror.h"
 #include "plpdirent.h"
 #include "bufferstore.h"
 
 typedef std::deque<class PlpDirent> PlpDir;
 
 class TCPSocket;
-class PlpDrive;
+class Drive;
 
 inline const int RFSV_SENDLEN = 2000;
 
@@ -41,41 +44,42 @@ inline const int RFSV_SENDLEN = 2000;
  */
 typedef int (*cpCallback_t)(void *, uint32_t);
 
-class rfsv16;
-class rfsv32;
+class RFSV16;
+class RFSV32;
 
 /**
  * A helper class for storing
- * intermediate internal information in rfsv16 and
- * rfsv32 .
+ * intermediate internal information in RFSV16 and
+ * RFSV32 .
  * @internal
  */
-class rfsvDirhandle {
-    friend class rfsv16;
-    friend class rfsv32;
+class RFSVDirHandle {
+    friend class RFSV16;
+    friend class RFSV32;
 
 private:
     uint32_t h;
     BufferStore b;
+    std::string name_;
 };
 
 /**
  * Access remote file services of a Psion.
  *
- * rfsv provides an API for accessing file services
+ * RFSV provides an API for accessing file services
  * of a Psion connected via ncpd. This class defines the
  * interface and a small amount of common constants and
  * methods. The majority of implementation is provided
- * by @ref rfsv32 and @ref rfsv16 , which implement the
+ * by @ref RFSV32 and @ref RFSV16 , which implement the
  * variations of the protocol for EPOC and SIBO respectively.
- * Usually, the class @ref rfsvfactory is used to instantiate
+ * Usually, the class @ref RFSVFactory is used to instantiate
  * the correct variant depending on the remote machine,
  * currently connected.
  */
-class rfsv {
+class RFSV {
 public:
     /**
-    * The kown modes for seek.
+    * The known modes for seek.
     */
     enum seek_mode {
         PSI_SEEK_SET = 1,
@@ -211,7 +215,9 @@ public:
         PSI_A_TEXT       = 0x1000
     };
 
-    virtual ~rfsv();
+    static RFSV *connect(const std::string &host, int port, Enum<ConnectionError> *error);
+
+    virtual ~RFSV();
     void reset();
     void reconnect();
 
@@ -289,9 +295,13 @@ public:
     * @param name The name of the directory
     * @param ret  An STL deque of @ref PlpDirent entries.
     *
-    * @returns A Psion error code (One of enum @ref rfsv::errs ).
+    * @returns A Psion error code (One of enum @ref RFSV::errs ).
     */
     virtual Enum<errs> dir(const char * const name, PlpDir &ret) = 0;
+
+    Enum<errs> dir(const std::string &path,
+                   bool recursive,
+                   std::vector<PlpDirent> &files);
 
     /**
     * Retrieves the modification time of a file on the Psion.
@@ -384,12 +394,14 @@ public:
     * @param drive The drive character of the drive to get details from
     *              (e.g: 'C', 'D' etc.).
     *              (0 represents A:, 1 is B: and so on ...)
-    * @param dinfo A @ref PlpDrive object which is filled with the drive's
+    * @param dinfo A @ref Drive object which is filled with the drive's
     *              information upon return.
     *
     * @returns A Psion error code (One of enum @ref #errs ).
     */
-    virtual Enum<errs> devinfo(const char drive, PlpDrive &dinfo) = 0;
+    virtual Enum<errs> devinfo(const char drive, Drive &dinfo) = 0;
+
+    Enum<errs> drives(std::vector<Drive> &drives);
 
     /**
     * Reads from a file on the Psion.
@@ -420,6 +432,7 @@ public:
     *
     * @param from Name of the file on the Psion to be copied.
     * @param to Name of the destination file on the local machine.
+    * @param context Callback context passed to the callback function @p func.
     * @param func Pointer to a function which gets called on every read.
     *             This function can be used to show some progress etc. May be
     *             set to NULL, where no callback is performed. If the callback
@@ -428,12 +441,12 @@ public:
     *
     * @returns A Psion error code (One of enum @ref #errs ).
     */
-    virtual Enum<errs> copyFromPsion(const char *from, const char *to, void *, cpCallback_t func) = 0;
+    virtual Enum<errs> copyFromPsion(const char *from, const char *to, void *context, cpCallback_t func) = 0;
 
     /**
     * Copies a file from the Psion to the local machine.
     */
-    virtual Enum<rfsv::errs> copyFromPsion(const char *from, int fd, cpCallback_t cb) = 0;
+    virtual Enum<RFSV::errs> copyFromPsion(const char *from, int fd, cpCallback_t cb) = 0;
 
     /**
     * Copies a file from local machine to the Psion.
@@ -541,7 +554,7 @@ public:
     *
     * @returns A Psion error code (One of enum @ref #errs ).
     */
-    virtual Enum<errs> opendir(const uint32_t attr, const char * const name, rfsvDirhandle &handle) = 0;
+    virtual Enum<errs> opendir(const uint32_t attr, const char * const name, RFSVDirHandle &handle) = 0;
 
     /**
     * Read directory entries.
@@ -553,7 +566,7 @@ public:
     *
     * @returns A Psion error code (One of enum @ref #errs ).
     */
-    virtual Enum<errs> readdir(rfsvDirhandle &handle, PlpDirent &entry) = 0;
+    virtual Enum<errs> readdir(RFSVDirHandle &handle, PlpDirent &entry) = 0;
 
     /**
     * Close a directory, previously opened with @ref opendir.
@@ -562,7 +575,7 @@ public:
     *
     * @returns A Psion error code (One of enum @ref #errs ).
     */
-    virtual Enum<errs> closedir(rfsvDirhandle &handle) = 0;
+    virtual Enum<errs> closedir(RFSVDirHandle &handle) = 0;
 
     /**
     * Set the name of a Psion Volume (Drive).
@@ -575,7 +588,7 @@ public:
     virtual Enum<errs> setVolumeName(const char drive, const char * const name) = 0;
 
     /**
-    * Converts a file attribute @ref rfsv::file_attribs to
+    * Converts a file attribute @ref RFSV::file_attribs to
     * human readable format, usable for showing them in directory
     * listings. The first 7 characters are common to all
     * machine types:
@@ -634,6 +647,10 @@ public:
      */
     virtual int getProtocolVersion() = 0;
 
+    virtual char defaultInternalDriveLetter() = 0;
+
+    virtual std::string deviceConfigurationPath() = 0;
+
 protected:
     /**
     * Retrieves the PLP protocol name. Mainly internal use.
@@ -642,9 +659,7 @@ protected:
     */
     const char *getConnectName();
 
-    TCPSocket *skt;
-    Enum<errs> status;
-    int32_t serNum;
+    std::unique_ptr<TCPSocket> socket_;
+    Enum<errs> status_;
+    int32_t operationId_;
 };
-
-#endif

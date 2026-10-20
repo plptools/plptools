@@ -22,7 +22,7 @@
 
 #include "config.h"
 
-#include "cli_utils.h"
+#include "cliutils.h"
 
 #include <algorithm>
 #include <cctype>

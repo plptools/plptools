@@ -1,8 +1,7 @@
 /*
  * This file is part of plptools.
  *
- *  Copyright (C) 1999 Philip Proudman <philip.proudman@btinternet.com>
- *  Copyright (C) 1999-2001 Fritz Elfert <felfert@to.com>
+ *  Copyright (c) 2026 Jason Morley <hello@jbmorley.co.uk>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -18,28 +17,26 @@
  *  along with this program; if not, see <https://www.gnu.org/licenses/>.
  *
  */
-#ifndef _linkchan_h_
-#define _linkchan_h_
+#pragma once
 
-#include "channel.h"
-#include "bufferarray.h"
+#include <memory>
+#include <string>
+#include <unordered_map>
 
-#define LINKCHAN_DEBUG_LOG  1
-#define LINKCHAN_DEBUG_DUMP 2
+namespace ini {
 
-class LinkChannel : public Channel {
-public:
-    LinkChannel(NCP *ncpController, int ncpChannel = -1);
+/**
+* Simple parser for flat ini data.
+*
+* Does not support sections or quoted values. Supports Windows and Unix line endings.
+*/
+extern std::unique_ptr<std::unordered_map<std::string, std::string>> deserialize(const std::string contents);
 
-    void ncpDataCallback(BufferStore &a);
-    const char *getNcpRegisterName();
-    void ncpConnectAck();
-    void ncpConnectTerminate();
-    void ncpConnectNak();
-    void ncpRegisterAck() {}
-    void Register(Channel *);
-private:
-    int registerSer;
-    BufferArray registerStack;
+/**
+* Outputs simple flat ini data.
+*
+* Does not currently attempt to quote values (multi-line strings and strings with trailing whitespace will break this.)
+*/
+extern std::string serialize(const std::unordered_map<std::string, std::string> &contents);
+
 };
-#endif

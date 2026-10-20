@@ -22,11 +22,13 @@
 
 #include "sisinstaller.h"
 
+#include "drive.h"
+#include "plpdirent.h"
+#include "psion.h"
 #include "sisfile.h"
 #include "sisfilelink.h"
 #include "sisfilerecord.h"
 #include "sisreqrecord.h"
-#include "psion.h"
 
 #include <cstdlib>
 #include <errno.h>
@@ -90,10 +92,10 @@ SISInstaller::createDirs(char* filename)
                                 {
                                 if (logLevel >= 1)
                                         fprintf(stderr, "Creating dir %s\n", filename);
-                                Enum<rfsv::errs> res;
+                                Enum<RFSV::errs> res;
                                 res = m_psion->mkdir(filename);
-                                if ((res != rfsv::E_PSI_GEN_NONE) &&
-                                        (res != rfsv::E_PSI_FILE_EXIST))
+                                if ((res != RFSV::E_PSI_GEN_NONE) &&
+                                        (res != RFSV::E_PSI_FILE_EXIST))
                                         {
                                                 fprintf(stderr, " -> Failed: %s\n", (const char*)res);
                                         }
@@ -155,7 +157,7 @@ SISInstaller::copyBuf(const uint8_t* buf, int len, char* name)
                                         "Couldn't create temp file: %s\n", strerror(errno));
                 return;
                 }
-        Enum<rfsv::errs> res;
+        Enum<RFSV::errs> res;
         if (logLevel >= 2)
                 fprintf(stderr, "Storing in %s\n", srcName);
         ssize_t written = write(fd, buf, len);
@@ -165,7 +167,7 @@ SISInstaller::copyBuf(const uint8_t* buf, int len, char* name)
                 continueRunning = 1;
                 res = m_psion->copyToPsion(srcName, name, NULL, checkAbortHash);
         }
-        if (write_ok && res == rfsv::E_PSI_GEN_NONE)
+        if (write_ok && res == RFSV::E_PSI_GEN_NONE)
                 {
                 if (logLevel >= 1)
                         fprintf(stderr, " -> Success.\n");
@@ -273,9 +275,9 @@ SisRC
 SISInstaller::loadInstalled()
 {
         PlpDir files;
-        Enum<rfsv::errs> res;
+        Enum<RFSV::errs> res;
 
-        if ((res = m_psion->dir(SYSTEMINSTALL, files)) != rfsv::E_PSI_GEN_NONE)
+        if ((res = m_psion->dir(SYSTEMINSTALL, files)) != RFSV::E_PSI_GEN_NONE)
                 {
                 return SIS_FAILED;
                 }
@@ -306,12 +308,12 @@ SISInstaller::loadPsionSis(const char* name)
                 fprintf(stderr, "Couldn't create temp file: %s\n", strerror(errno));
                 return;
                 }
-        Enum<rfsv::errs> res;
+        Enum<RFSV::errs> res;
         continueRunning = 1;
         if (logLevel >= 2)
                 fprintf(stderr, "Copying from %s to temp file %s\n", name, srcName);
         res = m_psion->copyFromPsion(name, fd, checkAbortHash);
-        if (res == rfsv::E_PSI_GEN_NONE)
+        if (res == RFSV::E_PSI_GEN_NONE)
                 {
                 off_t fileLen = lseek(fd, 0, SEEK_END);
                 if (logLevel >= 2)
@@ -555,25 +557,25 @@ void
 SISInstaller::selectDrive()
 {
         uint32_t devbits = 0;
-        Enum<rfsv::errs> res;
+        Enum<RFSV::errs> res;
         char drivelist[26];
         int ndrives = 0;
-        if ((res = m_psion->devlist(devbits)) == rfsv::E_PSI_GEN_NONE)
+        if ((res = m_psion->devlist(devbits)) == RFSV::E_PSI_GEN_NONE)
                 {
                 for (int i = 0; i < 26; i++)
                         {
-                        PlpDrive plpdrive;
+                        Drive drive;
                         if (((devbits & 1) != 0) &&
-                                (m_psion->devinfo(i + 'A', plpdrive) == rfsv::E_PSI_GEN_NONE))
+                                (m_psion->devinfo(i + 'A', drive) == RFSV::E_PSI_GEN_NONE))
                                 {
-                                uint32_t mediaType = plpdrive.getMediaType();
-                                if ((mediaType == 3) || (mediaType == 5))
+                                MediaType mediaType = drive.getMediaType();
+                                if ((mediaType == MediaType::kDisk) || (mediaType == MediaType::kRAM))
                                         {
                                         drivelist[ndrives] = 'A' + i;
                                         printf("%c: %lud bytes free, %lud bytes total\n",
                                                'A' + i,
-                                               plpdrive.getSpace(),
-                                               plpdrive.getSize());
+                                               drive.getSpace(),
+                                               drive.getSize());
                                         ++ndrives;
                                         }
                                 }

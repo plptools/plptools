@@ -18,48 +18,43 @@
  *  along with this program; if not, see <https://www.gnu.org/licenses/>.
  *
  */
-#ifndef _RPCS32_H_
-#define _RPCS32_H_
+#pragma once
 
 #include "rpcs.h"
+#include <memory>
 
 class TCPSocket;
-class rpcsfactory;
+class RPCSFactory;
 
 /**
- * This is the implementation of the @ref rpcs protocol for
+ * This is the implementation of the @ref RPCS protocol for
  * Psion series 5 (EPOC) variant. You normally never create
  * objects of this class directly. Thus the constructor is
- * private. Use @ref rpcsfactory for creating an instance of
- * @ref rpcs . For a complete documentation, see @ref rpcs .
+ * private. Use @ref RPCSFactory for creating an instance of
+ * @ref RPCS . For a complete documentation, see @ref RPCS .
  */
-class rpcs32 : public rpcs {
-    friend class rpcsfactory;
-
+class RPCS32 : public RPCS {
  public:
-    Enum<rfsv::errs> getCmdLine(const char *, std::string &);
-    Enum<rfsv::errs> getMachineInfo(machineInfo &);
-    Enum<rfsv::errs> getOwnerInfo(BufferArray &owner);
-    Enum<rfsv::errs> configRead(uint32_t, BufferStore &);
-    Enum<rfsv::errs> configWrite(BufferStore);
-    Enum<rfsv::errs> closeHandle(uint16_t);
-    Enum<rfsv::errs> regOpenIter(uint32_t uid, char *match, uint16_t &handle);
-    Enum<rfsv::errs> regReadIter(uint16_t handle);
-    Enum<rfsv::errs> setTime(time_t time);
+    Enum<RFSV::errs> getCmdLine(const char *, std::string &);
+    Enum<RFSV::errs> getMachineInfo(machineInfo &);
+    Enum<RFSV::errs> getOwnerInfo(BufferArray &owner);
+    Enum<RFSV::errs> configRead(uint32_t, BufferStore &);
+    Enum<RFSV::errs> configWrite(BufferStore);
+    Enum<RFSV::errs> closeHandle(uint16_t);
+    Enum<RFSV::errs> regOpenIter(uint32_t uid, char *match, uint16_t &handle);
+    Enum<RFSV::errs> regReadIter(uint16_t handle);
+    Enum<RFSV::errs> setTime(time_t time);
 #if 0
-    Enum<rfsv::errs> regWrite(void);
-    Enum<rfsv::errs> regRead(void);
-    Enum<rfsv::errs> regDelete(void);
-    Enum<rfsv::errs> queryOpen(void);
-    Enum<rfsv::errs> queryRead(void);
-    Enum<rfsv::errs> quitServer(void);
+    Enum<RFSV::errs> regWrite(void);
+    Enum<RFSV::errs> regRead(void);
+    Enum<RFSV::errs> regDelete(void);
+    Enum<RFSV::errs> queryOpen(void);
+    Enum<RFSV::errs> queryRead(void);
+    Enum<RFSV::errs> quitServer(void);
 #endif
+
+    RPCS32(std::unique_ptr<TCPSocket> socket);
 
 protected:
-    Enum<rfsv::errs> configOpen(uint16_t &, uint32_t);
-
- private:
-    rpcs32(TCPSocket *);
+    Enum<RFSV::errs> configOpen(uint16_t &, uint32_t);
 };
-
-#endif
