@@ -736,7 +736,7 @@ int FTP::session(DeviceEndpoint &deviceEndpoint, RFSV &rfsv, RPCS &rpcs, rclip &
         if (!strcmp(argv[0], "deviceid") && (argc == 1)) {
             cout << deviceEndpoint.id() << endl;
             if (!deviceEndpoint.hasPersistentId()) {
-                cout << _("Warning: ") << _("not persistent; use setdevicename to set a name and persist the device id") << endl;
+                cout << _("Warning: ") << _("device id not persistent; use setdevicename to persist the name and device id") << endl;
             }
             continue;
         }
@@ -745,7 +745,7 @@ int FTP::session(DeviceEndpoint &deviceEndpoint, RFSV &rfsv, RPCS &rpcs, rclip &
             if (name) {
                 cout << *name << endl;
             } else {
-                cout << _("Error: ") << "not set; use setdevicename to set a name and persist the device id" << endl;
+                cout << _("Error: ") << _("device name not set; use setdevicename to persist the name and device id") << endl;
             }
             continue;
         }
