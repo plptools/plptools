@@ -1,0 +1,1377 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR plptools developers
+# This file is distributed under the same license as the plptools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: plptools 1.0.26\n"
+"Report-Msgid-Bugs-To: plptools-developers@lists.sourceforge.net\n"
+"POT-Creation-Date: 2026-10-20 11:27-1000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: lib/rfsv.cc:39
+msgid "no error"
+msgstr ""
+
+#: lib/rfsv.cc:40
+msgid "general"
+msgstr ""
+
+#: lib/rfsv.cc:41
+msgid "bad argument"
+msgstr ""
+
+#: lib/rfsv.cc:42
+msgid "OS error"
+msgstr ""
+
+#: lib/rfsv.cc:43
+msgid "not supported"
+msgstr ""
+
+#: lib/rfsv.cc:44
+msgid "numeric underflow"
+msgstr ""
+
+#: lib/rfsv.cc:45
+msgid "numeric overflow"
+msgstr ""
+
+#: lib/rfsv.cc:46
+msgid "numeric exception"
+msgstr ""
+
+#: lib/rfsv.cc:47
+msgid "in use"
+msgstr ""
+
+#: lib/rfsv.cc:48
+msgid "out of memory"
+msgstr ""
+
+#: lib/rfsv.cc:49
+msgid "out of segments"
+msgstr ""
+
+#: lib/rfsv.cc:50
+msgid "out of semaphores"
+msgstr ""
+
+#: lib/rfsv.cc:51
+msgid "out of processes"
+msgstr ""
+
+#: lib/rfsv.cc:52
+msgid "already open"
+msgstr ""
+
+#: lib/rfsv.cc:53
+msgid "not open"
+msgstr ""
+
+#: lib/rfsv.cc:54
+msgid "bad image"
+msgstr ""
+
+#: lib/rfsv.cc:55
+msgid "receiver error"
+msgstr ""
+
+#: lib/rfsv.cc:56
+msgid "device error"
+msgstr ""
+
+#: lib/rfsv.cc:57
+msgid "no filesystem"
+msgstr ""
+
+#: lib/rfsv.cc:58
+msgid "not ready"
+msgstr ""
+
+#: lib/rfsv.cc:59
+msgid "no font"
+msgstr ""
+
+#: lib/rfsv.cc:60
+msgid "too wide"
+msgstr ""
+
+#: lib/rfsv.cc:61
+msgid "too many"
+msgstr ""
+
+#: lib/rfsv.cc:62
+msgid "file already exists"
+msgstr ""
+
+#: lib/rfsv.cc:63
+msgid "no such file"
+msgstr ""
+
+#: lib/rfsv.cc:64
+msgid "write error"
+msgstr ""
+
+#: lib/rfsv.cc:65
+msgid "read error"
+msgstr ""
+
+#: lib/rfsv.cc:66
+msgid "end of file"
+msgstr ""
+
+#: lib/rfsv.cc:67
+msgid "disk/serial read buffer full"
+msgstr ""
+
+#: lib/rfsv.cc:68
+msgid "invalid name"
+msgstr ""
+
+#: lib/rfsv.cc:69
+msgid "access denied"
+msgstr ""
+
+#: lib/rfsv.cc:70
+msgid "resource locked"
+msgstr ""
+
+#: lib/rfsv.cc:71
+msgid "no such device"
+msgstr ""
+
+#: lib/rfsv.cc:72
+msgid "no such directory"
+msgstr ""
+
+#: lib/rfsv.cc:73
+msgid "no such record"
+msgstr ""
+
+#: lib/rfsv.cc:74
+msgid "file is read-only"
+msgstr ""
+
+#: lib/rfsv.cc:75
+msgid "invalid I/O operation"
+msgstr ""
+
+#: lib/rfsv.cc:76
+msgid "I/O pending (not yet completed)"
+msgstr ""
+
+#: lib/rfsv.cc:77
+msgid "invalid volume name"
+msgstr ""
+
+#: lib/rfsv.cc:78
+msgid "cancelled"
+msgstr ""
+
+#: lib/rfsv.cc:79
+msgid "no memory for control block"
+msgstr ""
+
+#: lib/rfsv.cc:80
+msgid "unit disconnected"
+msgstr ""
+
+#: lib/rfsv.cc:81
+msgid "already connected"
+msgstr ""
+
+#: lib/rfsv.cc:82
+msgid "retransmission threshold exceeded"
+msgstr ""
+
+#: lib/rfsv.cc:83
+msgid "physical link failure"
+msgstr ""
+
+#: lib/rfsv.cc:84
+msgid "inactivity timer expired"
+msgstr ""
+
+#: lib/rfsv.cc:85
+msgid "serial parity error"
+msgstr ""
+
+#: lib/rfsv.cc:86
+msgid "serial framing error"
+msgstr ""
+
+#: lib/rfsv.cc:87
+msgid "serial overrun error"
+msgstr ""
+
+#: lib/rfsv.cc:88
+msgid "modem cannot connect to remote modem"
+msgstr ""
+
+#: lib/rfsv.cc:89
+msgid "remote modem busy"
+msgstr ""
+
+#: lib/rfsv.cc:90
+msgid "remote modem did not answer"
+msgstr ""
+
+#: lib/rfsv.cc:91
+msgid "number blacklisted by the modem"
+msgstr ""
+
+#: lib/rfsv.cc:92
+msgid "drive not ready"
+msgstr ""
+
+#: lib/rfsv.cc:93
+msgid "unknown media"
+msgstr ""
+
+#: lib/rfsv.cc:94
+msgid "directory full"
+msgstr ""
+
+#: lib/rfsv.cc:95
+msgid "write-protected"
+msgstr ""
+
+#: lib/rfsv.cc:96
+msgid "media corrupt"
+msgstr ""
+
+#: lib/rfsv.cc:97
+msgid "aborted operation"
+msgstr ""
+
+#: lib/rfsv.cc:98
+msgid "failed to erase flash media"
+msgstr ""
+
+#: lib/rfsv.cc:99
+msgid "invalid file for DBF system"
+msgstr ""
+
+#: lib/rfsv.cc:100
+msgid "power failure"
+msgstr ""
+
+#: lib/rfsv.cc:101
+msgid "too big"
+msgstr ""
+
+#: lib/rfsv.cc:102
+msgid "bad descriptor"
+msgstr ""
+
+#: lib/rfsv.cc:103
+msgid "bad entry point"
+msgstr ""
+
+#: lib/rfsv.cc:104
+msgid "could not diconnect"
+msgstr ""
+
+#: lib/rfsv.cc:105
+msgid "bad driver"
+msgstr ""
+
+#: lib/rfsv.cc:106
+msgid "operation not completed"
+msgstr ""
+
+#: lib/rfsv.cc:107
+msgid "server busy"
+msgstr ""
+
+#: lib/rfsv.cc:108
+msgid "terminated"
+msgstr ""
+
+#: lib/rfsv.cc:109
+msgid "died"
+msgstr ""
+
+#: lib/rfsv.cc:110
+msgid "bad handle"
+msgstr ""
+
+#: lib/rfsv.cc:111
+msgid "invalid operation for RFSV16"
+msgstr ""
+
+#: lib/rfsv.cc:112
+msgid "libplp internal error"
+msgstr ""
+
+#: lib/rpcs.cc:40
+msgid "Unknown device"
+msgstr ""
+
+#: lib/rpcs.cc:41
+msgid "PC"
+msgstr ""
+
+#: lib/rpcs.cc:42
+msgid "MC"
+msgstr ""
+
+#: lib/rpcs.cc:43
+msgid "HC"
+msgstr ""
+
+#: lib/rpcs.cc:44
+msgid "Series 3"
+msgstr ""
+
+#: lib/rpcs.cc:45
+msgid "Series 3a, 3c or 3mx"
+msgstr ""
+
+#: lib/rpcs.cc:46
+msgid "Workabout"
+msgstr ""
+
+#: lib/rpcs.cc:47
+msgid "Siena"
+msgstr ""
+
+#: lib/rpcs.cc:48
+msgid "Series 3c"
+msgstr ""
+
+#: lib/rpcs.cc:49
+msgid "Series 5"
+msgstr ""
+
+#: lib/rpcs.cc:50
+msgid "WinC"
+msgstr ""
+
+#: lib/rpcs.cc:54
+msgid "Empty"
+msgstr ""
+
+#: lib/rpcs.cc:55
+msgid "Very Low"
+msgstr ""
+
+#: lib/rpcs.cc:56
+msgid "Low"
+msgstr ""
+
+#: lib/rpcs.cc:57
+msgid "Good"
+msgstr ""
+
+#: lib/rpcs.cc:62
+msgid "Test"
+msgstr ""
+
+#: lib/rpcs.cc:63
+msgid "English"
+msgstr ""
+
+#: lib/rpcs.cc:64
+msgid "German"
+msgstr ""
+
+#: lib/rpcs.cc:65
+msgid "French"
+msgstr ""
+
+#: lib/rpcs.cc:66
+msgid "Spanish"
+msgstr ""
+
+#: lib/rpcs.cc:67
+msgid "Italian"
+msgstr ""
+
+#: lib/rpcs.cc:68
+msgid "Swedish"
+msgstr ""
+
+#: lib/rpcs.cc:69
+msgid "Danish"
+msgstr ""
+
+#: lib/rpcs.cc:70
+msgid "Norwegian"
+msgstr ""
+
+#: lib/rpcs.cc:71
+msgid "Finnish"
+msgstr ""
+
+#: lib/rpcs.cc:72
+msgid "American"
+msgstr ""
+
+#: lib/rpcs.cc:73
+msgid "Swiss French"
+msgstr ""
+
+#: lib/rpcs.cc:74
+msgid "Swiss German"
+msgstr ""
+
+#: lib/rpcs.cc:75
+msgid "Portugese"
+msgstr ""
+
+#: lib/rpcs.cc:76
+msgid "Turkish"
+msgstr ""
+
+#: lib/rpcs.cc:77
+msgid "Icelandic"
+msgstr ""
+
+#: lib/rpcs.cc:78
+msgid "Russian"
+msgstr ""
+
+#: lib/rpcs.cc:79
+msgid "Hungarian"
+msgstr ""
+
+#: lib/rpcs.cc:80
+msgid "Dutch"
+msgstr ""
+
+#: lib/rpcs.cc:81
+msgid "Belgian Flemish"
+msgstr ""
+
+#: lib/rpcs.cc:82
+msgid "Australian"
+msgstr ""
+
+#: lib/rpcs.cc:83
+msgid "Belgish French"
+msgstr ""
+
+#: lib/rpcs.cc:84
+msgid "Austrian"
+msgstr ""
+
+#: lib/rpcs.cc:85
+msgid "New Zealand English"
+msgstr ""
+
+#: lib/rpcs.cc:86
+msgid "Canadian French"
+msgstr ""
+
+#: lib/rpcs.cc:87
+msgid "Czech"
+msgstr ""
+
+#: lib/rpcs.cc:88
+msgid "Slovak"
+msgstr ""
+
+#: lib/rpcs.cc:89
+msgid "Polish"
+msgstr ""
+
+#: lib/rpcs.cc:90
+msgid "Slovenian"
+msgstr ""
+
+#: lib/psitime.h:60
+msgid " years "
+msgstr ""
+
+#: lib/psitime.h:60
+msgid " year "
+msgstr ""
+
+#: lib/psitime.h:62
+msgid " days "
+msgstr ""
+
+#: lib/psitime.h:62
+msgid " day "
+msgstr ""
+
+#: lib/psitime.h:64
+msgid " hours "
+msgstr ""
+
+#: lib/psitime.h:64
+msgid " hour "
+msgstr ""
+
+#: lib/psitime.h:66
+msgid " minutes "
+msgstr ""
+
+#: lib/psitime.h:66
+msgid " minute "
+msgstr ""
+
+#: lib/psitime.h:67 plpftp/ftp.cc:1109 plpftp/ftp.cc:1111 plpftp/ftp.cc:1189
+msgid " seconds"
+msgstr ""
+
+#: lib/psitime.h:67
+msgid " second"
+msgstr ""
+
+#: lib/siscomponentrecord.cpp:67
+#, c-format
+msgid "Length too large for name record %d.\n"
+msgstr ""
+
+#: lib/siscomponentrecord.cpp:82
+#, c-format
+msgid "Position/length too large for name record %d.\n"
+msgstr ""
+
+#: lib/siscomponentrecord.cpp:87
+#, c-format
+msgid "Name %d (for %s) is %.*s\n"
+msgstr ""
+
+#: lib/siscomponentrecord.cpp:98
+#, c-format
+msgid "%d .. %d (%d bytes): Name records\n"
+msgstr ""
+
+#: lib/sisfile.cpp:56
+#, c-format
+msgid "Could not read header, rc = %d\n"
+msgstr ""
+
+#: lib/sisfile.cpp:60
+#, c-format
+msgid "Ate header, got ix = %d\n"
+msgstr ""
+
+#: lib/sisfile.cpp:75
+#, c-format
+msgid "Problem reading language record %d, rc = %d.\n"
+msgstr ""
+
+#: lib/sisfile.cpp:93
+#, c-format
+msgid "Problem reading requisite record %d, rc = %d.\n"
+msgstr ""
+
+#: lib/sisfile.cpp:107
+#, c-format
+msgid "Problem reading the name record, rc = %d.\n"
+msgstr ""
+
+#: lib/sisfile.cpp:124
+#, c-format
+msgid "Problem reading file record %d, rc = %d.\n"
+msgstr ""
+
+#: lib/sisfileheader.cpp:55
+#, c-format
+msgid "Got uid1 = %08x\n"
+msgstr ""
+
+#: lib/sisfileheader.cpp:59
+msgid "Got bad uid2.\n"
+msgstr ""
+
+#: lib/sisfileheader.cpp:63
+#, c-format
+msgid "Got uid2 = %08x\n"
+msgstr ""
+
+#: lib/sisfileheader.cpp:67
+msgid "Got bad uid3.\n"
+msgstr ""
+
+#: lib/sisfileheader.cpp:71
+#, c-format
+msgid "Got uid3 = %08x\n"
+msgstr ""
+
+#: lib/sisfileheader.cpp:74
+#, c-format
+msgid "Got uid4 = %08x\n"
+msgstr ""
+
+#: lib/sisfileheader.cpp:82
+#, c-format
+msgid "Got first crc = %08x, wanted %08x\n"
+msgstr ""
+
+#: lib/sisfileheader.cpp:86
+msgid "Got bad crc.\n"
+msgstr ""
+
+#: lib/sisfileheader.cpp:92
+#, c-format
+msgid "Got %d languages\n"
+msgstr ""
+
+#: lib/sisfileheader.cpp:95
+#, c-format
+msgid "Got %d files\n"
+msgstr ""
+
+#: lib/sisfileheader.cpp:98
+#, c-format
+msgid "Got %d reqs\n"
+msgstr ""
+
+#: lib/sisfileheader.cpp:101
+#, c-format
+msgid "Selected language is %d\n"
+msgstr ""
+
+#: lib/sisfileheader.cpp:104
+#, c-format
+msgid "Installed files: %d / %d\n"
+msgstr ""
+
+#: lib/sisfileheader.cpp:107
+#, c-format
+msgid "Installed on drive %c\n"
+msgstr ""
+
+#: lib/sisfileheader.cpp:110
+#, c-format
+msgid "Got installer version: %08x\n"
+msgstr ""
+
+#: lib/sisfileheader.cpp:113
+#, c-format
+msgid "Got options: %04x\n"
+msgstr ""
+
+#: lib/sisfileheader.cpp:116
+#, c-format
+msgid "Got type: %04x\n"
+msgstr ""
+
+#: lib/sisfileheader.cpp:119
+#, c-format
+msgid "Got major: %d\n"
+msgstr ""
+
+#: lib/sisfileheader.cpp:122
+#, c-format
+msgid "Got minor: %d\n"
+msgstr ""
+
+#: lib/sisfileheader.cpp:125
+#, c-format
+msgid "Got variant: %d\n"
+msgstr ""
+
+#: lib/sisfileheader.cpp:128
+#, c-format
+msgid "Languages begin at %d\n"
+msgstr ""
+
+#: lib/sisfileheader.cpp:133
+#, c-format
+msgid "Files begin at %d\n"
+msgstr ""
+
+#: lib/sisfileheader.cpp:138
+#, c-format
+msgid "Requisites begin at %d\n"
+msgstr ""
+
+#: lib/sisfileheader.cpp:144
+#, c-format
+msgid "Components begin at %d\n"
+msgstr ""
+
+#: lib/sisfilerecord.cpp:40
+#, c-format
+msgid "Got flags %d\n"
+msgstr ""
+
+#: lib/sisfilerecord.cpp:43
+#, c-format
+msgid "Got file type %d\n"
+msgstr ""
+
+#: lib/sisfilerecord.cpp:46
+#, c-format
+msgid "Got file details %d\n"
+msgstr ""
+
+#: lib/sisfilerecord.cpp:53
+#, c-format
+msgid "Got source name %.*s\n"
+msgstr ""
+
+#: lib/sisfilerecord.cpp:59
+#, c-format
+msgid "Got destination name %.*s\n"
+msgstr ""
+
+#: lib/sisfilerecord.cpp:70
+#, c-format
+msgid "File is %d bytes long (at %d) (to %d)\n"
+msgstr ""
+
+#: lib/sisfilerecord.cpp:74
+#, c-format
+msgid "%d .. %d (%d bytes): Single file record type %d, %.*s\n"
+msgstr ""
+
+#: lib/sisfilerecord.cpp:104
+#, c-format
+msgid "File %d (for %s) is %d bytes long (at %d)\n"
+msgstr ""
+
+#: lib/sisfilerecord.cpp:110
+#, c-format
+msgid "%d .. %d (%d bytes): File record (%s) for %.*s\n"
+msgstr ""
+
+#: lib/sisfilerecord.cpp:122
+#, c-format
+msgid "Unknown file flags %d\n"
+msgstr ""
+
+#: lib/sislangrecord.cpp:35
+#, c-format
+msgid "Got language %d (%s)\n"
+msgstr ""
+
+#: lib/sislangrecord.cpp:38
+#, c-format
+msgid "%d .. %d (%d bytes): Language record for %s\n"
+msgstr ""
+
+#: lib/sisreqrecord.cpp:43
+#, c-format
+msgid "Requisite: uid=%08x, version=%d.%d-%d.\n"
+msgstr ""
+
+#: lib/sisreqrecord.cpp:52
+#, c-format
+msgid "Got namelength %d\n"
+msgstr ""
+
+#: lib/sisreqrecord.cpp:62
+#, c-format
+msgid "Got namepos %d\n"
+msgstr ""
+
+#: lib/sisreqrecord.cpp:65
+#, c-format
+msgid "Position/length too large for req record %d.\n"
+msgstr ""
+
+#: lib/sisreqrecord.cpp:70
+#, c-format
+msgid "Name of requisite for %s is %.*s\n"
+msgstr ""
+
+#: lib/sisreqrecord.cpp:77
+#, c-format
+msgid "%d .. %d (%d bytes): Req record for uid %08x\n"
+msgstr ""
+
+#: plpftp/main.cc:56
+msgid ""
+"Usage: plpftp [OPTIONS]... [FTPCOMMAND]\n"
+"\n"
+"If FTPCOMMAND is given, connect; run FTPCOMMAND and\n"
+"terminate afterwards. If no FTPCOMMAND is given, start up\n"
+"in interactive mode. For help on supported FTPCOMMANDs,\n"
+"use `?' or `help' as FTPCOMMAND.\n"
+"\n"
+"Supported options:\n"
+"\n"
+" -h, --help              Display this text.\n"
+" -V, --version           Print version and exit.\n"
+" -p, --port=[HOST:]PORT  Connect to port PORT on host HOST.\n"
+"                         Default for HOST is 127.0.0.1\n"
+"                         Default for PORT is "
+msgstr ""
+
+#: plpftp/main.cc:74
+msgid "Try `plpftp --help' for more information"
+msgstr ""
+
+#: plpftp/main.cc:85
+msgid "PLPFTP Version "
+msgstr ""
+
+#: plpftp/main.cc:86
+msgid "FTP like interface started. Type \"?\" for help."
+msgstr ""
+
+#: plpftp/main.cc:107
+msgid "plpftp Version "
+msgstr ""
+
+#: plpftp/main.cc:114 ncpd/main.cc:212 plpfuse/main.cc:408
+#: plpprint/plpprintd.cc:952
+msgid "Invalid port definition."
+msgstr ""
+
+#: plpftp/ftp.cc:107
+msgid "FTP commands:"
+msgstr ""
+
+#: plpftp/ftp.cc:133
+msgid "RPC commands:"
+msgstr ""
+
+#: plpftp/ftp.cc:145
+msgid "Device commands:"
+msgstr ""
+
+#: plpftp/ftp.cc:193 plpftp/ftp.cc:264
+msgid "Could not open command list file "
+msgstr ""
+
+#: plpftp/ftp.cc:198 plpftp/ftp.cc:219
+msgid "Could not get process list, Error: "
+msgstr ""
+
+#: plpftp/ftp.cc:213
+msgid ""
+"Could not stop all processes. Please stop running\n"
+"programs manually on the Psion, then hit return."
+msgstr ""
+
+#: plpftp/ftp.cc:270 plpftp/ftp.cc:313 plpftp/ftp.cc:620 plpftp/ftp.cc:628
+#: plpftp/ftp.cc:638 plpftp/ftp.cc:648 plpftp/ftp.cc:657 plpftp/ftp.cc:668
+#: plpftp/ftp.cc:680 plpftp/ftp.cc:731 plpftp/ftp.cc:748 plpftp/ftp.cc:756
+#: plpftp/ftp.cc:764 plpftp/ftp.cc:794 plpftp/ftp.cc:802 plpftp/ftp.cc:833
+#: plpftp/ftp.cc:858 plpftp/ftp.cc:886 plpftp/ftp.cc:917 plpftp/ftp.cc:944
+#: plpftp/ftp.cc:1000 plpftp/ftp.cc:1026 plpftp/ftp.cc:1034 plpftp/ftp.cc:1042
+#: plpftp/ftp.cc:1066 plpftp/ftp.cc:1075 plpftp/ftp.cc:1152 plpftp/ftp.cc:1163
+#: plpftp/ftp.cc:1237 plpftp/ftp.cc:1266 plpftp/ftp.cc:1320
+msgid "Error: "
+msgstr ""
+
+#: plpftp/ftp.cc:271
+msgid " is not a process list saved with killsave"
+msgstr ""
+
+#: plpftp/ftp.cc:312
+msgid "Could not start "
+msgstr ""
+
+#: plpftp/ftp.cc:322
+msgid "Clipboard protocol not supported by Psion Series 3."
+msgstr ""
+
+#: plpftp/ftp.cc:330
+msgid ""
+"Your Psion does not support the clipboard protocol.\n"
+"                The reason for that is usually a missing server library.\n"
+"                Make sure that C:\\System\\Libs\\clipsvr.rsy exists.\n"
+"                This file is part of PsiWin and usually gets copied to\n"
+"                your Psion when you enable CopyAnywhere in PsiWin.\n"
+"                You can also get it from a PsiWin installation directory\n"
+"                and copy it to your Psion manually."
+msgstr ""
+
+#: plpftp/ftp.cc:565
+msgid "Connected to '"
+msgstr ""
+
+#: plpftp/ftp.cc:565
+msgid "', a "
+msgstr ""
+
+#: plpftp/ftp.cc:565 plpftp/ftp.cc:568
+msgid ", at "
+msgstr ""
+
+#: plpftp/ftp.cc:566 plpftp/ftp.cc:568
+msgid " baud."
+msgstr ""
+
+#: plpftp/ftp.cc:568
+msgid "Connected to a "
+msgstr ""
+
+#: plpftp/ftp.cc:584
+msgid "Psion dir is: \""
+msgstr ""
+
+#: plpftp/ftp.cc:604
+msgid "Prompting now "
+msgstr ""
+
+#: plpftp/ftp.cc:604 plpftp/ftp.cc:609
+msgid "on"
+msgstr ""
+
+#: plpftp/ftp.cc:604 plpftp/ftp.cc:609 plpftp/ftp.cc:1087 plpftp/ftp.cc:1090
+#: plpftp/ftp.cc:1093
+msgid "off"
+msgstr ""
+
+#: plpftp/ftp.cc:609
+msgid "Hash printing now "
+msgstr ""
+
+#: plpftp/ftp.cc:614
+msgid "Local dir: \""
+msgstr ""
+
+#: plpftp/ftp.cc:615
+msgid "Psion dir: \""
+msgstr ""
+
+#: plpftp/ftp.cc:739
+msgid "Warning: "
+msgstr ""
+
+#: plpftp/ftp.cc:739
+msgid ""
+"device id not persistent; use setdevicename to persist the name and device id"
+msgstr ""
+
+#: plpftp/ftp.cc:748
+msgid ""
+"device name not set; use setdevicename to persist the name and device id"
+msgstr ""
+
+#: plpftp/ftp.cc:766
+msgid " Entries"
+msgstr ""
+
+#: plpftp/ftp.cc:773
+msgid "Drive Type Volname     Total     Free      UniqueID"
+msgstr ""
+
+#: plpftp/ftp.cc:819
+msgid "No such directory"
+msgstr ""
+
+#: plpftp/ftp.cc:820 plpftp/ftp.cc:834
+msgid "Keeping original directory \""
+msgstr ""
+
+#: plpftp/ftp.cc:875 plpftp/ftp.cc:961
+msgid "Transfer complete, ("
+msgstr ""
+
+#: plpftp/ftp.cc:876 plpftp/ftp.cc:962
+msgid " bytes in "
+msgstr ""
+
+#: plpftp/ftp.cc:877 plpftp/ftp.cc:963
+msgid " secs = "
+msgstr ""
+
+#: plpftp/ftp.cc:899
+msgid "Get \""
+msgstr ""
+
+#: plpftp/ftp.cc:923 plpftp/ftp.cc:1009
+msgid "Transfer complete\n"
+msgstr ""
+
+#: plpftp/ftp.cc:984
+msgid "Put \""
+msgstr ""
+
+#: plpftp/ftp.cc:1018
+msgid "Error in directory name \""
+msgstr ""
+
+#: plpftp/ftp.cc:1053
+msgid "Starting subshell ...\n"
+msgstr ""
+
+#: plpftp/ftp.cc:1079
+msgid "Unknown setup info received"
+msgstr ""
+
+#: plpftp/ftp.cc:1082
+msgid "Setup information:"
+msgstr ""
+
+#: plpftp/ftp.cc:1083
+msgid "  Screen contrast:                  "
+msgstr ""
+
+#: plpftp/ftp.cc:1085
+msgid "  Keyboard click:                   "
+msgstr ""
+
+#: plpftp/ftp.cc:1087 plpftp/ftp.cc:1090 plpftp/ftp.cc:1093
+msgid "high"
+msgstr ""
+
+#: plpftp/ftp.cc:1087 plpftp/ftp.cc:1090 plpftp/ftp.cc:1093
+msgid "low"
+msgstr ""
+
+#: plpftp/ftp.cc:1088
+msgid "  Screen click:                     "
+msgstr ""
+
+#: plpftp/ftp.cc:1091
+msgid "  Error sound:                      "
+msgstr ""
+
+#: plpftp/ftp.cc:1094
+msgid "  Auto-switch off:                  "
+msgstr ""
+
+#: plpftp/ftp.cc:1097 plpftp/ftp.cc:1123
+msgid "never"
+msgstr ""
+
+#: plpftp/ftp.cc:1100
+msgid "if running on battery power"
+msgstr ""
+
+#: plpftp/ftp.cc:1103 plpftp/ftp.cc:1129
+msgid "always"
+msgstr ""
+
+#: plpftp/ftp.cc:1108
+msgid "  Switch off after:                 "
+msgstr ""
+
+#: plpftp/ftp.cc:1110
+msgid "  Backlight off after:              "
+msgstr ""
+
+#: plpftp/ftp.cc:1112
+msgid "  Switch on when tapping on screen: "
+msgstr ""
+
+#: plpftp/ftp.cc:1113 plpftp/ftp.cc:1115 plpftp/ftp.cc:1117 plpftp/ftp.cc:1119
+#: plpftp/ftp.cc:1177 plpftp/ftp.cc:1191 plpftp/ftp.cc:1209
+msgid "yes"
+msgstr ""
+
+#: plpftp/ftp.cc:1113 plpftp/ftp.cc:1115 plpftp/ftp.cc:1117 plpftp/ftp.cc:1119
+#: plpftp/ftp.cc:1177 plpftp/ftp.cc:1191 plpftp/ftp.cc:1209
+msgid "no"
+msgstr ""
+
+#: plpftp/ftp.cc:1114
+msgid "  Switch on when opening:           "
+msgstr ""
+
+#: plpftp/ftp.cc:1116
+msgid "  Switch off when closing:          "
+msgstr ""
+
+#: plpftp/ftp.cc:1118
+msgid "  Ask for password on startup:      "
+msgstr ""
+
+#: plpftp/ftp.cc:1120
+msgid "  Show Owner info on startup:       "
+msgstr ""
+
+#: plpftp/ftp.cc:1126
+msgid "once a day"
+msgstr ""
+
+#: plpftp/ftp.cc:1167
+msgid "General:"
+msgstr ""
+
+#: plpftp/ftp.cc:1168
+msgid "  Machine Type: "
+msgstr ""
+
+#: plpftp/ftp.cc:1169
+msgid "  Machine Name: "
+msgstr ""
+
+#: plpftp/ftp.cc:1170
+msgid "  Machine UID:  "
+msgstr ""
+
+#: plpftp/ftp.cc:1171
+msgid "  UI Language:  "
+msgstr ""
+
+#: plpftp/ftp.cc:1172
+msgid "ROM:"
+msgstr ""
+
+#: plpftp/ftp.cc:1173
+msgid "  Version:      "
+msgstr ""
+
+#: plpftp/ftp.cc:1175 plpftp/ftp.cc:1179
+msgid "  Size:         "
+msgstr ""
+
+#: plpftp/ftp.cc:1176
+msgid "  Programmable: "
+msgstr ""
+
+#: plpftp/ftp.cc:1178
+msgid "RAM:"
+msgstr ""
+
+#: plpftp/ftp.cc:1180
+msgid "  Free:         "
+msgstr ""
+
+#: plpftp/ftp.cc:1181
+msgid "  Free max:     "
+msgstr ""
+
+#: plpftp/ftp.cc:1182
+msgid "RAM disk size:  "
+msgstr ""
+
+#: plpftp/ftp.cc:1183
+msgid "Registry size:  "
+msgstr ""
+
+#: plpftp/ftp.cc:1184
+msgid "Display size:   "
+msgstr ""
+
+#: plpftp/ftp.cc:1186
+msgid "Time:"
+msgstr ""
+
+#: plpftp/ftp.cc:1188
+msgid "  Current time: "
+msgstr ""
+
+#: plpftp/ftp.cc:1189
+msgid "  UTC offset:   "
+msgstr ""
+
+#: plpftp/ftp.cc:1190
+msgid "  DST:          "
+msgstr ""
+
+#: plpftp/ftp.cc:1192
+msgid "  Timezone:     "
+msgstr ""
+
+#: plpftp/ftp.cc:1193
+msgid "  Country Code: "
+msgstr ""
+
+#: plpftp/ftp.cc:1194
+msgid "Main battery:"
+msgstr ""
+
+#: plpftp/ftp.cc:1196
+msgid "  Changed at:   "
+msgstr ""
+
+#: plpftp/ftp.cc:1197 plpftp/ftp.cc:1210
+msgid "  Used for:     "
+msgstr ""
+
+#: plpftp/ftp.cc:1198 plpftp/ftp.cc:1204
+msgid "  Status:       "
+msgstr ""
+
+#: plpftp/ftp.cc:1199
+msgid "  Current:      "
+msgstr ""
+
+#: plpftp/ftp.cc:1200
+msgid "  UsedPower:    "
+msgstr ""
+
+#: plpftp/ftp.cc:1201 plpftp/ftp.cc:1205
+msgid "  Voltage:      "
+msgstr ""
+
+#: plpftp/ftp.cc:1202 plpftp/ftp.cc:1206
+msgid "  Max. voltage: "
+msgstr ""
+
+#: plpftp/ftp.cc:1203
+msgid "Backup battery:"
+msgstr ""
+
+#: plpftp/ftp.cc:1207
+msgid "External power:"
+msgstr ""
+
+#: plpftp/ftp.cc:1208
+msgid "  Supplied:     "
+msgstr ""
+
+#: plpftp/ftp.cc:1223
+msgid "Error setting clipboard"
+msgstr ""
+
+#: plpftp/ftp.cc:1229
+msgid "Error getting clipboard"
+msgstr ""
+
+#: plpftp/ftp.cc:1258
+msgid "no such process"
+msgstr ""
+
+#: plpftp/ftp.cc:1278
+msgid "syntax error. Try \"help\""
+msgstr ""
+
+#: sisinstall/sismain.cpp:45
+#, c-format
+msgid "Error %d on line %d: %s\n"
+msgstr ""
+
+#: sisinstall/sismain.cpp:59
+msgid ""
+"Usage: sisinstall [OPTIONS]... SISFILE\n"
+"\n"
+"Supported options:\n"
+"\n"
+" -h, --help              Display this text.\n"
+" -V, --version           Print version and exit.\n"
+" -v, --verbose=LEVEL     Set the verbosity level, by default 0.\n"
+" -n, --dry-run           Just parse the file.\n"
+msgstr ""
+
+#: sisinstall/sismain.cpp:96
+msgid "sisinstall Version"
+msgstr ""
+
+#: sisinstall/sismain.cpp:102
+#, c-format
+msgid "Installing sis file %s%s.\n"
+msgstr ""
+
+#: sisinstall/sismain.cpp:102
+msgid ", not really"
+msgstr ""
+
+#: sisinstall/sismain.cpp:104
+msgid "Missing SIS filename\n"
+msgstr ""
+
+#: sisinstall/sismain.cpp:113
+#, c-format
+msgid "File is %jd bytes long\n"
+msgstr ""
+
+#: sisinstall/sismain.cpp:131
+msgid "Couldn't connect with the Psion\n"
+msgstr ""
+
+#: sisinstall/sismain.cpp:141
+msgid "Could not parse the sis file.\n"
+msgstr ""
+
+#: ncpd/main.cc:65
+msgid "Got SIGTERM"
+msgstr ""
+
+#: ncpd/main.cc:73
+msgid "Got SIGINT"
+msgstr ""
+
+#: ncpd/main.cc:82
+msgid ""
+"Usage: ncpd [OPTIONS]...\n"
+"\n"
+"Supported options:\n"
+"\n"
+" -d, --dontfork          Run in foreground, don't fork\n"
+" -h, --help              Display this text.\n"
+" -V, --version           Print version and exit.\n"
+" -e, --autoexit          Exit after device is disconnected.\n"
+" -v, --verbose=LOGCLASS  Enable logging of LOGCLASS events\n"
+"                         Valid log classes are:\n"
+"                           m   - main program\n"
+"                           nl  - NCP protocol log\n"
+"                           nd  - NCP protocol data dump\n"
+"                           ll  - PLP protocol log\n"
+"                           ld  - PLP protocol data dump\n"
+"                           pl  - physical I/O log\n"
+"                           ph  - physical I/O handshake\n"
+"                           pd  - physical I/O data dump\n"
+"                           all - All of the above\n"
+" -n, --nodsr             Disable DSR check. Use this when DSR detection is\n"
+"                         poorly implemented in RS232 drivers or hardware.\n"
+"                         WARNING: Could cause connection instability.\n"
+" -s, --serial=DEV        Use serial device DEV.\n"
+" -b, --baudrate=RATE     Set serial speed to BAUD.\n"
+msgstr ""
+
+#: ncpd/main.cc:110
+msgid "                         Default: "
+msgstr ""
+
+#: ncpd/main.cc:112
+msgid ""
+"                         Default: Autocycle 115200, 57600, 38400, 19200, "
+"9600\n"
+msgstr ""
+
+#: ncpd/main.cc:115
+msgid ""
+" -p, --port=[HOST:]PORT  Listen on host HOST, port PORT.\n"
+"                         Default for HOST: 127.0.0.1\n"
+"                         Default for PORT: "
+msgstr ""
+
+#: ncpd/main.cc:123
+msgid "Try `ncpd --help' for more information"
+msgstr ""
+
+#: ncpd/main.cc:166
+msgid "ncpd Version "
+msgstr ""
+
+#: ncpd/main.cc:279
+msgid "normal exit"
+msgstr ""
+
+#: lib/link.cc:82
+msgid "Unknown"
+msgstr ""
+
+#: lib/link.cc:83
+msgid "SIBO"
+msgstr ""
+
+#: lib/link.cc:84
+msgid "EPOC"
+msgstr ""
+
+#: plpfuse/main.cc:341
+msgid ""
+"Usage: plpfuse [OPTION...] MOUNTPOINT\n"
+"\n"
+"plpfuse options:\n"
+"\n"
+"    -d, --debug             Increase debugging level\n"
+"    -h, --help              Display this text\n"
+"    -V, --version           Print version and exit\n"
+"    -p, --port=[HOST:]PORT  Connect to port PORT on host HOST\n"
+"                            Default for HOST is 127.0.0.1\n"
+"                            Default for PORT is "
+msgstr ""
+
+#: plpfuse/main.cc:398
+msgid "plpfuse version "
+msgstr ""
+
+#: plpprint/plpprintd.cc:974
+msgid "plpprintd: could not connect to ncpd"
+msgstr ""

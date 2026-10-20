@@ -26,7 +26,7 @@ set -u
 make -C po update-po
 
 # Ensure the localization files are unchanged.
-STATUS=$( git status --porcelain po/de.po po/sv.po )
+STATUS=$( git status --porcelain po/plptools.pot po/de.po po/sv.po )
 if [ -n "$STATUS" ]; then
     >&2 echo "Committed localization files are out of date."
     echo "$STATUS"
