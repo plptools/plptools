@@ -165,6 +165,28 @@ jobs:
     - name: Run smoke tests
       run: ./build-aux/smoke-tests.sh
 
+  check-localization:
+    runs-on: ubuntu-26.04
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get -y install libreadline-dev pkg-config gettext autopoint libfuse-dev libattr1-dev
+
+    - name: Checkout source
+      uses: actions/checkout@v6
+      with:
+        submodules: true
+
+    - name: Build and check localizations
+      run: |
+        ./build-aux/build.sh
+        ./build-aux/check-localization.sh
+
   documentation-build:
     runs-on: ubuntu-latest
     steps:
