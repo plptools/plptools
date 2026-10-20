@@ -30,6 +30,7 @@ STATUS=$( git status --porcelain po/de.po po/sv.po )
 if [ -n "$STATUS" ]; then
     >&2 echo "Committed localization files are out of date."
     echo "$STATUS"
+    git diff
     exit 1
 fi
 
