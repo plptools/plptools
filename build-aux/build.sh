@@ -65,9 +65,14 @@ case "$PLATFORM" in
     NetBSD)
         echo "Building for NetBSD..."
         export LDFLAGS="-L/usr/pkg/lib -Wl,--rpath=/usr/pkg/lib"
+
+        # Ensure we use the package version of xgettext and friends.
+        export XGETTEXT=/usr/pkg/bin/xgettext
+        export MSGMERGE=/usr/pkg/bin/msgmerge
+        export MSGFMT=/usr/pkg/bin/msgfmt
+        export GMSGFMT=/usr/pkg/bin/msgfmt
+
         MAKE="gmake"
-        /usr/pkg/bin/xgettext --version
-        echo "$PATH"
         ;;
     OpenBSD)
         echo "Building for OpenBSD..."
