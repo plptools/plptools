@@ -66,6 +66,8 @@ case "$PLATFORM" in
         echo "Building for NetBSD..."
         export LDFLAGS="-L/usr/pkg/lib -Wl,--rpath=/usr/pkg/lib"
         MAKE="gmake"
+        /usr/pkg/bin/xgettext --version
+        echo "$PATH"
         ;;
     OpenBSD)
         echo "Building for OpenBSD..."
