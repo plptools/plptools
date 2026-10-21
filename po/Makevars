@@ -11,6 +11,7 @@ top_builddir = ..
 XGETTEXT_OPTIONS = --keyword=_ --keyword=N_ \
                      --flag=_:1:pass-c-format \
         --flag=N_:1:pass-c-format \
+        --add-location=file \
              $${end_of_xgettext_options+}
 
 # This is the copyright holder that gets inserted into the header of the
