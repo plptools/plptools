@@ -70,7 +70,7 @@ case "$PLATFORM" in
         ;;
     NetBSD)
         echo "Installing dependencies for NetBSD..."
-        become pkgin -y install m4 libtool gnupg2 pkgconf autoconf automake gettext coreutils gmake git
+        become pkgin -y install m4 libtool gnupg2 pkgconf autoconf automake gettext coreutils gmake git gettext-tools
         ;;
     OpenBSD)
         echo "Installing dependencies for OpenBSD..."
