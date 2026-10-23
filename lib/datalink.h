@@ -72,6 +72,13 @@ private:
     }
 
     /**
+     * Open the serial port.
+     *
+     * Callers must hold the serial lock, and the port must be closed.
+     */
+    void serialOpen();
+
+    /**
     * Reads the incoming data and processes data frames.
     *
     * @return true if the link is stable and more data can be consumed; false otherwise.
@@ -110,7 +117,6 @@ private:
     int serialStatus = -1;
     int baudRateIndex_ = 0;
     int baudRate_;
-    bool lastFatal = false;
 
     // Reading from serial.
 

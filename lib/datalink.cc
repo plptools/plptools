@@ -249,17 +249,8 @@ DataLink::DataLink(const char *fname,
         baudRate_ = kBaudRatesTable[baudRateIndex_];
         baudRateIndex_ = baudRateIndex_ + 1;
     }
-    serialFd_ = init_serial(devname.c_str(), baudRate_, 0);
-    if (verbose_ & PKT_DEBUG_LOG) {
-        lout << "serial connection set to " << dec << baudRate_
-            << " baud, fd=" << serialFd_ << endl;
-    }
-    if (serialFd_ == -1) {
-        fcntl(serialFd_, F_SETFL, O_NONBLOCK);
-        lastFatal = true;
-    } else {
-        pthread_create(&dataPumpThreadId_, NULL, data_pump_thread, this);
-    }
+    serialOpen();
+    pthread_create(&dataPumpThreadId_, NULL, data_pump_thread, this);
 }
 
 DataLink::~DataLink() {
@@ -285,6 +276,18 @@ DataLink::~DataLink() {
     close(outputDataReadyPipe_[1]);
     outputDataReadyPipe_[0] = -1;
     outputDataReadyPipe_[1] = -1;
+}
+
+void DataLink::serialOpen() {
+    assert(serialFd_ == -1);
+    serialFd_ = init_serial(devname.c_str(), baudRate_, 0);
+    if (verbose_ & PKT_DEBUG_LOG) {
+        lout << "serial connection set to " << dec << baudRate_
+             << " baud, fd=" << serialFd_ << endl;
+    }
+    if (serialFd_ != -1) {
+        fcntl(serialFd_, F_SETFL, O_NONBLOCK);
+    }
 }
 
 void DataLink::reset() {
@@ -313,7 +316,6 @@ void DataLink::internalReset(bool resetBaudRateIndex) {
     outRead = outWrite = 0;
     inRead = inWrite = 0;
     esc = false;
-    lastFatal = false;
     serialStatus = -1;
     lastSYN = startPkt = -1;
     crcIn = 0;
@@ -329,15 +331,7 @@ void DataLink::internalReset(bool resetBaudRateIndex) {
             baudRateIndex_ = 0;
         }
     }
-    serialFd_ = init_serial(devname.c_str(), baudRate_, 0);
-    if (verbose_ & PKT_DEBUG_LOG) {
-        lout << "serial connection set to " << dec << baudRate_
-             << " baud, fd=" << serialFd_ << endl;
-    }
-    if (serialFd_ != -1) {
-        fcntl(serialFd_, F_SETFL, O_NONBLOCK);
-        lastFatal = false;
-    }
+    serialOpen();
 }
 
 void DataLink::signalPumpThread() {
@@ -556,8 +550,9 @@ bool DataLink::linkFailed() {
     if (serialFd_ == -1)
         return false;
     res = ioctl(serialFd_, TIOCMGET, &arg);
-    if (res < 0)
-        lastFatal = true;
+    if (res < 0) {
+        failed = true;
+    }
     if ((serialStatus == -1) || (arg != serialStatus)) {
         if (verbose_ & PKT_DEBUG_HANDSHAKE)
             lout << "packet: < DTR:" << ((arg & TIOCM_DTR)?1:0)
@@ -568,8 +563,9 @@ bool DataLink::linkFailed() {
         if (!((arg & TIOCM_RTS) && (arg & TIOCM_DTR))) {
             arg |= (TIOCM_DTR | TIOCM_RTS);
             res = ioctl(serialFd_, TIOCMSET, &arg);
-            if (res < 0)
-                lastFatal = true;
+            if (res < 0) {
+                failed = true;
+            }
             if (verbose_ & PKT_DEBUG_HANDSHAKE)
                 lout << "packet: > DTR:" << ((arg & TIOCM_DTR)?1:0)
                      << " RTS:" << ((arg & TIOCM_RTS)?1:0)
@@ -583,9 +579,8 @@ bool DataLink::linkFailed() {
     if (!noDSRCheck_ && (arg & TIOCM_DSR) == 0) {
         failed = true;
     }
-    if ((verbose_ & PKT_DEBUG_LOG) && lastFatal)
-        lout << "packet: linkFATAL\n";
-    if ((verbose_ & PKT_DEBUG_LOG) && failed)
+    if ((verbose_ & PKT_DEBUG_LOG) && failed) {
         lout << "packet: linkFAILED\n";
-    return (lastFatal || failed);
+    }
+    return failed;
 }
