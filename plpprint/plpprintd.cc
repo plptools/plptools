@@ -350,9 +350,9 @@ static void write_job_header(FILE *f, BufferStore buffer) {
         "%%EndProlog\n"
         "%%BeginSetup\n", f);
     if (isLandscape) {
-        fprintf(f, "<< /PageSize [%ld %ld] >> setpagedevice\n", lround(height / 20.0), lround(width / 20.0));
+        fprintf(f, "<< /PageSize [%ld %ld] >> setpagedevice\n", std::lround(height / 20.0), std::lround(width / 20.0));
     } else {
-        fprintf(f, "<< /PageSize [%ld %ld] >> setpagedevice\n", lround(width / 20.0), lround(height / 20.0));
+        fprintf(f, "<< /PageSize [%ld %ld] >> setpagedevice\n", std::lround(width / 20.0), std::lround(height / 20.0));
     }
     fputs(
         "currentpagedevice /PageSize get 0 get /pagewidth exch def\n"
@@ -377,7 +377,7 @@ static void write_job_footer(FILE *f, int pageCount) {
         }
         fprintf(f, "%%%%Pages: %d\n", pageCount);
         // fprintf(f, "%%%%BoundingBox: %ld %ld %ld %ld\n",
-        //         lround(minx / 20.0), lround(miny / 20.0), lround(maxx / 20.0), lround(maxy / 20.0));
+        //         std::lround(minx / 20.0), std::lround(miny / 20.0), std::lround(maxx / 20.0), std::lround(maxy / 20.0));
         fputs("%%EOF\n", f);
 }
 
@@ -997,7 +997,7 @@ static void convert_page(FILE *f, int pageNumber, BufferStore buffer) {
                 } else {
                     left += amargin;
                 }
-                bottom -= lround((bottom - top) / 4.0);
+                bottom -= std::lround((bottom - top) / 4.0);
                 fprintf(f, "%% @%d: JText '%s' %lu %lu %lu %lu %lu %d %lu\n", bufferIndex, text.c_str(),
                         left, bottom + baselineOffset, top, right, baseline, align, amargin);
                 fprintf(f, "(%s) %lu %lu %lu %lu %d T\n", text.c_str(),
