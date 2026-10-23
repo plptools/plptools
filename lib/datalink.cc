@@ -286,6 +286,12 @@ void DataLink::serialOpen() {
              << " baud, fd=" << serialFd_ << endl;
     }
     if (serialFd_ != -1) {
+        // Explicitly set the file descriptor as non-blocking, irrespective of how it was opened.
+        // This was introduced when we added locking to try to ensure thread-safety across the three domains managed by
+        // this class. While it was not documented at the time, we believe it exists to avoid races where a device is
+        // disconnected between a `select` returning to indicate the device is readable or writeable and the read or
+        // write call---in this scenario the operation would block indefinitely while we're holding a lock without
+        // the non-blocking behavior.
         fcntl(serialFd_, F_SETFL, O_NONBLOCK);
     }
 }
