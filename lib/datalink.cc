@@ -82,7 +82,7 @@ static void *data_pump_thread(void *arg) {
         int serialFd = -1;
         {
             std::lock_guard<std::mutex> lock(dataLink->serialMutex_);
-            serialFd = dataLink->fd;
+            serialFd = dataLink->serialFd_;
         }
 
         if (serialFd == -1) {
@@ -249,13 +249,13 @@ DataLink::DataLink(const char *fname,
         baudRate_ = kBaudRatesTable[baudRateIndex_];
         baudRateIndex_ = baudRateIndex_ + 1;
     }
-    fd = init_serial(devname.c_str(), baudRate_, 0);
+    serialFd_ = init_serial(devname.c_str(), baudRate_, 0);
     if (verbose_ & PKT_DEBUG_LOG) {
         lout << "serial connection set to " << dec << baudRate_
-            << " baud, fd=" << fd << endl;
+            << " baud, fd=" << serialFd_ << endl;
     }
-    if (fd == -1) {
-        fcntl(fd, F_SETFL, O_NONBLOCK);
+    if (serialFd_ == -1) {
+        fcntl(serialFd_, F_SETFL, O_NONBLOCK);
         lastFatal = true;
     } else {
         pthread_create(&dataPumpThreadId_, NULL, data_pump_thread, this);
@@ -272,11 +272,11 @@ DataLink::~DataLink() {
     outputCondition_.notify_all();
 
     // Stop the data pump thread and close the serial port.
-    if (fd != -1) {
+    if (serialFd_ != -1) {
         pthread_join(dataPumpThreadId_, NULL);
-        ser_exit(fd);
+        ser_exit(serialFd_);
     }
-    fd = -1;
+    serialFd_ = -1;
 
     delete []inBuffer;
     delete []outBuffer;
@@ -305,9 +305,9 @@ void DataLink::internalReset(bool resetBaudRateIndex) {
 
     if (verbose_ & PKT_DEBUG_LOG)
         lout << "resetting serial connection" << endl;
-    if (fd != -1) {
-        ser_exit(fd);
-        fd = -1;
+    if (serialFd_ != -1) {
+        ser_exit(serialFd_);
+        serialFd_ = -1;
     }
     usleep(100000);
     outRead = outWrite = 0;
@@ -329,13 +329,13 @@ void DataLink::internalReset(bool resetBaudRateIndex) {
             baudRateIndex_ = 0;
         }
     }
-    fd = init_serial(devname.c_str(), baudRate_, 0);
+    serialFd_ = init_serial(devname.c_str(), baudRate_, 0);
     if (verbose_ & PKT_DEBUG_LOG) {
         lout << "serial connection set to " << dec << baudRate_
-             << " baud, fd=" << fd << endl;
+             << " baud, fd=" << serialFd_ << endl;
     }
-    if (fd != -1) {
-        fcntl(fd, F_SETFL, O_NONBLOCK);
+    if (serialFd_ != -1) {
+        fcntl(serialFd_, F_SETFL, O_NONBLOCK);
         lastFatal = false;
     }
 }
@@ -553,9 +553,9 @@ bool DataLink::linkFailed() {
 
     std::lock_guard<std::mutex> serialLock(serialMutex_);
 
-    if (fd == -1)
+    if (serialFd_ == -1)
         return false;
-    res = ioctl(fd, TIOCMGET, &arg);
+    res = ioctl(serialFd_, TIOCMGET, &arg);
     if (res < 0)
         lastFatal = true;
     if ((serialStatus == -1) || (arg != serialStatus)) {
@@ -567,7 +567,7 @@ bool DataLink::linkFailed() {
                  << " CTS:" << ((arg & TIOCM_CTS)?1:0) << endl;
         if (!((arg & TIOCM_RTS) && (arg & TIOCM_DTR))) {
             arg |= (TIOCM_DTR | TIOCM_RTS);
-            res = ioctl(fd, TIOCMSET, &arg);
+            res = ioctl(serialFd_, TIOCMSET, &arg);
             if (res < 0)
                 lastFatal = true;
             if (verbose_ & PKT_DEBUG_HANDSHAKE)

@@ -106,7 +106,7 @@ private:
     // Serial.
 
     std::mutex serialMutex_;
-    int fd;
+    int serialFd_ = -1;
     int serialStatus = -1;
     int baudRateIndex_ = 0;
     int baudRate_;
