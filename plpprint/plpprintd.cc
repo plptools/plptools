@@ -27,6 +27,7 @@
 
 #include <iostream>
 #include <string>
+#include <cmath>
 
 #include <stdlib.h>
 #include <stdarg.h>
