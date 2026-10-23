@@ -24,12 +24,14 @@
 #include "config.h"
 
 #include <condition_variable>
+#include <memory>
 #include <stdio.h>
 #include <pthread.h>
 #include <mutex>
 
 #include "bufferstore.h"
 #include "bufferarray.h"
+#include "tcpsocket.h"
 
 extern "C" {
     static void *data_pump_thread(void *);
@@ -77,6 +79,8 @@ private:
      * Callers must hold the serial lock, and the port must be closed.
      */
     void serialOpen();
+
+    void serialClose();
 
     /**
     * Reads the incoming data and processes data frames.
@@ -160,6 +164,8 @@ private:
     */
     const int cancellationFd_;
     const short int verbose_;
+
+    std::unique_ptr<TCPSocket> socket_;
 
     int outputDataReadyPipe_[2] = { -1, -1 };
 

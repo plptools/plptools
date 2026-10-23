@@ -384,6 +384,10 @@ closeSocket(void)
     return true;
 }
 
+int TCPSocket::getFd() {
+    return m_Socket;
+}
+
 bool TCPSocket::
 bindSocket(const char * const Host, int Port)
 {
