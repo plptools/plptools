@@ -329,12 +329,6 @@ void DataLink::serialClose() {
     }
 
     return;
-    assert(serialFd_ != -1);
-
-    assert(socket_ != nullptr);
-    socket_->closeSocket();
-    socket_ = nullptr;
-    serialFd_ = -1;
 }
 
 void DataLink::reset() {
