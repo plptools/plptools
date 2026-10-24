@@ -212,6 +212,8 @@ public:
     */
     void setWatch(IOWatch *watch);
 
+    int getFd();
+
 private:
     /**
     * Creates the socket.
@@ -226,7 +228,7 @@ private:
 
     struct sockaddr m_HostAddr;
     struct sockaddr m_PeerAddr;
-    int m_Socket;
+    int m_Socket = -1;
     int m_Port;
     bool m_Bound;
     int m_LastError;
