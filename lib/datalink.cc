@@ -305,30 +305,6 @@ void DataLink::serialOpen() {
 
 void DataLink::serialClose() {
     cout << "Closing serial port...\n";
-
-    if (serialFd_ < 0) {
-        return;
-    }
-
-    char buf[1024];
-    while (true) {
-        ssize_t n = recv(serialFd_, buf, sizeof(buf), MSG_DONTWAIT);
-        if (n > 0) continue;
-        if (n == 0) {
-            // peer closed
-            ::close(serialFd_);
-            serialFd_ = -1;
-            break;
-        }
-        if (errno == EAGAIN || errno == EWOULDBLOCK)
-            break;
-        // real error
-        ::close(serialFd_);
-        serialFd_ = -1;
-        break;
-    }
-
-    return;
 }
 
 void DataLink::reset() {
