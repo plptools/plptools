@@ -35,7 +35,21 @@ fatal() {
     exit 1
 }
 
+check_version() {
+    COMMAND="$1"
+    echo "Checking '$COMMAND'..."
+    OUTPUT=$("$COMMAND" --version | awk '{print $3}')
+    if [ "$OUTPUT" != "$VERSION" ]; then
+        fatal "$COMMAND reported the wrong version ($OUTPUT instead of $VERSION)."
+    else
+        echo "$COMMAND reported the correct version."
+    fi
+}
+
 cd "$ROOT_DIRECTORY"
+
+VERSION=$(cat "$ROOT_DIRECTORY/VERSION")
+echo "$VERSION"
 
 # Check the binaries exist.
 [ -f "ncpd/ncpd" ] || fatal "ncpd missing"
@@ -47,10 +61,10 @@ cd "$ROOT_DIRECTORY"
 [ -f "sisinstall/sisinstall" ] || fatal "sisinstall missing"
 
 # Check the versions.
-ncpd/ncpd --version || fatal "Failed to get ncpd version"
-plpftp/plpftp --version || fatal "Failed to get plpftp version"
+check_version ncpd/ncpd
+check_version plpftp/plpftp
 # TODO: Exercise and smoke test conditional plpfuse builds in CI #58
 #       https://github.com/plptools/plptools/issues/58
-# plpfuse/plpfuse --version || fatal "Failed to get plpfuse version"
-plpprint/plpprintd --version || fatal "Failed to get plpprintd version"
-sisinstall/sisinstall --version || fatal "Failed to get sisinstall version"
+# check_version plpfuse/plpfuse
+check_version plpprint/plpprintd
+check_version sisinstall/sisinstall
