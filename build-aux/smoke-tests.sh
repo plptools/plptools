@@ -48,7 +48,7 @@ check_version() {
 
 cd "$ROOT_DIRECTORY"
 
-VERSION=$(cat "$ROOT_DIRECTORY/VERSION")
+VERSION=$(cat "$ROOT_DIRECTORY/VERSION.txt")
 echo "$VERSION"
 
 # Check the binaries exist.

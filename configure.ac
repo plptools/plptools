@@ -21,7 +21,7 @@
 AC_PREREQ([2.71])
 
 AC_INIT([plptools],
-        m4_normalize(m4_include([VERSION])),
+        m4_normalize(m4_include([VERSION.txt])),
         [plptools-developers@lists.sourceforge.net])
 AC_CANONICAL_TARGET
 AC_CONFIG_AUX_DIR([build-aux])
