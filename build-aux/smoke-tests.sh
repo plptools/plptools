@@ -30,41 +30,47 @@ set -u
 
 ROOT_DIRECTORY="$( cd "$( dirname "$0" )/.." > /dev/null 2>&1 && pwd )"
 
+BUILD_PLPFUSE=${BUILD_PLPFUSE:-false}
+
 fatal() {
     echo "$1" >&2
     exit 1
 }
 
-check_version() {
+check_command() {
     COMMAND="$1"
+    EXPECTED="$2"
+
+    # Check that the command doesn't exist if it's not expected.
+    if ! $EXPECTED ; then
+        if [ -f "$COMMAND" ]; then
+            fatal "Command '$COMMAND' exists unexpectedly."
+        fi
+        return
+    fi
+
+    # Check the command exists.
     echo "Checking '$COMMAND'..."
+    if [ ! -f "$COMMAND" ]; then
+        fatal "Command '$COMMAND' does not exist."
+    fi
+
+    # Check that the command outputs the correct version.
     OUTPUT=$("$COMMAND" --version | awk '{print $3}')
     if [ "$OUTPUT" != "$VERSION" ]; then
-        fatal "$COMMAND reported the wrong version ($OUTPUT instead of $VERSION)."
+        fatal "Command '$COMMAND' reported the wrong version ($OUTPUT instead of $VERSION)."
     else
-        echo "$COMMAND reported the correct version."
+        echo "Command '$COMMAND' reported the correct version."
     fi
 }
 
 cd "$ROOT_DIRECTORY"
 
 VERSION=$(cat "$ROOT_DIRECTORY/VERSION.txt")
-echo "$VERSION"
-
-# Check the binaries exist.
-[ -f "ncpd/ncpd" ] || fatal "ncpd missing"
-[ -f "plpftp/plpftp" ] || fatal "plpftp missing"
-# TODO: Exercise and smoke test conditional plpfuse builds in CI #58
-#       https://github.com/plptools/plptools/issues/58
-# [ -f "plpfuse/plpfuse" ] || fatal "plpfuse missing"
-[ -f "plpprint/plpprintd" ] || fatal "plpprintd missing"
-[ -f "sisinstall/sisinstall" ] || fatal "sisinstall missing"
 
 # Check the versions.
-check_version ncpd/ncpd
-check_version plpftp/plpftp
-# TODO: Exercise and smoke test conditional plpfuse builds in CI #58
-#       https://github.com/plptools/plptools/issues/58
-# check_version plpfuse/plpfuse
-check_version plpprint/plpprintd
-check_version sisinstall/sisinstall
+check_command ncpd/ncpd true
+check_command plpftp/plpftp true
+check_command plpfuse/plpfuse $BUILD_PLPFUSE
+check_command plpprint/plpprintd true
+check_command sisinstall/sisinstall true
