@@ -71,6 +71,6 @@ VERSION=$(cat "$ROOT_DIRECTORY/VERSION.txt")
 # Check the versions.
 check_command ncpd/ncpd true
 check_command plpftp/plpftp true
-check_command plpfuse/plpfuse $BUILD_FUSE
+check_command plpfuse/plpfuse $BUILD_PLPFUSE
 check_command plpprint/plpprintd true
 check_command sisinstall/sisinstall true
