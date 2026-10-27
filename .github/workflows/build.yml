@@ -185,6 +185,8 @@ jobs:
       run: ${{ matrix.vm.setup }}
 
     - name: Install dependencies
+      env:
+        BUILD_PLPFUSE: ${{ matrix.env.BUILD_PLPFUSE || 'true' }}
       run: ./build-aux/install-dependencies.sh
 
     - name: Build
