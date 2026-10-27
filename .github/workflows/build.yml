@@ -163,6 +163,8 @@ jobs:
       run: ./build-aux/build.sh --distcheck
 
     - name: Run smoke tests
+      env:
+        EXPECT_FUSE: ${{ matrix.env.EXPECT_FUSE || 'true' }}
       run: ./build-aux/smoke-tests.sh
 
   check-localization:

@@ -30,6 +30,8 @@ set -u
 
 ROOT_DIRECTORY="$( cd "$( dirname "$0" )/.." > /dev/null 2>&1 && pwd )"
 
+EXPECT_FUSE=${EXPECT_FUSE:-false}
+
 fatal() {
     echo "$1" >&2
     exit 1
@@ -49,20 +51,12 @@ check_version() {
 cd "$ROOT_DIRECTORY"
 
 VERSION=$(cat "$ROOT_DIRECTORY/VERSION.txt")
-echo "$VERSION"
-
-# Check the binaries exist.
-[ -f "ncpd/ncpd" ] || fatal "ncpd missing"
-[ -f "plpftp/plpftp" ] || fatal "plpftp missing"
-# TODO: Exercise and smoke test conditional plpfuse builds in CI #58
-#       https://github.com/plptools/plptools/issues/58
-# [ -f "plpfuse/plpfuse" ] || fatal "plpfuse missing"
-[ -f "plpprint/plpprintd" ] || fatal "plpprintd missing"
-[ -f "sisinstall/sisinstall" ] || fatal "sisinstall missing"
 
 # Check the versions.
 check_version ncpd/ncpd
 check_version plpftp/plpftp
-check_version plpfuse/plpfuse
+if $EXPECT_FUSE ; then
+    check_version plpfuse/plpfuse
+fi
 check_version plpprint/plpprintd
 check_version sisinstall/sisinstall
