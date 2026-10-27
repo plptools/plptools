@@ -25,7 +25,9 @@ if BUILD_PLPFUSE
 SUBDIRS += plpfuse
 endif
 
-EXTRA_DIST = AUTHORS COPYING INSTALL NEWS README HISTORY ABOUT-NLS \
+CONFIGURE_DEPENDENCIES = $(top_srcdir)/VERSION.txt
+
+EXTRA_DIST = ABOUT-NLS AUTHORS COPYING HISTORY INSTALL NEWS README VERSION.txt \
 	etc/plptools.in \
 	etc/ttytap.c etc/psidump etc/psidump.1 \
 	etc/udev-usbserial-plptools.rules \
