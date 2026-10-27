@@ -152,6 +152,9 @@ jobs:
       run:
         shell: ${{ matrix.vm && 'cpa.sh {0}' || 'bash' }}
 
+    env:
+      BUILD_PLPFUSE: ${{ matrix.env.BUILD_PLPFUSE || 'true' }}
+
     steps:
 
     - name: Check matrix configuration
@@ -185,16 +188,12 @@ jobs:
       run: ${{ matrix.vm.setup }}
 
     - name: Install dependencies
-      env:
-        BUILD_PLPFUSE: ${{ matrix.env.BUILD_PLPFUSE || 'true' }}
       run: ./build-aux/install-dependencies.sh
 
     - name: Build
       run: ./build-aux/build.sh --distcheck
 
     - name: Run smoke tests
-      env:
-        BUILD_PLPFUSE: ${{ matrix.env.BUILD_PLPFUSE || 'true' }}
       run: ./build-aux/smoke-tests.sh
 
   check-localization:

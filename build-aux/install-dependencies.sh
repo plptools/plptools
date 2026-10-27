@@ -47,7 +47,10 @@ case "$PLATFORM" in
         case "$ID" in
             ubuntu)
                 become apt-get update -y
-                become apt-get -y install build-essential m4 libtool git libreadline-dev pkg-config gettext autopoint libfuse-dev libattr1-dev
+                become apt-get -y install build-essential m4 libtool git libreadline-dev pkg-config gettext autopoint libattr1-dev
+                if $BUILD_PLPFUSE ; then
+                    become apt-get install -y libfuse-dev
+                fi
                 ;;
             debian)
                 become apt-get update -y
@@ -67,7 +70,10 @@ case "$PLATFORM" in
         ;;
     Darwin)
         echo "Installing dependencies for Darwin..."
-        brew install coreutils m4 readline pkg-config libtool automake gettext macfuse
+        brew install coreutils m4 readline pkg-config libtool automake gettext
+        if $BUILD_PLPFUSE ; then
+            brew install macfuse
+        fi
         ;;
     FreeBSD)
         echo "Installing dependencies for FreeBSD..."
