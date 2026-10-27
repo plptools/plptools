@@ -40,11 +40,14 @@ fatal() {
 check_version() {
     COMMAND="$1"
     echo "Checking '$COMMAND'..."
+    if [ ! -f "$COMMAND" ]; then
+        fatal "Command '$COMMAND' does not exist."
+    fi
     OUTPUT=$("$COMMAND" --version | awk '{print $3}')
     if [ "$OUTPUT" != "$VERSION" ]; then
-        fatal "$COMMAND reported the wrong version ($OUTPUT instead of $VERSION)."
+        fatal "Command '$COMMAND' reported the wrong version ($OUTPUT instead of $VERSION)."
     else
-        echo "$COMMAND reported the correct version."
+        echo "Command '$COMMAND' reported the correct version."
     fi
 }
 
