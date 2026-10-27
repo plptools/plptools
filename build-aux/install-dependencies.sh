@@ -20,6 +20,8 @@
 set -e
 set -u
 
+BUILD_PLPFUSE=${BUILD_PLPFUSE:-false}
+
 exit_unsupported() {
     echo "$1"
     echo ""
@@ -50,6 +52,9 @@ case "$PLATFORM" in
             debian)
                 become apt-get update -y
                 become apt-get install -y build-essential git libtool gpg pkg-config gettext autopoint libreadline-dev
+                if $BUILD_PLPFUSE ; then
+                    become apt-get install -y libfuse-dev
+                fi
                 ;;
             *)
                 exit_unsupported "Unsupported Linux distribution ($ID)."

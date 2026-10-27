@@ -30,7 +30,7 @@ set -u
 
 ROOT_DIRECTORY="$( cd "$( dirname "$0" )/.." > /dev/null 2>&1 && pwd )"
 
-EXPECT_FUSE=${EXPECT_FUSE:-false}
+BUILD_PLPFUSE=${BUILD_PLPFUSE:-false}
 
 fatal() {
     echo "$1" >&2
@@ -55,7 +55,7 @@ VERSION=$(cat "$ROOT_DIRECTORY/VERSION.txt")
 # Check the versions.
 check_version ncpd/ncpd
 check_version plpftp/plpftp
-if $EXPECT_FUSE ; then
+if $BUILD_PLPFUSE ; then
     check_version plpfuse/plpfuse
 fi
 check_version plpprint/plpprintd
