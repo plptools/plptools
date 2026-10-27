@@ -63,8 +63,6 @@ echo "$VERSION"
 # Check the versions.
 check_version ncpd/ncpd
 check_version plpftp/plpftp
-# TODO: Exercise and smoke test conditional plpfuse builds in CI #58
-#       https://github.com/plptools/plptools/issues/58
-# check_version plpfuse/plpfuse
+check_version plpfuse/plpfuse
 check_version plpprint/plpprintd
 check_version sisinstall/sisinstall
