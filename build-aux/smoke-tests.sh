@@ -37,12 +37,25 @@ fatal() {
     exit 1
 }
 
-check_version() {
+check_command() {
     COMMAND="$1"
+    EXPECTED="$2"
+
+    # Check that the command doesn't exist if it's not expected.
+    if ! $EXPECTED ; then
+        if [ -f "$COMMAND" ]; then
+            fatal "Command '$COMMAND' exists unexpectedly."
+        fi
+        return
+    fi
+
+    # Check the command exists.
     echo "Checking '$COMMAND'..."
     if [ ! -f "$COMMAND" ]; then
         fatal "Command '$COMMAND' does not exist."
     fi
+
+    # Check that the command outputs the correct version.
     OUTPUT=$("$COMMAND" --version | awk '{print $3}')
     if [ "$OUTPUT" != "$VERSION" ]; then
         fatal "Command '$COMMAND' reported the wrong version ($OUTPUT instead of $VERSION)."
@@ -56,10 +69,8 @@ cd "$ROOT_DIRECTORY"
 VERSION=$(cat "$ROOT_DIRECTORY/VERSION.txt")
 
 # Check the versions.
-check_version ncpd/ncpd
-check_version plpftp/plpftp
-if $BUILD_PLPFUSE ; then
-    check_version plpfuse/plpfuse
-fi
-check_version plpprint/plpprintd
-check_version sisinstall/sisinstall
+check_command ncpd/ncpd true
+check_command plpftp/plpftp true
+check_command plpfuse/plpfuse $BUILD_FUSE
+check_command plpprint/plpprintd true
+check_command sisinstall/sisinstall true
