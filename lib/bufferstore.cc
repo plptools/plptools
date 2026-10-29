@@ -40,7 +40,7 @@ BufferStore::BufferStore()
 : len(0)
 , lenAllocd(0)
 , start(0)
-, buff(0) {
+, buff(nullptr) {
 }
 
 BufferStore::BufferStore(const BufferStore &a)
