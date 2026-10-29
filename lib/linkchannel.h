@@ -30,12 +30,12 @@ class LinkChannel : public Channel {
 public:
     LinkChannel(NCP *ncpController, int ncpChannel = -1);
 
-    void ncpDataCallback(BufferStore &a);
-    const char *getNcpRegisterName();
-    void ncpConnectAck();
-    void ncpConnectTerminate();
-    void ncpConnectNak();
-    void ncpRegisterAck() {}
+    void ncpDataCallback(BufferStore &a) override;
+    const char *getNcpRegisterName() override;
+    void ncpConnectAck() override;
+    void ncpConnectTerminate() override;
+    void ncpConnectNak() override;
+    void ncpRegisterAck() override {}
     void Register(Channel *);
 private:
     int registerSer;
