@@ -362,7 +362,7 @@ SISInstaller::removeFile(SISFileRecord* fileRecord)
 SisRC
 SISInstaller::run(SISFile* file, uint8_t* buf, off_t len)
 {
-        return run(file, buf, len, 0);
+        return run(file, buf, len, nullptr);
 }
 
 SisRC
@@ -373,7 +373,7 @@ SISInstaller::run(SISFile* file, uint8_t* buf, off_t len, SISFile* parent)
         m_file = file;
         m_buf = buf;
         char msgbuf[1024];
-        if (parent == 0)
+        if (parent == nullptr)
                 {
                 n = m_file->m_header.m_nlangs;
                 if (n == 1)
@@ -413,7 +413,7 @@ SISInstaller::run(SISFile* file, uint8_t* buf, off_t len, SISFile* parent)
         // library has been loaded, since the sis file names could be just
         // about anything.
         //
-        if (m_installed == 0)
+        if (m_installed == nullptr)
                 loadInstalled();
 
         // Check Requisites.
@@ -441,7 +441,7 @@ SISInstaller::run(SISFile* file, uint8_t* buf, off_t len, SISFile* parent)
 
         bool uninstallFirst = false;
         SISFileLink* curr = m_installed;
-        SISFile* oldFile = 0;
+        SISFile* oldFile = nullptr;
         while (curr)
                 {
                 SISFile* sisFile = curr->m_file;
@@ -473,7 +473,7 @@ SISInstaller::run(SISFile* file, uint8_t* buf, off_t len, SISFile* parent)
 //                if (!m_forced)
 //                        return SIS_ABORTED;
 //                printf("Forced mode... Installing anyway!\n");
-                if (oldFile == 0)
+                if (oldFile == nullptr)
                         fprintf(stderr, "Already installed, but 0?\n");
                 else
                         {
@@ -488,7 +488,7 @@ SISInstaller::run(SISFile* file, uint8_t* buf, off_t len, SISFile* parent)
         n = m_file->m_header.m_nfiles;
         if (logLevel >= 1)
                 fprintf(stderr, "Found %d files.\n", n);
-        m_drive = (parent == 0) ? 0 : parent->m_header.m_installationDrive;
+        m_drive = (parent == nullptr) ? 0 : parent->m_header.m_installationDrive;
         int nCopiedFiles = 0;
         m_lastSisFile = 0;
         bool skipnext = false;

@@ -223,7 +223,7 @@ NCPSession::~NCPSession() {
 }
 
 int NCPSession::start() {
-    assert(sessionMainThreadId_ == 0);
+    assert(sessionMainThreadId_ == nullptr);
     int result = pipe(cancellationPipe_);
     if (result != 0) {
         return result;
@@ -249,5 +249,5 @@ bool NCPSession::isCancelled() {
 }
 
 void NCPSession::wait() {
-    pthread_join(sessionMainThreadId_, 0);
+    pthread_join(sessionMainThreadId_, nullptr);
 }
