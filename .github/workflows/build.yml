@@ -46,6 +46,10 @@ jobs:
               name: haiku
               architecture: x86-64
               version: 'r1beta6'
+            env:
+              # TODO: CI doesn't build plpfuse for NetBSD, FreeBSD, or Haiku #219
+              #       https://github.com/plptools/plptools/issues/219
+              BUILD_PLPFUSE: false
 
           - name: freebsd-15.1-x64-64
             os: ubuntu-26.04
@@ -53,6 +57,10 @@ jobs:
               name: freebsd
               architecture: x86-64
               version: '15.1'
+            env:
+              # TODO: CI doesn't build plpfuse for NetBSD, FreeBSD, or Haiku #219
+              #       https://github.com/plptools/plptools/issues/219
+              BUILD_PLPFUSE: false
 
           - name: netbsd-11.0-x86-64
             os: ubuntu-26.04
@@ -60,6 +68,10 @@ jobs:
               name: netbsd
               architecture: x86-64
               version: '11.0'
+            env:
+              # TODO: CI doesn't build plpfuse for NetBSD, FreeBSD, or Haiku #219
+              #       https://github.com/plptools/plptools/issues/219
+              BUILD_PLPFUSE: false
 
           - name: openbsd-7.9-x86-64
             os: ubuntu-26.04
@@ -67,54 +79,81 @@ jobs:
               name: openbsd
               architecture: x86-64
               version: '7.9'
+            env:
+              BUILD_PLPFUSE: true
 
           - name: ubuntu-24.04-amd64
             os: ubuntu-24.04
+            env:
+              BUILD_PLPFUSE: true
 
           - name: ubuntu-24.04-arm64
             os: ubuntu-24.04-arm
+            env:
+              BUILD_PLPFUSE: true
 
           - name: ubuntu-26.04-amd64
             os: ubuntu-24.04
             container:
               image: ubuntu:resolute
               setup: apt-get update -y && apt-get -y install git
+            env:
+              BUILD_PLPFUSE: true
 
           - name: ubuntu-26.04-arm64
             os: ubuntu-24.04-arm
             container:
               image: ubuntu:resolute
               setup: apt-get update -y && apt-get -y install git
+            env:
+              BUILD_PLPFUSE: true
 
           - name: ubuntu-26.10-amd64
             os: ubuntu-26.04
             container:
               image: ubuntu:stonking
               setup: apt-get update -y && apt-get -y install git
+            env:
+              BUILD_PLPFUSE: true
 
           - name: ubuntu-26.10-arm64
             os: ubuntu-26.04-arm
             container:
               image: ubuntu:stonking
               setup: apt-get update -y && apt-get -y install git
+            env:
+              BUILD_PLPFUSE: true
 
           - name: debian-bookworm
             os: ubuntu-latest
             container:
               image: debian:bookworm
               setup: apt-get update -y && apt-get -y install git
+            env:
+              BUILD_PLPFUSE: true
 
           - name: debian-trixie
             os: ubuntu-latest
             container:
               image: debian:trixie
               setup: apt-get update -y && apt-get -y install git
+            env:
+              BUILD_PLPFUSE: true
 
           - name: macos-26
             os: macos-26
+            env:
+              BUILD_PLPFUSE: true
+
+          - name: macos-26-no-fuse
+            os: macos-26
+            env:
+              BUILD_PLPFUSE: false
 
           - name: macos-15
             os: macos-15
+            env:
+              BUILD_PLPFUSE: true
 
     name: ${{ matrix.name }}
     runs-on: ${{ matrix.os }}
@@ -157,13 +196,20 @@ jobs:
       run: ${{ matrix.vm.setup }}
 
     - name: Install dependencies
-      run: ./build-aux/install-dependencies.sh
+      run: |
+        # Define BUILD_PLPFUSE inline to address environment-forwarding issues when using virtual machines.
+        export BUILD_PLPFUSE=${{ matrix.env.BUILD_PLPFUSE }}
+        ./build-aux/install-dependencies.sh
 
     - name: Build
-      run: ./build-aux/build.sh --distcheck
+      run: |
+        # We don't define BUILD_PLPFUSE here as we want to text the autotools auto-detection behavior.
+        ./build-aux/build.sh --distcheck
 
     - name: Run smoke tests
-      run: ./build-aux/smoke-tests.sh
+      run: |
+        export BUILD_PLPFUSE=${{ matrix.env.BUILD_PLPFUSE }}
+        ./build-aux/smoke-tests.sh
 
   check-localization:
     runs-on: ubuntu-26.04
