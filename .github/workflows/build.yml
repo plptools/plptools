@@ -171,12 +171,12 @@ jobs:
           - name: macos-26
             os: macos-26
             env:
-              BUILD_PLPFUSE: true
+              BUILD_PLPFUSE: false
 
-          - name: macos-26-no-fuse
+          - name: macos-26-fuse2
             os: macos-26
             env:
-              BUILD_PLPFUSE: false
+              BUILD_PLPFUSE: true
 
           - name: macos-15
             os: macos-15
