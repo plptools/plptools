@@ -108,7 +108,16 @@ jobs:
             env:
               BUILD_PLPFUSE: true
 
-          - name: ubuntu-26.10-amd64
+          - name: ubuntu-26.10-amd64-fuse2
+            os: ubuntu-26.04
+            container:
+              image: ubuntu:stonking
+              setup: apt-get update -y && apt-get -y install git
+            env:
+              FUSE_VERSION: 3
+              BUILD_PLPFUSE: true
+
+          - name: ubuntu-26.10-amd64-fuse3
             os: ubuntu-26.04
             container:
               image: ubuntu:stonking
@@ -197,7 +206,8 @@ jobs:
 
     - name: Install dependencies
       run: |
-        # Define BUILD_PLPFUSE inline to address environment-forwarding issues when using virtual machines.
+        # Define variables inline to address environment-forwarding issues when using virtual machines.
+        export FUSE_VERSION=${{ matrix.env.FUSE_VESRION || '2' }}
         export BUILD_PLPFUSE=${{ matrix.env.BUILD_PLPFUSE }}
         ./build-aux/install-dependencies.sh
 

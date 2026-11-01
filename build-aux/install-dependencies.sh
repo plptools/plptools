@@ -49,7 +49,13 @@ case "$PLATFORM" in
                 become apt-get update -y
                 become apt-get -y install build-essential m4 libtool git libreadline-dev pkg-config gettext autopoint libattr1-dev
                 if $BUILD_PLPFUSE ; then
-                    become apt-get install -y libfuse-dev
+                    if [ "$FUSE_VERSION" = "2" ]; then
+                        become apt-get install -y libfuse-dev
+                    elif [ "$FUSE_VERSION" = "3" ]; then
+                        become apt-get install -y libfuse3-dev
+                    else
+                        fatal "Unsupported FUSE version."
+                    fi
                 fi
                 ;;
             debian)
