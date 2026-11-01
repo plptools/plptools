@@ -56,7 +56,9 @@ jobs:
               architecture: x86-64
               version: '15.1'
             env:
-              BUILD_PLPFUSE: true
+              # TODO: CI doesn't build plpfuse for NetBSD or FreeBSD #219
+              #       https://github.com/plptools/plptools/issues/219
+              BUILD_PLPFUSE: false
 
           - name: netbsd-11.0-x86-64
             os: ubuntu-26.04
@@ -65,7 +67,7 @@ jobs:
               architecture: x86-64
               version: '11.0'
             env:
-              # TODO: CI doesn't build plpfuse for NetBSD #219
+              # TODO: CI doesn't build plpfuse for NetBSD or FreeBSD #219
               #       https://github.com/plptools/plptools/issues/219
               BUILD_PLPFUSE: false
 
@@ -159,9 +161,6 @@ jobs:
       run:
         shell: ${{ matrix.vm && 'cpa.sh {0}' || 'bash' }}
 
-    env:
-      BUILD_PLPFUSE: ${{ matrix.env.BUILD_PLPFUSE }}
-
     steps:
 
     - name: Check matrix configuration
@@ -189,27 +188,23 @@ jobs:
         shell: bash
         memory: 5G
         cpu_count: 4
-        environment_variables: BUILD_PLPFUSE
 
     - name: Configure the virtual machine (if required)
       if: matrix.vm.setup
       run: ${{ matrix.vm.setup }}
 
     - name: Install dependencies
-      env:
-        BUILD_PLPFUSE: ${{ matrix.env.BUILD_PLPFUSE }}
       run: |
+        # Define BUILD_PLPFUSE inline to address environment-forwarding issues when using virtual machines.
         export BUILD_PLPFUSE=${{ matrix.env.BUILD_PLPFUSE }}
         ./build-aux/install-dependencies.sh
 
     - name: Build
-      env:
-        BUILD_PLPFUSE: ${{ matrix.env.BUILD_PLPFUSE }}
-      run: ./build-aux/build.sh --distcheck
+      run: |
+        # We don't define BUILD_PLPFUSE here as we want to text the autotools auto-detection behavior.
+        ./build-aux/build.sh --distcheck
 
     - name: Run smoke tests
-      env:
-        BUILD_PLPFUSE: ${{ matrix.env.BUILD_PLPFUSE }}
       run: |
         export BUILD_PLPFUSE=${{ matrix.env.BUILD_PLPFUSE }}
         ./build-aux/smoke-tests.sh
