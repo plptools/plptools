@@ -1,7 +1,8 @@
 /*
   plpfuse: Expose EPOC's file system via FUSE
-  Copyright (C) 2001-2007  Miklos Szeredi <miklos@szeredi.hu>
-  Copyright (C) 2007-2024  Reuben Thomas <rrt@sc3d.org>
+  Copyright (C) 2001-2007 Miklos Szeredi <miklos@szeredi.hu>
+  Copyright (C) 2007-2024 Reuben Thomas <rrt@sc3d.org>
+  Copyright (C) 2026 Syed Shahrukh Hussain <syed.shahrukh@ossrevival.org>
 
   This program can be distributed under the terms of the GNU GPL.
   See the file COPYING.

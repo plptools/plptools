@@ -3,6 +3,7 @@
  *
  *  Copyright (C) 1999-2001 Fritz Elfert <felfert@to.com>
  *  Copyright (C) 2007 Reuben Thomas <rrt@sc3d.org>
+ *  Copyright (C) 2026 Syed Shahrukh Hussain <syed.shahrukh@ossrevival.org>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
