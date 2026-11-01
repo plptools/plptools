@@ -65,7 +65,7 @@ jobs:
               architecture: x86-64
               version: '11.0'
             env:
-              BUILD_PLPFUSE: true
+              BUILD_PLPFUSE: false
 
           - name: openbsd-7.9-x86-64
             os: ubuntu-26.04
