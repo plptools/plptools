@@ -50,6 +50,16 @@ require_fuse() {
     fi
 }
 
+debian_install_libfuse_dev() {
+    if [ "$FUSE_VERSION" = "2" ]; then
+        become apt-get install -y libfuse-dev
+    elif [ "$FUSE_VERSION" = "3" ]; then
+        become apt-get install -y libfuse3-dev
+    else
+        fatal "Unsupported FUSE version."
+    fi
+}
+
 : "${BUILD_PLPFUSE:?BUILD_PLPFUSE must be set to 'true' or 'false'}"
 if $BUILD_PLPFUSE ; then
     : "${FUSE_VERSION:?FUSE_VERSION must be set}"
@@ -65,26 +75,14 @@ case "$PLATFORM" in
                 become apt-get update -y
                 become apt-get -y install build-essential m4 libtool git libreadline-dev pkg-config gettext autopoint libattr1-dev
                 if $BUILD_PLPFUSE ; then
-                    if [ "$FUSE_VERSION" = "2" ]; then
-                        become apt-get install -y libfuse-dev
-                    elif [ "$FUSE_VERSION" = "3" ]; then
-                        become apt-get install -y libfuse3-dev
-                    else
-                        fatal "Unsupported FUSE version."
-                    fi
+                    debian_install_libfuse_dev
                 fi
                 ;;
             debian)
                 become apt-get update -y
                 become apt-get install -y build-essential git libtool gpg pkg-config gettext autopoint libreadline-dev
                 if $BUILD_PLPFUSE ; then
-                    if [ "$FUSE_VERSION" = "2" ]; then
-                        become apt-get install -y libfuse-dev
-                    elif [ "$FUSE_VERSION" = "3" ]; then
-                        become apt-get install -y libfuse3-dev
-                    else
-                        fatal "Unsupported FUSE version."
-                    fi
+                    debian_install_libfuse_dev
                 fi
                 ;;
             *)
