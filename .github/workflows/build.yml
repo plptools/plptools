@@ -198,7 +198,9 @@ jobs:
     - name: Install dependencies
       env:
         BUILD_PLPFUSE: ${{ matrix.env.BUILD_PLPFUSE }}
-      run: ./build-aux/install-dependencies.sh
+      run: |
+        export BUILD_PLPFUSE=${{ matrix.env.BUILD_PLPFUSE }}
+        ./build-aux/install-dependencies.sh
 
     - name: Build
       env:
@@ -208,7 +210,9 @@ jobs:
     - name: Run smoke tests
       env:
         BUILD_PLPFUSE: ${{ matrix.env.BUILD_PLPFUSE }}
-      run: ./build-aux/smoke-tests.sh
+      run: |
+        export BUILD_PLPFUSE=${{ matrix.env.BUILD_PLPFUSE }}
+        ./build-aux/smoke-tests.sh
 
   check-localization:
     runs-on: ubuntu-26.04
