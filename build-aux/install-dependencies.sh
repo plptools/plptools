@@ -20,8 +20,6 @@
 set -e
 set -u
 
-BUILD_PLPFUSE=${BUILD_PLPFUSE:-false}
-
 exit_unsupported() {
     echo "$1"
     echo ""
@@ -38,6 +36,8 @@ become() {
     fi
     $SUDO "$@"
 }
+
+: "${BUILD_PLPFUSE:?BUILD_PLPFUSE must be set to 'true' or 'false'}"
 
 PLATFORM=$(uname -s)
 case "$PLATFORM" in

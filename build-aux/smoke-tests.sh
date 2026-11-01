@@ -30,8 +30,6 @@ set -u
 
 ROOT_DIRECTORY="$( cd "$( dirname "$0" )/.." > /dev/null 2>&1 && pwd )"
 
-BUILD_PLPFUSE=${BUILD_PLPFUSE:-false}
-
 fatal() {
     echo "$1" >&2
     exit 1
@@ -63,6 +61,8 @@ check_command() {
         echo "Command '$COMMAND' reported the correct version."
     fi
 }
+
+: "${BUILD_PLPFUSE:?BUILD_PLPFUSE must be set to 'true' or 'false'}"
 
 cd "$ROOT_DIRECTORY"
 
