@@ -65,6 +65,8 @@ jobs:
               architecture: x86-64
               version: '11.0'
             env:
+              # TODO: CI doesn't build plpfuse for NetBSD #219
+              #       https://github.com/plptools/plptools/issues/219
               BUILD_PLPFUSE: false
 
           - name: openbsd-7.9-x86-64
@@ -193,12 +195,18 @@ jobs:
       run: ${{ matrix.vm.setup }}
 
     - name: Install dependencies
+      env:
+        BUILD_PLPFUSE: ${{ matrix.env.BUILD_PLPFUSE || 'true' }}
       run: ./build-aux/install-dependencies.sh
 
     - name: Build
+      env:
+        BUILD_PLPFUSE: ${{ matrix.env.BUILD_PLPFUSE || 'true' }}
       run: ./build-aux/build.sh --distcheck
 
     - name: Run smoke tests
+      env:
+        BUILD_PLPFUSE: ${{ matrix.env.BUILD_PLPFUSE || 'true' }}
       run: ./build-aux/smoke-tests.sh
 
   check-localization:
