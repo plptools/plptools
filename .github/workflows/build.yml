@@ -73,7 +73,7 @@ jobs:
               #       https://github.com/plptools/plptools/issues/219
               BUILD_PLPFUSE: false
 
-          - name: openbsd-7.9-x86-64
+          - name: openbsd-7.9-x86-64-fuse2
             os: ubuntu-26.04
             vm:
               name: openbsd
@@ -82,17 +82,17 @@ jobs:
             env:
               BUILD_PLPFUSE: true
 
-          - name: ubuntu-24.04-amd64
+          - name: ubuntu-24.04-amd64-fuse2
             os: ubuntu-24.04
             env:
               BUILD_PLPFUSE: true
 
-          - name: ubuntu-24.04-arm64
+          - name: ubuntu-24.04-arm64-fuse2
             os: ubuntu-24.04-arm
             env:
               BUILD_PLPFUSE: true
 
-          - name: ubuntu-26.04-amd64
+          - name: ubuntu-26.04-amd64-fuse2
             os: ubuntu-24.04
             container:
               image: ubuntu:resolute
@@ -100,7 +100,7 @@ jobs:
             env:
               BUILD_PLPFUSE: true
 
-          - name: ubuntu-26.04-arm64
+          - name: ubuntu-26.04-arm64-fuse2
             os: ubuntu-24.04-arm
             container:
               image: ubuntu:resolute
@@ -108,15 +108,25 @@ jobs:
             env:
               BUILD_PLPFUSE: true
 
-          - name: ubuntu-26.10-amd64
+          - name: ubuntu-26.10-amd64-fuse2
             os: ubuntu-26.04
             container:
               image: ubuntu:stonking
               setup: apt-get update -y && apt-get -y install git
             env:
+              FUSE_VERSION: 2
               BUILD_PLPFUSE: true
 
-          - name: ubuntu-26.10-arm64
+          - name: ubuntu-26.10-amd64-fuse3
+            os: ubuntu-26.04
+            container:
+              image: ubuntu:stonking
+              setup: apt-get update -y && apt-get -y install git
+            env:
+              FUSE_VERSION: 3
+              BUILD_PLPFUSE: true
+
+          - name: ubuntu-26.10-arm64-fuse2
             os: ubuntu-26.04-arm
             container:
               image: ubuntu:stonking
@@ -124,7 +134,7 @@ jobs:
             env:
               BUILD_PLPFUSE: true
 
-          - name: debian-bookworm
+          - name: debian-bookworm-fuse2
             os: ubuntu-latest
             container:
               image: debian:bookworm
@@ -138,19 +148,37 @@ jobs:
               image: debian:trixie
               setup: apt-get update -y && apt-get -y install git
             env:
+              BUILD_PLPFUSE: false
+
+          - name: debian-trixie-fuse2
+            os: ubuntu-latest
+            container:
+              image: debian:trixie
+              setup: apt-get update -y && apt-get -y install git
+            env:
+              FUSE_VERSION: 2
+              BUILD_PLPFUSE: true
+
+          - name: debian-trixie-fuse3
+            os: ubuntu-latest
+            container:
+              image: debian:trixie
+              setup: apt-get update -y && apt-get -y install git
+            env:
+              FUSE_VERSION: 3
               BUILD_PLPFUSE: true
 
           - name: macos-26
             os: macos-26
             env:
-              BUILD_PLPFUSE: true
-
-          - name: macos-26-no-fuse
-            os: macos-26
-            env:
               BUILD_PLPFUSE: false
 
-          - name: macos-15
+          - name: macos-26-fuse2
+            os: macos-26
+            env:
+              BUILD_PLPFUSE: true
+
+          - name: macos-15-fuse2
             os: macos-15
             env:
               BUILD_PLPFUSE: true
@@ -197,7 +225,8 @@ jobs:
 
     - name: Install dependencies
       run: |
-        # Define BUILD_PLPFUSE inline to address environment-forwarding issues when using virtual machines.
+        # Define variables inline to address environment-forwarding issues when using virtual machines.
+        export FUSE_VERSION=${{ matrix.env.FUSE_VESRION || '2' }}
         export BUILD_PLPFUSE=${{ matrix.env.BUILD_PLPFUSE }}
         ./build-aux/install-dependencies.sh
 
