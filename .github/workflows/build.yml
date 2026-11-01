@@ -47,7 +47,9 @@ jobs:
               architecture: x86-64
               version: 'r1beta6'
             env:
-              BUILD_PLPFUSE: true
+              # TODO: CI doesn't build plpfuse for NetBSD, FreeBSD, or Haiku #219
+              #       https://github.com/plptools/plptools/issues/219
+              BUILD_PLPFUSE: false
 
           - name: freebsd-15.1-x64-64
             os: ubuntu-26.04
@@ -56,7 +58,7 @@ jobs:
               architecture: x86-64
               version: '15.1'
             env:
-              # TODO: CI doesn't build plpfuse for NetBSD or FreeBSD #219
+              # TODO: CI doesn't build plpfuse for NetBSD, FreeBSD, or Haiku #219
               #       https://github.com/plptools/plptools/issues/219
               BUILD_PLPFUSE: false
 
@@ -67,7 +69,7 @@ jobs:
               architecture: x86-64
               version: '11.0'
             env:
-              # TODO: CI doesn't build plpfuse for NetBSD or FreeBSD #219
+              # TODO: CI doesn't build plpfuse for NetBSD, FreeBSD, or Haiku #219
               #       https://github.com/plptools/plptools/issues/219
               BUILD_PLPFUSE: false
 
