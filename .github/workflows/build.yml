@@ -189,6 +189,7 @@ jobs:
         shell: bash
         memory: 5G
         cpu_count: 4
+        environment_variables: BUILD_PLPFUSE
 
     - name: Configure the virtual machine (if required)
       if: matrix.vm.setup
