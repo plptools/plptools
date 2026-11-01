@@ -51,6 +51,9 @@ require_fuse() {
 }
 
 : "${BUILD_PLPFUSE:?BUILD_PLPFUSE must be set to 'true' or 'false'}"
+if $BUILD_PLPFUSE ; then
+    : "${FUSE_VERSION:?FUSE_VERSION must be set}"
+fi
 
 PLATFORM=$(uname -s)
 case "$PLATFORM" in
@@ -75,8 +78,13 @@ case "$PLATFORM" in
                 become apt-get update -y
                 become apt-get install -y build-essential git libtool gpg pkg-config gettext autopoint libreadline-dev
                 if $BUILD_PLPFUSE ; then
-                    require_fuse 2
-                    become apt-get install -y libfuse-dev
+                    if [ "$FUSE_VERSION" = "2" ]; then
+                        become apt-get install -y libfuse-dev
+                    elif [ "$FUSE_VERSION" = "3" ]; then
+                        become apt-get install -y libfuse3-dev
+                    else
+                        fatal "Unsupported FUSE version."
+                    fi
                 fi
                 ;;
             *)

@@ -114,7 +114,7 @@ jobs:
               image: ubuntu:stonking
               setup: apt-get update -y && apt-get -y install git
             env:
-              FUSE_VERSION: 3
+              FUSE_VERSION: 2
               BUILD_PLPFUSE: true
 
           - name: ubuntu-26.10-amd64-fuse3
@@ -123,9 +123,10 @@ jobs:
               image: ubuntu:stonking
               setup: apt-get update -y && apt-get -y install git
             env:
+              FUSE_VERSION: 3
               BUILD_PLPFUSE: true
 
-          - name: ubuntu-26.10-arm64
+          - name: ubuntu-26.10-arm64-fuse2
             os: ubuntu-26.04-arm
             container:
               image: ubuntu:stonking
@@ -147,6 +148,24 @@ jobs:
               image: debian:trixie
               setup: apt-get update -y && apt-get -y install git
             env:
+              BUILD_PLPFUSE: false
+
+          - name: debian-trixie-fuse2
+            os: ubuntu-latest
+            container:
+              image: debian:trixie
+              setup: apt-get update -y && apt-get -y install git
+            env:
+              FUSE_VERSION: 2
+              BUILD_PLPFUSE: true
+
+          - name: debian-trixie-fuse3
+            os: ubuntu-latest
+            container:
+              image: debian:trixie
+              setup: apt-get update -y && apt-get -y install git
+            env:
+              FUSE_VERSION: 3
               BUILD_PLPFUSE: true
 
           - name: macos-26
