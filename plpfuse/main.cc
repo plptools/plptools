@@ -3,6 +3,7 @@
  *
  *  Copyright (C) 1999-2001 Fritz Elfert <felfert@to.com>
  *  Copyright (C) 2007 Reuben Thomas <rrt@sc3d.org>
+ *  Copyright (C) 2026 Syed Shahrukh Hussain <syed.shahrukh@ossrevival.org>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -48,7 +49,11 @@
 #endif
 #include <getopt.h>
 
+#if FUSE_USE_VERSION >= 30
+#include <fuse3/fuse_lowlevel.h>
+#else
 #include <fuse/fuse_lowlevel.h>
+#endif
 
 using namespace std;
 
@@ -362,10 +367,26 @@ static struct option opts[] = {
 int fuse(int argc, char *argv[])
 {
     struct fuse_args args = FUSE_ARGS_INIT(argc, argv);
+#if FUSE_USE_VERSION >= 30
+    struct fuse_cmdline_opts opts;
+    struct fuse *fp;
+#else
     struct fuse_chan *ch;
     char *mountpoint;
+#endif
     int err = -1, foreground;
-
+#if FUSE_USE_VERSION >= 30
+    if (fuse_parse_cmdline(&args, &opts) != -1) {
+        if (opts.mountpoint == NULL) {
+            help();
+        } else if (fuse_daemonize(opts.foreground) != -1) {
+            fp = fuse_new(&args, &plp_oper, sizeof(plp_oper), NULL);
+            if (fp != NULL && (fuse_mount(fp, opts.mountpoint)) == 0)
+                err = fuse_loop(fp);
+            fuse_unmount(fp);
+        }
+    }
+#else  // fuse 2
     if (fuse_parse_cmdline(&args, &mountpoint, NULL, &foreground) != -1 &&
         (ch = fuse_mount(mountpoint, &args)) != NULL) {
         if (fuse_daemonize(foreground) != -1) {
@@ -375,8 +396,8 @@ int fuse(int argc, char *argv[])
         }
         fuse_unmount(mountpoint, ch);
     }
+#endif
     fuse_opt_free_args(&args);
-
     return err ? 1 : 0;
 }
 

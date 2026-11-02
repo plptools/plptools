@@ -2,6 +2,7 @@
  * This file is part of plptools.
  *
  *  Copyright (C) 2007-2024 Reuben Thomas <rrt@sc3d.org>
+ *  Copyright (C) 2026 Syed Shahrukh Hussain <syed.shahrukh@ossrevival.org>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -19,7 +20,11 @@
  */
 #pragma once
 
+#if FUSE_USE_VERSION >= 30
+#include <fuse3/fuse.h>
+#else
 #include <fuse.h>
+#endif
 
 typedef struct p_inode {
     int inode;
