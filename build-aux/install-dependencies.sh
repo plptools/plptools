@@ -20,6 +20,11 @@
 set -e
 set -u
 
+fatal() {
+    echo "$1" >&2
+    exit 1
+}
+
 exit_unsupported() {
     echo "$1"
     echo ""
@@ -37,6 +42,29 @@ become() {
     $SUDO "$@"
 }
 
+require_fuse() {
+    # Ensure $FUSE_VERSION matches $1; exit with a fatal error otherwise.
+    EXPECTED_FUSE_VERSION="$1"
+    if [ "$FUSE_VERSION" != "$EXPECTED_FUSE_VERSION" ]; then
+        fatal "Unsupported FUSE version; expected $EXPECTED_FUSE_VERSION, got $FUSE_VERSION"
+    fi
+}
+
+debian_install_libfuse_dev() {
+    if [ "$FUSE_VERSION" = "2" ]; then
+        become apt-get install -y libfuse-dev
+    elif [ "$FUSE_VERSION" = "3" ]; then
+        become apt-get install -y libfuse3-dev
+    else
+        fatal "Unsupported FUSE version."
+    fi
+}
+
+: "${BUILD_PLPFUSE:?BUILD_PLPFUSE must be set to 'true' or 'false'}"
+if $BUILD_PLPFUSE ; then
+    : "${FUSE_VERSION:?FUSE_VERSION must be set}"
+fi
+
 PLATFORM=$(uname -s)
 case "$PLATFORM" in
     Linux)
@@ -45,11 +73,17 @@ case "$PLATFORM" in
         case "$ID" in
             ubuntu)
                 become apt-get update -y
-                become apt-get -y install build-essential m4 libtool git libreadline-dev pkg-config gettext autopoint libfuse-dev libattr1-dev
+                become apt-get -y install build-essential m4 libtool git libreadline-dev pkg-config gettext autopoint libattr1-dev
+                if $BUILD_PLPFUSE ; then
+                    debian_install_libfuse_dev
+                fi
                 ;;
             debian)
                 become apt-get update -y
                 become apt-get install -y build-essential git libtool gpg pkg-config gettext autopoint libreadline-dev
+                if $BUILD_PLPFUSE ; then
+                    debian_install_libfuse_dev
+                fi
                 ;;
             *)
                 exit_unsupported "Unsupported Linux distribution ($ID)."
@@ -62,19 +96,32 @@ case "$PLATFORM" in
         ;;
     Darwin)
         echo "Installing dependencies for Darwin..."
-        brew install coreutils m4 readline pkg-config libtool automake gettext macfuse
+        brew install coreutils m4 readline pkg-config libtool automake gettext
+        if $BUILD_PLPFUSE ; then
+            require_fuse 2
+            brew install macfuse
+        fi
         ;;
     FreeBSD)
         echo "Installing dependencies for FreeBSD..."
         become pkg install -y m4 libtool git gnupg pkgconf automake autoconf gettext gmake
+        if $BUILD_PLPFUSE ; then
+            require_fuse 2
+        fi
         ;;
     NetBSD)
         echo "Installing dependencies for NetBSD..."
         become pkgin -y install m4 libtool gnupg2 pkgconf autoconf automake gettext coreutils gmake git gettext-tools
+        if $BUILD_PLPFUSE ; then
+            require_fuse 2
+        fi
         ;;
     OpenBSD)
         echo "Installing dependencies for OpenBSD..."
         become pkg_add -v m4 libtool gnupg autoconf%2.72 automake%1.18 gettext-tools readline gmake git
+        if $BUILD_PLPFUSE ; then
+            require_fuse 2
+        fi
         ;;
     *)
         exit_unsupported "Unsupported platform ($PLATFORM)."
