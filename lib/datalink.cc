@@ -222,11 +222,11 @@ DataLink::DataLink(const char *fname,
                    unsigned short verbose,
                    const int cancellationFd)
 : noDSRCheck_(noDSRCheck)
+, link_(link)
 , devname(fname)
 , requestedBaudRate_(baud)
-, link_(link)
-, verbose_(verbose)
-, cancellationFd_(cancellationFd) {
+, cancellationFd_(cancellationFd)
+, verbose_(verbose) {
 
     // Initialize CRC table
     crc_table[0] = 0;

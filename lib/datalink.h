@@ -143,21 +143,23 @@ private:
     std::condition_variable outputCondition_;
 
     // Initial configuration (const).
+
+    Link * const link_;
+
     const std::string devname;
 
     /**
     * Requested baud rate; -1 indicates automatic.
     */
     const int requestedBaudRate_;
-    Link * const link_;
 
     /**
     * Used to signal cancellation.
     *
     * Should never be read.
     */
-    const short int verbose_;
     const int cancellationFd_;
+    const short int verbose_;
 
     int outputDataReadyPipe_[2] = { -1, -1 };
 
