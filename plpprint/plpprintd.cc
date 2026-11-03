@@ -156,7 +156,6 @@ init_fontmap() {
         char buf[1024];
         while (fgets(buf, sizeof(buf), f)) {
             char *bp = buf;
-            int ne;
             if ((p = strchr(buf, '#')))
                 *p = '\0';
             if ((p = strchr(buf, '\n')))
@@ -446,8 +445,7 @@ convertPage(FILE *f, int page, bool last, BufferStore buf)
                 }
                 string fname(buf.getString(ofs), namelen);
                 ofs += namelen;
-                int screenfont = buf.getByte(ofs);
-                int basesize = buf.getWord(ofs+1);
+                // NOTE screenfont at ofs, basesize at ofs + 1
                 unsigned long style = buf.getDWord(ofs+3);
                 bool italic = ((style & 1) != 0);
                 bool bold = ((style & 2) != 0);
@@ -711,24 +709,25 @@ convertPage(FILE *f, int page, bool last, BufferStore buf)
                 }
                 string text(buf.getString(ofs), tlen);
                 ofs += tlen;
-                int left = buf.getDWord(ofs);
-                int top = buf.getDWord(ofs+4);
-                int right = buf.getDWord(ofs+8);
-                int bottom = buf.getDWord(ofs+12);
-                int baseline = buf.getDWord(ofs+16);
+                unsigned long textLeft = buf.getDWord(ofs);
+                unsigned long textTop = buf.getDWord(ofs+4);
+                unsigned long textRight = buf.getDWord(ofs+8);
+                unsigned long textBottom = buf.getDWord(ofs+12);
+                unsigned long baseline = buf.getDWord(ofs+16);
                 unsigned char align = buf.getByte(ofs+20);
                 int amargin = buf.getDWord(ofs+21);
-                fprintf(f, "%% @%d: JText '%s' %d %ld %d %d %d %d %d\n", i,
-                        text.c_str(), left, bottom + boffset, top, right,
+                fprintf(f, "%% @%d: JText '%s' %ld %ld %ld %ld %ld %d %d\n", i,
+                        text.c_str(), textLeft, textBottom + boffset, textTop, textRight,
                         baseline, align, amargin);
                 ps_escape(text);
-                if (align == 2)
+                if (align == 2) {
                     right -= amargin;
-                else
+                } else {
                     left += amargin;
+                }
                 bottom -= ((bottom - top) / 4);
-                fprintf(f, "(%s) %d %ld %d %d %d T\n", text.c_str(),
-                        left, bottom + boffset, top, right, align);
+                fprintf(f, "(%s) %ld %ld %ld %ld %d T\n", text.c_str(),
+                        textLeft, textBottom + boffset, textTop, textRight, align);
                 i = ofs + 25;
             }
                 break;
@@ -762,7 +761,6 @@ static unsigned char fakePage[15] = {
     0x00, 0x00, 0xc6, 0x41, 0x00, 0x00, 0x00,
 };
 
-const
 static void
 service_loop()
 {
@@ -879,6 +877,8 @@ service_loop()
                         spoolOpen = false;
                     }
                     break;
+                default:
+                    // NOP
             }
         }
         free(jname);
@@ -999,14 +999,14 @@ main(int argc, char **argv)
             while (serviceLoop) {
                 wPrt = new wprt(skt);
                 if (wPrt) {
-                    Enum<RFSV::errs> ret;
-                    ret = wPrt->initPrinter();
-                    if (ret == RFSV::E_PSI_GEN_NONE)
+                    Enum<RFSV::errs> ret2;
+                    ret2 = wPrt->initPrinter();
+                    if (ret2 == RFSV::E_PSI_GEN_NONE)
                         service_loop();
                     else {
                         if (debug)
                             debuglog("plpprintd: could not connect: %s",
-                                     ret.toString().c_str());
+                                     ret2.toString().c_str());
                     }
                     delete wPrt;
                     sleep(1);

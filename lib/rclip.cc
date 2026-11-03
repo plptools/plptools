@@ -109,6 +109,9 @@ bool rclip::sendCommand(enum commands cc) {
             break;
         case RCLIP_NOTIFY:
             a.addByte(0);
+            break;
+        case RCLIP_LISTEN:
+            // NOP
     }
     result = socket_->sendBufferStore(a);
     if (!result) {

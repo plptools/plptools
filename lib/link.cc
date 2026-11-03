@@ -372,8 +372,8 @@ void Link::receive(BufferStore buff) {
                 pthread_mutex_unlock(&queueMutex_);
 
                 // Retransmit the data.
-                for (vector<BufferStore>::iterator i = pendingData.begin(); i != pendingData.end(); i++) {
-                    dataLink_->send(*i, isEPOC);
+                for (vector<BufferStore>::iterator ib = pendingData.begin(); ib != pendingData.end(); ib++) {
+                    dataLink_->send(*ib, isEPOC);
                 }
 
                 if ((verbose_ & LNK_DEBUG_LOG) && (!nextFound)) {
@@ -631,8 +631,8 @@ void Link::retransmit() {
     pthread_mutex_unlock(&queueMutex_);
 
     // Retransmit the data.
-    for (vector<BufferStore>::iterator i = pendingData.begin(); i != pendingData.end(); i++) {
-        dataLink_->send(*i, isEPOC);
+    for (vector<BufferStore>::iterator ib = pendingData.begin(); ib != pendingData.end(); ib++) {
+        dataLink_->send(*ib, isEPOC);
     }
 
 }

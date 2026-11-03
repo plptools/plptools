@@ -294,7 +294,6 @@ void NCP::decodeControlMessage(BufferStore & buff) {
             // for the Series 5mx/7, this may need to change.
             //
             if (ver == PV_SERIES_5 || ver == PV_SERIES_3) {
-                BufferStore b;
                 protocolVersion = ver;
                 if (verbose & NCP_DEBUG_LOG) {
                     if (verbose & NCP_DEBUG_DUMP)

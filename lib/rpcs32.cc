@@ -276,7 +276,7 @@ Enum<RFSV::errs> RPCS32::configWrite(BufferStore data) {
     return RFSV::E_PSI_GEN_NONE;
 }
 
-Enum<RFSV::errs> RPCS32::closeHandle(uint16_t handle) {
+Enum<RFSV::errs> RPCS32::closeHandle(uint32_t handle) {
     BufferStore a;
 
     a.addWord(handle);

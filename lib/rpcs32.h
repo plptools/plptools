@@ -40,7 +40,7 @@ class RPCS32 : public RPCS {
     Enum<RFSV::errs> getOwnerInfo(BufferArray &owner);
     Enum<RFSV::errs> configRead(uint32_t, BufferStore &);
     Enum<RFSV::errs> configWrite(BufferStore);
-    Enum<RFSV::errs> closeHandle(uint16_t);
+    Enum<RFSV::errs> closeHandle(uint32_t);
     Enum<RFSV::errs> regOpenIter(uint32_t uid, char *match, uint16_t &handle);
     Enum<RFSV::errs> regReadIter(uint16_t handle);
     Enum<RFSV::errs> setTime(time_t time);
