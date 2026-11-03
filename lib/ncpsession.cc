@@ -223,7 +223,10 @@ NCPSession::~NCPSession() {
 }
 
 int NCPSession::start() {
-    assert(sessionMainThreadId_ == nullptr);
+    // `sessionMainThreadId_` is a `pthread_t` so isn't comparable to `nullptr`.
+    // Use `pthread_equal()` instead.
+    //  See https://stackoverflow.com/questions/6276939/is-there-an-invalid-pthread-t-id
+    assert(pthread_equal(sessionMainThreadId_, pthread_self()));
     int result = pipe(cancellationPipe_);
     if (result != 0) {
         return result;

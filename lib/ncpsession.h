@@ -116,7 +116,8 @@ private:
 
     // State.
 
-    pthread_t sessionMainThreadId_ = nullptr;
+    // Use ID of calling thread as default, uninitialized value
+    pthread_t sessionMainThreadId_ = pthread_self();
 
     /**
     * @ref NCP instance.
