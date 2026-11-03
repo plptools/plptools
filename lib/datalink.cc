@@ -23,6 +23,7 @@
 #include "config.h"
 
 #include <cassert>
+#include <memory>
 #include <mutex>
 #include <pthread.h>
 #include <string>
@@ -266,8 +267,8 @@ DataLink::~DataLink() {
     if (serialFd_ != -1) {
         pthread_join(dataPumpThreadId_, NULL);
         ser_exit(serialFd_);
+        serialClose();
     }
-    serialFd_ = -1;
 
     delete []inBuffer;
     delete []outBuffer;
@@ -279,21 +280,31 @@ DataLink::~DataLink() {
 }
 
 void DataLink::serialOpen() {
-    assert(serialFd_ == -1);
-    serialFd_ = init_serial(devname.c_str(), baudRate_, 0);
-    if (verbose_ & PKT_DEBUG_LOG) {
-        lout << "serial connection set to " << dec << baudRate_
-             << " baud, fd=" << serialFd_ << endl;
-    }
+
     if (serialFd_ != -1) {
-        // Explicitly set the file descriptor as non-blocking, irrespective of how it was opened.
-        // This was introduced when we added locking to try to ensure thread-safety across the three domains managed by
-        // this class. While it was not documented at the time, we believe it exists to avoid races where a device is
-        // disconnected between a `select` returning to indicate the device is readable or writeable and the read or
-        // write call---in this scenario the operation would block indefinitely while we're holding a lock without
-        // the non-blocking behavior.
-        fcntl(serialFd_, F_SETFL, O_NONBLOCK);
+        cout << "Connected; ignoring reconnect...\n";
+        return;
     }
+
+    assert(serialFd_ == -1);
+    assert(socket_ == nullptr);
+
+    cout << "Opening serial port...\n";
+
+    socket_ = std::make_unique<TCPSocket>();
+    if (!socket_->connect("127.0.0.1", 1234)) {
+        cout << "Failed to connect to serial port.\n";
+        socket_ = nullptr;
+        return;
+    } else {
+        cout << "Successfully connected to serial port.\n";
+    }
+    serialFd_ = socket_->getFd();
+    cout << "Serial port file descriptor = " << serialFd_ << "\n";
+}
+
+void DataLink::serialClose() {
+    cout << "Closing serial port...\n";
 }
 
 void DataLink::reset() {
@@ -315,8 +326,7 @@ void DataLink::internalReset(bool resetBaudRateIndex) {
     if (verbose_ & PKT_DEBUG_LOG)
         lout << "resetting serial connection" << endl;
     if (serialFd_ != -1) {
-        ser_exit(serialFd_);
-        serialFd_ = -1;
+        serialClose();
     }
     usleep(100000);
     outRead = outWrite = 0;
@@ -547,46 +557,5 @@ void DataLink::sendReceivedData(std::vector<BufferStore> &receivedData) {
 }
 
 bool DataLink::linkFailed() {
-    int arg;
-    int res;
-    bool failed = false;
-
-    std::lock_guard<std::mutex> serialLock(serialMutex_);
-
-    if (serialFd_ == -1)
-        return false;
-    res = ioctl(serialFd_, TIOCMGET, &arg);
-    if (res < 0) {
-        failed = true;
-    }
-    if ((serialStatus == -1) || (arg != serialStatus)) {
-        if (verbose_ & PKT_DEBUG_HANDSHAKE)
-            lout << "packet: < DTR:" << ((arg & TIOCM_DTR)?1:0)
-                 << " RTS:" << ((arg & TIOCM_RTS)?1:0)
-                 << " DCD:" << ((arg & TIOCM_CAR)?1:0)
-                 << " DSR:" << ((arg & TIOCM_DSR)?1:0)
-                 << " CTS:" << ((arg & TIOCM_CTS)?1:0) << endl;
-        if (!((arg & TIOCM_RTS) && (arg & TIOCM_DTR))) {
-            arg |= (TIOCM_DTR | TIOCM_RTS);
-            res = ioctl(serialFd_, TIOCMSET, &arg);
-            if (res < 0) {
-                failed = true;
-            }
-            if (verbose_ & PKT_DEBUG_HANDSHAKE)
-                lout << "packet: > DTR:" << ((arg & TIOCM_DTR)?1:0)
-                     << " RTS:" << ((arg & TIOCM_RTS)?1:0)
-                     << " DCD:" << ((arg & TIOCM_CAR)?1:0)
-                     << " DSR:" << ((arg & TIOCM_DSR)?1:0)
-                     << " CTS:" << ((arg & TIOCM_CTS)?1:0) << endl;
-        }
-        serialStatus = arg;
-    }
-    // TODO: Check for a solution on Solaris.
-    if (!noDSRCheck_ && (arg & TIOCM_DSR) == 0) {
-        failed = true;
-    }
-    if ((verbose_ & PKT_DEBUG_LOG) && failed) {
-        lout << "packet: linkFAILED\n";
-    }
-    return failed;
+    return serialFd_ == -1;
 }
