@@ -145,11 +145,11 @@ decodeBitmap(const unsigned char *p, int &width, int &height, BufferStore &out)
     uint32_t datlen = totlen - hdrlen;
     uint32_t xPixels = *((const uint32_t*)p); p += 4;
     uint32_t yPixels = *((const uint32_t*)p); p += 4;
-    [[maybe_unused]] uint32_t xTwips = *((const uint32_t*)p); p += 4;
-    [[maybe_unused]] uint32_t yTwips = *((const uint32_t*)p); p += 4;
+    // Next 8 bytes (xTwips, yTwips) not used here
+    p += 8;
     uint32_t bitsPerPixel = *((const uint32_t*)p); p += 4;
-    [[maybe_unused]] uint32_t unknown1 = *((const uint32_t*)p); p += 4;
-    [[maybe_unused]] uint32_t unknown2 = *((const uint32_t*)p); p += 4;
+    // Next 8 bytes not used here
+    p += 8;
     uint32_t RLEflag = *((const uint32_t*)p); p += 4;
 
     width = xPixels;

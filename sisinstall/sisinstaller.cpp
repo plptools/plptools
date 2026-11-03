@@ -82,18 +82,15 @@ void SISInstaller::createDirs(char* filename) {
         char ch = *end;
         if ((ch == '/') || (ch == '\\')) {
             *end = 0;
-            if (logLevel >= 1)
+            if (logLevel >= 1) {
                 fprintf(stderr, "Checking for existance of %s\n", filename);
-//          if (!m_psion->dirExists(filename)) {
-            if (logLevel >= 1)
                 fprintf(stderr, "Creating dir %s\n", filename);
-
+            }
             Enum<RFSV::errs> res;
             res = m_psion->mkdir(filename);
             if ((res != RFSV::E_PSI_GEN_NONE) && (res != RFSV::E_PSI_FILE_EXIST)) {
                 fprintf(stderr, " -> Failed: %s\n", (const char*)res);
             }
-//          }
             *end = ch;
             return;
         }

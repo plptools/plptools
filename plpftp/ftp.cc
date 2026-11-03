@@ -206,8 +206,7 @@ static int stopPrograms(RPCS &rpcs, const char *file) {
     time_t tstart = time(nullptr) + 5;
     while (!tmp.empty()) {
         for (processList::iterator i = tmp.begin(); i != tmp.end(); i++) {
-            const char* pid = i->getProcId().c_str();
-            rpcs.stopProgram(pid);
+            rpcs.stopProgram(i->getProcId());
         }
         usleep(100000);
         if (time(nullptr) > tstart) {
@@ -1069,7 +1068,6 @@ int FTP::session(DeviceEndpoint &deviceEndpoint, RFSV &rfsv, RPCS &rpcs, rclip &
             continue;
         }
         if (!strcmp(argv[0], "setupinfo")) {
-            //<RFSV::errs> rese;
             BufferStore db;
 
             if ((res = rpcs.configRead(0, db)) != RFSV::E_PSI_GEN_NONE) {
@@ -1247,8 +1245,7 @@ int FTP::session(DeviceEndpoint &deviceEndpoint, RFSV &rfsv, RPCS &rpcs, rclip &
                     processList::iterator j;
                     for (j = tmp.begin(); j != tmp.end(); j++) {
                         if (kpid == -1 || kpid == j->getPID()) {
-                            const char* pid = j->getProcId().c_str();
-                            rpcs.stopProgram(pid);
+                            rpcs.stopProgram(j->getProcId());
                             anykilled = true;
                         }
                     }

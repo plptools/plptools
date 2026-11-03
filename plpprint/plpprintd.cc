@@ -156,7 +156,6 @@ init_fontmap() {
         char buf[1024];
         while (fgets(buf, sizeof(buf), f)) {
             char *bp = buf;
-            //int ne;
             if ((p = strchr(buf, '#')))
                 *p = '\0';
             if ((p = strchr(buf, '\n')))
@@ -446,8 +445,7 @@ convertPage(FILE *f, int page, bool last, BufferStore buf)
                 }
                 string fname(buf.getString(ofs), namelen);
                 ofs += namelen;
-                [[maybe_unused]] int screenfont = buf.getByte(ofs);
-                [[maybe_unused]] int basesize = buf.getWord(ofs+1);
+                // NOTE screenfont at ofs, basesize at ofs + 1
                 unsigned long style = buf.getDWord(ofs+3);
                 bool italic = ((style & 1) != 0);
                 bool bold = ((style & 2) != 0);
@@ -711,24 +709,25 @@ convertPage(FILE *f, int page, bool last, BufferStore buf)
                 }
                 string text(buf.getString(ofs), tlen);
                 ofs += tlen;
-                left = buf.getDWord(ofs);
-                top = buf.getDWord(ofs+4);
-                right = buf.getDWord(ofs+8);
-                bottom = buf.getDWord(ofs+12);
+                unsigned long text_left = buf.getDWord(ofs);
+                unsigned long text_top = buf.getDWord(ofs+4);
+                unsigned long text_right = buf.getDWord(ofs+8);
+                unsigned long text_bottom = buf.getDWord(ofs+12);
                 unsigned long baseline = buf.getDWord(ofs+16);
                 unsigned char align = buf.getByte(ofs+20);
                 int amargin = buf.getDWord(ofs+21);
                 fprintf(f, "%% @%d: JText '%s' %ld %ld %ld %ld %ld %d %d\n", i,
-                        text.c_str(), left, bottom + boffset, top, right,
+                        text.c_str(), text_left, text_bottom + boffset, text_top, text_right,
                         baseline, align, amargin);
                 ps_escape(text);
-                if (align == 2)
+                if (align == 2) {
                     right -= amargin;
-                else
+                } else {
                     left += amargin;
+                }
                 bottom -= ((bottom - top) / 4);
                 fprintf(f, "(%s) %ld %ld %ld %ld %d T\n", text.c_str(),
-                        left, bottom + boffset, top, right, align);
+                        text_left, text_bottom + boffset, text_top, text_right, align);
                 i = ofs + 25;
             }
                 break;
@@ -762,7 +761,6 @@ static unsigned char fakePage[15] = {
     0x00, 0x00, 0xc6, 0x41, 0x00, 0x00, 0x00,
 };
 
-//const
 static void
 service_loop()
 {

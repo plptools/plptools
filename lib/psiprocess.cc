@@ -60,7 +60,7 @@ getArgs() {
     return args.c_str();
 }
 
-std::string PsiProcess::
+const char *PsiProcess::
 getProcId() {
     ostringstream tmp;
 
@@ -68,9 +68,7 @@ getProcId() {
         tmp << name << ".$" << setw(2) << setfill('0') << pid << '\0';
     else
         tmp << name << ".$" << pid << '\0';
-    // Returns address of stack variable
-    // Q. How to deal with this without causing a memory leak?
-    return tmp.str();
+    return tmp.str().c_str();
 }
 
 void PsiProcess::
