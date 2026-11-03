@@ -709,15 +709,15 @@ convertPage(FILE *f, int page, bool last, BufferStore buf)
                 }
                 string text(buf.getString(ofs), tlen);
                 ofs += tlen;
-                unsigned long text_left = buf.getDWord(ofs);
-                unsigned long text_top = buf.getDWord(ofs+4);
-                unsigned long text_right = buf.getDWord(ofs+8);
-                unsigned long text_bottom = buf.getDWord(ofs+12);
+                unsigned long textLeft = buf.getDWord(ofs);
+                unsigned long textTop = buf.getDWord(ofs+4);
+                unsigned long textRight = buf.getDWord(ofs+8);
+                unsigned long textBottom = buf.getDWord(ofs+12);
                 unsigned long baseline = buf.getDWord(ofs+16);
                 unsigned char align = buf.getByte(ofs+20);
                 int amargin = buf.getDWord(ofs+21);
                 fprintf(f, "%% @%d: JText '%s' %ld %ld %ld %ld %ld %d %d\n", i,
-                        text.c_str(), text_left, text_bottom + boffset, text_top, text_right,
+                        text.c_str(), textLeft, textBottom + boffset, textTop, textRight,
                         baseline, align, amargin);
                 ps_escape(text);
                 if (align == 2) {
@@ -727,7 +727,7 @@ convertPage(FILE *f, int page, bool last, BufferStore buf)
                 }
                 bottom -= ((bottom - top) / 4);
                 fprintf(f, "(%s) %ld %ld %ld %ld %d T\n", text.c_str(),
-                        text_left, text_bottom + boffset, text_top, text_right, align);
+                        textLeft, textBottom + boffset, textTop, textRight, align);
                 i = ofs + 25;
             }
                 break;
