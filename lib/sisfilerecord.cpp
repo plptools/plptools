@@ -129,9 +129,9 @@ uint8_t*
 SISFileRecord::getFilePtr(int fileNo)
 {
     if (fileNo < 0)
-        return 0;
+        return nullptr;
     if (m_filePtrs[fileNo] >= m_len)
-        return 0;
+        return nullptr;
     return &m_buf[m_filePtrs[fileNo]];
 }
 
