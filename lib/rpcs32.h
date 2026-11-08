@@ -35,15 +35,15 @@ class RPCSFactory;
  */
 class RPCS32 : public RPCS {
  public:
-    Enum<RFSV::errs> getCmdLine(const char *, std::string &);
-    Enum<RFSV::errs> getMachineInfo(machineInfo &);
-    Enum<RFSV::errs> getOwnerInfo(BufferArray &owner);
-    Enum<RFSV::errs> configRead(uint32_t, BufferStore &);
-    Enum<RFSV::errs> configWrite(BufferStore);
+    Enum<RFSV::errs> getCmdLine(const char *, std::string &) override;
+    Enum<RFSV::errs> getMachineInfo(machineInfo &) override;
+    Enum<RFSV::errs> getOwnerInfo(BufferArray &owner) override;
+    Enum<RFSV::errs> configRead(uint32_t, BufferStore &) override;
+    Enum<RFSV::errs> configWrite(BufferStore) override;
     Enum<RFSV::errs> closeHandle(uint16_t);
-    Enum<RFSV::errs> regOpenIter(uint32_t uid, char *match, uint16_t &handle);
-    Enum<RFSV::errs> regReadIter(uint16_t handle);
-    Enum<RFSV::errs> setTime(time_t time);
+    Enum<RFSV::errs> regOpenIter(uint32_t uid, char *match, uint16_t &handle) override;
+    Enum<RFSV::errs> regReadIter(uint16_t handle) override;
+    Enum<RFSV::errs> setTime(time_t time) override;
 #if 0
     Enum<RFSV::errs> regWrite(void);
     Enum<RFSV::errs> regRead(void);
@@ -56,5 +56,5 @@ class RPCS32 : public RPCS {
     RPCS32(std::unique_ptr<TCPSocket> socket);
 
 protected:
-    Enum<RFSV::errs> configOpen(uint16_t &, uint32_t);
+    Enum<RFSV::errs> configOpen(uint16_t &, uint32_t) override;
 };
