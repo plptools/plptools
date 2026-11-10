@@ -17,9 +17,7 @@
  *  along with this program; if not, see <https://www.gnu.org/licenses/>.
  *
  */
-
-#ifndef _PSIBITMAP_H_
-#define _PSIBITMAP_H_
+#pragma once
 
 #include "bufferstore.h"
 
@@ -63,5 +61,3 @@ encodeBitmap(int width, int height, getPixelFunction_t getPixel,
  */
 extern bool
 decodeBitmap(const unsigned char *p, int &width, int &height, BufferStore &out);
-
-#endif // !_PSIBITMAP_H_

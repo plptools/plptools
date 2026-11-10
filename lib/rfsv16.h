@@ -18,62 +18,69 @@
  *  along with this program; if not, see <https://www.gnu.org/licenses/>.
  *
  */
-#ifndef _RFSV16_H_
-#define _RFSV16_H_
+#pragma once
 
 #include "rfsv.h"
+#include <memory>
 
-class rfsvfactory;
+class RFSVFactory;
 
 /**
- * This is the implementation of the @ref rfsv protocol for
+ * This is the implementation of the @ref RFSV protocol for
  * Psion series 3 (SIBO) variant. You normally never create
  * objects of this class directly. Thus the constructor is
- * private. Use @ref rfsvfactory for creating an instance of
- * @ref rfsv . For a complete documentation, see @ref rfsv .
+ * private. Use @ref RFSVFactory for creating an instance of
+ * @ref RFSV . For a complete documentation, see @ref RFSV .
  */
-class rfsv16 : public rfsv {
-
-    /**
-     * rfsvfactory may call our constructor.
-     */
-    friend class rfsvfactory;
-
+class RFSV16 : public RFSV {
 public:
-    Enum<rfsv::errs> fopen(const uint32_t, const char * const, uint32_t &);
-    Enum<rfsv::errs> mktemp(uint32_t &, std::string &);
-    Enum<rfsv::errs> fcreatefile(const uint32_t, const char * const, uint32_t &);
-    Enum<rfsv::errs> freplacefile(const uint32_t, const char * const, uint32_t &);
-    Enum<rfsv::errs> fclose(const uint32_t);
-    Enum<rfsv::errs> dir(const char * const, PlpDir &);
-    Enum<rfsv::errs> pathtest(const char * const);
-    Enum<rfsv::errs> fgetmtime(const char * const, PsiTime &);
-    Enum<rfsv::errs> fsetmtime(const char * const, const PsiTime);
-    Enum<rfsv::errs> fgetattr(const char * const, uint32_t &);
-    Enum<rfsv::errs> fgeteattr(const char * const, PlpDirent &);
-    Enum<rfsv::errs> fsetattr(const char * const, const uint32_t seta, const uint32_t unseta);
-    Enum<rfsv::errs> dircount(const char * const, uint32_t &);
-    Enum<rfsv::errs> devlist(uint32_t &);
-    Enum<rfsv::errs> devinfo(const char, PlpDrive &);
-    Enum<rfsv::errs> fread(const uint32_t, unsigned char * const, const uint32_t, uint32_t &);
-    Enum<rfsv::errs> fwrite(const uint32_t, const unsigned char * const, const uint32_t, uint32_t &);
-    Enum<rfsv::errs> copyFromPsion(const char * const, const char * const, void *, cpCallback_t);
-    Enum<rfsv::errs> copyFromPsion(const char *from, int fd, cpCallback_t cb);
-    Enum<rfsv::errs> copyToPsion(const char * const, const char * const, void *, cpCallback_t);
-    Enum<rfsv::errs> copyOnPsion(const char *, const char *, void *, cpCallback_t);
-    Enum<rfsv::errs> fsetsize(const uint32_t, const uint32_t);
-    Enum<rfsv::errs> fseek(const uint32_t, const int32_t, const uint32_t, uint32_t &);
-    Enum<rfsv::errs> mkdir(const char * const);
-    Enum<rfsv::errs> rmdir(const char * const);
-    Enum<rfsv::errs> rename(const char * const, const char * const);
-    Enum<rfsv::errs> remove(const char * const);
-    Enum<rfsv::errs> opendir(const uint32_t, const char * const, rfsvDirhandle &);
-    Enum<rfsv::errs> readdir(rfsvDirhandle &, PlpDirent &);
-    Enum<rfsv::errs> closedir(rfsvDirhandle &);
-    Enum<rfsv::errs> setVolumeName(const char, const char * const);
+    RFSV16(std::unique_ptr<TCPSocket> socket);
 
-    uint32_t opMode(const uint32_t);
-    int getProtocolVersion() { return 3; }
+    Enum<RFSV::errs> fopen(const uint32_t, const char * const, uint32_t &) override;
+    Enum<RFSV::errs> mktemp(uint32_t &, std::string &) override;
+    Enum<RFSV::errs> fcreatefile(const uint32_t, const char * const, uint32_t &) override;
+    Enum<RFSV::errs> freplacefile(const uint32_t, const char * const, uint32_t &) override;
+    Enum<RFSV::errs> fclose(const uint32_t) override;
+    Enum<RFSV::errs> dir(const char * const, PlpDir &) override;
+    Enum<RFSV::errs> pathtest(const char * const) override;
+    Enum<RFSV::errs> fgetmtime(const char * const, PsiTime &) override;
+    Enum<RFSV::errs> fsetmtime(const char * const, const PsiTime) override;
+    Enum<RFSV::errs> fgetattr(const char * const, uint32_t &) override;
+    Enum<RFSV::errs> fgeteattr(const char * const, PlpDirent &) override;
+    Enum<RFSV::errs> fsetattr(const char * const, const uint32_t seta, const uint32_t unseta) override;
+    Enum<RFSV::errs> dircount(const char * const, uint32_t &) override;
+    Enum<RFSV::errs> devlist(uint32_t &) override;
+    Enum<RFSV::errs> devinfo(const char, Drive &) override;
+    Enum<RFSV::errs> fread(const uint32_t, unsigned char * const, const uint32_t, uint32_t &) override;
+    Enum<RFSV::errs> fwrite(const uint32_t, const unsigned char * const, const uint32_t, uint32_t &) override;
+    Enum<RFSV::errs> copyFromPsion(const char * const, const char * const, void *, cpCallback_t) override;
+    Enum<RFSV::errs> copyFromPsion(const char *from, int fd, cpCallback_t cb) override;
+    Enum<RFSV::errs> copyToPsion(const char * const, const char * const, void *, cpCallback_t) override;
+    Enum<RFSV::errs> copyOnPsion(const char *, const char *, void *, cpCallback_t) override;
+    Enum<RFSV::errs> fsetsize(const uint32_t, const uint32_t) override;
+    Enum<RFSV::errs> fseek(const uint32_t, const int32_t, const uint32_t, uint32_t &) override;
+    Enum<RFSV::errs> mkdir(const char * const) override;
+    Enum<RFSV::errs> rmdir(const char * const) override;
+    Enum<RFSV::errs> rename(const char * const, const char * const) override;
+    Enum<RFSV::errs> remove(const char * const) override;
+    Enum<RFSV::errs> opendir(const uint32_t, const char * const, RFSVDirHandle &) override;
+    Enum<RFSV::errs> readdir(RFSVDirHandle &, PlpDirent &) override;
+    Enum<RFSV::errs> closedir(RFSVDirHandle &) override;
+    Enum<RFSV::errs> setVolumeName(const char, const char * const) override;
+
+    uint32_t opMode(const uint32_t) override;
+
+    int getProtocolVersion() override {
+        return 3;
+    }
+
+    char defaultInternalDriveLetter() override {
+        return 'M';
+    };
+
+    std::string deviceConfigurationPath() override {
+        return "M:\\sync\\config.ini";
+    };
 
 private:
     enum commands {
@@ -133,20 +140,12 @@ private:
         P_FAMASK   = 0x0f3f  /* All of the above */
     };
 
-    /**
-    * Private constructor. Shall be called by
-    * rfsvfactory only.
-    */
-    rfsv16(TCPSocket *);
-
     // Miscellaneous
-    Enum<rfsv::errs> fopendir(const char * const, uint32_t &);
+    Enum<RFSV::errs> fopendir(const char * const, uint32_t &);
     uint32_t attr2std(const uint32_t);
     uint32_t std2attr(const uint32_t);
 
     // Communication
     bool sendCommand(enum commands, BufferStore &);
-    Enum<rfsv::errs> getResponse(BufferStore &);
+    Enum<RFSV::errs> getResponse(BufferStore &);
 };
-
-#endif

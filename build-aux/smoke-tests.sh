@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # This file is part of plptools.
 #
@@ -24,31 +24,53 @@
 # This script is intended to be run after CI builds to help us catch basic dependency related and high-level failures
 # when targeting a wide range of platforms.
 
-set -exuo pipefail
+set -e
+set -x
+set -u
 
-ROOT_DIRECTORY="$( cd "$( dirname "$( dirname "${BASH_SOURCE[0]}" )" )" &> /dev/null && pwd )"
+ROOT_DIRECTORY="$( cd "$( dirname "$0" )/.." > /dev/null 2>&1 && pwd )"
 
-function fatal {
-    echo $1 >&2
+fatal() {
+    echo "$1" >&2
     exit 1
 }
 
+check_command() {
+    COMMAND="$1"
+    EXPECTED="$2"
+
+    # Check that the command doesn't exist if it's not expected.
+    if ! $EXPECTED ; then
+        if [ -f "$COMMAND" ]; then
+            fatal "Command '$COMMAND' exists unexpectedly."
+        fi
+        return
+    fi
+
+    # Check the command exists.
+    echo "Checking '$COMMAND'..."
+    if [ ! -f "$COMMAND" ]; then
+        fatal "Command '$COMMAND' does not exist."
+    fi
+
+    # Check that the command outputs the correct version.
+    OUTPUT=$("$COMMAND" --version | awk '{print $3}')
+    if [ "$OUTPUT" != "$VERSION" ]; then
+        fatal "Command '$COMMAND' reported the wrong version ($OUTPUT instead of $VERSION)."
+    else
+        echo "Command '$COMMAND' reported the correct version."
+    fi
+}
+
+: "${BUILD_PLPFUSE:?BUILD_PLPFUSE must be set to 'true' or 'false'}"
+
 cd "$ROOT_DIRECTORY"
 
-# Check the binaries exist.
-[ -f "ncpd/ncpd" ] || fatal "npd missing"
-[ -f "plpftp/plpftp" ] || fatal "plpftp missing"
-# TODO: Exercise and smoke test conditional plpfuse builds in CI #58
-#       https://github.com/plptools/plptools/issues/58
-# [ -f "plpfuse/plpfuse" ] || fatal "plpfuse missing"
-[ -f "plpprint/plpprintd" ] || fatal "plpprintd missing"
-[ -f "sisinstall/sisinstall" ] || fatal "sisinstall missing"
+VERSION=$(cat "$ROOT_DIRECTORY/VERSION.txt")
 
 # Check the versions.
-ncpd/ncpd --version || fatal "Failed to get ncpd version"
-plpftp/plpftp --version || fatal "Failed to get plpftp version"
-# TODO: Exercise and smoke test conditional plpfuse builds in CI #58
-#       https://github.com/plptools/plptools/issues/58
-# plpfuse/plpfuse --version || fatal "Failed to get plpfuse version"
-plpprint/plpprintd --version || fatal "Failed to get plpprintd version"
-sisinstall/sisinstall --version || fatal "Failed to get sisinstall version"
+check_command ncpd/ncpd true
+check_command plpftp/plpftp true
+check_command plpfuse/plpfuse $BUILD_PLPFUSE
+check_command plpprint/plpprintd true
+check_command sisinstall/sisinstall true

@@ -2,6 +2,7 @@
  * This file is part of plptools.
  *
  *  Copyright (C) 1999 Matt J. Gumbley <matt@gumbley.demon.co.uk>
+ *  Copyright (C) 2026 Jason Morley <hello@jbmorley.co.uk>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -19,80 +20,19 @@
  */
 #include "config.h"
 
+#include "rfsvfactory.h"
+
+#include "ncpclient.h"
 #include "rfsv.h"
 #include "rfsv16.h"
 #include "rfsv32.h"
-#include "rfsvfactory.h"
-#include "bufferstore.h"
-#include "tcpsocket.h"
-#include "Enum.h"
 
-#include <stdlib.h>
-#include <time.h>
+RFSVFactory::RFSVFactory(const std::string &host, int port)
+: host_(host)
+, port_(port) {}
 
-using namespace std;
+RFSVFactory::~RFSVFactory() {}
 
-ENUM_DEFINITION_BEGIN(rfsvfactory::errs, rfsvfactory::FACERR_NONE)
-    stringRep.add(rfsvfactory::FACERR_NONE,           N_("no error"));
-    stringRep.add(rfsvfactory::FACERR_COULD_NOT_SEND, N_("could not send version request"));
-    stringRep.add(rfsvfactory::FACERR_AGAIN,          N_("try again"));
-    stringRep.add(rfsvfactory::FACERR_NOPSION,        N_("no EPOC device connected"));
-    stringRep.add(rfsvfactory::FACERR_PROTVERSION,    N_("wrong protocol version"));
-    stringRep.add(rfsvfactory::FACERR_NORESPONSE,     N_("no response from ncpd"));
-ENUM_DEFINITION_END(rfsvfactory::errs)
-
-rfsvfactory::rfsvfactory(TCPSocket *_skt) : serNum(0)
-{
-    err = FACERR_NONE;
-    skt = _skt;
-}
-
-rfsvfactory::~rfsvfactory()
-{
-}
-
-rfsv * rfsvfactory::create(bool reconnect)
-{
-    // skt is connected to the ncp daemon, which will have (hopefully) seen
-    // an INFO exchange, where the protocol version of the remote Psion was
-    // sent, and noted. We have to ask the ncp daemon which protocol it saw,
-    // so we can instantiate the correct RFSV protocol handler for the
-    // caller. We announce ourselves to the NCP daemon, and the relevant
-    // RFSV module will also announce itself.
-
-    BufferStore a;
-
-    err = FACERR_NONE;
-    a.addStringT("NCP$INFO");
-    if (!skt->sendBufferStore(a)) {
-        if (!reconnect)
-            err = FACERR_COULD_NOT_SEND;
-        else {
-            skt->closeSocket();
-            serNum = 0;
-            skt->reconnect();
-            err = FACERR_AGAIN;
-        }
-        return NULL;
-    }
-    if (skt->getBufferStore(a) == 1) {
-        if (a.getLen() > 8 && !strncmp(a.getString(), "Series 3", 8)) {
-            return new rfsv16(skt);
-        }
-        else if (a.getLen() > 8 && !strncmp(a.getString(), "Series 5", 8)) {
-            return new rfsv32(skt);
-        }
-        if ((a.getLen() > 8) && !strncmp(a.getString(), "No Psion", 8)) {
-            skt->closeSocket();
-            serNum = 0;
-            skt->reconnect();
-            err = FACERR_NOPSION;
-            return NULL;
-        }
-        // Invalid protocol version
-        err = FACERR_PROTVERSION;
-    } else
-        err = FACERR_NORESPONSE;
-
-    return NULL;
+RFSV* RFSVFactory::create(bool reconnect, Enum<ConnectionError> *error) {
+    return ncp_client::connect<RFSV, RFSV16, RFSV32>(host_, port_, reconnect, error);
 }

@@ -16,9 +16,7 @@
  *  You should have received a copy of the GNU General Public License along
  *  along with this program; if not, see <https://www.gnu.org/licenses/>.
  */
-
-#ifndef _SISCOMPONENTRECORD_H
-#define _SISCOMPONENTRECORD_H
+#pragma once
 
 #include "sistypes.h"
 
@@ -79,5 +77,3 @@ private:
     int m_nameCount;
 
 };
-
-#endif

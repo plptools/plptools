@@ -26,53 +26,51 @@
 
 #include <iostream>
 
+#include <memory>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 
 using namespace std;
 
-rpcs32::rpcs32(TCPSocket * _skt)
-{
-    skt = _skt;
+RPCS32::RPCS32(std::unique_ptr<TCPSocket> socket) {
+    socket_ = std::move(socket);
     mtCacheS5mx = 0;
     reset();
 }
 
-Enum<rfsv::errs> rpcs32::
-getCmdLine(const char *process, string &ret)
-{
+Enum<RFSV::errs> RPCS32::getCmdLine(const char *process, string &ret) {
     BufferStore a;
-    Enum<rfsv::errs> res;
+    Enum<RFSV::errs> res;
 
     a.addStringT(process);
-    if (!sendCommand(rpcs::GET_CMDLINE, a))
-        return rfsv::E_PSI_FILE_DISC;
-    if ((res = getResponse(a, true)) == rfsv::E_PSI_GEN_NONE)
+    if (!sendCommand(RPCS::GET_CMDLINE, a)) {
+        return RFSV::E_PSI_FILE_DISC;
+    }
+    if ((res = getResponse(a, true)) == RFSV::E_PSI_GEN_NONE) {
         ret = a.getString(0);
+    }
     return res;
 }
 
-Enum<rfsv::errs> rpcs32::
-getMachineInfo(machineInfo &mi)
-{
+Enum<RFSV::errs> RPCS32::getMachineInfo(machineInfo &mi) {
     BufferStore a;
-    Enum<rfsv::errs> res;
+    Enum<RFSV::errs> res;
 
-    if (!sendCommand(rpcs::GET_MACHINE_INFO, a))
-        return rfsv::E_PSI_FILE_DISC;
-    if ((res = getResponse(a, true)) != rfsv::E_PSI_GEN_NONE)
+    if (!sendCommand(RPCS::GET_MACHINE_INFO, a))
+        return RFSV::E_PSI_FILE_DISC;
+    if ((res = getResponse(a, true)) != RFSV::E_PSI_GEN_NONE)
         return res;
     if (a.getLen() != 256)
-        return rfsv::E_PSI_GEN_FAIL;
-    mi.machineType = (enum rpcs::machs)a.getDWord(0);
+        return RFSV::E_PSI_GEN_FAIL;
+    mi.machineType = (enum RPCS::machs)a.getDWord(0);
     strncpy(mi.machineName, a.getString(16), 16);
     mi.machineName[16] = '\0';
     mi.machineUID = a.getDWord(44);
     mi.machineUID <<= 32;
     mi.machineUID |= a.getDWord(40);
     mi.countryCode = a.getDWord(56);
-    mi.uiLanguage = (enum rpcs::languages)a.getDWord(164);
+    mi.uiLanguage = (enum RPCS::languages)a.getDWord(164);
 
     mi.romMajor = a.getByte(4);
     mi.romMinor = a.getByte(5);
@@ -101,7 +99,7 @@ getMachineInfo(machineInfo &mi)
 
     mi.mainBatteryInsertionTime.tv_low = a.getDWord(72);
     mi.mainBatteryInsertionTime.tv_high = a.getDWord(76);
-    mi.mainBatteryStatus = (enum rpcs::batterystates)a.getDWord(80);
+    mi.mainBatteryStatus = (enum RPCS::batterystates)a.getDWord(80);
     mi.mainBatteryUsedTime.tv_low = a.getDWord(84);
     mi.mainBatteryUsedTime.tv_high = a.getDWord(88);
     mi.mainBatteryCurrent = a.getDWord(92);
@@ -109,7 +107,7 @@ getMachineInfo(machineInfo &mi)
     mi.mainBatteryVoltage = a.getDWord(100);
     mi.mainBatteryMaxVoltage = a.getDWord(104);
 
-    mi.backupBatteryStatus = (enum rpcs::batterystates)a.getDWord(108);
+    mi.backupBatteryStatus = (enum RPCS::batterystates)a.getDWord(108);
     mi.backupBatteryVoltage = a.getDWord(112);
     mi.backupBatteryMaxVoltage = a.getDWord(116);
     mi.externalPowerUsedTime.tv_low = a.getDWord(124);
@@ -117,24 +115,24 @@ getMachineInfo(machineInfo &mi)
     mi.externalPower = (a.getDWord(120) != 0);
 
     mtCacheS5mx |= 8;
-    if (res == rfsv::E_PSI_GEN_NONE) {
-        if (!strcmp(mi.machineName, "SERIES5mx"))
+    if (res == RFSV::E_PSI_GEN_NONE) {
+        if (!strcmp(mi.machineName, "SERIES5mx")) {
             mtCacheS5mx |= 2;
+        }
     }
 
     return res;
 }
 
-Enum<rfsv::errs> rpcs32::
-getOwnerInfo(BufferArray &owner)
-{
-    Enum<rfsv::errs> res;
+Enum<RFSV::errs> RPCS32::getOwnerInfo(BufferArray &owner) {
+    Enum<RFSV::errs> res;
     BufferStore a;
 
     if (!sendCommand(GET_OWNERINFO, a))
-        return rfsv::E_PSI_FILE_DISC;
-    if ((res = (enum rfsv::errs)getResponse(a, true)) != rfsv::E_PSI_GEN_NONE)
+        return RFSV::E_PSI_FILE_DISC;
+    if ((res = (enum RFSV::errs)getResponse(a, true)) != RFSV::E_PSI_GEN_NONE) {
         return res;
+    }
     a.addByte(0);
     string s = a.getString(0);
     owner.clear();
@@ -154,53 +152,51 @@ getOwnerInfo(BufferArray &owner)
     return res;
 }
 
-Enum<rfsv::errs> rpcs32::
-regOpenIter(uint32_t uid, char *match, uint16_t &handle)
-{
+Enum<RFSV::errs> RPCS32::regOpenIter(uint32_t uid, char *match, uint16_t &handle) {
     BufferStore a;
-    Enum<rfsv::errs> res;
+    Enum<RFSV::errs> res;
 
     cout << "Oiter" << endl;
     a.addDWord(uid);
     a.addDWord(strlen(match));
     a.addStringT(match);
-    if (!sendCommand(rpcs::REG_OPEN_ITER, a))
-        return rfsv::E_PSI_FILE_DISC;
+    if (!sendCommand(RPCS::REG_OPEN_ITER, a)) {
+        return RFSV::E_PSI_FILE_DISC;
+    }
     res = getResponse(a, true);
     cout << "ro: r=" << res << " a=" << a << endl;
-    if (a.getLen() == 2)
+    if (a.getLen() == 2) {
         handle = a.getWord(0);
-    return rfsv::E_PSI_GEN_NONE;
+    }
+    return RFSV::E_PSI_GEN_NONE;
 }
 
-Enum<rfsv::errs> rpcs32::
-regReadIter(uint16_t handle)
-{
+Enum<RFSV::errs> RPCS32::regReadIter(uint16_t handle) {
     BufferStore a;
-    Enum<rfsv::errs> res;
+    Enum<RFSV::errs> res;
 
     cout << "Riter" << endl;
     a.addWord(handle);
-    if (!sendCommand(rpcs::REG_READ_ITER, a))
-        return rfsv::E_PSI_FILE_DISC;
+    if (!sendCommand(RPCS::REG_READ_ITER, a)) {
+        return RFSV::E_PSI_FILE_DISC;
+    }
     res = getResponse(a, true);
     cout << "ro: r=" << res << " a=" << a << endl;
-    if ((a.getLen() == 3) && (a.getByte(2) == 0xff))
-        return rfsv::E_PSI_FILE_EOF;
-    return rfsv::E_PSI_GEN_NONE;
+    if ((a.getLen() == 3) && (a.getByte(2) == 0xff)) {
+        return RFSV::E_PSI_FILE_EOF;
+    }
+    return RFSV::E_PSI_GEN_NONE;
 }
 
-Enum<rfsv::errs> rpcs32::
-setTime(time_t time)
-{
+Enum<RFSV::errs> RPCS32::setTime(time_t time) {
     BufferStore a;
-    Enum<rfsv::errs> res;
+    Enum<RFSV::errs> res;
     PsiTime pt;
     psi_timezone ptz;
-    rpcs::machineInfo mi;
+    RPCS::machineInfo mi;
 
     // cout << "settime" << endl;
-    if ((res = getMachineInfo(mi)) == rfsv::E_PSI_GEN_NONE) {
+    if ((res = getMachineInfo(mi)) == RFSV::E_PSI_GEN_NONE) {
         if (PsiZone::getInstance().getZone(ptz)) {
             pt = PsiTime(time + ptz.utc_offset);
             a.addDWord(pt.getPsiTimeLo());
@@ -210,65 +206,59 @@ setTime(time_t time)
             a.addDWord(ptz.dst_zones);
             a.addDWord(ptz.home_zone);
             // cout << "a=" << a << endl;
-            if (!sendCommand(rpcs::SET_TIME, a))
-                return rfsv::E_PSI_FILE_DISC;
-            return rfsv::E_PSI_GEN_NONE;
+            if (!sendCommand(RPCS::SET_TIME, a))
+                return RFSV::E_PSI_FILE_DISC;
+            return RFSV::E_PSI_GEN_NONE;
         } else
-            return rfsv::E_PSI_GEN_FAIL;
+            return RFSV::E_PSI_GEN_FAIL;
     } else
         return res;
 }
 
-Enum<rfsv::errs> rpcs32::
-configOpen(uint16_t &handle, uint32_t size)
-{
+Enum<RFSV::errs> RPCS32::configOpen(uint16_t &handle, uint32_t size) {
     BufferStore a;
-    Enum<rfsv::errs> res;
+    Enum<RFSV::errs> res;
 
     a.addDWord(size);
-    if (!sendCommand(rpcs::CONFIG_OPEN, a))
-        return rfsv::E_PSI_FILE_DISC;
+    if (!sendCommand(RPCS::CONFIG_OPEN, a))
+        return RFSV::E_PSI_FILE_DISC;
     res = getResponse(a, true);
-    if (res == rfsv::E_PSI_GEN_NONE && (a.getLen() >= 2))
+    if (res == RFSV::E_PSI_GEN_NONE && (a.getLen() >= 2))
         handle = a.getWord(0);
     return res;
 }
 
-Enum<rfsv::errs> rpcs32::
-configRead(uint32_t size, BufferStore &ret)
-{
+Enum<RFSV::errs> RPCS32::configRead(uint32_t size, BufferStore &ret) {
     BufferStore a;
     uint16_t handle;
-    Enum<rfsv::errs> res;
+    Enum<RFSV::errs> res;
 
     ret.init();
-    if ((res = configOpen(handle, size)) != rfsv::E_PSI_GEN_NONE)
+    if ((res = configOpen(handle, size)) != RFSV::E_PSI_GEN_NONE)
         return res;
     do {
         a.init();
         a.addWord(handle);
         a.addDWord(2047);
-        if (!sendCommand(rpcs::CONFIG_READ, a))
-            return rfsv::E_PSI_FILE_DISC;
-        if ((res = getResponse(a, true)) != rfsv::E_PSI_GEN_NONE) {
+        if (!sendCommand(RPCS::CONFIG_READ, a))
+            return RFSV::E_PSI_FILE_DISC;
+        if ((res = getResponse(a, true)) != RFSV::E_PSI_GEN_NONE) {
             closeHandle(handle);
             return res;
         }
         if (a.getLen() > 0)
             ret.addBuff(a);
     } while (a.getLen() > 0);
-    return rfsv::E_PSI_GEN_NONE;
+    return RFSV::E_PSI_GEN_NONE;
 }
 
-Enum<rfsv::errs> rpcs32::
-configWrite(BufferStore data)
-{
+Enum<RFSV::errs> RPCS32::configWrite(BufferStore data) {
     BufferStore a;
     uint16_t handle;
-    Enum<rfsv::errs> res;
+    Enum<RFSV::errs> res;
 
-    return rfsv::E_PSI_GEN_NONE;
-    if ((res = configOpen(handle, data.getLen())) != rfsv::E_PSI_GEN_NONE)
+    return RFSV::E_PSI_GEN_NONE;
+    if ((res = configOpen(handle, data.getLen())) != RFSV::E_PSI_GEN_NONE)
         return res;
     do {
         a.init();
@@ -276,23 +266,21 @@ configWrite(BufferStore data)
         a.addWord(handle);
         a.addBuff(data, l);
         data.discardFirstBytes(l);
-        if (!sendCommand(rpcs::CONFIG_WRITE, a))
-            return rfsv::E_PSI_FILE_DISC;
-        if ((res = getResponse(a, true)) != rfsv::E_PSI_GEN_NONE) {
+        if (!sendCommand(RPCS::CONFIG_WRITE, a))
+            return RFSV::E_PSI_FILE_DISC;
+        if ((res = getResponse(a, true)) != RFSV::E_PSI_GEN_NONE) {
             closeHandle(handle);
             return res;
         }
     } while (data.getLen() > 0);
-    return rfsv::E_PSI_GEN_NONE;
+    return RFSV::E_PSI_GEN_NONE;
 }
 
-Enum<rfsv::errs> rpcs32::
-closeHandle(uint16_t handle)
-{
+Enum<RFSV::errs> RPCS32::closeHandle(uint16_t handle) {
     BufferStore a;
 
     a.addWord(handle);
-    if (!sendCommand(rpcs::CLOSE_HANDLE, a))
-        return rfsv::E_PSI_FILE_DISC;
+    if (!sendCommand(RPCS::CLOSE_HANDLE, a))
+        return RFSV::E_PSI_FILE_DISC;
     return getResponse(a, true);
 }

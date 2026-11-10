@@ -18,8 +18,7 @@
  *  along with this program; if not, see <https://www.gnu.org/licenses/>.
  *
  */
-#ifndef _channel_h_
-#define _channel_h_
+#pragma once
 
 #include "config.h"
 #include <stdio.h>
@@ -76,5 +75,3 @@ private:
     int ncpChannel;
     bool _terminate;
 };
-
-#endif

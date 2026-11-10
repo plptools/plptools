@@ -42,13 +42,13 @@ SocketChannel::SocketChannel(TCPSocket* socket, NCP* ncp)
 SocketChannel::~SocketChannel() {
     socket_->closeSocket();
     delete socket_;
-    socket_ = 0;
+    socket_ = nullptr;
     if (registerName_)
         free(registerName_);
 }
 
 void SocketChannel::ncpDataCallback(BufferStore & a) {
-    if (registerName_ != 0) {
+    if (registerName_ != nullptr) {
         socket_->sendBufferStore(a);
     } else
         lerr << "socketchan: Connect without name!!!\n";
@@ -103,7 +103,7 @@ bool SocketChannel::ncpCommand(BufferStore & a) {
     } else if (!strncmp(str, "GSPD", 4)) {
         // Get Speed of serial device
         a.init();
-        a.addByte(rfsv::E_PSI_GEN_NONE);
+        a.addByte(RFSV::E_PSI_GEN_NONE);
         a.addDWord(ncpGetSpeed());
         socket_->sendBufferStore(a);
         ok = true;
@@ -113,10 +113,10 @@ bool SocketChannel::ncpCommand(BufferStore & a) {
         a.init();
         const char *name = a.getString(8);
         if (ncpFindPcServer(name))
-            a.addByte(rfsv::E_PSI_FILE_EXIST);
+            a.addByte(RFSV::E_PSI_FILE_EXIST);
         else {
             ncpRegisterPcServer(socket_, name);
-            a.addByte(rfsv::E_PSI_GEN_NONE);
+            a.addByte(RFSV::E_PSI_GEN_NONE);
         }
         socket_->sendBufferStore(a);
         ok = true;
@@ -124,7 +124,7 @@ bool SocketChannel::ncpCommand(BufferStore & a) {
     if (!ok) {
         lerr << "SocketChannel:: received unknown NCP command (" << a << ")" << endl;
         a.init();
-        a.addByte(rfsv::E_PSI_GEN_NSUP);
+        a.addByte(RFSV::E_PSI_GEN_NSUP);
         socket_->sendBufferStore(a);
     }
     return ok;
@@ -155,7 +155,7 @@ void SocketChannel::ncpConnectNak() {
         ncpConnectTerminate();
     else {
         connectTry_++;
-        connectTryTimestamp_ = time(0);
+        connectTryTimestamp_ = time(nullptr);
         ncpRegister();
     }
 }
@@ -163,7 +163,7 @@ void SocketChannel::ncpConnectNak() {
 void SocketChannel::socketPoll() {
     int res;
 
-    if (registerName_ == 0) {
+    if (registerName_ == nullptr) {
         BufferStore a;
         res = socket_->getBufferStore(a, false);
         switch (res) {
@@ -186,7 +186,7 @@ void SocketChannel::socketPoll() {
                 //
                 // All commands begin with "NCP$".
 
-                if (memchr(a.getString(), 0, a.getLen()) == 0) {
+                if (memchr(a.getString(), 0, a.getLen()) == nullptr) {
                     // Not 0 terminated, -> invalid
                     lerr << "ncpd: command " << a << " unrecognized."
                          << endl;
@@ -194,9 +194,9 @@ void SocketChannel::socketPoll() {
                 }
 
                 // There is a magic process name called "NCP$INFO.*"
-                // which is announced by the rfsvfactory. This causes a
+                // which is announced by the RFSVFactory. This causes a
                 // response to be issued containing the NCP version
-                // number. The rfsvfactory will create the correct type
+                // number. The RFSVFactory will create the correct type
                 // of RFSV protocol handler, which will then announce
                 // itself. So, first time in here, we might get the
                 // NCP$INFO.*
@@ -215,7 +215,7 @@ void SocketChannel::socketPoll() {
                 // other cases, we first perform a registration. Connect
                 // is then triggered by RegisterAck and uses the name
                 // we received from the Psion.
-                connectTryTimestamp_ = time(0);
+                connectTryTimestamp_ = time(nullptr);
                 if (strncmp(registerName_, "SYS$RFSV", 8) == 0)
                     ncpConnect();
                 else
@@ -240,7 +240,7 @@ void SocketChannel::socketPoll() {
             }
             ncpSend(a);
         }
-    } else if (time(0) > (connectTryTimestamp_ + 15))
+    } else if (time(nullptr) > (connectTryTimestamp_ + 15))
         terminateWhenAsked();
 }
 

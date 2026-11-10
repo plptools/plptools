@@ -1,9 +1,7 @@
 /*
  * This file is part of plptools.
  *
- *  Copyright (C) 1999 Philip Proudman <philip.proudman@btinternet.com>
- *  Copyright (C) 1999-2002 Fritz Elfert <felfert@to.com>
- *  Copyright (C) 2026 Jason Morley <hello@jbmorley.co.uk>
+ *  Copyright (c) 2026 Jason Morley <hello@jbmorley.co.uk>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -19,18 +17,25 @@
  *  along with this program; if not, see <https://www.gnu.org/licenses/>.
  *
  */
-
-#pragma once
-
 #include "config.h"
 
-#include <string>
+#include <stdlib.h>
+#include <stdio.h>
 
-namespace cli_utils {
+#include "doctest.h"
+#include "drive.h"
+#include "rfsv.h"
 
-    extern bool is_number(const std::string &s);
-    extern int lookup_default_port();
-    extern bool parse_port(const std::string &arg, std::string *host, int *port);
-    extern bool parse_port(std::nullptr_t, std::string*, int*) = delete;
+TEST_CASE("Drive::getPath") {
 
-};
+    SUBCASE("M") {
+        Drive drive(MediaType::kRAM, 0, 0, 0, 0, 0, 'M', "Drive");
+        CHECK(drive.getPath() == "M:\\");
+    }
+
+    SUBCASE("C") {
+        Drive drive(MediaType::kRAM, 0, 0, 0, 0, 0, 'C', "Drive");
+        CHECK(drive.getPath() == "C:\\");
+    }
+
+}

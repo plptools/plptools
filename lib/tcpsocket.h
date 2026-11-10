@@ -18,8 +18,7 @@
  *  along with this program; if not, see <https://www.gnu.org/licenses/>.
  *
  */
-#ifndef _PPSOCKET_H_
-#define _PPSOCKET_H_
+#pragma once
 
 #include <string>
 
@@ -233,5 +232,3 @@ private:
     int m_LastError;
     IOWatch *myWatch;
 };
-
-#endif

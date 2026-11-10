@@ -25,7 +25,7 @@
 #include <cstring>
 #include <iostream>
 
-#include <cli_utils.h>
+#include <cliutils.h>
 #include <bufferstore.h>
 #include <tcpsocket.h>
 #include <iowatch.h>

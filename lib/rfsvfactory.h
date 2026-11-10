@@ -4,6 +4,7 @@
  *  Copyright (C) 1999 Philip Proudman <philip.proudman@btinternet.com>
  *  Copyright (C) 1999 Matt J. Gumbley <matt@gumbley.demon.co.uk>
  *  Copyright (C) 1999-2001 Fritz Elfert <felfert@to.com>
+ *  Copyright (C) 2026 Jason Morley <hello@jbmorley.co.uk>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -19,74 +20,47 @@
  *  along with this program; if not, see <https://www.gnu.org/licenses/>.
  *
  */
-#ifndef _RFSVFACTORY_H_
-#define _RFSVFACTORY_H_
+#pragma once
 
+#include <cstddef>
+
+#include "connectionerror.h"
 #include "rfsv.h"
 
 class TCPSocket;
 
 /**
  * A factory for automatically instantiating the correct
- * @ref rfsv protocol variant depending on the connected Psion.
+ * @ref RFSV protocol variant depending on the connected Psion.
  */
-class rfsvfactory {
+class RFSVFactory final {
 
 public:
-    /**
-    * The known errors which can happen during @ref create .
-    */
-    enum errs {
-        FACERR_NONE = 0,
-        FACERR_COULD_NOT_SEND = 1,
-        FACERR_AGAIN = 2,
-        FACERR_NOPSION = 3,
-        FACERR_PROTVERSION = 4,
-        FACERR_NORESPONSE = 5
-    };
 
     /**
-    * Constructs a rfsvfactory.
+    * Constructs a RFSVFactory.
     *
-    * Does not take ownership of the socket.
-    *
-    * @param skt The socket to be used for connecting
-    * to the ncpd daemon.
+    * @param host The host be used for connecting to the ncpd daemon.
+    * @param port The port be used for connecting to the ncpd daemon.
     */
-    rfsvfactory(TCPSocket *skt);
+    RFSVFactory(const std::string &host, int port);
 
     /**
-     * Delete the rfsvfactory, cleaning up any resources.
+     * Delete the RFSVFactory, cleaning up any resources.
      */
-    virtual ~rfsvfactory();
+    ~RFSVFactory();
 
     /**
-    * Creates a new @ref rfsv instance.
+    * Creates a new @ref RFSV instance.
     *
-    * @param reconnect Set to true, if automatic reconnect
-    * should be performed on failure.
+    * @param reconnect Set to true, if automatic reconnect should be performed on failure.
+    * @param error Out parameter; set to the error on failure if non-NULL.
     *
-    * @returns A pointer to a newly created rfsv instance or
-    * NULL on failure.
+    * @returns A pointer to a newly created @ref RFSV instance or NULL on failure.
     */
-    virtual rfsv * create(bool);
-
-    /**
-    * Retrieve an error code.
-    *
-    * @returns The error code, in case @ref create has
-    * failed, 0 otherwise.
-    */
-    virtual Enum<errs> getError() { return err; }
+    RFSV* create(bool, Enum<ConnectionError> *error = nullptr);
 
 private:
-    /**
-    * The socket to be used for connecting to the
-    * ncpd daemon.
-    */
-    TCPSocket *skt;
-    int serNum;
-    Enum<errs> err;
+    std::string host_;
+    int port_;
 };
-
-#endif

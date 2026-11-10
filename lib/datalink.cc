@@ -82,7 +82,7 @@ static void *data_pump_thread(void *arg) {
         int serialFd = -1;
         {
             std::lock_guard<std::mutex> lock(dataLink->serialMutex_);
-            serialFd = dataLink->fd;
+            serialFd = dataLink->serialFd_;
         }
 
         if (serialFd == -1) {
@@ -249,17 +249,8 @@ DataLink::DataLink(const char *fname,
         baudRate_ = kBaudRatesTable[baudRateIndex_];
         baudRateIndex_ = baudRateIndex_ + 1;
     }
-    fd = init_serial(devname.c_str(), baudRate_, 0);
-    if (verbose_ & PKT_DEBUG_LOG) {
-        lout << "serial connection set to " << dec << baudRate_
-            << " baud, fd=" << fd << endl;
-    }
-    if (fd == -1) {
-        fcntl(fd, F_SETFL, O_NONBLOCK);
-        lastFatal = true;
-    } else {
-        pthread_create(&dataPumpThreadId_, NULL, data_pump_thread, this);
-    }
+    serialOpen();
+    pthread_create(&dataPumpThreadId_, NULL, data_pump_thread, this);
 }
 
 DataLink::~DataLink() {
@@ -272,11 +263,11 @@ DataLink::~DataLink() {
     outputCondition_.notify_all();
 
     // Stop the data pump thread and close the serial port.
-    if (fd != -1) {
+    if (serialFd_ != -1) {
         pthread_join(dataPumpThreadId_, NULL);
-        ser_exit(fd);
+        ser_exit(serialFd_);
     }
-    fd = -1;
+    serialFd_ = -1;
 
     delete []inBuffer;
     delete []outBuffer;
@@ -285,6 +276,24 @@ DataLink::~DataLink() {
     close(outputDataReadyPipe_[1]);
     outputDataReadyPipe_[0] = -1;
     outputDataReadyPipe_[1] = -1;
+}
+
+void DataLink::serialOpen() {
+    assert(serialFd_ == -1);
+    serialFd_ = init_serial(devname.c_str(), baudRate_, 0);
+    if (verbose_ & PKT_DEBUG_LOG) {
+        lout << "serial connection set to " << dec << baudRate_
+             << " baud, fd=" << serialFd_ << endl;
+    }
+    if (serialFd_ != -1) {
+        // Explicitly set the file descriptor as non-blocking, irrespective of how it was opened.
+        // This was introduced when we added locking to try to ensure thread-safety across the three domains managed by
+        // this class. While it was not documented at the time, we believe it exists to avoid races where a device is
+        // disconnected between a `select` returning to indicate the device is readable or writeable and the read or
+        // write call---in this scenario the operation would block indefinitely while we're holding a lock without
+        // the non-blocking behavior.
+        fcntl(serialFd_, F_SETFL, O_NONBLOCK);
+    }
 }
 
 void DataLink::reset() {
@@ -305,15 +314,14 @@ void DataLink::internalReset(bool resetBaudRateIndex) {
 
     if (verbose_ & PKT_DEBUG_LOG)
         lout << "resetting serial connection" << endl;
-    if (fd != -1) {
-        ser_exit(fd);
-        fd = -1;
+    if (serialFd_ != -1) {
+        ser_exit(serialFd_);
+        serialFd_ = -1;
     }
     usleep(100000);
     outRead = outWrite = 0;
     inRead = inWrite = 0;
     esc = false;
-    lastFatal = false;
     serialStatus = -1;
     lastSYN = startPkt = -1;
     crcIn = 0;
@@ -325,19 +333,11 @@ void DataLink::internalReset(bool resetBaudRateIndex) {
     if (requestedBaudRate_ < 0) {
         baudRate_ = kBaudRatesTable[baudRateIndex_];
         baudRateIndex_ = baudRateIndex_ + 1;
-        if (baudRateIndex_ >= BAUD_RATES_TABLE_SIZE) {
+        if ((unsigned long)baudRateIndex_ >= BAUD_RATES_TABLE_SIZE) {
             baudRateIndex_ = 0;
         }
     }
-    fd = init_serial(devname.c_str(), baudRate_, 0);
-    if (verbose_ & PKT_DEBUG_LOG) {
-        lout << "serial connection set to " << dec << baudRate_
-             << " baud, fd=" << fd << endl;
-    }
-    if (fd != -1) {
-        fcntl(fd, F_SETFL, O_NONBLOCK);
-        lastFatal = false;
-    }
+    serialOpen();
 }
 
 void DataLink::signalPumpThread() {
@@ -553,11 +553,12 @@ bool DataLink::linkFailed() {
 
     std::lock_guard<std::mutex> serialLock(serialMutex_);
 
-    if (fd == -1)
+    if (serialFd_ == -1)
         return false;
-    res = ioctl(fd, TIOCMGET, &arg);
-    if (res < 0)
-        lastFatal = true;
+    res = ioctl(serialFd_, TIOCMGET, &arg);
+    if (res < 0) {
+        failed = true;
+    }
     if ((serialStatus == -1) || (arg != serialStatus)) {
         if (verbose_ & PKT_DEBUG_HANDSHAKE)
             lout << "packet: < DTR:" << ((arg & TIOCM_DTR)?1:0)
@@ -567,9 +568,10 @@ bool DataLink::linkFailed() {
                  << " CTS:" << ((arg & TIOCM_CTS)?1:0) << endl;
         if (!((arg & TIOCM_RTS) && (arg & TIOCM_DTR))) {
             arg |= (TIOCM_DTR | TIOCM_RTS);
-            res = ioctl(fd, TIOCMSET, &arg);
-            if (res < 0)
-                lastFatal = true;
+            res = ioctl(serialFd_, TIOCMSET, &arg);
+            if (res < 0) {
+                failed = true;
+            }
             if (verbose_ & PKT_DEBUG_HANDSHAKE)
                 lout << "packet: > DTR:" << ((arg & TIOCM_DTR)?1:0)
                      << " RTS:" << ((arg & TIOCM_RTS)?1:0)
@@ -583,9 +585,8 @@ bool DataLink::linkFailed() {
     if (!noDSRCheck_ && (arg & TIOCM_DSR) == 0) {
         failed = true;
     }
-    if ((verbose_ & PKT_DEBUG_LOG) && lastFatal)
-        lout << "packet: linkFATAL\n";
-    if ((verbose_ & PKT_DEBUG_LOG) && failed)
+    if ((verbose_ & PKT_DEBUG_LOG) && failed) {
         lout << "packet: linkFAILED\n";
-    return (lastFatal || failed);
+    }
+    return failed;
 }

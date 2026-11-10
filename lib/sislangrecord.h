@@ -16,9 +16,7 @@
  *  You should have received a copy of the GNU General Public License along
  *  along with this program; if not, see <https://www.gnu.org/licenses/>.
  */
-
-#ifndef _SISLANGRECORD_H
-#define _SISLANGRECORD_H
+#pragma once
 
 #include "sistypes.h"
 
@@ -26,8 +24,7 @@
  * A simple language record, only containing the epoc specific 16 bit
  * language number.
  */
-class SISLangRecord
-{
+class SISLangRecord {
 public:
 
     /**
@@ -48,5 +45,3 @@ public:
     uint16_t m_lang;
 
 };
-
-#endif

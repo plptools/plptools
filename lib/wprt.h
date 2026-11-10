@@ -17,8 +17,7 @@
  *  along with this program; if not, see <https://www.gnu.org/licenses/>.
  *
  */
-#ifndef _WPRT_H_
-#define _WPRT_H_
+#pragma once
 
 #include "rfsv.h"
 #include "Enum.h"
@@ -60,22 +59,22 @@ public:
     *
     * @returns The connection status.
     */
-    Enum<rfsv::errs> getStatus();
+    Enum<RFSV::errs> getStatus();
 
     /**
     * Get Print Data
     */
-    Enum<rfsv::errs> getData(BufferStore &buf);
+    Enum<RFSV::errs> getData(BufferStore &buf);
 
     /**
     * Init Printer
     */
-    Enum<rfsv::errs> initPrinter();
+    Enum<RFSV::errs> initPrinter();
 
     /**
     * Cancels a running job.
     */
-    Enum<rfsv::errs> cancelJob();
+    Enum<RFSV::errs> cancelJob();
 
     /**
     * Stops the WPRT server.
@@ -102,7 +101,7 @@ protected:
     /**
     * The current status of the connection.
     */
-    Enum<rfsv::errs> status;
+    Enum<RFSV::errs> status;
 
    /**
     * Sends a command to the remote side.
@@ -110,7 +109,7 @@ protected:
     * If communication fails, a reconnect is triggered
     * and a second attempt to transmit the request
     * is attempted. If that second attempt fails,
-    * the function returns an error an sets rpcs::status
+    * the function returns an error an sets RPCS::status
     * to E_PSI_FILE_DISC.
     *
     * @param cc The command to execute on the remote side.
@@ -120,9 +119,7 @@ protected:
     */
     bool sendCommand(enum commands cc, BufferStore &data);
 
-    Enum<rfsv::errs> getResponse(BufferStore &data);
+    Enum<RFSV::errs> getResponse(BufferStore &data);
     const char *getConnectName();
 
 };
-
-#endif

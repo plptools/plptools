@@ -3,7 +3,6 @@
  *
  *  Copyright (C) 1999 Philip Proudman <philip.proudman@btinternet.com>
  *  Copyright (C) 1999-2002 Fritz Elfert <felfert@to.com>
- *  Copyright (C) 2006-2025 Reuben Thomas <rrt@sc3d.org>
  *  Copyright (C) 2026 Jason Morley <hello@jbmorley.co.uk>
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -20,39 +19,17 @@
  *  along with this program; if not, see <https://www.gnu.org/licenses/>.
  *
  */
-
 #pragma once
 
 #include "config.h"
 
 #include <string>
 
-/**
-* Conveniences for working with paths.
-*
-* These methods currently have a mishmash of C and C++ as they're a collection of various utilities from around
-* plptools. Hopefully they can be unified in the future.
-*/
-class Path {
-public:
+namespace cli_utils {
 
-    /**
-    * Returns the last path component of an EPOC path.
-    *
-    * If the path doesn't contain any EPOC path separators (`\`), the returned string matches the path.
-    */
-    static std::string getEPOCBasename(std::string path);
-
-    /**
-    * Compute parent directory of an EPOC directory.
-    */
-    static char *getEPOCDirname(const char *path);
-
-    /**
-    * Returns a new absolute EPOC path, determined by resolving `path` relative to `initialPath`.
-    *
-    * If `path` is already an absolute path, this returns `path`.
-    */
-    static char *resolveEPOCPath(const char *path, const char *initialPath);
+    extern bool is_number(const std::string &s);
+    extern int lookup_default_port();
+    extern bool parse_port(const std::string &arg, std::string *host, int *port);
+    extern bool parse_port(std::nullptr_t, std::string*, int*) = delete;
 
 };

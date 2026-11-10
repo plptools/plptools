@@ -2,6 +2,7 @@
  * This file is part of plptools.
  *
  *  Copyright (C) 2007-2024 Reuben Thomas <rrt@sc3d.org>
+ *  Copyright (C) 2026 Syed Shahrukh Hussain <syed.shahrukh@ossrevival.org>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -17,10 +18,13 @@
  *  along with this program; if not, see <https://www.gnu.org/licenses/>.
  *
  */
-#ifndef _plpfuse_h_
-#define _plpfuse_h_
+#pragma once
 
+#if FUSE_USE_VERSION >= 30
+#include <fuse3/fuse.h>
+#else
 #include <fuse.h>
+#endif
 
 typedef struct p_inode {
     int inode;
@@ -59,7 +63,5 @@ extern void debuglog(const char *fmt, ...);
 
 #define BLOCKSIZE      512
 #define FID            7 /* File system id */
-
-#endif
 
 extern struct fuse_operations plp_oper;

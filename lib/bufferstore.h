@@ -18,8 +18,7 @@
  *  along with this program; if not, see <https://www.gnu.org/licenses/>.
  *
  */
-#ifndef _BUFFERSTORE_H_
-#define _BUFFERSTORE_H_
+#pragma once
 
 #include "config.h"
 
@@ -258,5 +257,3 @@ private:
 inline bool BufferStore::empty() const {
     return (len - start) == 0;
 }
-
-#endif

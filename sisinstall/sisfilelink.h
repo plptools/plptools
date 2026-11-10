@@ -17,9 +17,7 @@
  *  along with this program; if not, see <https://www.gnu.org/licenses/>.
  *
  */
-
-#ifndef _SISFILELINK_H
-#define _SISFILELINK_H
+#pragma once
 
 class SISFile;
 
@@ -31,6 +29,3 @@ public:
     SISFileLink* m_next;
     SISFile* m_file;
 };
-
-#endif
-

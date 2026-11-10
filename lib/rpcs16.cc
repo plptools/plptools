@@ -25,43 +25,41 @@
 #include "bufferarray.h"
 #include "tcpsocket.h"
 
+#include <memory>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 
 using namespace std;
 
-rpcs16::rpcs16(TCPSocket *_skt)
-{
-    skt = _skt;
+RPCS16::RPCS16(std::unique_ptr<TCPSocket> socket) {
+    socket_ = std::move(socket);
     mtCacheS5mx = 0;
     reset();
 }
 
-Enum<rfsv::errs> rpcs16::
-getCmdLine(const char *process, string &ret)
-{
+Enum<RFSV::errs> RPCS16::getCmdLine(const char *process, string &ret) {
     BufferStore a;
-    Enum<rfsv::errs> res;
+    Enum<RFSV::errs> res;
 
     a.addStringT(process);
-    if (!sendCommand(rpcs::GET_CMDLINE, a))
-        return rfsv::E_PSI_FILE_DISC;
-    if ((res = getResponse(a, true)) == rfsv::E_PSI_GEN_NONE)
+    if (!sendCommand(RPCS::GET_CMDLINE, a)) {
+        return RFSV::E_PSI_FILE_DISC;
+    }
+    if ((res = getResponse(a, true)) == RFSV::E_PSI_GEN_NONE) {
         ret = a.getString(0);
+    }
     return res;
 }
 
-Enum<rfsv::errs> rpcs16::
-getOwnerInfo(BufferArray &owner)
-{
-    Enum<rfsv::errs> res;
+Enum<RFSV::errs> RPCS16::getOwnerInfo(BufferArray &owner) {
+    Enum<RFSV::errs> res;
     BufferStore a;
 
     if (!sendCommand(GET_OWNERINFO, a)) {
-        return rfsv::E_PSI_FILE_DISC;
+        return RFSV::E_PSI_FILE_DISC;
     }
-    if ((res = (enum rfsv::errs)getResponse(a, true)) != rfsv::E_PSI_GEN_NONE) {
+    if ((res = (enum RFSV::errs)getResponse(a, true)) != RFSV::E_PSI_GEN_NONE) {
         return res;
     }
 
@@ -73,9 +71,9 @@ getOwnerInfo(BufferArray &owner)
     owner.clear();
     for (int i = 0; i < 4; i++) {
         BufferStore b;
-        b.addString(a.getString(52 * i));
+        b.addStringT(a.getString(52 * i));
         owner += b;
     }
 
-    return rfsv::E_PSI_GEN_NONE;
+    return RFSV::E_PSI_GEN_NONE;
 }

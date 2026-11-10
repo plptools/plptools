@@ -19,8 +19,7 @@
  *  along with this program; if not, see <https://www.gnu.org/licenses/>.
  *
  */
-#ifndef _ncp_log_h_
-#define _ncp_log_h_
+#pragma once
 
 #include "config.h"
 
@@ -46,5 +45,3 @@ extern logbuf elog;
 extern std::ostream lout;
 extern std::ostream lerr;
 extern std::ostream linf;
-
-#endif
