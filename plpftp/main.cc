@@ -141,9 +141,9 @@ int main(int argc, char **argv) {
     Semaphore *sem = new Semaphore();
 
     // Optionally start ncpd.
-    NCPSession *session = nullptr;
+    std::unique_ptr<NCPSession> session = nullptr;
     if (serialDevice) {
-        session = new NCPSession(
+        session = std::make_unique<NCPSession>(
             port,
             baudRate,
             host,
@@ -151,7 +151,7 @@ int main(int argc, char **argv) {
             false,
             false,
             0,
-            [](void *context, bool connected, int version) {
+            [](void *context, bool connected, int /* version */) {
                 if (!connected) {
                     return;
                 }
@@ -176,7 +176,6 @@ int main(int argc, char **argv) {
     // TODO: We could perhaps move this into the session destructor?
     if (session) {
         session->wait();
-        delete session;
     }
 
 }
