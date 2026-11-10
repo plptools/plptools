@@ -22,7 +22,11 @@
 
 #include <iostream>
 #include <memory>
+#include <ostream>
+#include <sstream>
+#include <string>
 #include <vector>
+#include <sys/ioctl.h>
 
 #include <bufferstore.h>
 #include <cliutils.h>
@@ -51,27 +55,85 @@
 
 using namespace std;
 
-static void
-help()
-{
+static std::string wrapText(const std::string &text, int width) {
+    std::string output;
+    std::stringstream lines(text);
+    std::string line;
+    int yPos = 0;
+    while (std::getline(lines, line, '\n')) {
+        if (yPos > 0) {
+            output += "\n";
+        }
+        int xPos = 0;
+        std::stringstream words(line);
+        std::string word;
+        while (std::getline(words, word, ' ')) {
+            if (xPos + 1 + static_cast<int>(word.length()) > width) {
+                yPos += 1;
+                output += "\n";
+                xPos = word.length();
+            } else if (xPos > 0) {
+                output += " ";
+                xPos += 1;
+            }
+            output += word;
+            xPos += word.length();
+        }
+        yPos += 1;
+    }
+    return output;
+}
+
+static int terminalWidth(std::size_t fallback = 80) {
+    winsize w{};
+    if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &w) == 0 && w.ws_col > 0) {
+        return w.ws_col;
+    }
+    return fallback;
+}
+
+struct wrap {
+    int width = terminalWidth();
+};
+
+struct Wrapper {
+public:
+    Wrapper(std::ostream &os, int width)
+    : os_(os)
+    , width_(width) {
+
+    }
+
+    std::ostream &operator<<(const std::string &text) const {
+        return os_ << wrapText(text, width_);
+    }
+
+private:
+    std::ostream &os_;
+    int width_;
+};
+
+inline Wrapper operator<<(std::ostream &os, struct wrap w) {
+    return Wrapper(os, w.width);
+}
+
+static void help() {
     cout << _(
         "Usage: plpftp [OPTIONS]... [FTPCOMMAND]\n"
         "\n"
-        "If FTPCOMMAND is given, connect; run FTPCOMMAND and\n"
-        "terminate afterwards. If no FTPCOMMAND is given, start up\n"
-        "in interactive mode. For help on supported FTPCOMMANDs,\n"
-        "use `?' or `help' as FTPCOMMAND.\n"
-        "\n"
-        "Supported options:\n"
+        "Options:\n"
         "\n"
         " -h, --help              Display this text.\n"
         " -V, --version           Print version and exit.\n"
-        " -s, --serial=DEV        Use serial device DEV.\n"
-        " -b, --baudrate=RATE     Set serial speed to BAUD.\n"
+        " -s, --serial=DEV        Use serial device DEV (optional).\n"
+        " -b, --baudrate=RATE     Set serial speed to BAUD (optional).\n"
         " -p, --port=[HOST:]PORT  Connect to port PORT on host HOST.\n"
         "                         Default for HOST is 127.0.0.1\n"
         "                         Default for PORT is "
-        ) << DPORT << "\n\n";
+        ) << DPORT << endl;
+    cout << endl;
+    cout << wrap() << _("If FTPCOMMAND is given, connect, run FTPCOMMAND, and terminate afterwards. If no FTPCOMMAND is given, start up in interactive mode. For help on supported FTPCOMMANDs, use `?' or `help' as FTPCOMMAND.") << endl << endl;
+    cout << wrap() << _("By default, plpftp connects to a pre-existing ncpd instance on the specified TCP port (-p|--port). To connect directly without running a separate ncpd instance, provide a serial port (-s|--serial) and optional the baud rate (-b|--baud).") << endl << endl;
 }
 
 static void usage() {
