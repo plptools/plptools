@@ -23,6 +23,7 @@
 
 #include "config.h"
 
+#include <cstddef>
 #include <mutex>
 #include <string>
 #include <bufferstore.h>
@@ -50,16 +51,7 @@ public:
                bool noDSRCheck,
                unsigned short nverbose,
                NCPStatusCallback statusCallback = nullptr,
-               void *callbackContext = nullptr)
-    : portNumber_(portNumber)
-    , baudRate_(baudRate)
-    , host_(host)
-    , serialDevice_(serialDevice)
-    , autoexit_(autoexit)
-    , noDSRCheck_(noDSRCheck)
-    , nverbose_(nverbose)
-    , statusCallback_(statusCallback)
-    , callbackContext_(callbackContext) {}
+               void *callbackContext = nullptr);
 
     NCPSession(const NCPSession&) = delete;
     NCPSession& operator=(const NCPSession&) = delete;
