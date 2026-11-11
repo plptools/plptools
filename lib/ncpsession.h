@@ -116,6 +116,7 @@ private:
 
     // State.
 
+    // Use ID of calling thread as default, uninitialized value
     pthread_t sessionMainThreadId_ = 0;
 
     /**
