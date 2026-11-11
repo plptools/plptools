@@ -133,7 +133,7 @@ static void *data_pump_thread(void *arg) {
 
             if (FD_ISSET(dataLink->outputDataReadyPipe_[0], &r_set)) {
                 uint8_t byte;
-                ssize_t n = read(dataLink->outputDataReadyPipe_[0], &byte, 1);
+                ssize_t _ = read(dataLink->outputDataReadyPipe_[0], &byte, 1);
             }
 
             // We can write to the transport; write as much as we can.
@@ -215,19 +215,18 @@ static const int kBaudRatesTable[] = {
 #define BAUD_RATES_TABLE_SIZE (sizeof(kBaudRatesTable) / sizeof(int))
 
 using namespace std;
-
 DataLink::DataLink(const char *fname,
                    int baud,
                    Link *link,
                    bool noDSRCheck,
                    unsigned short verbose,
                    const int cancellationFd)
-: devname(fname)
-, requestedBaudRate_(baud)
+: noDSRCheck_(noDSRCheck)
 , link_(link)
-, noDSRCheck_(noDSRCheck)
-, verbose_(verbose)
-, cancellationFd_(cancellationFd) {
+, devname(fname)
+, requestedBaudRate_(baud)
+, cancellationFd_(cancellationFd)
+, verbose_(verbose) {
 
     // Initialize CRC table
     crc_table[0] = 0;
