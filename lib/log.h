@@ -89,7 +89,7 @@ public:
     * and calls syslog(level, buffer)
     * whenever a LF is seen.
     */
-    int overflow(int c = EOF);
+    int overflow(int c = EOF) override;
 
 private:
 

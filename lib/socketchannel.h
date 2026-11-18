@@ -30,13 +30,13 @@ public:
   SocketChannel(TCPSocket* socket, NCP* ncp);
   virtual ~SocketChannel();
 
-  void ncpDataCallback(BufferStore& a);
-  const char* getNcpRegisterName();
-  void ncpConnectAck();
-  void ncpRegisterAck();
+  void ncpDataCallback(BufferStore& a) override;
+  const char* getNcpRegisterName() override;
+  void ncpConnectAck() override;
+  void ncpRegisterAck() override;
   void ncpDoRegisterAck(int) {}
-  void ncpConnectTerminate();
-  void ncpConnectNak();
+  void ncpConnectTerminate() override;
+  void ncpConnectNak() override;
 
   bool isConnected() const;
   void socketPoll();

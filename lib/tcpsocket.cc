@@ -72,7 +72,7 @@ TCPSocket::TCPSocket()
 
     m_Bound = false;
     m_LastError = 0;
-    myWatch = 0L;
+    myWatch = nullptr;
 }
 
 TCPSocket::~TCPSocket()
@@ -129,7 +129,7 @@ toString()
 {
     string ret = "";
     char nbuf[10];
-    char *tmp = 0L;
+    char *tmp = nullptr;
 
     tmp = inet_ntoa(((struct sockaddr_in *) &m_HostAddr)->sin_addr);
     ret += tmp ? tmp : "none:none";

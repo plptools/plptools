@@ -41,9 +41,9 @@ PsiTime::PsiTime(time_t time) {
 }
 
 PsiTime::PsiTime(psi_timeval *_ptv, psi_timezone *_ptz) {
-    if (_ptv != 0L)
+    if (_ptv != nullptr)
         ptv = *_ptv;
-    if (_ptz != 0L) {
+    if (_ptz != nullptr) {
         ptz = *_ptz;
         ptzValid = true;
     } else {
@@ -66,9 +66,9 @@ PsiTime::PsiTime(const uint32_t _ptvHi, const uint32_t _ptvLo) {
 }
 
 PsiTime::PsiTime(struct timeval *_utv, struct timezone *_utz) {
-    if (_utv != 0L)
+    if (_utv != nullptr)
         utv = *_utv;
-    if (_utz != 0L)
+    if (_utz != nullptr)
         utz = *_utz;
     tryPsiZone();
     unix2psi();
@@ -88,7 +88,7 @@ PsiTime::~PsiTime() {
 }
 
 void PsiTime::setUnixTime(struct timeval *_utv) {
-    if (_utv != 0L)
+    if (_utv != nullptr)
         utv = *_utv;
     unix2psi();
 }
@@ -106,7 +106,7 @@ void PsiTime::setUnixNow(void) {
 
 
 void PsiTime::setPsiTime(psi_timeval *_ptv) {
-    if (_ptv != 0L)
+    if (_ptv != nullptr)
         ptv = *_ptv;
     psi2unix();
 }
@@ -118,7 +118,7 @@ void PsiTime::setPsiTime(const uint32_t _ptvHi, const uint32_t _ptvLo) {
 }
 
 void PsiTime::setPsiZone(psi_timezone *_ptz) {
-    if (_ptz != 0L) {
+    if (_ptz != nullptr) {
         ptz = *_ptz;
         ptzValid = true;
     }
@@ -210,10 +210,10 @@ static long long evalOffset(psi_timezone ptz, time_t time, bool valid) {
      * environment variable PSI_TZ
      */
     const char *offstr = getenv("PSI_TZ");
-    if (offstr != 0) {
-      char *err = 0;
+    if (offstr != nullptr) {
+      char *err = nullptr;
       offset = strtol(offstr, &err, 0);
-      if (err != 0 && *err != '\0') {
+      if (err != nullptr && *err != '\0') {
         offset = 0;
       }
     } else {
@@ -235,7 +235,7 @@ static long long evalOffset(psi_timezone ptz, time_t time, bool valid) {
 }
 
 void PsiTime::setSiboTime(uint32_t stime) {
-    long long micro = evalOffset(ptz, time(0), false);
+    long long micro = evalOffset(ptz, time(nullptr), false);
 
     micro /= 1000000;
     utv.tv_sec = stime + OnePM + micro;
@@ -244,7 +244,7 @@ void PsiTime::setSiboTime(uint32_t stime) {
 }
 
 uint32_t PsiTime::getSiboTime(void) {
-    long long micro = evalOffset(ptz, time(0), false);
+    long long micro = evalOffset(ptz, time(nullptr), false);
 
     micro /= 1000000;
     return utv.tv_sec - OnePM - micro;
@@ -280,11 +280,11 @@ void PsiTime::tryPsiZone() {
         ptzValid = true;
 }
 
-PsiZone *PsiZone::_instance = 0L;
+PsiZone *PsiZone::_instance = nullptr;
 
 PsiZone &PsiZone::
 getInstance() {
-    if (_instance == 0L)
+    if (_instance == nullptr)
         _instance = new PsiZone();
     return *_instance;
 }

@@ -27,26 +27,26 @@
 class FakePsion : public Psion {
 public:
 
-    virtual ~FakePsion();
+    virtual ~FakePsion() override;
 
-    virtual bool connect();
+    virtual bool connect() override;
 
     virtual Enum<RFSV::errs> copyToPsion(const char * const from,
                                          const char * const to,
-                                         void *, cpCallback_t func);
+                                         void *, cpCallback_t func) override;
 
-    virtual Enum<RFSV::errs> devinfo(const char drive, Drive& plpDrive);
+    virtual Enum<RFSV::errs> devinfo(const char drive, Drive& plpDrive) override;
 
-    virtual Enum<RFSV::errs> devlist(uint32_t& devbits);
+    virtual Enum<RFSV::errs> devlist(uint32_t& devbits) override;
 
-    virtual Enum<RFSV::errs> dir(const char* dir, PlpDir& files);
+    virtual Enum<RFSV::errs> dir(const char* dir, PlpDir& files) override;
 
-    virtual bool dirExists(const char* name);
+    virtual bool dirExists(const char* name) override;
 
-    virtual void disconnect();
+    virtual void disconnect() override;
 
-    virtual Enum<RFSV::errs> mkdir(const char* dir);
+    virtual Enum<RFSV::errs> mkdir(const char* dir) override;
 
-    virtual void remove(const char* name);
+    virtual void remove(const char* name) override;
 
 };

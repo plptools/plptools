@@ -37,6 +37,6 @@ class RPCSFactory;
 class RPCS16 : public RPCS {
  public:
     RPCS16(std::unique_ptr<TCPSocket> socket);
-    Enum<RFSV::errs> getCmdLine(const char *, std::string &);
-    Enum<RFSV::errs> getOwnerInfo(BufferArray &owner);
+    Enum<RFSV::errs> getCmdLine(const char *, std::string &) override;
+    Enum<RFSV::errs> getOwnerInfo(BufferArray &owner) override;
 };

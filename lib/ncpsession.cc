@@ -249,5 +249,5 @@ bool NCPSession::isCancelled() {
 }
 
 void NCPSession::wait() {
-    pthread_join(sessionMainThreadId_, 0);
+    pthread_join(sessionMainThreadId_, nullptr);
 }

@@ -30,7 +30,7 @@
 Channel::Channel(NCP * _ncpController) {
     verbose = 0;
     ncpChannel = 0;
-    connectName = 0;
+    connectName = nullptr;
     ncpController = _ncpController;
     _terminate = false;
 }

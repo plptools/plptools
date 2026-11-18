@@ -28,7 +28,7 @@
 
 SISFile::SISFile()
 {
-    m_buf = 0;
+    m_buf = nullptr;
     m_ownBuffer = false;
 }
 

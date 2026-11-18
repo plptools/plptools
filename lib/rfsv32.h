@@ -38,48 +38,48 @@ class RFSV32 : public RFSV {
 public:
     RFSV32(std::unique_ptr<TCPSocket> socket);
 
-    Enum<RFSV::errs> dir(const char * const, PlpDir &);
-    Enum<RFSV::errs> dircount(const char * const, uint32_t &);
-    Enum<RFSV::errs> copyFromPsion(const char * const, const char * const, void *, cpCallback_t);
-    Enum<RFSV::errs> copyFromPsion(const char *from, int fd, cpCallback_t cb);
-    Enum<RFSV::errs> copyToPsion(const char * const, const char * const, void *, cpCallback_t);
-    Enum<RFSV::errs> copyOnPsion(const char * const, const char * const, void *, cpCallback_t);
-    Enum<RFSV::errs> pathtest(const char * const);
-    Enum<RFSV::errs> mkdir(const char * const);
-    Enum<RFSV::errs> rmdir(const char * const);
-    Enum<RFSV::errs> remove(const char * const);
-    Enum<RFSV::errs> rename(const char * const, const char * const);
-    Enum<RFSV::errs> mktemp(uint32_t &, std::string &);
-    Enum<RFSV::errs> fgeteattr(const char * const, PlpDirent &);
-    Enum<RFSV::errs> fgetattr(const char * const, uint32_t &);
-    Enum<RFSV::errs> fsetattr(const char * const, const uint32_t, const uint32_t);
-    Enum<RFSV::errs> fgetmtime(const char * const, PsiTime &);
-    Enum<RFSV::errs> fsetmtime(const char * const, PsiTime const);
-    Enum<RFSV::errs> fopen(const uint32_t, const char * const, uint32_t &);
-    Enum<RFSV::errs> fcreatefile(const uint32_t, const char * const, uint32_t &);
-    Enum<RFSV::errs> freplacefile(const uint32_t, const char * const, uint32_t &);
-    Enum<RFSV::errs> fseek(const uint32_t, const int32_t, const uint32_t, uint32_t &);
-    Enum<RFSV::errs> fread(const uint32_t, unsigned char * const, const uint32_t, uint32_t &);
-    Enum<RFSV::errs> fwrite(const uint32_t, const unsigned char * const, const uint32_t, uint32_t &);
-    Enum<RFSV::errs> fsetsize(uint32_t, uint32_t);
-    Enum<RFSV::errs> fclose(const uint32_t);
-    Enum<RFSV::errs> devlist(uint32_t &);
-    Enum<RFSV::errs> devinfo(const char, Drive&);
-    Enum<RFSV::errs> opendir(const uint32_t, const char * const, RFSVDirHandle &);
-    Enum<RFSV::errs> readdir(RFSVDirHandle &, PlpDirent &);
-    Enum<RFSV::errs> closedir(RFSVDirHandle &);
-    Enum<RFSV::errs> setVolumeName(const char, const char * const);
-    uint32_t opMode(const uint32_t);
+    Enum<RFSV::errs> dir(const char * const, PlpDir &) override;
+    Enum<RFSV::errs> dircount(const char * const, uint32_t &) override;
+    Enum<RFSV::errs> copyFromPsion(const char * const, const char * const, void *, cpCallback_t) override;
+    Enum<RFSV::errs> copyFromPsion(const char *from, int fd, cpCallback_t cb) override;
+    Enum<RFSV::errs> copyToPsion(const char * const, const char * const, void *, cpCallback_t) override;
+    Enum<RFSV::errs> copyOnPsion(const char * const, const char * const, void *, cpCallback_t) override;
+    Enum<RFSV::errs> pathtest(const char * const) override;
+    Enum<RFSV::errs> mkdir(const char * const) override;
+    Enum<RFSV::errs> rmdir(const char * const) override;
+    Enum<RFSV::errs> remove(const char * const) override;
+    Enum<RFSV::errs> rename(const char * const, const char * const) override;
+    Enum<RFSV::errs> mktemp(uint32_t &, std::string &) override;
+    Enum<RFSV::errs> fgeteattr(const char * const, PlpDirent &) override;
+    Enum<RFSV::errs> fgetattr(const char * const, uint32_t &) override;
+    Enum<RFSV::errs> fsetattr(const char * const, const uint32_t, const uint32_t) override;
+    Enum<RFSV::errs> fgetmtime(const char * const, PsiTime &) override;
+    Enum<RFSV::errs> fsetmtime(const char * const, PsiTime const) override;
+    Enum<RFSV::errs> fopen(const uint32_t, const char * const, uint32_t &) override;
+    Enum<RFSV::errs> fcreatefile(const uint32_t, const char * const, uint32_t &) override;
+    Enum<RFSV::errs> freplacefile(const uint32_t, const char * const, uint32_t &) override;
+    Enum<RFSV::errs> fseek(const uint32_t, const int32_t, const uint32_t, uint32_t &) override;
+    Enum<RFSV::errs> fread(const uint32_t, unsigned char * const, const uint32_t, uint32_t &) override;
+    Enum<RFSV::errs> fwrite(const uint32_t, const unsigned char * const, const uint32_t, uint32_t &) override;
+    Enum<RFSV::errs> fsetsize(uint32_t, uint32_t) override;
+    Enum<RFSV::errs> fclose(const uint32_t) override;
+    Enum<RFSV::errs> devlist(uint32_t &) override;
+    Enum<RFSV::errs> devinfo(const char, Drive&) override;
+    Enum<RFSV::errs> opendir(const uint32_t, const char * const, RFSVDirHandle &) override;
+    Enum<RFSV::errs> readdir(RFSVDirHandle &, PlpDirent &) override;
+    Enum<RFSV::errs> closedir(RFSVDirHandle &) override;
+    Enum<RFSV::errs> setVolumeName(const char, const char * const) override;
+    uint32_t opMode(const uint32_t) override;
 
-    int getProtocolVersion() {
+    int getProtocolVersion() override {
         return 5;
     }
 
-    char defaultInternalDriveLetter() {
+    char defaultInternalDriveLetter() override {
         return 'C';
     };
 
-    std::string deviceConfigurationPath() {
+    std::string deviceConfigurationPath() override {
         return "C:\\System\\Sync\\config.ini";
     };
 

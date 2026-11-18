@@ -42,13 +42,13 @@ SocketChannel::SocketChannel(TCPSocket* socket, NCP* ncp)
 SocketChannel::~SocketChannel() {
     socket_->closeSocket();
     delete socket_;
-    socket_ = 0;
+    socket_ = nullptr;
     if (registerName_)
         free(registerName_);
 }
 
 void SocketChannel::ncpDataCallback(BufferStore & a) {
-    if (registerName_ != 0) {
+    if (registerName_ != nullptr) {
         socket_->sendBufferStore(a);
     } else
         lerr << "socketchan: Connect without name!!!\n";
@@ -155,7 +155,7 @@ void SocketChannel::ncpConnectNak() {
         ncpConnectTerminate();
     else {
         connectTry_++;
-        connectTryTimestamp_ = time(0);
+        connectTryTimestamp_ = time(nullptr);
         ncpRegister();
     }
 }
@@ -163,7 +163,7 @@ void SocketChannel::ncpConnectNak() {
 void SocketChannel::socketPoll() {
     int res;
 
-    if (registerName_ == 0) {
+    if (registerName_ == nullptr) {
         BufferStore a;
         res = socket_->getBufferStore(a, false);
         switch (res) {
@@ -186,7 +186,7 @@ void SocketChannel::socketPoll() {
                 //
                 // All commands begin with "NCP$".
 
-                if (memchr(a.getString(), 0, a.getLen()) == 0) {
+                if (memchr(a.getString(), 0, a.getLen()) == nullptr) {
                     // Not 0 terminated, -> invalid
                     lerr << "ncpd: command " << a << " unrecognized."
                          << endl;
@@ -215,7 +215,7 @@ void SocketChannel::socketPoll() {
                 // other cases, we first perform a registration. Connect
                 // is then triggered by RegisterAck and uses the name
                 // we received from the Psion.
-                connectTryTimestamp_ = time(0);
+                connectTryTimestamp_ = time(nullptr);
                 if (strncmp(registerName_, "SYS$RFSV", 8) == 0)
                     ncpConnect();
                 else
@@ -240,7 +240,7 @@ void SocketChannel::socketPoll() {
             }
             ncpSend(a);
         }
-    } else if (time(0) > (connectTryTimestamp_ + 15))
+    } else if (time(nullptr) > (connectTryTimestamp_ + 15))
         terminateWhenAsked();
 }
 

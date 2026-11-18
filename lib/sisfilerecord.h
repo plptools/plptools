@@ -43,7 +43,7 @@ public:
     SisRC fillFrom(uint8_t* buf, int* base, off_t len, SISFile* sisFile);
 
     uint8_t* getDestPtr() {
-        return m_destPtr < m_len ? &m_buf[m_destPtr] : 0;
+        return m_destPtr < m_len ? &m_buf[m_destPtr] : nullptr;
     }
 
     /**
