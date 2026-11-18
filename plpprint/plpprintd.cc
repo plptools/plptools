@@ -250,7 +250,7 @@ ps_setfont(FILE *f, const char *fname, bool bold, bool italic,
         usedfonts += psf;
         usedfonts += "\n";
     }
-    fprintf(f, "%ld /%s F\n", fsize, psf);
+    fprintf(f, "%lu /%s F\n", fsize, psf);
 }
 
 static void
@@ -337,7 +337,7 @@ convertPage(FILE *f, int page, bool last, BufferStore buf)
                 // Start of section
                 unsigned long section = buf.getDWord(i+1) & 3;
                 unsigned long pagenr = buf.getDWord(i+1) >> 2;
-                fprintf(f, "%% @%d: Section %ld, Page %ld\n", i, section, pagenr);
+                fprintf(f, "%% @%d: Section %lu, Page %lu\n", i, section, pagenr);
                 fprintf(f, "1 1 TH 32 DM RC 1 PS CC\n");
                 // (section & 3) =
                 // 0 = Header, 1 = Body, 2 = Footer, 3 = Footer
@@ -413,9 +413,8 @@ convertPage(FILE *f, int page, bool last, BufferStore buf)
                 if (bottom > maxy)
                     maxy = bottom;
                 i += 17;
-                fprintf(f, "%% @%d: bbox %ld %ld %ld %ld\n", i, left, top, right,
-                        bottom);
-                fprintf(f, "%ld %ld %ld %ld CB\n", left, top, right, bottom);
+                fprintf(f, "%% @%d: bbox %lu %lu %lu %lu\n", i, left, top, right, bottom);
+                fprintf(f, "%lu %lu %lu %lu CB\n", left, top, right, bottom);
             }
                 break;
             case 0x05: {
@@ -453,7 +452,7 @@ convertPage(FILE *f, int page, bool last, BufferStore buf)
                 bool bold = ((style & 2) != 0);
                 unsigned long fontsize = buf.getDWord(ofs+7);
                 boffset = (long)buf.getDWord(ofs+11);
-                fprintf(f, "%% @%d: Font '%s' %ld %s%s%s\n", i, fname.c_str(),
+                fprintf(f, "%% @%d: Font '%s' %lu %s%s%s\n", i, fname.c_str(),
                         fontsize, bold ? "Bold" : "", italic ? "Italic" : "",
                         (bold || italic) ? "" : "Regular");
                 ps_setfont(f, fname.c_str(), bold, italic, fontsize);
@@ -482,14 +481,14 @@ convertPage(FILE *f, int page, bool last, BufferStore buf)
                 break;
             case 0x0b: {
                 // newline
-                fprintf(f, "%% @%d: Newline %d %d\n", i, buf.getDWord(i+1),
+                fprintf(f, "%% @%d: Newline %u %u\n", i, buf.getDWord(i+1),
                         buf.getDWord(i+5));
                 i += 9;
             }
                 break;
             case 0x0c: {
                 // cr
-                fprintf(f, "%% @%d: CR %d %d\n", i, buf.getDWord(i+1),
+                fprintf(f, "%% @%d: CR %u %u\n", i, buf.getDWord(i+1),
                         buf.getDWord(i+5));
                 i += 9;
             }
@@ -637,11 +636,10 @@ convertPage(FILE *f, int page, bool last, BufferStore buf)
                 // Draw polygon
                 unsigned long count = buf.getDWord(i+1);
                 int o = i + 5;
-                fprintf(f, "%% @%d: Polygon (%ld segments)\n", i, count);
+                fprintf(f, "%% @%d: Polygon (%lu segments)\n", i, count);
                 fprintf(f, "[\n");
                 for (int j = 0; j < count; j++) {
-                    fprintf(f, "%d %d\n", buf.getDWord(o),
-                            buf.getDWord(o+4));
+                    fprintf(f, "%u %u\n", buf.getDWord(o), buf.getDWord(o+4));
                     o += 8;
                 }
                 unsigned char frule = buf.getByte(o);
@@ -672,7 +670,7 @@ convertPage(FILE *f, int page, bool last, BufferStore buf)
                 unsigned long u2   = buf.getDWord(i+17+blen+4);
                 unsigned long u3   = buf.getDWord(i+17+blen+8);
                 unsigned long u4   = buf.getDWord(i+17+blen+12);
-                fprintf(f, "%% @%d: Bitmap %ld %ld %ld %ld\n", i, u1, u2, u3, u4);
+                fprintf(f, "%% @%d: Bitmap %lu %lu %lu %lu\n", i, u1, u2, u3, u4);
                 ps_bitmap(f, llx, lly, urx, ury, buf.getString(i+17));
                 i += (17 + blen + 16);
             }
@@ -691,9 +689,9 @@ convertPage(FILE *f, int page, bool last, BufferStore buf)
                 string text(buf.getString(ofs), tlen);
                 ofs += tlen;
                 ps_escape(text);
-                fprintf(f, "%% @%d: Text '%s' %d %d\n", i,
+                fprintf(f, "%% @%d: Text '%s' %u %u\n", i,
                         text.c_str(), buf.getDWord(ofs), buf.getDWord(ofs+4));
-                fprintf(f, "(%s) %d %ld 0 0 -1 T\n", text.c_str(),
+                fprintf(f, "(%s) %u %ld 0 0 -1 T\n", text.c_str(),
                         buf.getDWord(ofs), buf.getDWord(ofs+4) + boffset);
                 i = ofs + 8;
             }

@@ -554,75 +554,58 @@ SISInstaller::run(SISFile* file, uint8_t* buf, off_t len, SISFile* parent)
 }
 
 void
-SISInstaller::selectDrive()
-{
-        uint32_t devbits = 0;
-        Enum<RFSV::errs> res;
-        char drivelist[26];
-        int ndrives = 0;
-        if ((res = m_psion->devlist(devbits)) == RFSV::E_PSI_GEN_NONE)
-                {
-                for (int i = 0; i < 26; i++)
-                        {
-                        Drive drive;
-                        if (((devbits & 1) != 0) &&
-                                (m_psion->devinfo(i + 'A', drive) == RFSV::E_PSI_GEN_NONE))
-                                {
-                                MediaType mediaType = drive.getMediaType();
-                                if ((mediaType == MediaType::kDisk) || (mediaType == MediaType::kRAM))
-                                        {
-                                        drivelist[ndrives] = 'A' + i;
-                                        printf("%c: %lud bytes free, %lud bytes total\n",
-                                               'A' + i,
-                                               drive.getSpace(),
-                                               drive.getSize());
-                                        ++ndrives;
-                                        }
-                                }
-                        devbits >>= 1;
-                        }
+SISInstaller::selectDrive() {
+    uint32_t devbits = 0;
+    Enum<RFSV::errs> res;
+    char drivelist[26];
+    int ndrives = 0;
+    if ((res = m_psion->devlist(devbits)) == RFSV::E_PSI_GEN_NONE) {
+        for (int i = 0; i < 26; i++) {
+            Drive drive;
+            if (((devbits & 1) != 0) && (m_psion->devinfo(i + 'A', drive) == RFSV::E_PSI_GEN_NONE)) {
+                MediaType mediaType = drive.getMediaType();
+                if ((mediaType == MediaType::kDisk) || (mediaType == MediaType::kRAM)) {
+                    drivelist[ndrives] = 'A' + i;
+                    printf("%c: %llu bytes free, %llu bytes total\n",
+                        'A' + i,
+                        drive.getSpace(),
+                        drive.getSize());
+                    ++ndrives;
                 }
+            }
+            devbits >>= 1;
+        }
         drivelist[ndrives] = 0;
-        if (ndrives == 0)
-                {
-                m_drive = 'C';
-                if (logLevel >= 1)
-                        printf("Selecting the only drive %c\n", m_drive);
+        if (ndrives == 0) {
+            m_drive = 'C';
+            if (logLevel >= 1) {
+                printf("Selecting the only drive %c\n", m_drive);
+            }
+        } else if (ndrives == 1) {
+            m_drive = drivelist[0];
+            if (logLevel >= 1) {
+                printf("Selecting the only drive %c\n", m_drive);
+            }
+        } else {
+            printf("Please select a drive\n");
+            char ch;
+            char readbuf[2];
+            while (m_drive == 0) {
+                if (fgets(readbuf, 2, stdin) == NULL) {
+                    printf("please enter a drive");
+                    continue;
                 }
-        else if (ndrives == 1)
-                {
-                m_drive = drivelist[0];
-                if (logLevel >= 1)
-                        printf("Selecting the only drive %c\n", m_drive);
+                ch = readbuf[0];
+                if ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z')) {
+                    m_drive = toupper(ch);
+                    if (!strchr(drivelist, m_drive)) {
+                        m_drive = 0;
+                        printf("Please select a valid drive: %s\n", drivelist);
+                    }
                 }
-        else
-                {
-
-                        {
-                        printf("Please select a drive\n");
-                        char ch;
-                        char readbuf[2];
-                        while (m_drive == 0)
-                                {
-                                if (fgets(readbuf, 2, stdin) == NULL)
-                                        {
-                                        printf("please enter a drive");
-                                        continue;
-                                        }
-                                ch = readbuf[0];
-                                if ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z'))
-                                        {
-                                        m_drive = toupper(ch);
-                                        if (!strchr(drivelist, m_drive))
-                                                {
-                                                m_drive = 0;
-                                                printf("Please select a valid drive: %s\n", drivelist);
-                                                }
-                                        }
-                                }
-                        }
-
-                }
+            }
+        }
+    }
 }
 
 void
