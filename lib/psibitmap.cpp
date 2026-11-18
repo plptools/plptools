@@ -160,13 +160,13 @@ decodeBitmap(const unsigned char *p, int &width, int &height, BufferStore &out)
     int pixelsPerByte = (8 / bitsPerPixel);
     int nColors = 1 << bitsPerPixel;
     int grayVal = 255 / (nColors - 1);
-    int bytesPerLine = (xPixels + pixelsPerByte - 1) / pixelsPerByte;
+    uint32_t bytesPerLine = (xPixels + pixelsPerByte - 1) / pixelsPerByte;
     int mask = (bitsPerPixel << 1) - 1;
 
-    int oidx = 0;
-    int x = 0;
-    int y = 0;
-    int offset = 0;
+    uint32_t oidx = 0;
+    uint32_t x = 0;
+    uint32_t y = 0;
+    uint32_t offset = 0;
 
     if (RLEflag) {
         int i = 0;

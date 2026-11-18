@@ -28,19 +28,17 @@ const int OFF_NUMBER_OF_FILES = 26;
 const int OFF_INSTALLATION_DRIVE = 28;
 
 SisRC
-SISFileHeader::compareApp(SISFileHeader* other)
-{
-        if (m_uid1 != other->m_uid1)
-                return SIS_DIFFERENT_APP;
-        if ((m_major < other->m_major) ||
-                ((m_major == other->m_major) &&
-                 (m_minor < other->m_minor)))
-                return SIS_VER_EARLIER;
-        if ((m_major == other->m_major) &&
-                (m_minor == other->m_minor) &&
-                (m_variant != other->m_variant))
-                return SIS_OTHER_VARIANT;
-        return SIS_SAME_OR_LATER;
+SISFileHeader::compareApp(SISFileHeader* other) {
+    if (m_uid1 != other->m_uid1) {
+        return SIS_DIFFERENT_APP;
+    }
+    if ((m_major < other->m_major) || ((m_major == other->m_major) && (m_minor < other->m_minor))) {
+        return SIS_VER_EARLIER;
+    }
+    if ((m_major == other->m_major) && (m_minor == other->m_minor) && (m_variant != other->m_variant)) {
+        return SIS_OTHER_VARIANT;
+    }
+    return SIS_SAME_OR_LATER;
 }
 
 SisRC
@@ -81,7 +79,7 @@ SISFileHeader::fillFrom(uint8_t* buf, int* base, off_t len)
         if (logLevel >= 2)
                 printf(_("Got first crc = %08x, wanted %08x\n"),
                            crc2 << 16 | crc1, m_uid4);
-        if ((crc2 << 16 | crc1) != m_uid4)
+        if (((uint32_t)crc2 << 16 | (uint32_t)crc1) != m_uid4)
                 {
                 printf("%s", _("Got bad crc.\n"));
                 return SIS_CORRUPTED;

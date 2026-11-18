@@ -139,7 +139,7 @@ void check_for_new_socket_connection(NCPSession *session) {
     bool didAddSocket = false;
     {
         std::lock_guard<std::mutex> lock(session->socketChannelLock_);
-        if ((session->socketChannels_.size() < session->ncp_->maxLinks()) && (session->ncp_->gotLinkChannel())) {
+        if ((session->socketChannels_.size() < (string::size_type)session->ncp_->maxLinks()) && (session->ncp_->gotLinkChannel())) {
             session->socketChannels_.push_back(new SocketChannel(next, session->ncp_));
             didAddSocket = true;
         }

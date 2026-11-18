@@ -137,7 +137,7 @@ Enum<RFSV::errs> RPCS32::getOwnerInfo(BufferArray &owner) {
     string s = a.getString(0);
     owner.clear();
     int p = 0;
-    int l;
+    string::size_type l;
     while ((l = s.find('\006', p)) != s.npos) {
         BufferStore b;
         b.addStringT(s.substr(p, l - p).c_str());
