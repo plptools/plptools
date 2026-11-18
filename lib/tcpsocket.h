@@ -25,6 +25,7 @@
 #include <unistd.h>
 #include <netdb.h>
 #include <sys/socket.h>
+#include <netinet/in.h>
 #include <arpa/inet.h>
 
 class BufferStore;
@@ -224,8 +225,9 @@ private:
     int recv(void *buf, int len, int flags);
     int send(const void * const buf, int len, int flags);
 
-    struct sockaddr m_HostAddr;
-    struct sockaddr m_PeerAddr;
+    // Convert from `socketaddr` to `sockaddr_in` to save casts later
+    struct sockaddr_in m_HostAddr;
+    struct sockaddr_in m_PeerAddr;
     int m_Socket;
     int m_Port;
     bool m_Bound;
