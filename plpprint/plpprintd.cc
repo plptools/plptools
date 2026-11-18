@@ -97,7 +97,7 @@ infolog(const char *fmt, ...)
     va_end(ap);
 }
 
-static int minx, maxx, miny, maxy;
+static unsigned long minx, maxx, miny, maxy;
 string usedfonts;
 
 typedef struct fontmap_entry_s {
@@ -256,7 +256,7 @@ ps_setfont(FILE *f, const char *fname, bool bold, bool italic,
 static void
 ps_escape(string &text)
 {
-    int pos = 0;
+    string::size_type pos = 0;
     while ((pos = text.find_first_of("()", pos)) != text.npos) {
         text.insert(pos, "\\");
         pos += 2;
@@ -639,7 +639,7 @@ convertPage(FILE *f, int page, bool last, BufferStore buf)
                 int o = i + 5;
                 fprintf(f, "%% @%d: Polygon (%ld segments)\n", i, count);
                 fprintf(f, "[\n");
-                for (int j = 0; j < count; j++) {
+                for (unsigned long j = 0; j < count; j++) {
                     fprintf(f, "%d %d\n", buf.getDWord(o),
                             buf.getDWord(o+4));
                     o += 8;

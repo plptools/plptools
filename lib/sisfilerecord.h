@@ -102,6 +102,6 @@ private:
      */
     uint8_t* m_buf;
 
-    int m_len;
+    uint32_t m_len;
 
 };
