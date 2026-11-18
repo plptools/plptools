@@ -67,8 +67,8 @@ TCPSocket::TCPSocket()
     memset(&m_HostAddr, 0, sizeof(m_HostAddr));
     memset(&m_PeerAddr, 0, sizeof(m_PeerAddr));
 
-    ((struct sockaddr_in *) &m_HostAddr)->sin_family = AF_INET;
-    ((struct sockaddr_in *) &m_PeerAddr)->sin_family = AF_INET;
+    m_HostAddr.sin_family = AF_INET;
+    m_PeerAddr.sin_family = AF_INET;
 
     m_Bound = false;
     m_LastError = 0;
@@ -110,11 +110,13 @@ reconnect()
         return (false);
     m_LastError = 0;
     m_Bound = false;
-    if (::bind(m_Socket, &m_HostAddr, sizeof(m_HostAddr)) != 0) {
+    // Convert sockaddr_in -> sockaddr only when needed
+    if (::bind(m_Socket, reinterpret_cast<struct sockaddr *>(&m_HostAddr), sizeof(m_HostAddr)) != 0) {
         m_LastError = errno;
         return (false);
     }
-    if (::connect(m_Socket, &m_PeerAddr, sizeof(m_PeerAddr)) != 0) {
+    // Convert sockaddr_in -> sockaddr only when needed
+    if (::connect(m_Socket, reinterpret_cast<struct sockaddr *>(&m_PeerAddr), sizeof(m_PeerAddr)) != 0) {
         m_LastError = errno;
         return (false);
     }
@@ -131,19 +133,19 @@ toString()
     char nbuf[10];
     char *tmp = nullptr;
 
-    tmp = inet_ntoa(((struct sockaddr_in *) &m_HostAddr)->sin_addr);
+    tmp = inet_ntoa(m_HostAddr.sin_addr);
     ret += tmp ? tmp : "none:none";
     if (tmp) {
         ret += ':';
-        sprintf(nbuf, "%d", ntohs(((struct sockaddr_in *) &m_HostAddr)->sin_port));
+        sprintf(nbuf, "%d", ntohs(m_HostAddr.sin_port));
         ret += nbuf;
     }
     ret += " -> ";
-    tmp = inet_ntoa(((struct sockaddr_in *) &m_PeerAddr)->sin_addr);
+    tmp = inet_ntoa(m_PeerAddr.sin_addr);
     ret += tmp ? tmp : "none:none";
     if (tmp) {
         ret += ':';
-        sprintf(nbuf, "%d", ntohs(((struct sockaddr_in *) &m_PeerAddr)->sin_port));
+        sprintf(nbuf, "%d", ntohs(m_PeerAddr.sin_port));
         ret += nbuf;
     }
     return ret;
@@ -170,7 +172,8 @@ connect(const char * const Peer, int PeerPort, const char * const Host, int Host
     //***********
     //* Connect *
     //***********
-    if (::connect(m_Socket, &m_PeerAddr, sizeof(m_PeerAddr)) != 0) {
+    // Convert sockaddr_in -> sockaddr only when needed
+    if (::connect(m_Socket, reinterpret_cast<struct sockaddr *>(&m_PeerAddr), sizeof(m_PeerAddr)) != 0) {
         m_LastError = errno;
         return (false);
     }
@@ -218,8 +221,9 @@ accept(std::string *Peer)
     //* Accept a connection *
     //***********************
 
-    len = sizeof(struct sockaddr);
-    accepted->m_Socket = ::accept(m_Socket, &accepted->m_PeerAddr, &len);
+    // Convert sockaddr_in -> sockaddr only when needed
+    len = sizeof(accepted->m_PeerAddr);
+    accepted->m_Socket = ::accept(m_Socket, reinterpret_cast<struct sockaddr *>(&accepted->m_PeerAddr), &len);
 
     if (accepted->m_Socket == INVALID_SOCKET) {
         m_LastError = errno;
@@ -243,7 +247,7 @@ accept(std::string *Peer)
     //* If required get the name of the connected client *
     //****************************************************
     if (Peer) {
-        *Peer = inet_ntoa(((struct sockaddr_in *) &accepted->m_PeerAddr)->sin_addr);
+        *Peer = inet_ntoa(accepted->m_PeerAddr.sin_addr);
     }
     return accepted;
 }
@@ -412,7 +416,8 @@ bindSocket(const char * const Host, int Port)
         return false;
 
     // Now bind the socket
-    if (::bind(m_Socket, &m_HostAddr, sizeof(m_HostAddr)) != 0) {
+    // Convert sockaddr_in -> sockaddr only when needed
+    if (::bind(m_Socket, reinterpret_cast<struct sockaddr *>(&m_HostAddr), sizeof(m_HostAddr)) != 0) {
         m_LastError = errno;
         return false;
     }
@@ -445,7 +450,8 @@ bindInRange(const char * const Host, int Low, int High, int Retries)
         for (port = Low; port <= High; port++) {
             if (!setHost(Host, port))
                 return false;
-            if (::bind(m_Socket, &m_HostAddr, sizeof(m_HostAddr)) == 0)
+            // Convert sockaddr_in -> sockaddr only when needed
+            if (::bind(m_Socket, reinterpret_cast<struct sockaddr *>(&m_HostAddr), sizeof(m_HostAddr)) == 0)
                 break;
         }
         if (port > High) {
@@ -457,7 +463,8 @@ bindInRange(const char * const Host, int Low, int High, int Retries)
             port = Low + (rand() % (High - Low));
             if (!setHost(Host, port))
                 return false;
-            if (::bind(m_Socket, &m_HostAddr, sizeof(m_HostAddr)) == 0)
+            // Convert sockaddr_in -> sockaddr only when needed
+            if (::bind(m_Socket, reinterpret_cast<struct sockaddr *>(&m_HostAddr), sizeof(m_HostAddr)) == 0)
                 break;
         }
         if (i >= Retries) {
@@ -543,12 +550,12 @@ setPeer(const char * const Peer, int Port)
                 return (false);
             }
         }
-        memcpy(&((struct sockaddr_in *)&m_PeerAddr)->sin_addr, he->h_addr_list[0],
-               sizeof(((struct sockaddr_in *)&m_PeerAddr)->sin_addr));
+        memcpy(&m_PeerAddr.sin_addr, he->h_addr_list[0],
+               sizeof(m_PeerAddr.sin_addr));
     }
     // If a port name was supplied use it
     if (Port > 0)
-        ((struct sockaddr_in *)&m_PeerAddr)->sin_port = htons(Port);
+        m_PeerAddr.sin_port = htons(Port);
     return true;
 }
 
@@ -558,7 +565,7 @@ getPeer(string *Peer, int *Port)
     char *peer;
 
     if (Peer) {
-        peer = inet_ntoa(((struct sockaddr_in *) &m_PeerAddr)->sin_addr);
+        peer = inet_ntoa(m_PeerAddr.sin_addr);
         if (!peer) {
             m_LastError = errno;
             return (false);
@@ -566,7 +573,7 @@ getPeer(string *Peer, int *Port)
         *Peer = peer;
     }
     if (Port)
-        *Port = ntohs(((struct sockaddr_in *) &m_PeerAddr)->sin_port);
+        *Port = ntohs(m_PeerAddr.sin_port);
     return false;
 }
 
@@ -595,13 +602,13 @@ setHost(const char * const Host, int Port)
                 return false;
             }
         }
-        memcpy(&((struct sockaddr_in *)&m_HostAddr)->sin_addr, he->h_addr_list[0],
-               sizeof(((struct sockaddr_in *)&m_HostAddr)->sin_addr));
+        memcpy(&m_HostAddr.sin_addr, he->h_addr_list[0],
+               sizeof(m_HostAddr.sin_addr));
     }
 
     // If a port name was supplied use it
     if (Port > 0)
-        ((struct sockaddr_in *)&m_HostAddr)->sin_port = htons(Port);
+        m_HostAddr.sin_port = htons(Port);
     return true;
 }
 
@@ -611,7 +618,7 @@ getHost(string *Host, int *Port)
     char *host;
 
     if (Host) {
-        host = inet_ntoa(((struct sockaddr_in *)&m_HostAddr)->sin_addr);
+        host = inet_ntoa(m_HostAddr.sin_addr);
         if (!host) {
             m_LastError = errno;
             return false;
@@ -619,6 +626,6 @@ getHost(string *Host, int *Port)
         *Host = host;
     }
     if (Port)
-        *Port = ntohs(((struct sockaddr_in *)&m_HostAddr)->sin_port);
+        *Port = ntohs(m_HostAddr.sin_port);
     return true;
 }
